@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ทำข้อสอบ</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sarabun',sans-serif;background:#fff8f3;min-height:100vh}
+:root{--primary:#c94b00;--secondary:#f39800;--gradient:linear-gradient(135deg,#c94b00,#f39800)}
+
+.quiz-bar{background:var(--gradient);color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 3px 12px rgba(201,75,0,.4)}
+.quiz-bar .title{font-size:15px;font-weight:800}
+.quiz-bar .meta{font-size:12px;opacity:.85}
+.timer{background:rgba(255,255,255,.2);padding:6px 14px;border-radius:20px;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
+.timer.warn{background:rgba(255,50,50,.4);animation:pulse .7s infinite alternate}
+@keyframes pulse{to{background:rgba(255,0,0,.6)}}
+
+.progress-bar{height:4px;background:rgba(255,255,255,.3)}
+.progress-fill{height:100%;background:#fff;transition:.3s;border-radius:0 4px 4px 0}
+
+.q-nav{padding:10px 12px;background:#fff;border-bottom:1px solid #ffd0a0;display:flex;gap:5px;flex-wrap:wrap}
+.q-btn{width:32px;height:32px;border:2px solid #ffd0a0;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;background:#fff;transition:.15s;display:flex;align-items:center;justify-content:center}
+.q-btn.active{background:#c94b00;color:#fff;border-color:#c94b00}
+.q-btn.answered{background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7}
+
+.q-area{max-width:680px;margin:0 auto;padding:16px}
+.q-card{background:#fff;border-radius:14px;padding:clamp(16px,4vw,24px);box-shadow:0 4px 20px rgba(201,75,0,.1);margin-bottom:16px}
+.q-number{font-size:12px;color:#f39800;font-weight:800;text-transform:uppercase;margin-bottom:6px}
+.q-text{font-size:clamp(15px,2vw,17px);font-weight:700;color:#333;line-height:1.6;margin-bottom:16px}
+.q-image{max-width:100%;border-radius:8px;margin-bottom:12px}
+.option{border:2px solid #ffd0a0;border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:10px;font-size:14px}
+.option:hover{border-color:#c94b00;background:#fff8f3}
+.option.selected{border-color:#c94b00;background:#fff3e0}
+.option.correct{border-color:#2e7d32;background:#e8f5e9!important}
+.option.wrong{border-color:#c62828;background:#ffebee!important}
+.option-letter{width:28px;height:28px;border-radius:50%;background:#ffd0a0;color:#c94b00;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.option.selected .option-letter{background:#c94b00;color:#fff}
+.option.correct .option-letter{background:#2e7d32;color:#fff}
+.option.wrong .option-letter{background:#c62828;color:#fff}
+.explanation{background:#fff3e0;border:1px solid #f39800;border-radius:8px;padding:10px 14px;font-size:13px;color:#7c4700;margin-top:10px;display:none}
+.explanation.show{display:block}
+
+.btn-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:0 16px 20px}
+.btn{padding:11px 24px;border:none;border-radius:10px;cursor:pointer;font-family:inherit;font-size:15px;font-weight:700;transition:.15s;display:inline-flex;align-items:center;gap:6px}
+.btn-orange{background:#c94b00;color:#fff}.btn-orange:hover{background:#a33b00}
+.btn-gray{background:#546e7a;color:#fff}.btn-gray:hover{background:#37474f}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* Result screen */
+.result-screen{display:none;min-height:100vh;background:var(--gradient);align-items:center;justify-content:center;padding:20px}
+.result-card{background:#fff;border-radius:20px;padding:clamp(24px,5vw,40px);max-width:520px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.score-circle{width:130px;height:130px;border-radius:50%;background:var(--gradient);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 30px rgba(201,75,0,.35)}
+.score-number{font-size:38px;font-weight:900;line-height:1}
+.score-label{font-size:12px;opacity:.85}
+.result-title{font-size:22px;font-weight:800;color:#c94b00;margin-bottom:6px}
+.result-sub{font-size:14px;color:#888;margin-bottom:20px}
+.result-stats{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+.stat-chip{background:#fff3e0;border:1px solid #ffd0a0;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:700;color:#7c4700}
+.review-btn{background:var(--gradient);color:#fff;border:none;padding:12px 28px;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;transition:.15s}
+.review-btn:hover{opacity:.9}
+.review-area{text-align:left;margin-top:16px;max-height:350px;overflow-y:auto}
+.review-item{background:#f9f9f9;border-radius:10px;padding:12px;margin-bottom:8px;border-left:4px solid #ccc}
+.review-item.correct-item{border-color:#2e7d32}
+.review-item.wrong-item{border-color:#c62828}
+.review-q{font-size:13px;font-weight:600;color:#333;margin-bottom:5px}
+.review-ans{font-size:12px;padding:3px 8px;border-radius:5px;display:inline-block;margin:2px 0}
+.ans-correct{background:#e8f5e9;color:#2e7d32;font-weight:700}
+.ans-wrong{background:#ffebee;color:#c62828;font-weight:700}
+
+/* Loading/error */
+.loading-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:#c94b00;font-size:16px;font-weight:700}
+</style>
+</head>
+<body>
+
+<div id="loadingScreen" class="loading-screen">
+  <div style="font-size:36px">⏳</div>
+  <div>กำลังโหลดข้อสอบ...</div>
+</div>
+
+<div id="quizScreen" style="display:none">
+  <div class="quiz-bar">
+    <div><div class="title" id="quizTitle">ข้อสอบ</div><div class="meta" id="quizMeta"></div></div>
+    <div class="timer" id="timerDisplay">00:00</div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+  <div class="q-nav" id="qNav"></div>
+
+  <div class="q-area">
+    <div class="q-card" id="qCard"></div>
+    <div class="btn-row">
+      <button class="btn btn-gray" id="btnPrev" onclick="goQ(-1)">◀ ก่อนหน้า</button>
+      <button class="btn btn-orange" id="btnNext" onclick="goQ(1)">ถัดไป ▶</button>
+      <button class="btn btn-orange" id="btnSubmit" onclick="confirmSubmit()" style="display:none;background:#2e7d32">✅ ส่งข้อสอบ</button>
+    </div>
+  </div>
+</div>
+
+<div id="resultScreen" class="result-screen">
+  <div class="result-card">
+    <div class="score-circle"><div class="score-number" id="rScore">0</div><div class="score-label">คะแนน %</div></div>
+    <div class="result-title" id="rTitle">ผลการสอบ</div>
+    <div class="result-sub" id="rSub"></div>
+    <div class="result-stats" id="rStats"></div>
+    <button class="review-btn" onclick="toggleReview()">📋 ดูเฉลย</button>
+    <div class="review-area" id="reviewArea" style="display:none"></div>
+    <div style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button onclick="window.location.href='student.html'" style="padding:10px 20px;background:#546e7a;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit">🏠 กลับหน้าหลัก</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, getDoc, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { FIREBASE_CONFIG } from "./js/config.js";
+
+const app = initializeApp(FIREBASE_CONFIG);
+const db = getFirestore(app);
+
+const params = new URLSearchParams(location.search);
+const quizId = params.get('id');
+const studentName = params.get('student') || 'นักเรียน';
+const roomId = params.get('room') || '';
+
+let quiz = null;
+let questions = [];
+let answers = {};
+let currentQ = 0;
+let timerSec = 0;
+let timerInterval = null;
+let submitted = false;
+
+async function init(){
+  if(!quizId){showError('ไม่พบรหัสข้อสอบ');return;}
+  try{
+    const snap = await getDoc(doc(db,'quizzes',quizId));
+    if(!snap.exists()){showError('ไม่พบข้อสอบนี้');return;}
+    quiz = snap.data();
+    questions = quiz.questions || [];
+    if(!questions.length){showError('ข้อสอบยังไม่มีคำถาม');return;}
+    timerSec = (quiz.timeLimit || 30) * 60;
+    document.getElementById('quizTitle').textContent = quiz.title || 'ข้อสอบ';
+    document.getElementById('quizMeta').textContent = `${studentName} · ${questions.length} ข้อ · ${quiz.timeLimit||30} นาที`;
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('quizScreen').style.display = 'block';
+    buildNav();
+    renderQ();
+    startTimer();
+  }catch(e){showError('โหลดข้อสอบไม่ได้: '+e.message);}
+}
+
+function showError(msg){document.getElementById('loadingScreen').innerHTML=`<div style="font-size:36px">❌</div><div style="color:#c62828">${msg}</div><a href="student.html" style="color:#c94b00;text-decoration:none;font-size:14px">← กลับ</a>`;}
+
+function buildNav(){
+  const nav = document.getElementById('qNav');
+  nav.innerHTML = questions.map((_,i)=>`<button class="q-btn ${i===0?'active':''}" id="qb_${i}" onclick="gotoQ(${i})">${i+1}</button>`).join('');
+}
+
+function renderQ(){
+  const q = questions[currentQ];
+  const opts = ['ก','ข','ค','ง','จ'];
+  let h = `<div class="q-number">ข้อที่ ${currentQ+1} จาก ${questions.length}</div><div class="q-text">${q.question||''}</div>`;
+  if(q.image)h+=`<img src="${q.image}" class="q-image" alt="question image"/>`;
+  (q.options||[]).forEach((o,i)=>{
+    const sel=answers[currentQ]===i;
+    h+=`<div class="option${sel?' selected':''}" onclick="selectOpt(${i})"><span class="option-letter">${opts[i]||i+1}</span>${o}</div>`;
+  });
+  document.getElementById('qCard').innerHTML=h;
+  updateNav();
+  document.getElementById('progressFill').style.width=(100*(currentQ+1)/questions.length)+'%';
+  document.getElementById('btnPrev').disabled=currentQ===0;
+  const isLast=currentQ===questions.length-1;
+  document.getElementById('btnNext').style.display=isLast?'none':'inline-flex';
+  document.getElementById('btnSubmit').style.display=isLast?'inline-flex':'none';
+}
+
+window.selectOpt=function(i){if(submitted)return;answers[currentQ]=i;renderQ();};
+window.goQ=function(d){gotoQ(currentQ+d);};
+window.gotoQ=function(i){if(i<0||i>=questions.length)return;currentQ=i;renderQ();};
+
+function updateNav(){
+  questions.forEach((_,i)=>{
+    const b=document.getElementById('qb_'+i);if(!b)return;
+    b.className='q-btn'+(i===currentQ?' active':answers[i]!==undefined?' answered':'');
+  });
+}
+
+function startTimer(){
+  timerInterval=setInterval(()=>{
+    timerSec--;
+    if(timerSec<=0){clearInterval(timerInterval);submitQuiz();}
+    const m=Math.floor(timerSec/60),s=timerSec%60;
+    const t=document.getElementById('timerDisplay');
+    t.textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    if(timerSec<=120)t.classList.add('warn');
+  },1000);
+}
+
+window.confirmSubmit=function(){if(confirm('ต้องการส่งข้อสอบแล้วใช่ไหม?'))submitQuiz();};
+
+async function submitQuiz(){
+  if(submitted)return;submitted=true;clearInterval(timerInterval);
+  let correct=0;
+  questions.forEach((q,i)=>{if(answers[i]===q.correctIndex)correct++;});
+  const score=Math.round(100*correct/questions.length);
+  const pass=score>=(quiz.passingScore||60);
+  try{
+    await addDoc(collection(db,'quiz_results'),{
+      quizId,quizTitle:quiz.title||'ข้อสอบ',
+      studentId:studentName+'_'+roomId,studentName,roomId,
+      score,correct,total:questions.length,answers,
+      submittedAt:serverTimestamp()
+    });
+  }catch(e){console.log('save failed',e);}
+  document.getElementById('quizScreen').style.display='none';
+  document.getElementById('resultScreen').style.display='flex';
+  document.getElementById('rScore').textContent=score;
+  document.getElementById('rTitle').textContent=pass?'🎉 ผ่านการสอบ!':'😔 ยังไม่ผ่าน';
+  document.getElementById('rSub').textContent=pass?`ยินดีด้วย ${studentName}! คะแนน ${score}%`:`ขอให้กลับมาทบทวนและลองใหม่นะ ${studentName}`;
+  document.getElementById('rStats').innerHTML=`<div class="stat-chip">✅ ถูก ${correct} ข้อ</div><div class="stat-chip">❌ ผิด ${questions.length-correct} ข้อ</div><div class="stat-chip">📊 ${score}%</div>`;
+  buildReview();
+}
+
+function buildReview(){
+  const opts=['ก','ข','ค','ง','จ'];
+  let h='';
+  questions.forEach((q,i)=>{
+    const ans=answers[i];const correct=ans===q.correctIndex;
+    h+=`<div class="review-item ${correct?'correct-item':'wrong-item'}">
+      <div class="review-q">ข้อ ${i+1}: ${q.question}</div>
+      <div class="review-ans ${correct?'ans-correct':'ans-wrong'}">${correct?'✅':'❌'} คำตอบของคุณ: ${ans!==undefined?(opts[ans]||ans+1)+'. '+(q.options[ans]||''):'ไม่ได้ตอบ'}</div>
+      ${!correct?`<div class="review-ans ans-correct">✅ เฉลย: ${opts[q.correctIndex]||q.correctIndex+1}. ${q.options[q.correctIndex]||''}</div>`:''}
+      ${q.explanation?`<div style="font-size:12px;color:#666;margin-top:4px">💡 ${q.explanation}</div>`:''}
+    </div>`;
+  });
+  document.getElementById('reviewArea').innerHTML=h;
+}
+window.toggleReview=function(){const r=document.getElementById('reviewArea');r.style.display=r.style.display==='none'?'block':'none';};
+
+init();
+</script>
+</body>
+</html>
