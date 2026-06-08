@@ -299,7 +299,7 @@ async function loadAnn(){
       const a = d.data();
       if(a.roomId && a.roomId!=='all' && a.roomId!==student.roomId) return;
       const dt = a.createdAt?.toDate?.()?.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'}) || '';
-      h += `<div class="ann-card"><div class="ann-title">${a.title||'ประกาศ'}</div><div class="ann-body">${a.content||''}</div><div class="ann-date">📅 ${dt}</div></div>`;
+      h += `<div class="ann-card">${a.imageUrl?`<img src="${a.imageUrl}" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px;margin-bottom:8px" onerror="this.style.display='none'">`:''}<div class="ann-title">${a.title||'ประกาศ'}</div><div class="ann-body">${a.content||''}</div><div class="ann-date">📅 ${dt}</div></div>`;
     });
     el.innerHTML = h || '<div class="empty-state"><i class="fas fa-bullhorn"></i><p>ยังไม่มีประกาศ</p></div>';
   }catch(e){ el.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`; }
@@ -459,41 +459,6 @@ function initChat(){
   chatUnsub = onSnapshot(q, snap => {
     const el = document.getElementById('chatMsgs');
     if(snap.empty){
-      el.innerHTML = '<div class="empty-state"><i class="fas fa-comments" style="color:#ffd0a0"></i><p style="font-size:13px">ยังไม่มีข้อความ ส่งคำถามให้ครูได้เลย!</p></div>';
-      return;
-    }
-    let h = '';
-    snap.forEach(d => {
-      const m = d.data();
-      const mine = m.role === 'student' && m.sender === student.name;
-      const dt = m.createdAt?.toDate?.()?.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}) || '';
-      h += `<div class="msg ${mine?'mine':'theirs'}">
-        ${!mine ? `<div class="msg-sender">${m.sender||'ครู'}</div>` : ''}
-        <div class="bubble">${m.text}</div>
-        <div class="msg-time">${dt}</div>
-      </div>`;
-    });
-    el.innerHTML = h;
-    el.scrollTop = el.scrollHeight;
-  }, err => {
-    document.getElementById('chatMsgs').innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p style="font-size:13px">โหลดแชทไม่ได้: ${err.message}</p></div>`;
-  });
-}
-
-window.sendChat = async function(){
-  const inp = document.getElementById('chatInput');
-  const text = inp.value.trim();
-  if(!text || !student) return;
-  inp.value = '';
-  try{
-    await addDoc(collection(db,'chats', student.roomId,'messages'),{
-      text, sender: student.name, role: 'student', createdAt: serverTimestamp()
-    });
-  }catch(e){ alert('ส่งข้อความไม่ได้: '+e.message); }
-};
-</script>
-</body>
-</html>
       el.innerHTML = '<div class="empty-state"><i class="fas fa-comments" style="color:#ffd0a0"></i><p style="font-size:13px">ยังไม่มีข้อความ ส่งคำถามให้ครูได้เลย!</p></div>';
       return;
     }
