@@ -13,7 +13,7 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
 :root{--primary:#c94b00;--secondary:#f39800;--gradient:linear-gradient(135deg,#c94b00,#f39800)}
 
 /* LOGIN */
-.login-wrap{min-height:100vh;background:var(--gradient);display:flex;align-items:center;justify-content:center;padding:20px}
+.login-wrap{width:100%;min-height:100%;background:var(--gradient);display:flex;align-items:center;justify-content:center;padding:20px}
 .login-card{background:#fff;border-radius:20px;padding:36px 32px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);text-align:center}
 .login-card img{width:72px;height:72px;border-radius:50%;margin-bottom:12px;border:3px solid #f39800;object-fit:cover}
 .login-card h1{font-size:20px;font-weight:800;color:#c94b00;margin-bottom:3px}
@@ -242,9 +242,24 @@ tbody tr:hover td{background:#fff3e8}
     <!-- RESULTS -->
     <div id="page-results" class="page">
       <div class="section-hd"><h2><i class="fas fa-chart-bar"></i> ผลสอบ</h2>
-        <select id="resFilter" onchange="loadResults()" style="padding:7px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-family:inherit;font-size:13px"><option value="">ทุกข้อสอบ</option></select>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <select id="resFilter" onchange="loadResults()" style="padding:7px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-family:inherit;font-size:13px"><option value="">ทุกข้อสอบ</option></select>
+          <select id="resGradeFilter" onchange="loadResults()" style="padding:7px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-family:inherit;font-size:13px">
+            <option value="">ทุกชั้น</option>
+            <option value="ป.4">ป.4</option><option value="ป.5">ป.5</option><option value="ป.6">ป.6</option>
+            <option value="ม.1">ม.1</option><option value="ม.2">ม.2</option><option value="ม.3">ม.3</option>
+          </select>
+          <select id="resSubjectFilter" onchange="loadResults()" style="padding:7px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-family:inherit;font-size:13px">
+            <option value="">ทุกวิชา</option>
+            <option value="ภาษาไทย">ภาษาไทย</option>
+            <option value="คณิตศาสตร์">คณิตศาสตร์</option>
+            <option value="วิทยาศาสตร์">วิทยาศาสตร์</option>
+            <option value="สังคมศึกษา">สังคมศึกษา</option>
+            <option value="ภาษาอังกฤษ">ภาษาอังกฤษ</option>
+          </select>
+        </div>
       </div>
-      <div class="table-wrap"><table><thead><tr><th>นักเรียน</th><th>ข้อสอบ</th><th>คะแนน</th><th>ถูก/ทั้งหมด</th><th>วันที่สอบ</th></tr></thead><tbody id="tbRes"></tbody></table></div>
+      <div class="table-wrap"><table><thead><tr><th>นักเรียน</th><th>ชั้น/วิชา</th><th>ข้อสอบ/หน่วย</th><th>คะแนน</th><th>ถูก/ทั้งหมด</th><th>วันที่สอบ</th><th>ดูคำตอบ</th></tr></thead><tbody id="tbRes"></tbody></table></div>
     </div>
 
     <!-- CHAT -->
@@ -329,6 +344,7 @@ tbody tr:hover td{background:#fff3e8}
     <div class="frow" style="flex:1;min-width:170px"><label>🏫 ห้องเรียน</label><select id="annRoom"><option value="all">ทุกห้องเรียน</option></select></div>
     <div class="frow" style="flex:1;min-width:130px"><label>📚 วิชา</label><input type="text" id="annSubject" placeholder="เช่น วิทยาศาสตร์"/></div>
   </div>
+  <div class="frow"><label>🖼️ URL รูปภาพประกอบ (ไม่บังคับ)</label><input type="url" id="annImageUrl" placeholder="https://... URL รูปภาพ"/></div>
   <div class="btn-row"><button class="btn btn-gray" onclick="closeModal('mAnn')">ยกเลิก</button><button class="btn btn-orange" onclick="saveAnn()">บันทึก</button></div>
 </div></div>
 
@@ -496,7 +512,7 @@ window.openModal = id => document.getElementById(id).classList.add('show');
 window.closeModal = id => document.getElementById(id).classList.remove('show');
 window.clearForm = function(t){
   if(t==='cls'){document.getElementById('clsId').value='';document.getElementById('clsName').value='';document.getElementById('clsCode').value='';}
-  if(t==='ann'){document.getElementById('annId').value='';document.getElementById('annTitle').value='';document.getElementById('annContent').value='';}
+  if(t==='ann'){document.getElementById('annId').value='';document.getElementById('annTitle').value='';document.getElementById('annContent').value='';document.getElementById('annImageUrl').value='';}
   if(t==='ws'){document.getElementById('wsId').value='';['wsTitle','wsSubject','wsDesc','wsUrl','wsHtml'].forEach(id=>document.getElementById(id).value='');}
   if(t==='qz'){document.getElementById('qzId').value='';document.getElementById('qzTitle').value='';document.getElementById('qzType').value='questions';toggleQzType('questions');document.getElementById('qzTime').value=30;document.getElementById('qzPass').value=60;document.getElementById('qzHtmlUrl').value='';qzQuestions=[];renderQ();}
   if(t==='vid'){document.getElementById('vidId').value='';['vidTitle','vidUrl','vidDesc'].forEach(id=>document.getElementById(id).value='');}
@@ -552,15 +568,16 @@ async function loadAnn(){
   const snap=await getDocs(q);
   snap.forEach(d=>{const a=d.data();_ann[d.id]=a;const dt=a.createdAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
     const rname=a.roomId==='all'||!a.roomId?'ทุกห้อง':(_clsMap[a.roomId]?.name||a.roomId);
-    tb.innerHTML+=`<tr><td><b>${a.title||'-'}</b></td><td><small>${rname}</small></td><td><small>${a.subject||'-'}</small></td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.content||''}</td><td>${dt}</td><td><button class="btn btn-gray btn-sm" onclick="editAnn('${d.id}')">✏️</button> <button class="btn btn-red btn-sm" onclick="delDoc('announcements','${d.id}',loadAnn)">🗑️</button></td></tr>`;
+    tb.innerHTML+=`<tr><td><b>${a.title||'-'}</b>${a.imageUrl?`<br><img src="${a.imageUrl}" style="max-width:80px;max-height:50px;border-radius:4px;margin-top:4px;object-fit:cover" onerror="this.style.display='none'">`:''}</td><td><small>${rname}</small></td><td><small>${a.subject||'-'}</small></td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.content||''}</td><td>${dt}</td><td><button class="btn btn-gray btn-sm" onclick="editAnn('${d.id}')">✏️</button> <button class="btn btn-red btn-sm" onclick="delDoc('announcements','${d.id}',loadAnn)">🗑️</button></td></tr>`;
   });
 }
-window.editAnn=function(id){const a=_ann[id]||{};document.getElementById('annId').value=id;document.getElementById('annTitle').value=a.title||'';document.getElementById('annContent').value=a.content||'';document.getElementById('annRoom').value=a.roomId||'all';document.getElementById('annSubject').value=a.subject||'';openModal('mAnn');};
+window.editAnn=function(id){const a=_ann[id]||{};document.getElementById('annId').value=id;document.getElementById('annTitle').value=a.title||'';document.getElementById('annContent').value=a.content||'';document.getElementById('annRoom').value=a.roomId||'all';document.getElementById('annSubject').value=a.subject||'';document.getElementById('annImageUrl').value=a.imageUrl||'';openModal('mAnn');};
 window.saveAnn=async function(){
-  const id=document.getElementById('annId').value,title=document.getElementById('annTitle').value.trim(),content=document.getElementById('annContent').value.trim(),roomId=document.getElementById('annRoom').value,subject=document.getElementById('annSubject').value.trim();
+  const id=document.getElementById('annId').value,title=document.getElementById('annTitle').value.trim(),content=document.getElementById('annContent').value.trim(),roomId=document.getElementById('annRoom').value,subject=document.getElementById('annSubject').value.trim(),imageUrl=document.getElementById('annImageUrl').value.trim();
   if(!title)return;
-  if(id)await setDoc(doc(db,'announcements',id),{title,content,roomId,subject},{merge:true});
-  else await addDoc(collection(db,'announcements'),{title,content,roomId,subject,createdAt:serverTimestamp()});
+  const data={title,content,roomId,subject,imageUrl};
+  if(id)await setDoc(doc(db,'announcements',id),data,{merge:true});
+  else await addDoc(collection(db,'announcements'),{...data,createdAt:serverTimestamp()});
   closeModal('mAnn');loadAnn();
 };
 
@@ -672,17 +689,69 @@ window.saveVid=async function(){
 };
 
 // ==================== RESULTS ====================
+let _resultsDocs={};
 window.loadResults=async function(){
-  const tb=document.getElementById('tbRes');tb.innerHTML='';
+  const tb=document.getElementById('tbRes');tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:#aaa">กำลังโหลด...</td></tr>';
   const filter=document.getElementById('resFilter').value;
-  const q=query(collection(db,'quiz_results'),orderBy('submittedAt','desc'));
-  const snap=await getDocs(q);
-  snap.forEach(d=>{const r=d.data();
-    if(filter&&r.quizId!==filter)return;
-    const dt=r.submittedAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
-    const pass=r.score>=(r.passingScore||60);
-    tb.innerHTML+=`<tr><td>${r.studentName||r.studentId||'-'}</td><td>${r.quizTitle||r.quizId||'-'}</td><td><span class="badge ${pass?'badge-green':'badge-orange'}">${r.score||0}%</span></td><td>${r.correct||0}/${r.total||0}</td><td>${dt}</td></tr>`;
+  const gradeF=document.getElementById('resGradeFilter').value;
+  const subjectF=document.getElementById('resSubjectFilter').value;
+  try{
+    const snap=await getDocs(collection(db,'quiz_results'));
+    const docs=[];
+    snap.forEach(d=>docs.push({id:d.id,data:d.data()}));
+    // Sort by timestamp or submittedAt descending
+    docs.sort((a,b)=>{
+      const ta=(a.data.submittedAt||a.data.timestamp)?.toDate?.()?.getTime()||0;
+      const tb2=(b.data.submittedAt||b.data.timestamp)?.toDate?.()?.getTime()||0;
+      return tb2-ta;
+    });
+    _resultsDocs={};
+    let rows='';
+    docs.forEach(({id,data:r})=>{
+      _resultsDocs[id]=r;
+      if(filter&&r.quizId!==filter)return;
+      if(gradeF&&r.grade!==gradeF)return;
+      if(subjectF&&r.subject!==subjectF)return;
+      const dt=(r.submittedAt||r.timestamp)?.toDate?.()?.toLocaleDateString('th-TH')||'';
+      const isFormatB=r.grade!==undefined||r.mcScore!==undefined;
+      let scoreDisplay,correctDisplay,quizLabel,gradeSubject;
+      if(isFormatB){
+        const pct=r.totalOutOf?Math.round((r.mcScore||0)/r.totalOutOf*100):0;
+        const pass=pct>=60;
+        scoreDisplay=`<span class="badge ${pass?'badge-green':'badge-orange'}">${r.mcScore||0}/${r.totalOutOf||0} (${pct}%)</span>`;
+        correctDisplay=`${r.mcScore||0}/${r.totalOutOf||0}`;
+        quizLabel=r.unit||'-';
+        gradeSubject=`${r.grade||''} ${r.subject||''}`.trim();
+      }else{
+        const pass=(r.score||0)>=(r.passingScore||60);
+        scoreDisplay=`<span class="badge ${pass?'badge-green':'badge-orange'}">${r.score||0}%</span>`;
+        correctDisplay=`${r.correct||0}/${r.total||0}`;
+        quizLabel=r.quizTitle||r.quizId||'-';
+        gradeSubject=r.subject||'-';
+      }
+      const hasAns=r.answers&&Object.keys(r.answers).length>0;
+      rows+=`<tr><td>${r.studentName||r.studentId||'-'}</td><td><small>${gradeSubject}</small></td><td>${quizLabel}</td><td>${scoreDisplay}</td><td>${correctDisplay}</td><td>${dt}</td><td>${hasAns?`<button class="btn btn-blue btn-sm" onclick="viewAnswers('${id}')">📋 ดูคำตอบ</button>`:'-'}</td></tr>`;
+    });
+    tb.innerHTML=rows||'<tr><td colspan="7" style="text-align:center;padding:20px;color:#aaa">ยังไม่มีข้อมูลผลสอบ</td></tr>';
+  }catch(e){tb.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:20px;color:#c62828">โหลดไม่ได้: ${e.message}</td></tr>`;}
+};
+window.viewAnswers=function(docId){
+  const r=_resultsDocs[docId];if(!r)return;
+  const answers=r.answers||{};
+  const keys=Object.keys(answers).sort((a,b)=>parseInt(a.replace(/\D/g,''))-parseInt(b.replace(/\D/g,'')));
+  let h=`<div style="margin-bottom:12px;padding:10px;background:#fff3e0;border-radius:8px;font-size:13px">
+    <b>นักเรียน:</b> ${r.studentName||'-'} &nbsp; <b>ชั้น:</b> ${r.grade||'-'} &nbsp; <b>วิชา:</b> ${r.subject||'-'}<br>
+    <b>หน่วย:</b> ${r.unit||r.quizTitle||'-'} &nbsp; <b>คะแนน:</b> ${r.mcScore!==undefined?r.mcScore:r.correct||0}/${r.totalOutOf!==undefined?r.totalOutOf:r.total||0}
+  </div>
+  <table style="width:100%;border-collapse:collapse;font-size:13px">
+    <thead><tr><th style="background:#c94b00;color:#fff;padding:7px 10px;text-align:center">ข้อที่</th><th style="background:#c94b00;color:#fff;padding:7px 10px;text-align:center">คำตอบ</th></tr></thead><tbody>`;
+  keys.forEach(k=>{
+    const num=k.replace(/\D/g,'');
+    h+=`<tr style="border-bottom:1px solid #ffd0a0"><td style="padding:5px 10px;text-align:center">${num}</td><td style="padding:5px 10px;text-align:center;font-weight:700">${answers[k]||'-'}</td></tr>`;
   });
+  h+='</tbody></table>';
+  document.getElementById('answersContent').innerHTML=h;
+  openModal('mAnswers');
 };
 
 // ==================== CHAT ====================
@@ -728,9 +797,22 @@ window.sendTeacherChat=async function(){
   });
 };
 
+// ==================== EXPOSE LOAD FUNCTIONS ====================
+window.loadCls = loadCls;
+window.loadAnn = loadAnn;
+window.loadWs = loadWs;
+window.loadQz = loadQz;
+window.loadVid = loadVid;
+
 // ==================== UTILS ====================
 window.delDoc=async function(col,id,cb){if(!confirm('ลบรายการนี้?'))return;await deleteDoc(doc(db,col,id));cb();};
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 </script>
+
+<div class="overlay" id="mAnswers"><div class="modal lg">
+  <h2>📋 คำตอบของนักเรียน</h2>
+  <div id="answersContent" style="font-size:13px"></div>
+  <div class="btn-row"><button class="btn btn-gray" onclick="closeModal('mAnswers')">ปิด</button></div>
+</div></div>
 </body>
 </html>
