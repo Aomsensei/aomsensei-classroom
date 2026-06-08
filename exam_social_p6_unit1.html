@@ -179,59 +179,7 @@
       .sig-grid { grid-template-columns:1fr; gap:28px; }
       .subj-score-grid { grid-template-columns:1fr; }
     }
-
-    /* EXTRA: student select / grade buttons */
-    .form-field select.line {
-      border:none; border-bottom:2px solid var(--border); background:transparent;
-      width:100%; padding:4px 2px; font-size:15px; font-family:'Sarabun',sans-serif;
-      color:var(--text); outline:none; cursor:pointer; appearance:none;
-    }
-    .form-field select.line:focus { border-bottom-color:var(--primary); }
-    .btn-grade { background:linear-gradient(90deg,#1565c0,#1976d2); color:#fff; border:none; border-radius:10px; padding:11px 24px; font-size:15px; font-weight:600; font-family:'Sarabun',sans-serif; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 14px rgba(21,101,192,.30); transition:transform .15s; margin-bottom:16px; }
-    .btn-grade:hover { transform:translateY(-2px); }
-    .btn-save  { background:linear-gradient(90deg,#2e7d32,#388e3c); color:#fff; border:none; border-radius:10px; padding:11px 24px; font-size:15px; font-weight:600; font-family:'Sarabun',sans-serif; cursor:pointer; display:none; align-items:center; gap:8px; box-shadow:0 4px 14px rgba(46,125,50,.30); transition:transform .15s; margin-bottom:16px; }
-    .btn-save:hover { transform:translateY(-2px); }
-    .btn-save.show { display:inline-flex; }
-    .choice-label.correct { border-color:#4caf50!important; background:#e8f5e9!important; }
-    .choice-label.wrong   { border-color:#f44336!important; background:#ffebee!important; }
-    .choice-label.correct .choice-letter { background:#4caf50; color:#fff; border-color:#4caf50; }
-    .choice-label.wrong   .choice-letter { background:#f44336; color:#fff; border-color:#f44336; }
-    .grade-result-bar { background:#fff8f0; border:2px solid var(--accent); border-radius:12px; padding:14px 20px; margin:16px 0; display:none; align-items:center; gap:14px; }
-    .grade-result-bar.show { display:flex; }
-    .grade-score-big { font-size:36px; font-weight:700; color:var(--primary); line-height:1; }
-    .grade-score-sub { font-size:14px; color:var(--muted); }
-    .save-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#2e7d32; color:#fff; border-radius:12px; padding:14px 28px; font-size:15px; font-weight:600; box-shadow:0 6px 24px rgba(0,0,0,.25); display:none; z-index:9999; align-items:center; gap:10px; }
-    .save-toast.show { display:flex; }
   </style>
-
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp }
-      from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    /* =========================================================
-       วางค่า Firebase Config ของท่านที่นี่
-       (คัดลอกมาจาก admin.html หรือ student.html ในโปรเจกต์)
-    ========================================================= */
-    const firebaseConfig = {
-      apiKey:            "YOUR_API_KEY",
-      authDomain:        "YOUR_PROJECT.firebaseapp.com",
-      projectId:         "YOUR_PROJECT_ID",
-      storageBucket:     "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId:             "YOUR_APP_ID"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db  = getFirestore(app);
-
-    /* expose to global scope for doSaveResult() */
-    window._fbDb         = db;
-    window._fbCollection = collection;
-    window._fbAddDoc     = addDoc;
-    window._fbTimestamp  = serverTimestamp;
-  </script>
 </head>
 <body>
 <div class="page-wrapper no-print">
@@ -261,25 +209,25 @@
   <!-- STUDENT FORM -->
   <div class="student-form">
     <div class="form-field full-width">
-      <label>ชื่อ–นามสกุล นักเรียน</label>
-      <select class="line" id="studentName">
-      <option value="">-- เลือกชื่อนักเรียน --</option>
-      <option value="เด็กชายกิตติภพ ทองสัมฤทธิ์">1. เด็กชายกิตติภพ ทองสัมฤทธิ์</option>
-      <option value="เด็กชายวีรภาพ จันทร์สิงห์">2. เด็กชายวีรภาพ จันทร์สิงห์</option>
-      <option value="เด็กชายอนันท์ชัย หินชัยภูมิ">3. เด็กชายอนันท์ชัย หินชัยภูมิ</option>
-      <option value="เด็กชายชาญชัย บุญหล้า">4. เด็กชายชาญชัย บุญหล้า</option>
-      <option value="เด็กชายจักรภัทร เงินคำ">5. เด็กชายจักรภัทร เงินคำ</option>
-      <option value="เด็กหญิงสุภัสรา โพธิ์แก้ว">6. เด็กหญิงสุภัสรา โพธิ์แก้ว</option>
-      <option value="เด็กหญิงอรนิชา ชำนาญ">7. เด็กหญิงอรนิชา ชำนาญ</option>
-      <option value="เด็กหญิงดาวิกา ขาวดี">8. เด็กหญิงดาวิกา ขาวดี</option>
-      <option value="เด็กหญิงปวันรัตน์ พรมจินดาศรี">9. เด็กหญิงปวันรัตน์ พรมจินดาศรี</option>
-      <option value="เด็กหญิงศุภิสรา เณรสุวรรณ">10. เด็กหญิงศุภิสรา เณรสุวรรณ</option>
-      <option value="เด็กหญิงสุภัชชา แสงประทุม">11. เด็กหญิงสุภัชชา แสงประทุม</option>
-      <option value="เด็กหญิงน้ำมนต์ มีเพชร">12. เด็กหญิงน้ำมนต์ มีเพชร</option>
-      <option value="เด็กหญิงมัญชุสา บินสูงเนิน">13. เด็กหญิงมัญชุสา บินสูงเนิน</option>
-      <option value="เด็กชายอลงกรณ์ เสาธงทอง">14. เด็กชายอลงกรณ์ เสาธงทอง</option>
-      <option value="เด็กชายสุรเชษฐ์ เงินจัตุรัส">15. เด็กชายสุรเชษฐ์ เงินจัตุรัส</option>
-      <option value="เด็กหญิงกมลพร พงษ์สวัสดิ์">16. เด็กหญิงกมลพร พงษ์สวัสดิ์</option>
+      <label>ชื่อ–นามสกุล</label>
+      <select id="studentNameSel" class="line" style="font-family:'Sarabun',sans-serif;font-size:15px;padding:6px 4px;border:none;border-bottom:2px solid #ccc;width:100%;background:transparent">
+        <option value="">— เลือกชื่อนักเรียน —</option>
+        <option value="เด็กชายกิตติภพ ทองสัมฤทธิ์">เด็กชายกิตติภพ ทองสัมฤทธิ์</option>
+        <option value="เด็กชายวีรภาพ จันทร์สิงห์">เด็กชายวีรภาพ จันทร์สิงห์</option>
+        <option value="เด็กชายอนันท์ชัย หินชัยภูมิ">เด็กชายอนันท์ชัย หินชัยภูมิ</option>
+        <option value="เด็กชายชาญชัย บุญหล้า">เด็กชายชาญชัย บุญหล้า</option>
+        <option value="เด็กชายจักรภัทร เงินคำ">เด็กชายจักรภัทร เงินคำ</option>
+        <option value="เด็กหญิงสุภัสรา โพธิ์แก้ว">เด็กหญิงสุภัสรา โพธิ์แก้ว</option>
+        <option value="เด็กหญิงอรนิชา ชำนาญ">เด็กหญิงอรนิชา ชำนาญ</option>
+        <option value="เด็กหญิงดาวิกา ขาวดี">เด็กหญิงดาวิกา ขาวดี</option>
+        <option value="เด็กหญิงปวันรัตน์ พรมจินดาศรี">เด็กหญิงปวันรัตน์ พรมจินดาศรี</option>
+        <option value="เด็กหญิงศุภิสรา เณรสุวรรณ">เด็กหญิงศุภิสรา เณรสุวรรณ</option>
+        <option value="เด็กหญิงสุภัชชา แสงประทุม">เด็กหญิงสุภัชชา แสงประทุม</option>
+        <option value="เด็กหญิงน้ำมนต์ มีเพชร">เด็กหญิงน้ำมนต์ มีเพชร</option>
+        <option value="เด็กหญิงมัญชุสา บินสูงเนิน">เด็กหญิงมัญชุสา บินสูงเนิน</option>
+        <option value="เด็กชายอลงกรณ์ เสาธงทอง">เด็กชายอลงกรณ์ เสาธงทอง</option>
+        <option value="เด็กชายสุรเชษฎ์ เงินจัตุรัส">เด็กชายสุรเชษฎ์ เงินจัตุรัส</option>
+        <option value="เด็กหญิงกมลพร พงษ์สวัสดิ์">เด็กหญิงกมลพร พงษ์สวัสดิ์</option>
       </select>
     </div>
     <div class="form-field">
@@ -694,27 +642,11 @@
     </div>
   </div>
 
-
-  <!-- GRADE RESULT BAR -->
-  <div class="grade-result-bar" id="gradeResultBar">
-    <div>
-      <div class="grade-score-big" id="gradeScoreBig">0/20</div>
-      <div class="grade-score-sub">คะแนนปรนัย</div>
-    </div>
-    <div style="flex:1;padding-left:14px;">
-      <div id="gradeResultMsg" style="font-size:15px;font-weight:600;color:var(--primary);"></div>
-      <div id="gradeResultSub" style="font-size:13px;color:var(--muted);margin-top:4px;"></div>
-    </div>
-  </div>
-
-  <!-- SAVE TOAST -->
-  <div class="save-toast" id="saveToast">✅ บันทึกผลสอบแล้ว!</div>
-
   <!-- ANSWER KEY + PRINT -->
   <div class="answer-section">
-    <button class="btn-grade" onclick="askPassword('grade')">🔍 ตรวจข้อสอบอัตโนมัติ</button>
-    <button class="btn-save" id="btnSave" onclick="askPassword('save')">💾 บันทึกผลสอบ</button>
     <button class="answer-toggle" onclick="askPassword('answer')">🔑 แสดง / ซ่อน เฉลย (สำหรับครู)</button>
+    <button class="answer-toggle" style="background:linear-gradient(90deg,#1565c0,#1976d2)" onclick="askPassword('autograde')">🔍 ตรวจข้อสอบอัตโนมัติ</button>
+    <button class="answer-toggle" style="background:linear-gradient(90deg,#2e7d32,#388e3c)" onclick="askPassword('save')">💾 บันทึกผลสอบ</button>
     <button class="print-btn" onclick="openPrintModal()">🖨️ ปริ๊นท์รายงานผลคะแนน</button>
     <div class="answer-key-grid" id="answerGrid">
       <div class="ans-cell"><div class="ans-q">ข้อ 1</div><div class="ans-a">ก</div></div>
@@ -885,10 +817,10 @@
       } else if (pwTarget === 'score') {
         document.getElementById('scoreContent').classList.add('open');
         document.getElementById('scoreLockedBar').style.display = 'none';
-      } else if (pwTarget === 'grade') {
-        doGrade();
+      } else if (pwTarget === 'autograde') {
+        autoGrade();
       } else if (pwTarget === 'save') {
-        doSaveResult();
+        saveExamResult();
       }
     } else {
       document.getElementById('pwError').textContent = '❌ รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่';
@@ -942,100 +874,34 @@
   }
   document.getElementById('printModal').addEventListener('click', function(e) { if (e.target === this) closePrintModal(); });
 
-  // ===================== FIREBASE CONFIG CHECK =====================
-  let _fbReady = false;
-  window.addEventListener('load', () => {
-    if(window._fbDb) _fbReady = true;
-    else console.warn('⚠️ Firebase not initialized — edit the firebaseConfig block in this file.');
-  });
-
-  // ===================== AUTO-GRADE =====================
-  const ANSWER_KEY = ['ก','ข','ค','ง','ก','ค','ข','ง','ก','ข','ง','ค','ก','ข','ง','ค','ก','ข','ง','ค'];
-  let mcScore = 0;
-  let graded = false;
-
-  function doGrade() {
-    mcScore = 0;
-    for(let i=1;i<=20;i++){
-      const inputs   = document.querySelectorAll(`input[name="q${i}"]`);
-      const selected = document.querySelector(`input[name="q${i}"]:checked`);
-      const correct  = ANSWER_KEY[i-1];
-      inputs.forEach(inp=>{
-        const lbl = inp.closest('.choice-label');
-        lbl.classList.remove('correct','wrong');
-        if(inp.value===correct) lbl.classList.add('correct');
-        else if(selected && inp.value===selected.value && inp.value!==correct) lbl.classList.add('wrong');
-      });
-      if(selected && selected.value===correct) mcScore++;
-    }
-    graded = true;
-    // Update score box
-    document.querySelector('.score-inner .value').textContent = mcScore+'/20';
-    // Show result bar
-    const bar = document.getElementById('gradeResultBar');
-    bar.classList.add('show');
-    document.getElementById('gradeScoreBig').textContent = mcScore+'/20';
-    const pct = Math.round(mcScore/20*100);
-    const msg = pct>=80?'🏅 ดีเยี่ยม':pct>=70?'✅ ดี':pct>=60?'📘 พอใช้':pct>=50?'⚠️ ผ่าน':'❌ ควรทบทวน';
-    document.getElementById('gradeResultMsg').textContent = msg+' ('+pct+'%)';
-    document.getElementById('gradeResultSub').textContent = 'คะแนน MC '+mcScore+'/20 — กดปุ่ม "บันทึกผลสอบ" เพื่อส่งข้อมูลให้ครู';
-    document.getElementById('btnSave').classList.add('show');
+  const ANSWER_KEY = ["ก","ข","ค","ง","ก","ค","ข","ง","ก","ข","ง","ค","ก","ข","ง","ค","ก","ข","ง","ค"];
+  function autoGrade() {
+    var correct = 0, ans = {};
+    ANSWER_KEY.forEach(function(a,i){ var q=i+1, s=document.querySelector('input[name="q'+q+'"]:checked'); var g=s?s.value:'-'; ans['q'+q]=g; if(g===a) correct++; });
+    alert('📊 ผลการตรวจ\nถูก '+correct+' จาก 20 ข้อ ('+Math.round(correct/20*100)+'%)\n\nกด 💾 บันทึกผลสอบ เพื่อบันทึก');
+    window._lastGrade = {correct:correct, ans:ans};
   }
-
-  // ===================== SAVE TO FIREBASE =====================
-  async function doSaveResult() {
-    const name = document.getElementById('studentName').value.trim();
-    if(!name) { alert('กรุณาเลือกชื่อนักเรียนก่อน'); return; }
-    if(!graded) { alert('กรุณากด "ตรวจข้อสอบ" ก่อนบันทึก'); return; }
-
-    const answers = {};
-    for(let i=1;i<=20;i++){
-      const sel = document.querySelector(`input[name="q${i}"]:checked`);
-      answers['q'+i] = sel ? sel.value : '-';
-    }
-
-    // subjective answers (text fields)
-    const subjLines = document.querySelectorAll('.answer-lines .answer-line');
-    const q21ans = [], q22ans = [];
-    let cnt = 0;
-    subjLines.forEach(inp=>{
-      if(cnt<6) q21ans.push(inp.value); else q22ans.push(inp.value);
-      cnt++;
-    });
-
-    const doc = {
-      studentName: name,
-      grade: 'ป.6',
-      subject: 'สังคมศึกษา',
-      unit: 'หน่วยที่ 1',
-      mcScore: mcScore,
-      totalOutOf: 30,
-      answers: answers,
-      q21: q21ans.join(' | '),
-      q22: q22ans.join(' | '),
-      savedAt: new Date().toISOString()
-    };
-
-    if(!_fbReady || !window._fbDb) {
-      alert('❌ Firebase ยังไม่พร้อม — กรุณาใส่ค่า firebaseConfig ในไฟล์ HTML ก่อน');
-      return;
-    }
-
-    try {
-      await window._fbAddDoc(window._fbCollection(window._fbDb,'quiz_results'), {
-        ...doc,
-        timestamp: window._fbTimestamp()
-      });
-      const toast = document.getElementById('saveToast');
-      toast.classList.add('show');
-      setTimeout(()=>toast.classList.remove('show'),3000);
-      document.getElementById('btnSave').disabled = true;
-      document.getElementById('btnSave').textContent = '✅ บันทึกแล้ว';
-    } catch(e) {
-      alert('❌ บันทึกไม่สำเร็จ: '+e.message);
-    }
+  function saveExamResult() {
+    var sel=document.getElementById('studentNameSel'), name=sel?sel.value:'';
+    if(!name){alert('⚠️ กรุณาเลือกชื่อนักเรียนก่อน');return;}
+    var r=window._lastGrade||{};
+    var d={studentName:name,grade:'ป.6',subject:'สังคมศึกษา',unit:'หน่วยที่ 1',mcScore:r.correct||0,totalOutOf:20,answers:r.ans||{}};
+    if(typeof window._saveExamResult==='function') window._saveExamResult(d);
+    else alert('❌ Firebase ยังโหลดไม่เสร็จ');
   }
-
 </script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { FIREBASE_CONFIG } from "./js/config.js";
+    var app=initializeApp(FIREBASE_CONFIG), auth=getAuth(app), db=getFirestore(app);
+    signInAnonymously(auth).catch(function(){});
+    window._saveExamResult=async function(data){
+      try{ await addDoc(collection(db,'quiz_results'),Object.assign({},data,{timestamp:serverTimestamp()})); alert('✅ บันทึกเรียบร้อย!'); }
+      catch(e){ alert('❌ บันทึกไม่ได้: '+e.message); }
+    };
+  </script>
 </body>
 </html>
