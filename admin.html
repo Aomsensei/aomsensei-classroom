@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin | ห้องเรียนออนไลน์ครูโอม</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;display:flex;min-height:100vh}
+:root{--primary:#c94b00;--dark:#a33b00;--secondary:#f39800;--accent:#e65c00;--bg:#fff8f3;--gradient:linear-gradient(135deg,#c94b00,#f39800)}
+
+/* Sidebar */
+.sidebar{width:220px;background:linear-gradient(180deg,#c94b00 0%,#7c2800 100%);color:#fff;flex-shrink:0;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;transition:.3s}
+.sidebar-logo{padding:20px 16px;border-bottom:1px solid rgba(255,255,255,.15);text-align:center}
+.sidebar-logo img{width:55px;height:55px;border-radius:50%;border:3px solid rgba(255,255,255,.5);object-fit:cover;margin-bottom:8px}
+.sidebar-logo .sch-name{font-size:13px;font-weight:800;line-height:1.3}
+.sidebar-logo .sch-sub{font-size:10px;opacity:.75}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 18px;cursor:pointer;font-size:13.5px;font-weight:700;transition:.15s;color:rgba(255,255,255,.8);border:none;background:none;width:100%;text-align:left;text-decoration:none}
+.nav-item:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-item.active{background:rgba(255,255,255,.2);color:#fff;border-left:3px solid #f39800}
+.nav-item i{width:18px;text-align:center;font-size:15px}
+.sidebar-footer{margin-top:auto;padding:14px}
+.btn-logout{width:100%;padding:9px;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;transition:.15s}
+.btn-logout:hover{background:rgba(255,255,255,.25)}
+
+/* Main */
+.main{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:#fff;border-bottom:2px solid #ffd0a0;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:40;box-shadow:0 2px 8px rgba(201,75,0,.1)}
+.topbar .page-title{font-size:18px;font-weight:800;color:#c94b00;display:flex;align-items:center;gap:8px}
+.topbar .teacher-chip{display:flex;align-items:center;gap:8px;background:#fff3e0;border-radius:20px;padding:5px 12px;font-size:13px;font-weight:700;color:#7c4700}
+.topbar .teacher-chip img{width:28px;height:28px;border-radius:50%;object-fit:cover}
+.content{padding:20px;flex:1}
+
+/* Login */
+.login-wrap{min-height:100vh;background:var(--gradient);display:flex;align-items:center;justify-content:center;padding:20px;width:100%}
+.login-card{background:#fff;border-radius:20px;padding:36px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2);text-align:center}
+.login-card img{width:70px;height:70px;border-radius:50%;margin-bottom:12px;border:3px solid #f39800;object-fit:cover}
+.login-card h1{font-size:20px;font-weight:800;color:#c94b00;margin-bottom:4px}
+.login-card p{font-size:13px;color:#888;margin-bottom:20px}
+.login-card input{width:100%;padding:11px 14px;border:2px solid #ffd0a0;border-radius:10px;font-size:15px;font-family:inherit;margin-bottom:10px;outline:none;transition:.2s}
+.login-card input:focus{border-color:#c94b00}
+.btn-login{width:100%;padding:13px;background:var(--gradient);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit}
+.login-err{background:#ffebee;color:#c62828;padding:8px;border-radius:8px;font-size:13px;margin-top:8px;display:none}
+
+/* Cards */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:20px}
+.stat-card{background:#fff;border-radius:12px;padding:16px;text-align:center;box-shadow:0 2px 12px rgba(201,75,0,.1);border-top:4px solid var(--secondary)}
+.stat-num{font-size:32px;font-weight:900;color:#c94b00}
+.stat-label{font-size:13px;color:#888;margin-top:2px}
+
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.section-header h2{font-size:17px;font-weight:800;color:#c94b00;display:flex;align-items:center;gap:8px}
+.btn{padding:8px 16px;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;transition:.15s;display:inline-flex;align-items:center;gap:5px;text-decoration:none}
+.btn-orange{background:#c94b00;color:#fff}.btn-orange:hover{background:#a33b00}
+.btn-green{background:#2e7d32;color:#fff}.btn-green:hover{background:#1b5e20}
+.btn-red{background:#c62828;color:#fff}.btn-red:hover{background:#8b1919}
+.btn-blue{background:#1565c0;color:#fff}.btn-blue:hover{background:#0d47a1}
+.btn-gray{background:#546e7a;color:#fff}.btn-gray:hover{background:#37474f}
+.btn-sm{padding:5px 10px;font-size:12px}
+
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(201,75,0,.08)}
+thead th{background:#c94b00;color:#fff;padding:11px 14px;text-align:left;white-space:nowrap}
+tbody td{padding:10px 14px;border-bottom:1px solid #ffd0a0}
+tbody tr:hover td{background:#fff3e8}
+.badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700}
+.badge-green{background:#e8f5e9;color:#2e7d32}
+.badge-orange{background:#fff3e0;color:#c94b00}
+.badge-blue{background:#e3f2fd;color:#1565c0}
+
+/* Modal */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:16px}
+.overlay.show{display:flex}
+.modal{background:#fff;border-radius:14px;padding:clamp(18px,4vw,28px);width:100%;max-width:520px;max-height:92vh;overflow-y:auto;box-shadow:0 10px 50px rgba(0,0,0,.2)}
+.modal.lg{max-width:700px}
+.modal h2{color:#c94b00;margin-bottom:16px;font-size:17px;font-weight:800}
+.form-row{margin-bottom:12px}
+.form-row label{display:block;font-weight:700;font-size:13px;color:#555;margin-bottom:4px}
+.form-row input,.form-row select,.form-row textarea{width:100%;padding:9px 12px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit}
+.form-row textarea{resize:vertical;min-height:80px}
+.form-row input:focus,.form-row select:focus,.form-row textarea:focus{outline:none;border-color:#c94b00}
+.btn-row{display:flex;gap:8px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap}
+
+/* Questions editor */
+.q-item{background:#fff3e8;border:1.5px solid #ffd0a0;border-radius:10px;padding:12px;margin-bottom:10px}
+.q-item-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.q-item-label{font-weight:800;color:#c94b00;font-size:13px}
+.opt-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.opt-row input[type=text]{flex:1}
+.opt-row input[type=radio]{accent-color:#c94b00;width:16px;height:16px}
+
+/* Chat */
+.chat-wrap{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(201,75,0,.1)}
+.chat-room-tabs{display:flex;gap:5px;padding:10px;border-bottom:1px solid #ffd0a0;flex-wrap:wrap}
+.room-tab{padding:5px 12px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:700;background:#fff3e0;color:#c94b00;border:1.5px solid #ffd0a0;transition:.15s}
+.room-tab.active{background:#c94b00;color:#fff;border-color:#c94b00}
+.chat-msgs{height:320px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:75%;display:flex;flex-direction:column;gap:2px}
+.msg.mine{align-self:flex-end;align-items:flex-end}
+.msg.theirs{align-self:flex-start;align-items:flex-start}
+.msg-bubble{padding:8px 12px;border-radius:14px;font-size:13.5px;line-height:1.5}
+.msg.mine .msg-bubble{background:#c94b00;color:#fff;border-radius:14px 14px 4px 14px}
+.msg.theirs .msg-bubble{background:#f0f0f0;color:#333;border-radius:14px 14px 14px 4px}
+.msg-sender{font-size:10px;color:#c94b00;font-weight:700}
+.msg-time{font-size:10px;color:#bbb}
+.chat-input-row{padding:10px;border-top:1px solid #ffd0a0;display:flex;gap:8px}
+.chat-input-row input{flex:1;padding:9px 12px;border:1.5px solid #ffd0a0;border-radius:20px;font-size:14px;font-family:inherit;outline:none}
+.chat-input-row input:focus{border-color:#c94b00}
+.chat-send-btn{background:#c94b00;color:#fff;border:none;border-radius:50%;width:38px;height:38px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+.empty-state{text-align:center;padding:40px 20px;color:#bbb}
+.page{display:none}
+.page.active{display:block}
+
+@media(max-width:768px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.menu-toggle{display:flex!important}}
+.menu-toggle{display:none;background:#c94b00;color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:18px;position:fixed;bottom:20px;right:20px;z-index:100;width:44px;height:44px;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(201,75,0,.5)}
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="loginScreen" style="display:flex;width:100%;position:fixed;inset:0;z-index:300">
+  <div class="login-wrap">
+    <div class="login-card">
+      <img src="images/teacher.jpg" alt="ครู" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 80%22><circle cx=%2240%22 cy=%2240%22 r=%2240%22 fill=%22%23f39800%22/><text x=%2240%22 y=%2255%22 font-size=%2240%22 text-anchor=%22middle%22 fill=%22white%22>👨‍🏫</text></svg>'"/>
+      <h1>Admin Panel</h1>
+      <p>ห้องเรียนออนไลน์ครูโอม</p>
+      <input type="email" id="loginEmail" placeholder="อีเมล์ครู"/>
+      <input type="password" id="loginPwd" placeholder="รหัสผ่าน" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <button class="btn-login" onclick="doLogin()">🔐 เข้าสู่ระบบ</button>
+      <div id="loginErr" class="login-err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <img src="images/logo.png" alt="logo" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 60 60%22><circle cx=%2230%22 cy=%2230%22 r=%2230%22 fill=%22rgba(255,255,255,.3)%22/><text x=%2230%22 y=%2242%22 font-size=%2230%22 text-anchor=%22middle%22 fill=%22white%22>🏫</text></svg>'"/>
+    <div class="sch-name">โรงเรียนหินฝนวิทยาคม</div>
+    <div class="sch-sub">Admin Panel · ปีการศึกษา 2569</div>
+  </div>
+  <nav style="padding:10px 0;flex:1;overflow-y:auto">
+    <button class="nav-item active" onclick="showPage('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</button>
+    <button class="nav-item" onclick="showPage('classrooms')"><i class="fas fa-school"></i> ห้องเรียน</button>
+    <button class="nav-item" onclick="showPage('announcements')"><i class="fas fa-bullhorn"></i> ประกาศ</button>
+    <button class="nav-item" onclick="showPage('worksheets')"><i class="fas fa-file-alt"></i> ใบงาน</button>
+    <button class="nav-item" onclick="showPage('quizzes')"><i class="fas fa-pen-to-square"></i> ข้อสอบ</button>
+    <button class="nav-item" onclick="showPage('videos')"><i class="fas fa-play-circle"></i> วิดีโอ</button>
+    <button class="nav-item" onclick="showPage('results')"><i class="fas fa-chart-bar"></i> ผลสอบ</button>
+    <button class="nav-item" onclick="showPage('chat')"><i class="fas fa-comments"></i> แชทนักเรียน</button>
+    <a href="scores.html" class="nav-item"><i class="fas fa-star"></i> ระบบเก็บคะแนน</a>
+  </nav>
+  <div class="sidebar-footer"><button class="btn-logout" onclick="doLogout()">🚪 ออกจากระบบ</button></div>
+</div>
+
+<button class="menu-toggle" id="menuToggle" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="fas fa-bars"></i></button>
+
+<!-- Main -->
+<div class="main" id="mainArea" style="display:none">
+  <div class="topbar">
+    <div class="page-title" id="pageTitle"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
+    <div class="teacher-chip">
+      <img src="images/teacher.jpg" alt="" onerror="this.style.display='none'"/>
+      <span id="teacherEmail">ครู</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- Dashboard -->
+    <div id="page-dashboard" class="page active">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card"><div class="stat-num" id="stClassrooms">-</div><div class="stat-label">ห้องเรียน</div></div>
+        <div class="stat-card"><div class="stat-num" id="stAnnounce">-</div><div class="stat-label">ประกาศ</div></div>
+        <div class="stat-card"><div class="stat-num" id="stWorksheet">-</div><div class="stat-label">ใบงาน</div></div>
+        <div class="stat-card"><div class="stat-num" id="stQuiz">-</div><div class="stat-label">ข้อสอบ</div></div>
+        <div class="stat-card"><div class="stat-num" id="stVideo">-</div><div class="stat-label">วิดีโอ</div></div>
+        <div class="stat-card"><div class="stat-num" id="stResults">-</div><div class="stat-label">ผลสอบ</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+        <div style="background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 12px rgba(201,75,0,.08)">
+          <div style="font-size:14px;font-weight:800;color:#c94b00;margin-bottom:12px">📊 สัดส่วนเนื้อหา</div>
+          <canvas id="contentChart" style="max-height:200px"></canvas>
+        </div>
+        <div style="background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 12px rgba(201,75,0,.08)">
+          <div style="font-size:14px;font-weight:800;color:#c94b00;margin-bottom:12px">🔗 ลิงก์ด่วน</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <a href="index.html" target="_blank" class="btn btn-orange"><i class="fas fa-globe"></i> เปิดหน้าหลัก</a>
+            <a href="student.html" target="_blank" class="btn btn-blue"><i class="fas fa-user-graduate"></i> พอร์ทัลนักเรียน</a>
+            <a href="scores.html" class="btn btn-green"><i class="fas fa-star"></i> ระบบเก็บคะแนน</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Classrooms -->
+    <div id="page-classrooms" class="page">
+      <div class="section-header"><h2><i class="fas fa-school"></i> ห้องเรียน</h2><button class="btn btn-orange" onclick="openModal('modalClassroom')">➕ เพิ่มห้อง</button></div>
+      <div class="table-wrap"><table><thead><tr><th>ชื่อห้อง</th><th>รหัสห้อง</th><th>จำนวนนักเรียน</th><th>การจัดการ</th></tr></thead><tbody id="tbClassrooms"></tbody></table></div>
+    </div>
+
+    <!-- Announcements -->
+    <div id="page-announcements" class="page">
+      <div class="section-header"><h2><i class="fas fa-bullhorn"></i> ประกาศ</h2><button class="btn btn-orange" onclick="openModal('modalAnn')">➕ เพิ่มประกาศ</button></div>
+      <div class="table-wrap"><table><thead><tr><th>หัวข้อ</th><th>เนื้อหา</th><th>วันที่</th><th>การจัดการ</th></tr></thead><tbody id="tbAnn"></tbody></table></div>
+    </div>
+
+    <!-- Worksheets -->
+    <div id="page-worksheets" class="page">
+      <div class="section-header"><h2><i class="fas fa-file-alt"></i> ใบงาน</h2><button class="btn btn-orange" onclick="openModal('modalWs')">➕ เพิ่มใบงาน</button></div>
+      <div class="table-wrap"><table><thead><tr><th>ชื่อ</th><th>วิชา</th><th>คำอธิบาย</th><th>วันที่</th><th>การจัดการ</th></tr></thead><tbody id="tbWs"></tbody></table></div>
+    </div>
+
+    <!-- Quizzes -->
+    <div id="page-quizzes" class="page">
+      <div class="section-header"><h2><i class="fas fa-pen-to-square"></i> ข้อสอบ</h2><button class="btn btn-orange" onclick="openModal('modalQuiz')">➕ สร้างข้อสอบ</button></div>
+      <div class="table-wrap"><table><thead><tr><th>ชื่อข้อสอบ</th><th>เวลา</th><th>จำนวนข้อ</th><th>เกณฑ์ผ่าน</th><th>การจัดการ</th></tr></thead><tbody id="tbQuiz"></tbody></table></div>
+    </div>
+
+    <!-- Videos -->
+    <div id="page-videos" class="page">
+      <div class="section-header"><h2><i class="fas fa-play-circle"></i> วิดีโอ</h2><button class="btn btn-orange" onclick="openModal('modalVideo')">➕ เพิ่มวิดีโอ</button></div>
+      <div class="table-wrap"><table><thead><tr><th>ชื่อ</th><th>URL</th><th>คำอธิบาย</th><th>วันที่</th><th>การจัดการ</th></tr></thead><tbody id="tbVideo"></tbody></table></div>
+    </div>
+
+    <!-- Results -->
+    <div id="page-results" class="page">
+      <div class="section-header"><h2><i class="fas fa-chart-bar"></i> ผลสอบ</h2>
+        <select id="resultFilter" onchange="loadResults()"><option value="">-- ทุกข้อสอบ --</option></select>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>นักเรียน</th><th>ข้อสอบ</th><th>คะแนน</th><th>ถูก/ทั้งหมด</th><th>วันที่สอบ</th></tr></thead><tbody id="tbResults"></tbody></table></div>
+    </div>
+
+    <!-- Chat -->
+    <div id="page-chat" class="page">
+      <div class="section-header"><h2><i class="fas fa-comments"></i> แชทกับนักเรียน</h2></div>
+      <div class="chat-wrap">
+        <div class="chat-room-tabs" id="chatRoomTabs"><span style="color:#bbb;font-size:13px">กำลังโหลดห้อง...</span></div>
+        <div id="chatMsgs" class="chat-msgs"><div class="empty-state">เลือกห้องเรียนเพื่อดูแชท</div></div>
+        <div class="chat-input-row">
+          <input type="text" id="chatInput" placeholder="ตอบนักเรียน..." onkeydown="if(event.key==='Enter')sendTeacherChat()"/>
+          <button class="chat-send-btn" onclick="sendTeacherChat()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODALS -->
+<!-- Classroom -->
+<div class="overlay" id="modalClassroom"><div class="modal">
+  <h2>🏫 ห้องเรียน</h2>
+  <input type="hidden" id="clsId"/>
+  <div class="form-row"><label>ชื่อห้อง</label><input type="text" id="clsName" placeholder="เช่น ม.3/1"/></div>
+  <div class="form-row"><label>รหัสห้อง (ให้นักเรียนใช้เข้า)</label><input type="text" id="clsCode" placeholder="เช่น M301"/></div>
+  <div class="btn-row"><button class="btn btn-gray" onclick="closeModal('modalClassroom')">ยกเลิก</button><button class="btn btn-orange" onclick="saveClassroom()">บันทึก</button></div>
+</div></div>
+
+<!-- Announcement -->
+<div class="overlay" id="modalAnn"><div class="modal">
+  <h2>📢 ประกาศ</h2>
+  <input type="hidden" id="annId"/>
+  <div class="form-row"><label>หัวข้อ</label><input type="text" id="annTitle"/></div>
+  <div class="form-row"><label>เนื้อหา</label><textarea id="annContent" rows="4"></textarea></div>
+  <div class="btn-row"><button class="btn btn-gray" onclick="closeModal('modalAnn')">ยกเลิก</button><button class="btn btn-orange" onclick="saveAnn()">บันทึก</button></div>
+</div></div>
+
+<!-- Worksheet -->
+<div class="overlay" id="modalWs"><div class="modal lg">
+  <h2>📄 ใบงาน</h2>
+  <input type="hidden" id="wsId"/>
+  <div class="form-row"><label>ชื่อใบงาน</label><input type="text" id="wsTitle"/></div>
+  <div class="form-row"><label>วิชา</label><input type="text" id="wsSubject" placeholder="เช่น คณิตศาสตร์"/></div>
+  <div class="form-row"><label>คำอธิบาย / โจทย์</label><textarea id="wsDesc" rows="5"></textarea></div>
+  <div class="form-row"><label>ลิงก์ไฟล์ (URL หรือ Google Drive)</label><input type="url" id="wsUrl" placeholder="https://..."/></div>
+  <div class="form-row"><label>HTML Content (ถ้ามี)</label><textarea id="wsHtml" rows="4" placeholder="วาง HTML ที่นี่ (ไม่บังคับ)"></textarea></div>
+  <div class="btn-row"><button class="btn btn-gray" onclick="closeModal('modalWs')">ยกเลิก</button><button class="btn btn-orange" onclick="saveWs()">บันทึก</button></div>
+</div></div>
+
+<!-- Quiz -->
+<div class="overlay" id="modalQuiz"><div class="modal lg">
+  <h2>📝 สร้างข้อสอบ</h2>
+  <input type="hidden" id="qzId"/>
+  <div style="display:flex;gap:12px;flex-wrap:wrap">
+    <div class="form-row" style="flex:2;min-width:200px"><label>ชื่อข้อสอบ</label><input type="text" id="qzTitle"/></div>
+    <div class="form-row" style="flex:1;min-width:100px"><label>เวลา (นาที)</label><input type="number" id="qzTime" value="30" min="1"/></div>
+    <div class="form-row" style="flex:1;min-width:100px"><label>เกณฑ์ผ่าน (%)</label><input type="number" id="qzPass" value="60" min="0" max="100"/></div>
+  </div>
+  <div style="font-weight:800;color:#c94b00;margin:8px 0;font-size:13px">คำถาม (กด ➕ เพิ่ม):</div>
+  <div id="qzQuestions"></div>
+  <button class="btn btn-green btn-sm" onclick="addQuestion()">➕ เพิ่มคำถาม</button>
+  <div class="btn-row"><button class="btn btn-gray" onclick="closeModal('modalQuiz')">ยกเลิก</button><button class="btn btn-orange" onclick="saveQuiz()">บันทึก</button></div>
+</div></div>
+
+<!-- Video -->
+<div class="overlay" id="modalVideo"><div class="modal">
+  <h2>🎬 วิดีโอ</h2>
+  <input type="hidden" id="vidId"/>
+  <div class="form-row"><label>ชื่อวิดีโอ</label><input type="text" id="vidTitle"/></div>
+  <div class="form-row"><label>URL (YouTube หรืออื่นๆ)</label><input type="url" id="vidUrl" placeholder="https://youtube.com/watch?v=..."/></div>
+  <div class="form-row"><label>คำอธิบาย</label><textarea id="vidDesc" rows="3"></textarea></div>
+  <div class="btn-row"><button class="btn btn-gray" onclick="closeModal('modalVideo')">ยกเลิก</button><button class="btn btn-orange" onclick="saveVideo()">บันทึก</button></div>
+</div></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, getDocs, addDoc, setDoc, doc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { FIREBASE_CONFIG } from "./js/config.js";
+
+const app = initializeApp(FIREBASE_CONFIG);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let chartInst = null;
+let chatUnsub = null;
+let currentChatRoom = null;
+let quizQuestions = [];
+
+// ==================== AUTH ====================
+window.doLogin = async function(){
+  const email=document.getElementById('loginEmail').value;
+  const pwd=document.getElementById('loginPwd').value;
+  const err=document.getElementById('loginErr');
+  try{
+    await signInWithEmailAndPassword(auth,email,pwd);
+    err.style.display='none';
+  }catch(e){err.textContent='❌ อีเมล์หรือรหัสผ่านไม่ถูกต้อง';err.style.display='block';}
+};
+window.doLogout = ()=>signOut(auth);
+
+onAuthStateChanged(auth, user=>{
+  document.getElementById('loginScreen').style.display=user?'none':'flex';
+  document.getElementById('mainArea').style.display=user?'flex':'none';
+  if(user){document.getElementById('teacherEmail').textContent=user.email||'ครู';loadDashboard();}
+});
+
+// ==================== PAGES ====================
+const pageTitles={dashboard:'🏠 Dashboard',classrooms:'🏫 ห้องเรียน',announcements:'📢 ประกาศ',worksheets:'📄 ใบงาน',quizzes:'📝 ข้อสอบ',videos:'🎬 วิดีโอ',results:'📊 ผลสอบ',chat:'💬 แชทนักเรียน'};
+window.showPage = function(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(el=>{if(el.textContent.includes(pageTitles[p]?.split(' ')[1]||p))el.classList.add('active');});
+  document.getElementById('pageTitle').textContent=pageTitles[p]||p;
+  document.getElementById('sidebar').classList.remove('open');
+  if(p==='dashboard')loadDashboard();
+  else if(p==='classrooms')loadClassrooms();
+  else if(p==='announcements')loadAnnouncements();
+  else if(p==='worksheets')loadWorksheets();
+  else if(p==='quizzes')loadQuizzes();
+  else if(p==='videos')loadVideos();
+  else if(p==='results')loadResults();
+  else if(p==='chat')initTeacherChat();
+};
+
+// ==================== MODAL ====================
+window.openModal = id=>document.getElementById(id).classList.add('show');
+window.closeModal = id=>document.getElementById(id).classList.remove('show');
+document.querySelectorAll('.overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show');}));
+
+// ==================== DASHBOARD ====================
+async function loadDashboard(){
+  const cols=['classrooms','announcements','worksheets','quizzes','videos','quiz_results'];
+  const ids=['stClassrooms','stAnnounce','stWorksheet','stQuiz','stVideo','stResults'];
+  const counts=[];
+  for(let i=0;i<cols.length;i++){
+    try{const s=await getDocs(collection(db,cols[i]));document.getElementById(ids[i]).textContent=s.size;counts.push(s.size);}
+    catch(e){counts.push(0);}
+  }
+  const ctx=document.getElementById('contentChart').getContext('2d');
+  if(chartInst)chartInst.destroy();
+  chartInst=new Chart(ctx,{type:'doughnut',data:{labels:['ประกาศ','ใบงาน','ข้อสอบ','วิดีโอ'],datasets:[{data:counts.slice(1,5),backgroundColor:['#c94b00','#f39800','#e65c00','#ffc107'],borderWidth:2}]},options:{plugins:{legend:{position:'bottom',labels:{font:{family:'Sarabun',size:12}}}},maintainAspectRatio:true}});
+}
+
+// ==================== CLASSROOMS ====================
+async function loadClassrooms(){
+  const tb=document.getElementById('tbClassrooms');tb.innerHTML='';
+  const snap=await getDocs(collection(db,'classrooms'));
+  snap.forEach(d=>{const r=d.data();tb.innerHTML+=`<tr><td><b>${r.name||d.id}</b></td><td><span class="badge badge-orange">${r.code||'-'}</span></td><td>${r.studentCount||0}</td><td><button class="btn btn-gray btn-sm" onclick="editClassroom('${d.id}','${r.name}','${r.code}')">✏️</button> <button class="btn btn-red btn-sm" onclick="delDoc('classrooms','${d.id}',loadClassrooms)">🗑️</button></td></tr>`;});
+}
+window.editClassroom=function(id,name,code){document.getElementById('clsId').value=id;document.getElementById('clsName').value=name;document.getElementById('clsCode').value=code;openModal('modalClassroom');};
+window.saveClassroom=async function(){
+  const id=document.getElementById('clsId').value,name=document.getElementById('clsName').value.trim(),code=document.getElementById('clsCode').value.trim();
+  if(!name)return;
+  if(id){await setDoc(doc(db,'classrooms',id),{name,code},{merge:true});}
+  else{await addDoc(collection(db,'classrooms'),{name,code,studentCount:0,createdAt:serverTimestamp()});}
+  closeModal('modalClassroom');loadClassrooms();document.getElementById('clsId').value='';
+};
+
+// ==================== ANNOUNCEMENTS ====================
+async function loadAnnouncements(){
+  const tb=document.getElementById('tbAnn');tb.innerHTML='';
+  const q=query(collection(db,'announcements'),orderBy('createdAt','desc'));
+  const snap=await getDocs(q);
+  snap.forEach(d=>{const a=d.data();const dt=a.createdAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
+    tb.innerHTML+=`<tr><td><b>${a.title||'-'}</b></td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.content||''}</td><td>${dt}</td><td><button class="btn btn-gray btn-sm" onclick="editAnn('${d.id}','${esc(a.title)}','${esc(a.content)}')">✏️</button> <button class="btn btn-red btn-sm" onclick="delDoc('announcements','${d.id}',loadAnnouncements)">🗑️</button></td></tr>`;
+  });
+}
+window.editAnn=function(id,t,c){document.getElementById('annId').value=id;document.getElementById('annTitle').value=t;document.getElementById('annContent').value=c;openModal('modalAnn');};
+window.saveAnn=async function(){
+  const id=document.getElementById('annId').value,title=document.getElementById('annTitle').value.trim(),content=document.getElementById('annContent').value.trim();
+  if(!title)return;
+  if(id)await setDoc(doc(db,'announcements',id),{title,content},{merge:true});
+  else await addDoc(collection(db,'announcements'),{title,content,createdAt:serverTimestamp()});
+  closeModal('modalAnn');document.getElementById('annId').value='';loadAnnouncements();
+};
+
+// ==================== WORKSHEETS ====================
+async function loadWorksheets(){
+  const tb=document.getElementById('tbWs');tb.innerHTML='';
+  const q=query(collection(db,'worksheets'),orderBy('createdAt','desc'));
+  const snap=await getDocs(q);
+  snap.forEach(d=>{const w=d.data();const dt=w.createdAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
+    tb.innerHTML+=`<tr><td><b>${w.title||'-'}</b></td><td>${w.subject||'-'}</td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${w.description||''}</td><td>${dt}</td><td><button class="btn btn-gray btn-sm" onclick="editWs('${d.id}')">✏️</button> <button class="btn btn-red btn-sm" onclick="delDoc('worksheets','${d.id}',loadWorksheets)">🗑️</button></td></tr>`;
+    window['_ws_'+d.id]=w;
+  });
+}
+window.editWs=function(id){const w=window['_ws_'+id]||{};document.getElementById('wsId').value=id;document.getElementById('wsTitle').value=w.title||'';document.getElementById('wsSubject').value=w.subject||'';document.getElementById('wsDesc').value=w.description||'';document.getElementById('wsUrl').value=w.fileUrl||'';document.getElementById('wsHtml').value=w.htmlContent||'';openModal('modalWs');};
+window.saveWs=async function(){
+  const id=document.getElementById('wsId').value;
+  const data={title:document.getElementById('wsTitle').value.trim(),subject:document.getElementById('wsSubject').value.trim(),description:document.getElementById('wsDesc').value.trim(),fileUrl:document.getElementById('wsUrl').value.trim(),htmlContent:document.getElementById('wsHtml').value.trim()};
+  if(!data.title)return;
+  if(id)await setDoc(doc(db,'worksheets',id),data,{merge:true});
+  else await addDoc(collection(db,'worksheets'),{...data,createdAt:serverTimestamp()});
+  closeModal('modalWs');document.getElementById('wsId').value='';loadWorksheets();
+};
+
+// ==================== QUIZZES ====================
+async function loadQuizzes(){
+  const tb=document.getElementById('tbQuiz');tb.innerHTML='';
+  const sel=document.getElementById('resultFilter');sel.innerHTML='<option value="">-- ทุกข้อสอบ --</option>';
+  const q=query(collection(db,'quizzes'),orderBy('createdAt','desc'));
+  const snap=await getDocs(q);
+  snap.forEach(d=>{const qz=d.data();
+    tb.innerHTML+=`<tr><td><b>${qz.title||'-'}</b></td><td>${qz.timeLimit||30} นาที</td><td>${(qz.questions||[]).length} ข้อ</td><td>${qz.passingScore||60}%</td><td><button class="btn btn-gray btn-sm" onclick="editQuiz('${d.id}')">✏️</button> <button class="btn btn-red btn-sm" onclick="delDoc('quizzes','${d.id}',loadQuizzes)">🗑️</button></td></tr>`;
+    sel.innerHTML+=`<option value="${d.id}">${qz.title||d.id}</option>`;
+    window['_qz_'+d.id]=qz;
+  });
+}
+window.editQuiz=function(id){const qz=window['_qz_'+id]||{};document.getElementById('qzId').value=id;document.getElementById('qzTitle').value=qz.title||'';document.getElementById('qzTime').value=qz.timeLimit||30;document.getElementById('qzPass').value=qz.passingScore||60;quizQuestions=[...(qz.questions||[])];renderQuestions();openModal('modalQuiz');};
+window.addQuestion=function(){quizQuestions.push({question:'',options:['','','',''],correctIndex:0,explanation:''});renderQuestions();};
+function renderQuestions(){
+  const opts=['ก','ข','ค','ง'];
+  document.getElementById('qzQuestions').innerHTML=quizQuestions.map((q,qi)=>`
+    <div class="q-item"><div class="q-item-header"><span class="q-item-label">คำถามที่ ${qi+1}</span>
+      <button class="btn btn-red btn-sm" onclick="removeQ(${qi})">✕</button></div>
+    <div class="form-row"><input type="text" value="${esc(q.question)}" placeholder="คำถาม" oninput="quizQuestions[${qi}].question=this.value"/></div>
+    ${q.options.map((o,oi)=>`<div class="opt-row">
+      <input type="radio" name="correct_${qi}" ${q.correctIndex===oi?'checked':''} onchange="quizQuestions[${qi}].correctIndex=${oi}"/>
+      <span class="option-letter" style="width:24px;height:24px;border-radius:50%;background:#ffd0a0;color:#c94b00;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${opts[oi]}</span>
+      <input type="text" value="${esc(o)}" placeholder="ตัวเลือก ${opts[oi]}" oninput="quizQuestions[${qi}].options[${oi}]=this.value"/>
+    </div>`).join('')}
+    <div class="form-row"><input type="text" value="${esc(q.explanation||'')}" placeholder="คำอธิบาย (ไม่บังคับ)" oninput="quizQuestions[${qi}].explanation=this.value"/></div>
+  </div>`).join('');
+}
+window.removeQ=function(i){quizQuestions.splice(i,1);renderQuestions();};
+window.saveQuiz=async function(){
+  const id=document.getElementById('qzId').value;
+  const data={title:document.getElementById('qzTitle').value.trim(),timeLimit:parseInt(document.getElementById('qzTime').value)||30,passingScore:parseInt(document.getElementById('qzPass').value)||60,questions:quizQuestions};
+  if(!data.title)return;
+  if(id)await setDoc(doc(db,'quizzes',id),data,{merge:true});
+  else await addDoc(collection(db,'quizzes'),{...data,createdAt:serverTimestamp()});
+  closeModal('modalQuiz');document.getElementById('qzId').value='';quizQuestions=[];loadQuizzes();
+};
+
+// ==================== VIDEOS ====================
+async function loadVideos(){
+  const tb=document.getElementById('tbVideo');tb.innerHTML='';
+  const q=query(collection(db,'videos'),orderBy('createdAt','desc'));
+  const snap=await getDocs(q);
+  snap.forEach(d=>{const v=d.data();const dt=v.createdAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
+    tb.innerHTML+=`<tr><td><b>${v.title||'-'}</b></td><td><a href="${v.url||'#'}" target="_blank" style="color:#1565c0;font-size:12px">🔗 ลิงก์</a></td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.description||''}</td><td>${dt}</td><td><button class="btn btn-gray btn-sm" onclick="editVideo('${d.id}','${esc(v.title)}','${esc(v.url)}','${esc(v.description)}')">✏️</button> <button class="btn btn-red btn-sm" onclick="delDoc('videos','${d.id}',loadVideos)">🗑️</button></td></tr>`;
+  });
+}
+window.editVideo=function(id,t,u,d){document.getElementById('vidId').value=id;document.getElementById('vidTitle').value=t;document.getElementById('vidUrl').value=u;document.getElementById('vidDesc').value=d;openModal('modalVideo');};
+window.saveVideo=async function(){
+  const id=document.getElementById('vidId').value;
+  const data={title:document.getElementById('vidTitle').value.trim(),url:document.getElementById('vidUrl').value.trim(),description:document.getElementById('vidDesc').value.trim()};
+  if(!data.title)return;
+  if(id)await setDoc(doc(db,'videos',id),data,{merge:true});
+  else await addDoc(collection(db,'videos'),{...data,createdAt:serverTimestamp()});
+  closeModal('modalVideo');document.getElementById('vidId').value='';loadVideos();
+};
+
+// ==================== RESULTS ====================
+window.loadResults = async function(){
+  const tb=document.getElementById('tbResults');tb.innerHTML='';
+  const filter=document.getElementById('resultFilter').value;
+  const q=filter?query(collection(db,'quiz_results'),orderBy('submittedAt','desc')):query(collection(db,'quiz_results'),orderBy('submittedAt','desc'));
+  const snap=await getDocs(q);
+  snap.forEach(d=>{const r=d.data();
+    if(filter&&r.quizId!==filter)return;
+    const dt=r.submittedAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
+    const pass=r.score>=(r.passingScore||60);
+    tb.innerHTML+=`<tr><td>${r.studentName||r.studentId||'-'}</td><td>${r.quizTitle||r.quizId||'-'}</td><td><span class="badge ${pass?'badge-green':'badge-orange'}">${r.score||0}%</span></td><td>${r.correct||0}/${r.total||0}</td><td>${dt}</td></tr>`;
+  });
+};
+
+// ==================== CHAT ====================
+async function initTeacherChat(){
+  if(chatUnsub){chatUnsub();chatUnsub=null;}
+  const snap=await getDocs(collection(db,'classrooms'));
+  const tabs=document.getElementById('chatRoomTabs');
+  tabs.innerHTML='';
+  const rooms=[];
+  snap.forEach(d=>{const r=d.data();rooms.push({id:d.id,name:r.name||d.id});});
+  if(!rooms.length){tabs.innerHTML='<span style="color:#bbb;font-size:13px">ยังไม่มีห้อง</span>';return;}
+  rooms.forEach((r,i)=>{tabs.innerHTML+=`<button class="room-tab ${i===0?'active':''}" id="ctab_${r.id}" onclick="openChatRoom('${r.id}')">${r.name}</button>`;});
+  openChatRoom(rooms[0].id);
+}
+window.openChatRoom=function(id){
+  document.querySelectorAll('.room-tab').forEach(t=>t.classList.remove('active'));
+  const tb=document.getElementById('ctab_'+id);if(tb)tb.classList.add('active');
+  if(chatUnsub){chatUnsub();chatUnsub=null;}
+  currentChatRoom=id;
+  const q=query(collection(db,'chats','rooms',id,'messages'),orderBy('createdAt','asc'));
+  chatUnsub=onSnapshot(q,snap=>{
+    const el=document.getElementById('chatMsgs');
+    if(snap.empty){el.innerHTML='<div class="empty-state"><p style="color:#bbb;font-size:13px">ยังไม่มีข้อความในห้องนี้</p></div>';return;}
+    let h='';
+    snap.forEach(d=>{const m=d.data();
+      const mine=m.role==='teacher';
+      const dt=m.createdAt?.toDate?.()?.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})||'';
+      h+=`<div class="msg ${mine?'mine':'theirs'}">
+        ${!mine?`<div class="msg-sender">${m.sender||'นักเรียน'}</div>`:''}
+        <div class="msg-bubble">${m.text}</div>
+        <div class="msg-time">${dt}</div>
+      </div>`;
+    });
+    el.innerHTML=h;el.scrollTop=el.scrollHeight;
+  });
+};
+window.sendTeacherChat=async function(){
+  const inp=document.getElementById('chatInput');const text=inp.value.trim();
+  if(!text||!currentChatRoom)return;inp.value='';
+  const auth2=getAuth(app);
+  await addDoc(collection(db,'chats','rooms',currentChatRoom,'messages'),{
+    text,sender:'ครู รณฤทธิ์ ศรีสองเมือง',role:'teacher',createdAt:serverTimestamp()
+  });
+};
+
+// ==================== UTILS ====================
+window.delDoc=async function(col,id,cb){
+  if(!confirm('ลบรายการนี้?'))return;
+  await deleteDoc(doc(db,col,id));cb();
+};
+function esc(s){return (s||'').replace(/'/g,"&#39;").replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>
