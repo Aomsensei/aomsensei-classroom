@@ -86,9 +86,7 @@ input.si.wide{width:32px}
     </div>
   </div>
   <div class="hd-right">
-    <button class="btn btn-teal" onclick="exportData()">💾 สำรอง (.json)</button>
-    <label class="btn btn-teal" style="cursor:pointer">📂 นำเข้า (.json)<input type="file" accept=".json" onchange="importData(event)" style="display:none"></label>
-    <button class="btn btn-firebase" id="btnSync" onclick="manualSync()">☁️ บันทึก Firebase</button>
+    <span id="autoSyncBadge" style="background:rgba(255,255,255,.2);color:#fff;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700">☁️ auto-sync</span>
     <button class="btn btn-blue" onclick="openPrintModal()">🖨️ พิมพ์รายงาน</button>
     <button class="btn btn-orange" onclick="openAddClassModal()">➕ ชั้นเรียน</button>
     <a href="admin.html" class="btn btn-gray">🔙 Admin</a>
@@ -277,24 +275,24 @@ async function syncToFirebase(){
   try{
     await setDoc(doc(db,'score_system',FB_DOC),{data:state,updatedAt:serverTimestamp()});
     localStorage.setItem(STORE_KEY,JSON.stringify(state));
-    setStatus('sync','☁️ บันทึก Firebase เรียบร้อย · '+new Date().toLocaleTimeString('th-TH'));
+    setStatus('sync','☁️ บันทึกอัตโนมัติแล้ว · '+new Date().toLocaleTimeString('th-TH'));
+    const badge=document.getElementById('autoSyncBadge');
+    if(badge) badge.textContent='☁️ auto-sync ✓';
   }catch(e){
     localStorage.setItem(STORE_KEY,JSON.stringify(state));
     setStatus('ok','💾 บันทึก Local · Firebase ล้มเหลว ('+e.code+')');
+    const badge=document.getElementById('autoSyncBadge');
+    if(badge) badge.textContent='⚠️ ออฟไลน์ (บันทึกเฉพาะเครื่อง)';
   }
 }
-
-window.manualSync=async function(){
-  document.getElementById('btnSync').textContent='⏳ กำลังบันทึก...';
-  await syncToFirebase();
-  document.getElementById('btnSync').textContent='☁️ บันทึก Firebase';
-};
 
 function saveState(){
   localStorage.setItem(STORE_KEY,JSON.stringify(state));
   clearTimeout(syncTimeout);
-  syncTimeout=setTimeout(()=>syncToFirebase(),3000);
-  setStatus('sync','⏳ กำลังบันทึก...');
+  syncTimeout=setTimeout(()=>syncToFirebase(),2000);
+  setStatus('sync','⏳ กำลังบันทึกอัตโนมัติ...');
+  const badge=document.getElementById('autoSyncBadge');
+  if(badge) badge.textContent='⏳ กำลังบันทึก...';
 }
 
 function setStatus(type,text){
@@ -303,29 +301,6 @@ function setStatus(type,text){
   txt.innerHTML=text;
 }
 
-// ==================== EXPORT/IMPORT ====================
-window.exportData=function(){
-  const now=new Date();
-  const ts=`${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
-  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download=`คะแนน_หินฝนวิทยาคม_${ts}.json`;a.click();
-};
-window.importData=function(e){
-  const file=e.target.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    try{
-      const data=JSON.parse(ev.target.result);
-      if(!data.classes||!data.subjects)throw new Error('ไฟล์ไม่ถูกต้อง');
-      state=data;saveState();
-      currentClass=Object.keys(state.classes)[0]||'';
-      renderTabs();renderSubjectSelect();renderTable();
-      alert('✅ นำเข้าข้อมูลสำเร็จ!');
-    }catch(err){alert('❌ ไฟล์ไม่ถูกต้อง');}
-  };
-  reader.readAsText(file);e.target.value='';
-};
 
 // ==================== GRADE ====================
 function calcGrade(t){t=parseFloat(t)||0;if(t>=80)return 4;if(t>=75)return 3.5;if(t>=70)return 3;if(t>=65)return 2.5;if(t>=60)return 2;if(t>=55)return 1.5;if(t>=50)return 1;return 0;}
