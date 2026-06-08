@@ -82,7 +82,7 @@ service cloud.firestore {
     }
 
     // ===== แชท: นักเรียนส่งได้, อ่านได้, ครูลบได้ =====
-    match /chats/rooms/{roomId}/messages/{msgId} {
+    match /chats/{roomId}/messages/{msgId} {
       allow read: if true;
       allow create: if true;
       allow delete: if request.auth != null;
@@ -93,6 +93,12 @@ service cloud.firestore {
       allow read: if true;
       allow create: if true;
       allow update, delete: if request.auth != null;
+    }
+
+    // ===== ตั้งค่าเว็บไซต์ (โลโก้/โปรไฟล์): ทุกคนอ่านได้, ครูเขียนได้ =====
+    match /settings/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
     }
   }
 }
