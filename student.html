@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ห้องเรียนออนไลน์ | นักเรียน</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:100vh}
+:root{--primary:#c94b00;--primary-dark:#a33b00;--secondary:#f39800;--accent:#e65c00;--bg-light:#fff8f3;--gradient:linear-gradient(135deg,#c94b00 0%,#f39800 100%)}
+
+/* Login */
+.login-screen{min-height:100vh;background:var(--gradient);display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{background:#fff;border-radius:20px;padding:40px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2);text-align:center}
+.login-logo{width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:14px;border:3px solid #f39800}
+.login-card h1{font-size:22px;font-weight:800;color:#c94b00;margin-bottom:4px}
+.login-card p{font-size:13px;color:#888;margin-bottom:24px}
+.login-card input,.login-card select{width:100%;padding:12px 16px;border:2px solid #ffd0a0;border-radius:10px;font-size:15px;font-family:inherit;margin-bottom:12px;outline:none;transition:.2s}
+.login-card input:focus,.login-card select:focus{border-color:#c94b00}
+.btn-login{width:100%;padding:14px;background:var(--gradient);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;transition:.2s}
+.btn-login:hover{opacity:.9;transform:translateY(-1px)}
+.login-err{background:#ffebee;color:#c62828;padding:10px;border-radius:8px;font-size:13px;margin-top:8px;display:none}
+
+/* App */
+.app-screen{display:none;min-height:100vh;flex-direction:column}
+.top-bar{background:var(--gradient);color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 3px 12px rgba(201,75,0,.4);position:sticky;top:0;z-index:50}
+.top-bar-left{display:flex;align-items:center;gap:10px}
+.top-bar-left img{width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,255,255,.5);object-fit:cover}
+.top-bar-left .info .name{font-size:14px;font-weight:800}
+.top-bar-left .info .cls{font-size:11px;opacity:.85}
+.btn-logout{background:rgba(255,255,255,.2);color:#fff;border:none;padding:6px 12px;border-radius:20px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700}
+
+/* Tabs */
+.nav-tabs{display:flex;background:#e65c00;overflow-x:auto;scrollbar-width:none;position:sticky;top:56px;z-index:40}
+.nav-tabs::-webkit-scrollbar{display:none}
+.nav-tab{flex:1;min-width:60px;padding:10px 6px;text-align:center;color:rgba(255,255,255,.7);cursor:pointer;font-size:12px;font-weight:700;border:none;background:none;white-space:nowrap;transition:.15s}
+.nav-tab.active{background:#fff8f3;color:#c94b00;border-radius:8px 8px 0 0}
+.nav-tab i{display:block;font-size:17px;margin-bottom:2px}
+
+/* Content */
+.tab-content{display:none;padding:14px}
+.tab-content.active{display:block}
+
+.section-title{font-size:18px;font-weight:800;color:#c94b00;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+
+.card{background:#fff;border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 2px 12px rgba(201,75,0,.1);border-left:4px solid #f39800}
+.card-title{font-size:15px;font-weight:700;color:#333;margin-bottom:5px}
+.card-meta{font-size:12px;color:#999;margin-bottom:8px}
+.card-desc{font-size:13px;color:#555;line-height:1.6}
+.card-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+
+.btn{padding:8px 16px;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;transition:.15s;display:inline-flex;align-items:center;gap:5px;text-decoration:none}
+.btn-orange{background:#c94b00;color:#fff}.btn-orange:hover{background:#a33b00}
+.btn-green{background:#2e7d32;color:#fff}.btn-green:hover{background:#1b5e20}
+.btn-blue{background:#1565c0;color:#fff}.btn-blue:hover{background:#0d47a1}
+.btn-sm{padding:5px 10px;font-size:12px}
+
+/* Announcement */
+.ann-card{background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 2px 12px rgba(201,75,0,.1);border-top:3px solid #f39800}
+.ann-title{font-size:15px;font-weight:800;color:#c94b00;margin-bottom:6px}
+.ann-body{font-size:13.5px;color:#444;line-height:1.7;white-space:pre-wrap}
+.ann-date{font-size:11px;color:#bbb;margin-top:6px}
+
+/* Quiz card */
+.quiz-card{background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 2px 12px rgba(201,75,0,.1);border-left:4px solid #c94b00;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.quiz-info{flex:1}
+.quiz-title{font-size:14px;font-weight:700;color:#333}
+.quiz-meta{font-size:11px;color:#999;margin-top:2px}
+.quiz-result-badge{background:#e8f5e9;color:#2e7d32;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:700;white-space:nowrap}
+.quiz-result-badge.fail{background:#ffebee;color:#c62828}
+
+/* Score table */
+.score-table{width:100%;border-collapse:collapse;font-size:13px}
+.score-table th{background:#c94b00;color:#fff;padding:8px 10px;text-align:left}
+.score-table td{padding:8px 10px;border-bottom:1px solid #ffd0a0}
+.score-table tr:nth-child(even) td{background:#fff3e8}
+.grade-badge{display:inline-block;background:#f39800;color:#fff;border-radius:12px;padding:2px 10px;font-weight:800;font-size:13px}
+
+/* Chat */
+.chat-container{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(201,75,0,.1);display:flex;flex-direction:column;height:calc(100vh - 180px);min-height:300px}
+.chat-header{background:var(--gradient);color:#fff;padding:10px 14px;border-radius:12px 12px 0 0;display:flex;align-items:center;gap:10px}
+.chat-header img{width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,255,255,.5)}
+.chat-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:80%;display:flex;flex-direction:column;gap:2px}
+.msg.mine{align-self:flex-end;align-items:flex-end}
+.msg.theirs{align-self:flex-start;align-items:flex-start}
+.msg-bubble{padding:9px 13px;border-radius:16px;font-size:14px;line-height:1.5;word-break:break-word}
+.msg.mine .msg-bubble{background:#c94b00;color:#fff;border-radius:16px 16px 4px 16px}
+.msg.theirs .msg-bubble{background:#f0f0f0;color:#333;border-radius:16px 16px 16px 4px}
+.msg-time{font-size:10px;color:#bbb}
+.chat-input-row{padding:10px;border-top:1px solid #ffd0a0;display:flex;gap:8px}
+.chat-input-row input{flex:1;padding:10px 14px;border:1.5px solid #ffd0a0;border-radius:20px;font-size:14px;font-family:inherit;outline:none}
+.chat-input-row input:focus{border-color:#c94b00}
+.chat-send{background:#c94b00;color:#fff;border:none;border-radius:50%;width:40px;height:40px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* Video */
+.video-card{background:#fff;border-radius:12px;overflow:hidden;margin-bottom:12px;box-shadow:0 2px 12px rgba(201,75,0,.1)}
+.video-card iframe{width:100%;aspect-ratio:16/9;display:block;border:none}
+.video-card .video-info{padding:10px 12px}
+.video-title{font-size:14px;font-weight:700;color:#333;margin-bottom:3px}
+.video-desc{font-size:12px;color:#777}
+
+.empty-state{text-align:center;padding:40px 20px;color:#bbb}
+.empty-state i{font-size:48px;margin-bottom:10px;display:block}
+.empty-state p{font-size:14px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <img id="loginLogo" src="images/logo.png" class="login-logo" alt="logo" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 80%22><circle cx=%2240%22 cy=%2240%22 r=%2240%22 fill=%22%23c94b00%22/><text x=%2240%22 y=%2255%22 font-size=%2240%22 text-anchor=%22middle%22 fill=%22white%22>🏫</text></svg>'"/>
+    <h1>ห้องเรียนออนไลน์</h1>
+    <p>โรงเรียนหินฝนวิทยาคม</p>
+    <select id="loginRoom"><option value="">-- เลือกห้องเรียน --</option></select>
+    <input type="text" id="loginName" placeholder="ชื่อของนักเรียน" autocomplete="off"/>
+    <button class="btn-login" onclick="doLogin()">🚪 เข้าสู่ห้องเรียน</button>
+    <div id="loginErr" class="login-err">รหัสห้องหรือชื่อไม่ถูกต้อง กรุณาลองใหม่</div>
+  </div>
+</div>
+
+<!-- APP SCREEN -->
+<div id="appScreen" class="app-screen">
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <img src="images/logo.png" alt="logo" onerror="this.style.display='none'"/>
+      <div class="info">
+        <div class="name" id="welcomeName">สวัสดี นักเรียน</div>
+        <div class="cls" id="welcomeClass">โรงเรียนหินฝนวิทยาคม</div>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">🚪 ออก</button>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('announce')" id="tab-announce"><i class="fas fa-bullhorn"></i>ประกาศ</button>
+    <button class="nav-tab" onclick="switchTab('worksheet')" id="tab-worksheet"><i class="fas fa-file-alt"></i>ใบงาน</button>
+    <button class="nav-tab" onclick="switchTab('quiz')" id="tab-quiz"><i class="fas fa-pen-to-square"></i>ข้อสอบ</button>
+    <button class="nav-tab" onclick="switchTab('video')" id="tab-video"><i class="fas fa-play-circle"></i>วิดีโอ</button>
+    <button class="nav-tab" onclick="switchTab('score')" id="tab-score"><i class="fas fa-chart-bar"></i>คะแนน</button>
+    <button class="nav-tab" onclick="switchTab('chat')" id="tab-chat"><i class="fas fa-comments"></i>แชทครู</button>
+  </div>
+
+  <!-- ประกาศ -->
+  <div id="content-announce" class="tab-content active">
+    <div class="section-title"><i class="fas fa-bullhorn"></i> ประกาศจากครู</div>
+    <div id="announceList"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>กำลังโหลด...</p></div></div>
+  </div>
+
+  <!-- ใบงาน -->
+  <div id="content-worksheet" class="tab-content">
+    <div class="section-title"><i class="fas fa-file-alt"></i> ใบงาน</div>
+    <div id="worksheetList"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>กำลังโหลด...</p></div></div>
+  </div>
+
+  <!-- ข้อสอบ -->
+  <div id="content-quiz" class="tab-content">
+    <div class="section-title"><i class="fas fa-pen-to-square"></i> ข้อสอบออนไลน์</div>
+    <div id="quizList"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>กำลังโหลด...</p></div></div>
+  </div>
+
+  <!-- วิดีโอ -->
+  <div id="content-video" class="tab-content">
+    <div class="section-title"><i class="fas fa-play-circle"></i> วิดีโอการเรียนรู้</div>
+    <div id="videoList"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>กำลังโหลด...</p></div></div>
+  </div>
+
+  <!-- คะแนน -->
+  <div id="content-score" class="tab-content">
+    <div class="section-title"><i class="fas fa-chart-bar"></i> ผลคะแนนของฉัน</div>
+    <div id="scoreList"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>กำลังโหลด...</p></div></div>
+  </div>
+
+  <!-- แชท -->
+  <div id="content-chat" class="tab-content" style="padding:14px">
+    <div class="chat-container">
+      <div class="chat-header">
+        <img src="images/teacher.jpg" alt="ครู" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22><circle cx=%2220%22 cy=%2220%22 r=%2220%22 fill=%22%23f39800%22/><text x=%2220%22 y=%2227%22 font-size=%2222%22 text-anchor=%22middle%22 fill=%22white%22>👨‍🏫</text></svg>'"/>
+        <div>
+          <div style="font-weight:800;font-size:14px">ครู รณฤทธิ์ ศรีสองเมือง</div>
+          <div style="font-size:11px;opacity:.85">แชทถามครูได้เลย!</div>
+        </div>
+        <div id="chatStatus" style="margin-left:auto;font-size:11px;opacity:.8"></div>
+      </div>
+      <div id="chatMessages" class="chat-messages">
+        <div class="empty-state" style="flex:1;justify-content:center;display:flex;flex-direction:column;align-items:center">
+          <i class="fas fa-comments" style="font-size:36px;color:#ffd0a0;margin-bottom:8px"></i>
+          <p style="color:#bbb;font-size:13px">ยังไม่มีข้อความ<br>ส่งคำถามให้ครูได้เลย!</p>
+        </div>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" placeholder="พิมพ์คำถาม..." onkeydown="if(event.key==='Enter')sendChat()"/>
+        <button class="chat-send" onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PDF Print area -->
+<div id="pdfPrintArea" style="display:none;position:fixed;inset:0;background:#fff;z-index:9999;padding:30px;overflow:auto">
+  <div style="max-width:800px;margin:0 auto">
+    <div style="margin-bottom:16px;display:flex;gap:10px" class="no-print-btn">
+      <button onclick="window.print()" style="padding:8px 20px;background:#c94b00;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-family:inherit;font-weight:700">🖨️ พิมพ์ / บันทึก PDF</button>
+      <button onclick="closePdf()" style="padding:8px 20px;background:#546e7a;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-family:inherit;font-weight:700">✕ ปิด</button>
+    </div>
+    <div id="pdfContent"></div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { FIREBASE_CONFIG } from "./js/config.js";
+
+const app = initializeApp(FIREBASE_CONFIG);
+const db = getFirestore(app);
+
+let currentStudent = null;
+let chatUnsub = null;
+
+// ==================== ROOMS ====================
+async function loadRooms(){
+  try{
+    const snap = await getDocs(collection(db,'classrooms'));
+    const sel = document.getElementById('loginRoom');
+    snap.forEach(d=>{const r=d.data();sel.innerHTML+=`<option value="${d.id}">${r.name||d.id} (รหัส: ${r.code||d.id})</option>`;});
+  }catch(e){console.log(e);}
+}
+loadRooms();
+
+// ==================== LOGIN ====================
+window.doLogin = async function(){
+  const roomId=document.getElementById('loginRoom').value;
+  const name=document.getElementById('loginName').value.trim();
+  if(!roomId||!name){document.getElementById('loginErr').style.display='block';return;}
+  try{
+    const snap=await getDocs(collection(db,'classrooms'));
+    let room=null;
+    snap.forEach(d=>{if(d.id===roomId)room={id:d.id,...d.data()};});
+    if(!room){document.getElementById('loginErr').style.display='block';return;}
+    currentStudent={roomId:room.id,roomName:room.name||room.id,name};
+    document.getElementById('loginErr').style.display='none';
+    document.getElementById('welcomeName').textContent='สวัสดี '+name;
+    document.getElementById('welcomeClass').textContent=room.name||room.id+' · โรงเรียนหินฝนวิทยาคม';
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('appScreen').style.display='flex';
+    loadAll();
+  }catch(e){console.log(e);document.getElementById('loginErr').style.display='block';}
+};
+
+window.doLogout = function(){
+  if(chatUnsub)chatUnsub();
+  currentStudent=null;
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('appScreen').style.display='none';
+};
+
+// ==================== TABS ====================
+window.switchTab = function(t){
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('content-'+t).classList.add('active');
+  document.getElementById('tab-'+t).classList.add('active');
+  if(t==='chat')initChat();
+};
+
+// ==================== LOAD ALL ====================
+function loadAll(){loadAnnouncements();loadWorksheets();loadQuizzes();loadVideos();loadScores();}
+
+// ==================== ANNOUNCEMENTS ====================
+async function loadAnnouncements(){
+  const el=document.getElementById('announceList');
+  try{
+    const q=query(collection(db,'announcements'),orderBy('createdAt','desc'));
+    const snap=await getDocs(q);
+    if(snap.empty){el.innerHTML='<div class="empty-state"><i class="fas fa-bullhorn"></i><p>ยังไม่มีประกาศ</p></div>';return;}
+    let h='';
+    snap.forEach(d=>{const a=d.data();
+      const dt=a.createdAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
+      h+=`<div class="ann-card"><div class="ann-title">${a.title||'ประกาศ'}</div><div class="ann-body">${a.content||''}</div><div class="ann-date">📅 ${dt}</div></div>`;
+    });
+    el.innerHTML=h;
+  }catch(e){el.innerHTML='<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้</p></div>';}
+}
+
+// ==================== WORKSHEETS ====================
+async function loadWorksheets(){
+  const el=document.getElementById('worksheetList');
+  try{
+    const q=query(collection(db,'worksheets'),orderBy('createdAt','desc'));
+    const snap=await getDocs(q);
+    if(snap.empty){el.innerHTML='<div class="empty-state"><i class="fas fa-file-alt"></i><p>ยังไม่มีใบงาน</p></div>';return;}
+    let h='';
+    snap.forEach(d=>{const w=d.data();
+      const dt=w.createdAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
+      const hasLink=w.fileUrl||w.htmlContent;
+      h+=`<div class="card"><div class="card-title">📄 ${w.title||'ใบงาน'}</div>
+        <div class="card-meta">📅 ${dt}${w.subject?' · '+w.subject:''}</div>
+        <div class="card-desc">${w.description||''}</div>
+        <div class="card-actions">
+          ${hasLink?`<button class="btn btn-orange btn-sm" onclick="openWorksheet('${d.id}')">📖 เปิดใบงาน</button>`:''}
+          <button class="btn btn-blue btn-sm" onclick="printWorksheet('${d.id}')">🖨️ พิมพ์ / PDF</button>
+        </div></div>`;
+    });
+    el.innerHTML=h;
+    window._worksheets={};snap.forEach(d=>window._worksheets[d.id]=d.data());
+  }catch(e){el.innerHTML='<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้</p></div>';}
+}
+window.openWorksheet=function(id){const w=window._worksheets[id];if(w?.fileUrl){window.open(w.fileUrl,'_blank');}else if(w?.htmlContent){const b=window.open('','_blank');b.document.write(w.htmlContent);b.document.close();}};
+window.printWorksheet=function(id){
+  const w=window._worksheets[id];if(!w)return;
+  const title=w.title||'ใบงาน';
+  const content=w.htmlContent||`<div style="font-family:'Sarabun',sans-serif;padding:30px;max-width:800px;margin:0 auto">
+    <h1 style="color:#c94b00;border-bottom:2px solid #f39800;padding-bottom:10px">${title}</h1>
+    ${w.subject?`<p style="color:#888;margin:8px 0">วิชา: ${w.subject}</p>`:''}
+    ${w.description?`<div style="margin-top:16px;line-height:2;font-size:15px">${w.description}</div>`:''}
+    <div style="margin-top:40px;border-top:1px dashed #ccc;padding-top:20px;font-size:13px;color:#aaa;text-align:center">
+      โรงเรียนหินฝนวิทยาคม · ครู รณฤทธิ์ ศรีสองเมือง
+    </div>
+  </div>`;
+  document.getElementById('pdfContent').innerHTML=content;
+  document.getElementById('pdfPrintArea').style.display='block';
+  document.title=title;
+};
+window.closePdf=function(){document.getElementById('pdfPrintArea').style.display='none';document.title='ห้องเรียนออนไลน์ | นักเรียน';};
+
+// ==================== QUIZZES ====================
+async function loadQuizzes(){
+  const el=document.getElementById('quizList');
+  try{
+    const q=query(collection(db,'quizzes'),orderBy('createdAt','desc'));
+    const snap=await getDocs(q);
+    if(snap.empty){el.innerHTML='<div class="empty-state"><i class="fas fa-pen-to-square"></i><p>ยังไม่มีข้อสอบ</p></div>';return;}
+    const results={};
+    try{
+      const rq=query(collection(db,'quiz_results'),where('studentId','==',currentStudent.name+'_'+currentStudent.roomId));
+      const rs=await getDocs(rq);
+      rs.forEach(d=>results[d.data().quizId]=d.data());
+    }catch(e){}
+    let h='';
+    snap.forEach(d=>{const qz=d.data();
+      const dt=qz.createdAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
+      const done=results[d.id];
+      h+=`<div class="quiz-card">
+        <div class="quiz-info"><div class="quiz-title">📝 ${qz.title||'ข้อสอบ'}</div>
+        <div class="quiz-meta">⏱️ ${qz.timeLimit||30} นาที · ${(qz.questions||[]).length} ข้อ · ${dt}</div></div>
+        ${done
+          ?`<span class="quiz-result-badge ${done.score<(qz.passingScore||60)?'fail':''}">${done.score}%</span>`
+          :`<button class="btn btn-orange btn-sm" onclick="startQuiz('${d.id}')">เริ่มสอบ</button>`}
+      </div>`;
+    });
+    el.innerHTML=h;
+  }catch(e){el.innerHTML='<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้</p></div>';}
+}
+window.startQuiz=function(id){
+  const u=`quiz.html?id=${id}&student=${encodeURIComponent(currentStudent.name)}&room=${encodeURIComponent(currentStudent.roomId)}`;
+  window.location.href=u;
+};
+
+// ==================== VIDEOS ====================
+async function loadVideos(){
+  const el=document.getElementById('videoList');
+  try{
+    const q=query(collection(db,'videos'),orderBy('createdAt','desc'));
+    const snap=await getDocs(q);
+    if(snap.empty){el.innerHTML='<div class="empty-state"><i class="fas fa-play-circle"></i><p>ยังไม่มีวิดีโอ</p></div>';return;}
+    let h='';
+    snap.forEach(d=>{const v=d.data();
+      const embedUrl=getYtEmbed(v.url||'');
+      h+=`<div class="video-card">
+        ${embedUrl?`<iframe src="${embedUrl}" allowfullscreen loading="lazy"></iframe>`:`<div style="background:#f5f5f5;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center"><a href="${v.url}" target="_blank" style="color:#c94b00;font-weight:700;text-decoration:none">▶️ เปิดวิดีโอ</a></div>`}
+        <div class="video-info"><div class="video-title">${v.title||'วิดีโอ'}</div><div class="video-desc">${v.description||''}</div></div>
+      </div>`;
+    });
+    el.innerHTML=h;
+  }catch(e){el.innerHTML='<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้</p></div>';}
+}
+function getYtEmbed(url){
+  const m=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/);
+  return m?'https://www.youtube.com/embed/'+m[1]:'';
+}
+
+// ==================== SCORES ====================
+async function loadScores(){
+  const el=document.getElementById('scoreList');
+  try{
+    const rq=query(collection(db,'quiz_results'),where('studentId','==',currentStudent.name+'_'+currentStudent.roomId));
+    const rs=await getDocs(rq);
+    if(rs.empty){el.innerHTML='<div class="empty-state"><i class="fas fa-chart-bar"></i><p>ยังไม่มีคะแนน</p></div>';return;}
+    let h=`<table class="score-table"><thead><tr><th>วิชา / ข้อสอบ</th><th>คะแนน</th><th>วันที่สอบ</th></tr></thead><tbody>`;
+    rs.forEach(d=>{const r=d.data();
+      const dt=r.submittedAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
+      h+=`<tr><td>${r.quizTitle||r.quizId||'-'}</td><td><span class="grade-badge">${r.score||0}%</span></td><td>${dt}</td></tr>`;
+    });
+    h+='</tbody></table>';
+    el.innerHTML=h;
+  }catch(e){el.innerHTML='<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้</p></div>';}
+}
+
+// ==================== CHAT ====================
+function initChat(){
+  if(!currentStudent||chatUnsub)return;
+  const roomId=currentStudent.roomId;
+  const q=query(collection(db,'chats','rooms',roomId,'messages'),orderBy('createdAt','asc'));
+  chatUnsub=onSnapshot(q,snap=>{
+    const el=document.getElementById('chatMessages');
+    if(snap.empty){el.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#bbb;font-size:13px"><i class="fas fa-comments" style="font-size:36px;color:#ffd0a0;margin-bottom:8px"></i><p>ยังไม่มีข้อความ ส่งคำถามให้ครูได้เลย!</p></div>`;return;}
+    let h='';
+    snap.forEach(d=>{const m=d.data();
+      const mine=m.sender===currentStudent.name;
+      const dt=m.createdAt?.toDate?.()?.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})||'';
+      h+=`<div class="msg ${mine?'mine':'theirs'}">
+        ${!mine?`<div style="font-size:11px;color:#c94b00;font-weight:700;margin-bottom:2px">${m.sender||'ครู'}</div>`:''}
+        <div class="msg-bubble">${m.text}</div>
+        <div class="msg-time">${dt}</div>
+      </div>`;
+    });
+    el.innerHTML=h;
+    el.scrollTop=el.scrollHeight;
+  });
+}
+window.sendChat=async function(){
+  const inp=document.getElementById('chatInput');const text=inp.value.trim();
+  if(!text||!currentStudent)return;
+  inp.value='';
+  try{
+    await addDoc(collection(db,'chats','rooms',currentStudent.roomId,'messages'),{
+      text,sender:currentStudent.name,role:'student',createdAt:serverTimestamp()
+    });
+  }catch(e){alert('ส่งข้อความไม่ได้ กรุณาลองใหม่');}
+};
+</script>
+<style>@media print{.no-print-btn{display:none!important}}</style>
+</body>
+</html>
