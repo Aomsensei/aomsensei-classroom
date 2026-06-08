@@ -102,6 +102,9 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
 .empty-state{text-align:center;padding:36px 20px;color:#ccc}
 .empty-state i{font-size:44px;margin-bottom:10px;display:block}
 
+/* Chat tab badge */
+.chat-tab-badge{background:#c62828;color:#fff;border-radius:50%;min-width:17px;height:17px;font-size:9px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;margin-left:3px;vertical-align:middle;animation:pulse-badge .8s infinite alternate}
+@keyframes pulse-badge{from{opacity:1;transform:scale(1)}to{opacity:.7;transform:scale(1.2)}}
 /* PDF overlay */
 #pdfOverlay{display:none;position:fixed;inset:0;background:#fff;z-index:9999;padding:20px;overflow:auto}
 .pdf-toolbar{display:flex;gap:10px;margin-bottom:16px}
@@ -149,7 +152,7 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
 
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="switchTab('ann')" id="tab-ann"><i class="fas fa-bullhorn"></i>ประกาศ</button>
-    <button class="nav-tab" onclick="switchTab('ws')" id="tab-ws"><i class="fas fa-file-alt"></i>ใบงาน</button>
+    <button class="nav-tab" onclick="switchTab('ws')" id="tab-ws"><i class="fas fa-file-alt"></i>ใบงานและใบความรู้</button>
     <button class="nav-tab" onclick="switchTab('quiz')" id="tab-quiz"><i class="fas fa-pen-to-square"></i>ข้อสอบ</button>
     <button class="nav-tab" onclick="switchTab('vid')" id="tab-vid"><i class="fas fa-play-circle"></i>วิดีโอ</button>
     <button class="nav-tab" onclick="switchTab('score')" id="tab-score"><i class="fas fa-chart-bar"></i>คะแนน</button>
@@ -162,7 +165,7 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
   </div>
 
   <div id="content-ws" class="tab-content">
-    <div class="section-title"><i class="fas fa-file-alt"></i> ใบงาน</div>
+    <div class="section-title"><i class="fas fa-file-alt"></i> ใบงานและใบความรู้</div>
     <div id="listWs"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i></div></div>
   </div>
 
@@ -213,11 +216,13 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, collection, getDocs, addDoc, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { FIREBASE_CONFIG } from "./js/config.js";
 
 const app = initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 async function loadSiteSettings(){
   try{
@@ -237,6 +242,9 @@ let student = null;  // { roomId, roomName, name }
 let chatUnsub = null;
 let _quizCache = {};
 window._worksheets = {};
+let _isChatTabActive = false;
+let _prevTeacherCount = 0;
+let _chatInitialized = false;
 
 // ==================== LOGIN ====================
 window.doLogin = async function(){
@@ -253,6 +261,7 @@ window.doLogin = async function(){
       if((r.code||'').toUpperCase() === code) room = {id: d.id, ...r};
     });
     if(!room){ err.textContent = '❌ ไม่พบรหัสห้อง "'+code+'" กรุณาตรวจสอบใหม่'; err.style.display='block'; return; }
+    try{ await signInAnonymously(auth); }catch(_){}
     student = { roomId: room.id, roomName: room.name || room.id, name };
     document.getElementById('welcomeName').textContent = 'สวัสดี ' + name;
     document.getElementById('welcomeCls').textContent = room.name + ' · โรงเรียนหินฝนวิทยาคม';
@@ -275,12 +284,28 @@ window.doLogout = function(){
 };
 
 // ==================== TABS ====================
+function _setChatBadge(count){
+  const tab=document.getElementById('tab-chat');if(!tab)return;
+  let badge=tab.querySelector('.chat-tab-badge');
+  if(count>0){
+    if(!badge){badge=document.createElement('span');badge.className='chat-tab-badge';tab.appendChild(badge);}
+    badge.textContent=count>9?'9+':String(count);
+  } else if(badge){badge.remove();}
+}
+
 window.switchTab = function(t){
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
   document.getElementById('content-'+t).classList.add('active');
   document.getElementById('tab-'+t).classList.add('active');
-  if(t === 'chat') initChat();
+  if(t === 'chat'){
+    _isChatTabActive=true;
+    _setChatBadge(0); // clear badge on open
+    _prevTeacherCount=0;_chatInitialized=false;
+    initChat();
+  } else {
+    _isChatTabActive=false;
+  }
 };
 
 // ==================== LOAD ALL ====================
@@ -327,7 +352,7 @@ async function loadWs(){
           <button class="btn btn-blue btn-sm" onclick="printWs('${d.id}')">🖨️ พิมพ์ PDF</button>
         </div></div>`;
     });
-    el.innerHTML = h || '<div class="empty-state"><i class="fas fa-file-alt"></i><p>ยังไม่มีใบงาน</p></div>';
+    el.innerHTML = h || '<div class="empty-state"><i class="fas fa-file-alt"></i><p>ยังไม่มีใบงาน/ใบความรู้</p></div>';
   }catch(e){ el.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`; }
 }
 window.openWs = function(id){ const w = window._worksheets[id]; if(!w?.htmlContent) return; const b = window.open('','_blank'); b.document.write(w.htmlContent); b.document.close(); };
@@ -455,9 +480,20 @@ async function loadScore(){
 // ==================== CHAT ====================
 function initChat(){
   if(!student || chatUnsub) return;
+  _chatInitialized=false;
   const q = query(collection(db,'chats', student.roomId,'messages'), orderBy('createdAt','asc'));
   chatUnsub = onSnapshot(q, snap => {
     const el = document.getElementById('chatMsgs');
+    // Count teacher messages for badge tracking
+    let teacherCount=0;
+    snap.forEach(d=>{if(d.data().role==='teacher')teacherCount++;});
+    // Baseline on first snapshot
+    if(!_chatInitialized){_prevTeacherCount=teacherCount;_chatInitialized=true;}
+    // Show badge if new teacher messages arrived while tab was inactive
+    else if(!_isChatTabActive&&teacherCount>_prevTeacherCount){
+      _setChatBadge(teacherCount-_prevTeacherCount);
+    }
+    if(_isChatTabActive)_prevTeacherCount=teacherCount;
     if(snap.empty){
       el.innerHTML = '<div class="empty-state"><i class="fas fa-comments" style="color:#ffd0a0"></i><p style="font-size:13px">ยังไม่มีข้อความ ส่งคำถามให้ครูได้เลย!</p></div>';
       return;
