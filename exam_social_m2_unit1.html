@@ -317,7 +317,59 @@
       .sig-grid { grid-template-columns:1fr; gap:28px; }
       .subj-score-grid { grid-template-columns:1fr; }
     }
+
+    /* EXTRA: student select / grade buttons */
+    .form-field select.line {
+      border:none; border-bottom:2px solid var(--border); background:transparent;
+      width:100%; padding:4px 2px; font-size:15px; font-family:'Sarabun',sans-serif;
+      color:var(--text); outline:none; cursor:pointer; appearance:none;
+    }
+    .form-field select.line:focus { border-bottom-color:var(--primary); }
+    .btn-grade { background:linear-gradient(90deg,#1565c0,#1976d2); color:#fff; border:none; border-radius:10px; padding:11px 24px; font-size:15px; font-weight:600; font-family:'Sarabun',sans-serif; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 14px rgba(21,101,192,.30); transition:transform .15s; margin-bottom:16px; }
+    .btn-grade:hover { transform:translateY(-2px); }
+    .btn-save  { background:linear-gradient(90deg,#2e7d32,#388e3c); color:#fff; border:none; border-radius:10px; padding:11px 24px; font-size:15px; font-weight:600; font-family:'Sarabun',sans-serif; cursor:pointer; display:none; align-items:center; gap:8px; box-shadow:0 4px 14px rgba(46,125,50,.30); transition:transform .15s; margin-bottom:16px; }
+    .btn-save:hover { transform:translateY(-2px); }
+    .btn-save.show { display:inline-flex; }
+    .choice-label.correct { border-color:#4caf50!important; background:#e8f5e9!important; }
+    .choice-label.wrong   { border-color:#f44336!important; background:#ffebee!important; }
+    .choice-label.correct .choice-letter { background:#4caf50; color:#fff; border-color:#4caf50; }
+    .choice-label.wrong   .choice-letter { background:#f44336; color:#fff; border-color:#f44336; }
+    .grade-result-bar { background:#fff8f0; border:2px solid var(--accent); border-radius:12px; padding:14px 20px; margin:16px 0; display:none; align-items:center; gap:14px; }
+    .grade-result-bar.show { display:flex; }
+    .grade-score-big { font-size:36px; font-weight:700; color:var(--primary); line-height:1; }
+    .grade-score-sub { font-size:14px; color:var(--muted); }
+    .save-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#2e7d32; color:#fff; border-radius:12px; padding:14px 28px; font-size:15px; font-weight:600; box-shadow:0 6px 24px rgba(0,0,0,.25); display:none; z-index:9999; align-items:center; gap:10px; }
+    .save-toast.show { display:flex; }
   </style>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp }
+      from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    /* =========================================================
+       วางค่า Firebase Config ของท่านที่นี่
+       (คัดลอกมาจาก admin.html หรือ student.html ในโปรเจกต์)
+    ========================================================= */
+    const firebaseConfig = {
+      apiKey:            "YOUR_API_KEY",
+      authDomain:        "YOUR_PROJECT.firebaseapp.com",
+      projectId:         "YOUR_PROJECT_ID",
+      storageBucket:     "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId:             "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    /* expose to global scope for doSaveResult() */
+    window._fbDb         = db;
+    window._fbCollection = collection;
+    window._fbAddDoc     = addDoc;
+    window._fbTimestamp  = serverTimestamp;
+  </script>
 </head>
 <body>
 <div class="page-wrapper no-print">
@@ -347,8 +399,23 @@
   <!-- STUDENT FORM -->
   <div class="student-form">
     <div class="form-field full-width">
-      <label>ชื่อ–นามสกุล</label>
-      <input class="line" type="text" placeholder="........................................................................" />
+      <label>ชื่อ–นามสกุล นักเรียน</label>
+      <select class="line" id="studentName">
+      <option value="">-- เลือกชื่อนักเรียน --</option>
+      <option value="เด็กชายภัทรพงศ์ อารีชาติ">1. เด็กชายภัทรพงศ์ อารีชาติ</option>
+      <option value="เด็กชายภานุวัฒน์ ลายแพ่ง">2. เด็กชายภานุวัฒน์ ลายแพ่ง</option>
+      <option value="เด็กชายนเดช ครบหมาย">3. เด็กชายนเดช ครบหมาย</option>
+      <option value="เด็กชายปกรณ์เกียรติ สาลี">4. เด็กชายปกรณ์เกียรติ สาลี</option>
+      <option value="เด็กชายเอกบดินทร์ ขุนศรี">5. เด็กชายเอกบดินทร์ ขุนศรี</option>
+      <option value="เด็กหญิงอรอุมา นวนกระโทก">6. เด็กหญิงอรอุมา นวนกระโทก</option>
+      <option value="เด็กหญิงธวัลรัตน์ ประเสริฐ">7. เด็กหญิงธวัลรัตน์ ประเสริฐ</option>
+      <option value="เด็กหญิงเกษร รักษากุล">8. เด็กหญิงเกษร รักษากุล</option>
+      <option value="เด็กหญิงปาริชาติ ศิริไทย">9. เด็กหญิงปาริชาติ ศิริไทย</option>
+      <option value="เด็กหญิงปราณี ศิริไทย">10. เด็กหญิงปราณี ศิริไทย</option>
+      <option value="เด็กหญิงกนกวรรณ มีวิธี">11. เด็กหญิงกนกวรรณ มีวิธี</option>
+      <option value="เด็กหญิงธันยรัตน์ แก้งคำ">12. เด็กหญิงธันยรัตน์ แก้งคำ</option>
+      <option value="เด็กชายตุลา แซ่โจ๋ว">13. เด็กชายตุลา แซ่โจ๋ว</option>
+      </select>
     </div>
     <div class="form-field">
       <label>ชั้น / ห้อง</label>
@@ -764,8 +831,26 @@
     </div>
   </div>
 
+
+  <!-- GRADE RESULT BAR -->
+  <div class="grade-result-bar" id="gradeResultBar">
+    <div>
+      <div class="grade-score-big" id="gradeScoreBig">0/20</div>
+      <div class="grade-score-sub">คะแนนปรนัย</div>
+    </div>
+    <div style="flex:1;padding-left:14px;">
+      <div id="gradeResultMsg" style="font-size:15px;font-weight:600;color:var(--primary);"></div>
+      <div id="gradeResultSub" style="font-size:13px;color:var(--muted);margin-top:4px;"></div>
+    </div>
+  </div>
+
+  <!-- SAVE TOAST -->
+  <div class="save-toast" id="saveToast">✅ บันทึกผลสอบแล้ว!</div>
+
   <!-- ANSWER KEY + PRINT -->
   <div class="answer-section">
+    <button class="btn-grade" onclick="askPassword('grade')">🔍 ตรวจข้อสอบอัตโนมัติ</button>
+    <button class="btn-save" id="btnSave" onclick="askPassword('save')">💾 บันทึกผลสอบ</button>
     <button class="answer-toggle" onclick="askPassword('answer')">🔑 แสดง / ซ่อน เฉลย (สำหรับครู)</button>
     <button class="print-btn" onclick="openPrintModal()">🖨️ ปริ๊นท์รายงานผลคะแนน</button>
     <div class="answer-key-grid" id="answerGrid">
@@ -941,6 +1026,10 @@
       } else if (pwTarget === 'score') {
         document.getElementById('scoreContent').classList.add('open');
         document.getElementById('scoreLockedBar').style.display = 'none';
+      } else if (pwTarget === 'grade') {
+        doGrade();
+      } else if (pwTarget === 'save') {
+        doSaveResult();
       }
     } else {
       document.getElementById('pwError').textContent = '❌ รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่';
@@ -1001,6 +1090,101 @@
     setTimeout(() => window.print(), 150);
   }
   document.getElementById('printModal').addEventListener('click', function(e) { if (e.target === this) closePrintModal(); });
+
+  // ===================== FIREBASE CONFIG CHECK =====================
+  let _fbReady = false;
+  window.addEventListener('load', () => {
+    if(window._fbDb) _fbReady = true;
+    else console.warn('⚠️ Firebase not initialized — edit the firebaseConfig block in this file.');
+  });
+
+  // ===================== AUTO-GRADE =====================
+  const ANSWER_KEY = ['ก','ค','ข','ง','ก','ข','ค','ง','ข','ก','ง','ค','ก','ข','ง','ค','ก','ข','ค','ง'];
+  let mcScore = 0;
+  let graded = false;
+
+  function doGrade() {
+    mcScore = 0;
+    for(let i=1;i<=20;i++){
+      const inputs   = document.querySelectorAll(`input[name="q${i}"]`);
+      const selected = document.querySelector(`input[name="q${i}"]:checked`);
+      const correct  = ANSWER_KEY[i-1];
+      inputs.forEach(inp=>{
+        const lbl = inp.closest('.choice-label');
+        lbl.classList.remove('correct','wrong');
+        if(inp.value===correct) lbl.classList.add('correct');
+        else if(selected && inp.value===selected.value && inp.value!==correct) lbl.classList.add('wrong');
+      });
+      if(selected && selected.value===correct) mcScore++;
+    }
+    graded = true;
+    // Update score box
+    document.querySelector('.score-inner .value').textContent = mcScore+'/20';
+    // Show result bar
+    const bar = document.getElementById('gradeResultBar');
+    bar.classList.add('show');
+    document.getElementById('gradeScoreBig').textContent = mcScore+'/20';
+    const pct = Math.round(mcScore/20*100);
+    const msg = pct>=80?'🏅 ดีเยี่ยม':pct>=70?'✅ ดี':pct>=60?'📘 พอใช้':pct>=50?'⚠️ ผ่าน':'❌ ควรทบทวน';
+    document.getElementById('gradeResultMsg').textContent = msg+' ('+pct+'%)';
+    document.getElementById('gradeResultSub').textContent = 'คะแนน MC '+mcScore+'/20 — กดปุ่ม "บันทึกผลสอบ" เพื่อส่งข้อมูลให้ครู';
+    document.getElementById('btnSave').classList.add('show');
+  }
+
+  // ===================== SAVE TO FIREBASE =====================
+  async function doSaveResult() {
+    const name = document.getElementById('studentName').value.trim();
+    if(!name) { alert('กรุณาเลือกชื่อนักเรียนก่อน'); return; }
+    if(!graded) { alert('กรุณากด "ตรวจข้อสอบ" ก่อนบันทึก'); return; }
+
+    const answers = {};
+    for(let i=1;i<=20;i++){
+      const sel = document.querySelector(`input[name="q${i}"]:checked`);
+      answers['q'+i] = sel ? sel.value : '-';
+    }
+
+    // subjective answers (text fields)
+    const subjLines = document.querySelectorAll('.answer-lines .answer-line');
+    const q21ans = [], q22ans = [];
+    let cnt = 0;
+    subjLines.forEach(inp=>{
+      if(cnt<6) q21ans.push(inp.value); else q22ans.push(inp.value);
+      cnt++;
+    });
+
+    const doc = {
+      studentName: name,
+      grade: 'ม.2',
+      subject: 'สังคมศึกษา',
+      unit: 'หน่วยที่ 1',
+      mcScore: mcScore,
+      totalOutOf: 30,
+      answers: answers,
+      q21: q21ans.join(' | '),
+      q22: q22ans.join(' | '),
+      savedAt: new Date().toISOString()
+    };
+
+    if(!_fbReady || !window._fbDb) {
+      alert('❌ Firebase ยังไม่พร้อม — กรุณาใส่ค่า firebaseConfig ในไฟล์ HTML ก่อน');
+      return;
+    }
+
+    try {
+      await window._fbAddDoc(window._fbCollection(window._fbDb,'quiz_results'), {
+        ...doc,
+        timestamp: window._fbTimestamp()
+      });
+      const toast = document.getElementById('saveToast');
+      toast.classList.add('show');
+      setTimeout(()=>toast.classList.remove('show'),3000);
+      document.getElementById('btnSave').disabled = true;
+      document.getElementById('btnSave').textContent = '✅ บันทึกแล้ว';
+    } catch(e) {
+      alert('❌ บันทึกไม่สำเร็จ: '+e.message);
+    }
+  }
+
 </script>
 </body>
 </html>
