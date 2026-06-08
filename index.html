@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ห้องเรียนครูโอม | โรงเรียนหินฝนวิทยาคม</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--primary:#c94b00;--primary-dark:#a33b00;--secondary:#f39800;--accent:#e65c00;--success:#2e7d32;--bg-light:#fff8f3;--card-shadow:0 4px 20px rgba(201,75,0,.1);--gradient:linear-gradient(135deg,#c94b00 0%,#f39800 100%)}
+    *{font-family:'Sarabun',sans-serif}
+    body{background:var(--bg-light);min-height:100vh}
+    .navbar-custom{background:var(--gradient);padding:.7rem 1.2rem;box-shadow:0 2px 20px rgba(201,75,0,.35)}
+    .nav-logo{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.6);background:#fff}
+    .navbar-brand span{font-weight:800;font-size:1rem;color:#fff}
+    .nav-btn{border:2px solid rgba(255,255,255,.7);color:#fff;border-radius:25px;padding:.3rem 1rem;font-weight:600;font-size:.83rem;transition:all .2s;text-decoration:none}
+    .nav-btn:hover{background:#fff;color:var(--primary)}
+    .nav-btn.admin{background:rgba(255,255,255,.18)}
+    /* HERO */
+    .hero-section{background:var(--gradient);color:#fff;padding:3.5rem 0 4.5rem;position:relative;overflow:hidden}
+    .hero-section::before{content:'';position:absolute;top:-40%;left:-10%;width:450px;height:450px;background:rgba(255,255,255,.06);border-radius:50%}
+    .hero-section::after{content:'';position:absolute;bottom:-25%;right:-5%;width:350px;height:350px;background:rgba(255,255,255,.06);border-radius:50%}
+    .school-logo{width:80px;height:80px;border-radius:50%;border:3px solid rgba(255,255,255,.8);object-fit:contain;background:#fff;padding:4px;box-shadow:0 6px 25px rgba(0,0,0,.2)}
+    .teacher-avatar{width:90px;height:90px;border-radius:50%;border:4px solid rgba(255,255,255,.85);object-fit:cover;box-shadow:0 6px 25px rgba(0,0,0,.2)}
+    .hero-title{font-size:1.8rem;font-weight:800}
+    .hero-sub{font-size:.95rem;opacity:.88}
+    .hero-school{font-size:.85rem;opacity:.8;background:rgba(255,255,255,.15);display:inline-block;padding:.25rem .8rem;border-radius:20px;margin-top:.4rem}
+    .hero-stats{display:flex;gap:2rem;margin-top:1.5rem;flex-wrap:wrap}
+    .hero-stat .num{font-size:1.6rem;font-weight:800}
+    .hero-stat .lbl{font-size:.78rem;opacity:.8}
+    .btn-enter{background:#fff;color:var(--primary);font-weight:700;font-size:.95rem;padding:.75rem 2rem;border-radius:50px;border:none;box-shadow:0 4px 20px rgba(0,0,0,.2);transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
+    .btn-enter:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.25);color:var(--primary-dark)}
+    /* WAVE */
+    .wave-divider{background:var(--gradient)}
+    .wave-divider svg{display:block}
+    /* CARDS */
+    .section-title{font-weight:800;font-size:1.3rem;color:#1e293b}
+    .section-title span{color:var(--primary)}
+    .feature-card{background:#fff;border-radius:16px;padding:1.4rem;text-align:center;border:none;box-shadow:var(--card-shadow);transition:all .25s}
+    .feature-card:hover{transform:translateY(-5px);box-shadow:0 10px 40px rgba(201,75,0,.15)}
+    .feature-icon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto .9rem}
+    /* ANNOUNCEMENTS */
+    .ann-card{background:#fff;border-radius:12px;border-left:4px solid var(--primary);padding:1rem 1.2rem;box-shadow:var(--card-shadow);margin-bottom:.8rem;transition:all .2s}
+    .ann-card:hover{transform:translateX(4px)}
+    .ann-card.pinned{border-left-color:var(--secondary)}
+    /* CLASSROOMS */
+    .classroom-card{background:#fff;border-radius:16px;border:none;box-shadow:var(--card-shadow);overflow:hidden;transition:all .25s}
+    .classroom-card:hover{transform:translateY(-5px);box-shadow:0 10px 40px rgba(201,75,0,.15)}
+    .classroom-header{height:75px;display:flex;align-items:center;justify-content:center;font-size:2rem}
+    .classroom-code{background:var(--bg-light);border-radius:8px;padding:.35rem .7rem;font-size:.8rem;color:var(--primary);font-weight:700;display:inline-flex;align-items:center;gap:.4rem}
+    /* FOOTER */
+    footer{background:#3d1a00;color:rgba(255,255,255,.7);padding:2rem 0;margin-top:3rem;text-align:center;font-size:.86rem}
+    footer a{color:rgba(255,255,255,.8);text-decoration:none}
+    /* SKELETON */
+    .empty-state{text-align:center;padding:3rem 1rem;color:#94a3b8}
+    .empty-state i{font-size:2.5rem;margin-bottom:.8rem;display:block}
+    .skeleton{background:linear-gradient(90deg,#fde8d8 25%,#fff8f3 50%,#fde8d8 75%);background-size:200% 100%;animation:sk 1.2s infinite;border-radius:8px}
+    @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    @media(max-width:576px){.hero-title{font-size:1.4rem}.hero-stats{gap:1.2rem}}
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-custom">
+  <div class="container-fluid d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center gap-2">
+      <img src="images/logo.png" class="nav-logo" alt="โลโก้โรงเรียน" onerror="this.style.display='none'"/>
+      <span class="navbar-brand m-0">ห้องเรียนครูโอม</span>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="student.html" class="nav-btn"><i class="fas fa-user-graduate me-1"></i>นักเรียน</a>
+      <a href="admin.html" class="nav-btn admin"><i class="fas fa-lock me-1"></i>ครู</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero-section">
+  <div class="container position-relative" style="z-index:1">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <img src="images/logo.png" class="school-logo" alt="โลโก้" onerror="this.outerHTML='<div class=&quot;school-logo d-flex align-items-center justify-content-center&quot; style=&quot;font-size:2rem;color:#c94b00&quot;>🏫</div>'"/>
+          <div>
+            <h1 class="hero-title mb-0">ห้องเรียนออนไลน์ครูโอม</h1>
+            <div class="hero-school">🏫 โรงเรียนหินฝนวิทยาคม</div>
+          </div>
+        </div>
+        <p class="hero-sub mb-0">Aomsensei Classroom · เรียนรู้ได้ทุกที่ ทุกเวลา</p>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="num" id="stat-classrooms">-</div><div class="lbl">ห้องเรียน</div></div>
+          <div class="hero-stat"><div class="num" id="stat-students">-</div><div class="lbl">นักเรียน</div></div>
+          <div class="hero-stat"><div class="num" id="stat-worksheets">-</div><div class="lbl">ใบงาน</div></div>
+          <div class="hero-stat"><div class="num" id="stat-quizzes">-</div><div class="lbl">ข้อสอบ</div></div>
+        </div>
+        <div class="mt-4">
+          <a href="student.html" class="btn-enter"><i class="fas fa-door-open"></i> เข้าสู่ห้องเรียน</a>
+        </div>
+      </div>
+      <div class="col-md-4 text-center d-none d-md-block">
+        <img src="images/teacher.jpg" class="teacher-avatar" alt="ครูโอม" style="width:130px;height:130px" onerror="this.outerHTML='<div style=&quot;width:130px;height:130px;border-radius:50%;border:4px solid rgba(255,255,255,.85);background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:3.5rem;margin:0 auto&quot;>👨‍🏫</div>'"/>
+        <div style="margin-top:.8rem;font-size:.9rem;font-weight:600;opacity:.9">ครู รณฤทธิ์ ศรีสองเมือง</div>
+        <div style="font-size:.78rem;opacity:.75">ครูประจำชั้น มัธยมศึกษาปีที่ 3</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wave-divider">
+  <svg viewBox="0 0 1200 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" height="48">
+    <path d="M0,30 C300,60 900,0 1200,30 L1200,60 L0,60 Z" fill="#fff8f3"/>
+  </svg>
+</div>
+
+<div class="container py-4">
+  <!-- FEATURES -->
+  <div class="row g-3 mb-5">
+    <div class="col-6 col-md-3">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#fff3e0;color:#c94b00"><i class="fas fa-file-alt"></i></div>
+        <div style="font-weight:700;font-size:.92rem;color:#1e293b">ใบงาน</div>
+        <div style="font-size:.78rem;color:#64748b">ดาวน์โหลด / PDF</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#fff3e0;color:#e65c00"><i class="fas fa-pencil-alt"></i></div>
+        <div style="font-weight:700;font-size:.92rem;color:#1e293b">ข้อสอบออนไลน์</div>
+        <div style="font-size:.78rem;color:#64748b">ดูคะแนนได้ทันที</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#fff3e0;color:#f39800"><i class="fas fa-video"></i></div>
+        <div style="font-weight:700;font-size:.92rem;color:#1e293b">วิดีโอการสอน</div>
+        <div style="font-size:.78rem;color:#64748b">ย้อนดูตลอดเวลา</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#fff3e0;color:#2e7d32"><i class="fas fa-comments"></i></div>
+        <div style="font-weight:700;font-size:.92rem;color:#1e293b">แชทถามครู</div>
+        <div style="font-size:.78rem;color:#64748b">ตอบทุกคำถาม</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <i class="fas fa-bullhorn fs-5" style="color:var(--secondary)"></i>
+        <h2 class="section-title mb-0">ประกาศ <span>ล่าสุด</span></h2>
+      </div>
+      <div id="announcements-container">
+        <div class="skeleton mb-2" style="height:70px"></div>
+        <div class="skeleton mb-2" style="height:70px"></div>
+        <div class="skeleton mb-2" style="height:70px"></div>
+      </div>
+    </div>
+    <div class="col-lg-7">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <i class="fas fa-door-open fs-5" style="color:var(--primary)"></i>
+        <h2 class="section-title mb-0">ห้องเรียน <span>ทั้งหมด</span></h2>
+      </div>
+      <div class="row g-3" id="classrooms-container">
+        <div class="col-md-6"><div class="skeleton" style="height:145px"></div></div>
+        <div class="col-md-6"><div class="skeleton" style="height:145px"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <img src="images/logo.png" style="width:40px;height:40px;border-radius:50%;margin-bottom:.5rem;background:#fff;padding:3px;object-fit:contain" alt="logo" onerror="this.style.display='none'"/>
+    <p class="mb-1"><strong>ห้องเรียนออนไลน์ครูโอม</strong> · โรงเรียนหินฝนวิทยาคม</p>
+    <p class="mb-0" style="font-size:.78rem">
+      <a href="student.html"><i class="fas fa-user-graduate me-1"></i>นักเรียนเข้าระบบ</a> &nbsp;|&nbsp;
+      <a href="scores.html"><i class="fas fa-chart-line me-1"></i>ระบบคะแนน</a> &nbsp;|&nbsp;
+      <a href="admin.html"><i class="fas fa-lock me-1"></i>ครูเข้าระบบ</a>
+    </p>
+  </div>
+</footer>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { FIREBASE_CONFIG } from "./js/config.js";
+
+  const app = initializeApp(FIREBASE_CONFIG);
+  const db = getFirestore(app);
+  const COLORS=['#c94b00','#e65c00','#f39800','#2e7d32','#1565c0','#6a1b9a'];
+  const ICONS=['📚','🔬','📐','🎨','💻','🌍'];
+
+  function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+  async function loadStats(){
+    try{
+      const [c,s,w,q]=await Promise.all([
+        getDocs(collection(db,'classrooms')),getDocs(collection(db,'students')),
+        getDocs(collection(db,'worksheets')),getDocs(collection(db,'quizzes'))
+      ]);
+      document.getElementById('stat-classrooms').textContent=c.size;
+      document.getElementById('stat-students').textContent=s.size;
+      document.getElementById('stat-worksheets').textContent=w.size;
+      document.getElementById('stat-quizzes').textContent=q.size;
+    }catch(e){['stat-classrooms','stat-students','stat-worksheets','stat-quizzes'].forEach(id=>document.getElementById(id).textContent='0')}
+  }
+
+  async function loadAnnouncements(){
+    const c=document.getElementById('announcements-container');
+    try{
+      const snap=await getDocs(query(collection(db,'announcements'),orderBy('createdAt','desc'),limit(5)));
+      if(snap.empty){c.innerHTML='<div class="empty-state"><i class="fas fa-bullhorn"></i><p>ยังไม่มีประกาศ</p></div>';return}
+      c.innerHTML='';
+      snap.forEach(doc=>{
+        const d=doc.data();
+        const date=d.createdAt?.toDate?d.createdAt.toDate().toLocaleDateString('th-TH'):'';
+        c.innerHTML+=`<div class="ann-card ${d.pinned?'pinned':''}">
+          <div class="d-flex justify-content-between mb-1">
+            <span style="font-weight:700;color:#1e293b;font-size:.93rem">${d.pinned?'<i class="fas fa-thumbtack me-1" style="color:var(--secondary)"></i>':''}${escHtml(d.title)}</span>
+            <span style="font-size:.76rem;color:#94a3b8">${date}</span>
+          </div>
+          <div style="font-size:.86rem;color:#475569">${escHtml((d.content||'').substring(0,120))}${(d.content||'').length>120?'...':''}</div>
+        </div>`;
+      });
+    }catch(e){c.innerHTML='<div class="empty-state"><i class="fas fa-wifi-slash"></i><p>กรุณาตั้งค่า Firebase ใน js/config.js</p></div>'}
+  }
+
+  async function loadClassrooms(){
+    const c=document.getElementById('classrooms-container');
+    try{
+      const snap=await getDocs(collection(db,'classrooms'));
+      if(snap.empty){c.innerHTML='<div class="col-12"><div class="empty-state"><i class="fas fa-door-open"></i><p>ยังไม่มีห้องเรียน</p></div></div>';return}
+      c.innerHTML='';let i=0;
+      snap.forEach(doc=>{
+        const d=doc.data();
+        const col=COLORS[i%COLORS.length],icon=ICONS[i%ICONS.length];i++;
+        c.innerHTML+=`<div class="col-sm-6"><div class="classroom-card">
+          <div class="classroom-header" style="background:${col}">${icon}</div>
+          <div class="p-3">
+            <div style="font-weight:700;font-size:.95rem;color:#1e293b">${escHtml(d.name)}</div>
+            <div style="font-size:.8rem;color:#64748b;margin-bottom:.5rem">${escHtml(d.subject||'')}</div>
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="classroom-code"><i class="fas fa-key"></i> ${escHtml(d.code)}</span>
+              <a href="student.html?code=${encodeURIComponent(d.code)}" class="btn btn-sm rounded-pill" style="background:var(--primary);color:#fff;font-size:.76rem">เข้าเรียน</a>
+            </div>
+          </div>
+        </div></div>`;
+      });
+    }catch(e){c.innerHTML='<div class="col-12"><div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดห้องเรียนไม่ได้</p></div></div>'}
+  }
+
+  loadStats();loadAnnouncements();loadClassrooms();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
