@@ -340,8 +340,16 @@ function calcTotal(cls,sub,sid){
 
 // ==================== TABS ====================
 window.switchClass=function(c){currentClass=c;renderTabs();renderTable();};
+function sortClasses(keys){
+  const order={'ป':0,'ม':1};
+  return [...keys].sort((a,b)=>{
+    const ta=order[a[0]]??2,tb=order[b[0]]??2;
+    if(ta!==tb)return ta-tb;
+    return parseFloat(a.replace(/[^\d.]/g,''))-parseFloat(b.replace(/[^\d.]/g,''));
+  });
+}
 function renderTabs(){
-  document.getElementById('classTabs').innerHTML=Object.keys(state.classes).map(c=>`<button class="tab ${c===currentClass?'active':''}" onclick="switchClass('${c}')">${c}</button>`).join('');
+  document.getElementById('classTabs').innerHTML=sortClasses(Object.keys(state.classes)).map(c=>`<button class="tab ${c===currentClass?'active':''}" onclick="switchClass('${c}')">${c}</button>`).join('');
 }
 
 // ==================== TABLE ====================
@@ -572,7 +580,7 @@ onAuthStateChanged(auth, async user=>{
   isTeacher=!!user;
   if(user){await loadFromFirebase();}
   else{loadFromLocal();}
-  currentClass=Object.keys(state.classes)[0]||'';
+  currentClass=sortClasses(Object.keys(state.classes))[0]||'';
   renderTabs();renderSubjectSelect();renderTable();
 });
 </script>
