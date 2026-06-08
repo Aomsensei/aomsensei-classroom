@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบเก็บคะแนน | โรงเรียนหินฝนวิทยาคม</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{font-family:'Sarabun','TH Sarabun New',sans-serif;background:#fff8f3;color:#333;min-height:100vh;display:flex;flex-direction:column}
+.header{background:linear-gradient(135deg,#c94b00,#f39800);color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;box-shadow:0 3px 10px rgba(200,75,0,.4);position:sticky;top:0;z-index:60}
+.hd-logo{width:38px;height:38px;border-radius:50%;object-fit:contain;background:#fff;padding:3px;flex-shrink:0}
+.hd-title{font-size:clamp(13px,2vw,18px);font-weight:800;line-height:1.2}
+.hd-sub{font-size:clamp(10px,1.2vw,12px);opacity:.9}
+.hd-right{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.status-bar{background:#fff3e0;border-bottom:2px solid #ffcc80;padding:5px 16px;font-size:12px;color:#7c4700;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.status-bar .dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dot-ok{background:#43a047}.dot-warn{background:#fb8c00}.dot-sync{background:#1565c0}
+.tabs{display:flex;background:#e65c00;padding:0 12px;gap:2px;overflow-x:auto;scrollbar-width:thin}
+.tab{padding:7px 16px;cursor:pointer;color:rgba(255,255,255,.8);border-radius:6px 6px 0 0;font-size:clamp(11px,1.4vw,13px);font-weight:700;white-space:nowrap;transition:all .15s;flex-shrink:0;border:none;background:none}
+.tab:hover{background:rgba(255,255,255,.2);color:#fff}
+.tab.active{background:#fff8f3;color:#c94b00}
+.toolbar{background:#fff;border-bottom:2px solid #ffd0a0;padding:7px 12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.toolbar label{font-weight:700;color:#c94b00;font-size:13px;white-space:nowrap}
+.toolbar select{padding:4px 8px;border:1.5px solid #ffa040;border-radius:5px;font-size:13px;font-family:inherit;background:#fff;max-width:180px}
+.btn{padding:5px 11px;border:none;border-radius:5px;cursor:pointer;font-family:inherit;font-size:clamp(11px,1.2vw,12px);font-weight:700;transition:all .15s;display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+.btn-orange{background:#c94b00;color:#fff}.btn-orange:hover{background:#a33b00}
+.btn-green{background:#2e7d32;color:#fff}.btn-green:hover{background:#1b5e20}
+.btn-red{background:#c62828;color:#fff}.btn-red:hover{background:#8b1919}
+.btn-blue{background:#1565c0;color:#fff}.btn-blue:hover{background:#0d47a1}
+.btn-teal{background:#00695c;color:#fff}.btn-teal:hover{background:#004d40}
+.btn-gray{background:#546e7a;color:#fff}.btn-gray:hover{background:#37474f}
+.btn-sm{padding:3px 8px;font-size:11px}
+.btn-firebase{background:#1565c0;color:#fff}.btn-firebase:hover{background:#0d47a1}
+.table-wrap{overflow-x:auto;padding:8px 12px;flex:1;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;font-size:11px;width:max-content;min-width:100%}
+thead th{background:#c94b00;color:#fff;padding:5px 3px;text-align:center;white-space:nowrap;border:1px solid #a33b00;position:sticky;top:0;z-index:2}
+thead th.grp{background:#e65c00;font-size:10px;padding:3px 2px}
+tbody tr:nth-child(even){background:#fff3e8}
+tbody tr:hover{background:#ffe0c0}
+tbody td{padding:2px 2px;border:1px solid #ffd0a0;text-align:center;vertical-align:middle}
+tbody td.name-col{text-align:left;white-space:nowrap;min-width:120px;max-width:150px;font-size:11.5px;font-weight:500;padding-left:5px}
+tbody td.num-col{font-weight:700;color:#666;min-width:22px;font-size:11px}
+input.si{width:26px;padding:2px 1px;border:1px solid #ffb066;border-radius:3px;text-align:center;font-size:10.5px;font-family:inherit;background:#fffaf6;-moz-appearance:textfield}
+input.si::-webkit-outer-spin-button,input.si::-webkit-inner-spin-button{-webkit-appearance:none}
+input.si:focus{outline:none;border-color:#c94b00;background:#fff3e0}
+input.si.wide{width:32px}
+.total-cell{font-weight:800;color:#c94b00;font-size:12px}
+.grade-cell{font-weight:900;font-size:13px;color:#b33c00;min-width:28px}
+.grade-4{color:#1b5e20}.grade-0{color:#b71c1c}
+.sync-indicator{font-size:10px;color:#1565c0;display:inline-block;margin-left:4px}
+.notice{background:#fff3cd;border:1px solid #ffc107;padding:10px 14px;border-radius:6px;font-size:13px;color:#664d03;margin:12px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:14px}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:10px;padding:clamp(14px,3vw,24px);width:100%;max-width:400px;max-height:92vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.25)}
+.modal.wide{max-width:700px}
+.modal h2{color:#c94b00;margin-bottom:14px;font-size:17px}
+.form-row{margin-bottom:10px;display:flex;flex-direction:column;gap:3px}
+.form-row label{font-weight:700;font-size:12.5px;color:#555}
+.form-row input,.form-row select{padding:6px 9px;border:1.5px solid #ffa040;border-radius:5px;font-size:13px;font-family:inherit}
+.btn-row{display:flex;gap:8px;margin-top:14px;justify-content:flex-end;flex-wrap:wrap}
+.print-preview{border:1px solid #ddd;border-radius:6px;padding:10px;background:#fff;max-height:52vh;overflow-y:auto;font-size:12px;margin-top:8px}
+.credit-bar{background:linear-gradient(135deg,#c94b00,#f39800);color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;box-shadow:0 -2px 10px rgba(200,75,0,.3)}
+.credit-inner{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+.credit-logo{width:34px;height:34px;border-radius:50%;background:#fff;padding:3px;object-fit:contain}
+.credit-name{font-size:14px;font-weight:800}
+.credit-role{font-size:11px;opacity:.9}
+@media print{
+  body *{visibility:hidden}
+  #print-area,#print-area *{visibility:visible}
+  #print-area{position:fixed;inset:0;padding:16px;background:white}
+  .no-print{display:none!important}
+}
+@media(max-width:580px){.hd-right{width:100%}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="d-flex align-items-center gap-2">
+    <img src="images/logo.png" class="hd-logo" alt="logo" onerror="this.style.display='none'"/>
+    <div>
+      <div class="hd-title">📚 ระบบเก็บคะแนนรายวิชา</div>
+      <div class="hd-sub">โรงเรียนหินฝนวิทยาคม · ปีการศึกษา 2569</div>
+    </div>
+  </div>
+  <div class="hd-right">
+    <button class="btn btn-teal" onclick="exportData()">💾 สำรอง (.json)</button>
+    <label class="btn btn-teal" style="cursor:pointer">📂 นำเข้า (.json)<input type="file" accept=".json" onchange="importData(event)" style="display:none"></label>
+    <button class="btn btn-firebase" id="btnSync" onclick="manualSync()">☁️ บันทึก Firebase</button>
+    <button class="btn btn-blue" onclick="openPrintModal()">🖨️ พิมพ์รายงาน</button>
+    <button class="btn btn-orange" onclick="openAddClassModal()">➕ ชั้นเรียน</button>
+    <a href="admin.html" class="btn btn-gray">🔙 Admin</a>
+  </div>
+</div>
+
+<div class="status-bar" id="statusBar">
+  <span class="dot dot-warn" id="statusDot"></span>
+  <span id="statusText">กำลังโหลดข้อมูล...</span>
+</div>
+
+<div class="tabs" id="classTabs"></div>
+
+<div class="toolbar">
+  <label>วิชา:</label>
+  <select id="subjectSelect" onchange="renderTable()"><option value="">-- เลือกวิชา --</option></select>
+  <button class="btn btn-green" onclick="openAddSubjectModal()">➕ เพิ่มวิชา</button>
+  <button class="btn btn-red btn-sm" onclick="deleteSubject()">🗑️ ลบวิชา</button>
+  <span style="flex:1"></span>
+  <button class="btn btn-green" onclick="openAddStudentModal()">👤 เพิ่มนักเรียน</button>
+  <button class="btn btn-red btn-sm" onclick="deleteCurrentClass()">🗑️ ลบชั้นนี้</button>
+</div>
+
+<div class="table-wrap" id="tableWrap">
+  <div class="notice">กรุณาเลือกวิชาเพื่อเริ่มกรอกคะแนน</div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="subjectModal">
+  <div class="modal"><h2>➕ เพิ่มวิชา</h2>
+    <div class="form-row"><label>ชื่อวิชา</label><input type="text" id="newSubjectName" placeholder="เช่น คณิตศาสตร์"/></div>
+    <div class="btn-row"><button class="btn btn-gray" onclick="closeModal('subjectModal')">ยกเลิก</button><button class="btn btn-green" onclick="addSubject()">บันทึก</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addClassModal">
+  <div class="modal"><h2>➕ เพิ่มชั้นเรียน</h2>
+    <div class="form-row"><label>ชื่อชั้นเรียน</label><input type="text" id="newClassName" placeholder="เช่น ม.3"/></div>
+    <div class="form-row"><label>ประเภทชั้น</label>
+      <select id="newClassType">
+        <option value="primary">ประถมศึกษา (เก็บ 20 ช่อง + 4 สอบ)</option>
+        <option value="secondary">มัธยมศึกษา (เก็บ 15 ช่อง + 2 สอบ)</option>
+      </select></div>
+    <div class="btn-row"><button class="btn btn-gray" onclick="closeModal('addClassModal')">ยกเลิก</button><button class="btn btn-green" onclick="addClass()">บันทึก</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addStudentModal">
+  <div class="modal"><h2>👤 เพิ่มนักเรียน</h2>
+    <div class="form-row"><label>คำนำหน้า</label>
+      <select id="newStudentPrefix"><option>เด็กชาย</option><option>เด็กหญิง</option><option>นาย</option><option>นางสาว</option><option>นาง</option></select></div>
+    <div class="form-row"><label>ชื่อ</label><input type="text" id="newStudentFirst" placeholder="ชื่อจริง"/></div>
+    <div class="form-row"><label>นามสกุล</label><input type="text" id="newStudentLast" placeholder="นามสกุล"/></div>
+    <div class="btn-row"><button class="btn btn-gray" onclick="closeModal('addStudentModal')">ยกเลิก</button><button class="btn btn-green" onclick="addStudent()">บันทึก</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="printModal">
+  <div class="modal wide"><h2>🖨️ พิมพ์รายงานผลการเรียน</h2>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:4px">
+      <div class="form-row" style="flex:1;min-width:130px"><label>ชั้นเรียน</label><select id="printClass" onchange="updatePrintPreview()"><option value="">-- เลือกชั้น --</option></select></div>
+      <div class="form-row" style="flex:1;min-width:130px"><label>วิชา</label><select id="printSubject" onchange="updatePrintPreview()"><option value="">-- เลือกวิชา --</option></select></div>
+      <div class="form-row" style="flex:1;min-width:150px"><label>ครูผู้สอน</label><input type="text" id="printTeacher" placeholder="ชื่อ-สกุล ครูผู้สอน" oninput="saveSchoolInfo();updatePrintPreview()"/></div>
+      <div class="form-row" style="flex:1;min-width:150px"><label>หัวหน้างานบริหารวิชาการ</label><input type="text" id="printAcademic" placeholder="ชื่อ-สกุล หัวหน้าวิชาการ" oninput="saveSchoolInfo();updatePrintPreview()"/></div>
+      <div class="form-row" style="flex:1;min-width:150px"><label>ผู้อำนวยการ</label><input type="text" id="printPrincipal" placeholder="ชื่อ-สกุล ผู้อำนวยการ" oninput="saveSchoolInfo();updatePrintPreview()"/></div>
+    </div>
+    <div style="font-size:11px;color:#888;margin-bottom:6px">💡 ชื่อครู/หัวหน้าวิชาการ/ผู้อำนวยการจะถูกบันทึกไว้อัตโนมัติ</div>
+    <div id="printPreviewArea" class="print-preview">กรุณาเลือกชั้นเรียนและวิชา</div>
+    <div class="btn-row"><button class="btn btn-gray" onclick="closeModal('printModal')">ปิด</button><button class="btn btn-blue" onclick="doPrint()">🖨️ พิมพ์ (A4 แนวนอน)</button></div>
+  </div>
+</div>
+
+<div id="print-area" style="display:none"></div>
+
+<div class="credit-bar">
+  <div class="credit-inner">
+    <img src="images/logo.png" class="credit-logo" alt="logo" onerror="this.outerHTML='🏫'"/>
+    <div>
+      <div class="credit-name">ครู รณฤทธิ์ ศรีสองเมือง</div>
+      <div class="credit-role">🏫 โรงเรียนหินฝนวิทยาคม · ระบบเก็บคะแนนรายวิชา ปีการศึกษา 2569</div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { FIREBASE_CONFIG } from "./js/config.js";
+
+const app = initializeApp(FIREBASE_CONFIG);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const STORE_KEY = 'hinfonScores_v4';
+const FB_DOC = 'hinfon_scores';
+
+// ==================== INITIAL DATA ====================
+const INITIAL_DATA={
+  classes:{
+    'ป.4':{type:'primary',students:[
+      {id:'p4_1',prefix:'เด็กชาย',first:'สุภนัย',last:'สาลี'},{id:'p4_2',prefix:'เด็กชาย',first:'พงศ์พัฒน์',last:'อารีชาติ'},
+      {id:'p4_3',prefix:'เด็กชาย',first:'ชัยภัทร',last:'โมคศิริ'},{id:'p4_4',prefix:'เด็กชาย',first:'จีรวัฒน์',last:'พันธ์ภูมิ'},
+      {id:'p4_5',prefix:'เด็กหญิง',first:'อริสรา',last:'สิงห์ประเสริฐ'},{id:'p4_6',prefix:'เด็กหญิง',first:'กัญญาภัทร',last:'แสงประทุม'},
+      {id:'p4_7',prefix:'เด็กหญิง',first:'เก้าฤทัย',last:'สินชัย'},{id:'p4_8',prefix:'เด็กชาย',first:'ธีรวัฒน์',last:'มีรัมย์'},
+      {id:'p4_9',prefix:'เด็กชาย',first:'ณัฐชนนท์',last:'สิงห์ทอง'},{id:'p4_10',prefix:'เด็กชาย',first:'จิตติพัฒน์',last:'โฉมสันเทียะ'},
+      {id:'p4_11',prefix:'เด็กชาย',first:'ปัณณธร',last:'หวังหมู่กลาง'},{id:'p4_12',prefix:'เด็กหญิง',first:'ฐิติมา',last:'บุตรดาพันธ์'},
+      {id:'p4_13',prefix:'เด็กหญิง',first:'สุพรรษา',last:'เสาธงทอง'},{id:'p4_14',prefix:'เด็กหญิง',first:'วิชาดา',last:'คำหมาย'},
+      {id:'p4_15',prefix:'เด็กชาย',first:'ปัญญากร',last:'พงษ์สวัสดิ์'},{id:'p4_16',prefix:'เด็กหญิง',first:'จิดาภา',last:'โอสถประสาท'},
+    ]},
+    'ป.5':{type:'primary',students:[
+      {id:'p5_1',prefix:'เด็กชาย',first:'จารุวิทย์',last:'พรมพยอม'},{id:'p5_2',prefix:'เด็กชาย',first:'ปวร',last:'ตาลพุฒซา'},
+      {id:'p5_3',prefix:'เด็กชาย',first:'ภาณุพงศ์',last:'ทุมพันธ์'},{id:'p5_4',prefix:'เด็กชาย',first:'มงคล',last:'ดาช่วย'},
+      {id:'p5_5',prefix:'เด็กชาย',first:'รัฐกาญจน์',last:'ถอยวิลัย'},{id:'p5_6',prefix:'เด็กชาย',first:'รัฐภูมิ',last:'ชัยทิพย์'},
+      {id:'p5_7',prefix:'เด็กชาย',first:'จักรพันธ์',last:'โพธิ์แก้ว'},{id:'p5_8',prefix:'เด็กหญิง',first:'กัญญาภัค',last:'บรรเทากุล'},
+      {id:'p5_9',prefix:'เด็กหญิง',first:'นันทิชา',last:'ภิรมย์ชม'},{id:'p5_10',prefix:'เด็กหญิง',first:'นาหราน',last:'วิชัยรัมย์'},
+      {id:'p5_11',prefix:'เด็กหญิง',first:'ลัดดาวัลย์',last:'คำหมาย'},{id:'p5_12',prefix:'เด็กหญิง',first:'หทัยชนก',last:'แดงประคำ'},
+      {id:'p5_13',prefix:'เด็กหญิง',first:'กัญญพัชร',last:'มาลิลี'},{id:'p5_14',prefix:'เด็กหญิง',first:'สิรินทิพย์',last:'โฉมเหมาะ'},
+      {id:'p5_15',prefix:'เด็กหญิง',first:'ทักษอร',last:'เรืองรอง'},
+    ]},
+    'ป.6':{type:'primary',students:[
+      {id:'p6_1',prefix:'เด็กชาย',first:'กิตติภพ',last:'ทองสัมฤทธิ์'},{id:'p6_2',prefix:'เด็กชาย',first:'วีรภาพ',last:'จันทร์สิงห์'},
+      {id:'p6_3',prefix:'เด็กชาย',first:'อนันท์ชัย',last:'หินชัยภูมิ'},{id:'p6_4',prefix:'เด็กชาย',first:'ชาญชัย',last:'บุญหล้า'},
+      {id:'p6_5',prefix:'เด็กชาย',first:'จักรภัทร',last:'เงินคำ'},{id:'p6_6',prefix:'เด็กหญิง',first:'สุภัสรา',last:'โพธิ์แก้ว'},
+      {id:'p6_7',prefix:'เด็กหญิง',first:'อรนิชา',last:'ชำนาญ'},{id:'p6_8',prefix:'เด็กหญิง',first:'ดาวิกา',last:'ขาวดี'},
+      {id:'p6_9',prefix:'เด็กหญิง',first:'ปวันรัตน์',last:'พรมจินดาศรี'},{id:'p6_10',prefix:'เด็กหญิง',first:'ศุภิสรา',last:'เณรสุวรรณ'},
+      {id:'p6_11',prefix:'เด็กหญิง',first:'สุภัชชา',last:'แสงประทุม'},{id:'p6_12',prefix:'เด็กหญิง',first:'น้ำมนต์',last:'มีเพชร'},
+      {id:'p6_13',prefix:'เด็กหญิง',first:'มัญชุสา',last:'บินสูงเนิน'},{id:'p6_14',prefix:'เด็กชาย',first:'อลงกรณ์',last:'เสาธงทอง'},
+      {id:'p6_15',prefix:'เด็กชาย',first:'สุรเชษฐ์',last:'เงินจัตุรัส'},{id:'p6_16',prefix:'เด็กหญิง',first:'กมลพร',last:'พงษ์สวัสดิ์'},
+    ]},
+    'ม.1':{type:'secondary',students:[
+      {id:'m1_1',prefix:'เด็กชาย',first:'อาชวิน',last:'เณรสุวรรณ'},{id:'m1_2',prefix:'เด็กชาย',first:'ทยากร',last:'กองพา'},
+      {id:'m1_3',prefix:'เด็กชาย',first:'ณฐภัทร',last:'ก้อนแก้ว'},{id:'m1_4',prefix:'เด็กชาย',first:'ดนัย',last:'พลอยขุนทด'},
+      {id:'m1_5',prefix:'เด็กชาย',first:'พุทธรักษ์',last:'จอนโคกกรวด'},{id:'m1_6',prefix:'เด็กหญิง',first:'ชนิสรา',last:'ศรีม่วง'},
+      {id:'m1_7',prefix:'เด็กหญิง',first:'วิลาสินี',last:'คำเขื่อน'},{id:'m1_8',prefix:'เด็กหญิง',first:'ปิ่นมณี',last:'หาญเวช'},
+      {id:'m1_9',prefix:'เด็กหญิง',first:'วิจิตตรา',last:'ปานสันเทียะ'},{id:'m1_10',prefix:'เด็กหญิง',first:'ปริณดา',last:'แสงประทุม'},
+    ]},
+    'ม.2':{type:'secondary',students:[
+      {id:'m2_1',prefix:'เด็กชาย',first:'ภัทรพงศ์',last:'อารีชาติ'},{id:'m2_2',prefix:'เด็กชาย',first:'ภานุวัฒน์',last:'ลายแพ่ง'},
+      {id:'m2_3',prefix:'เด็กชาย',first:'นเดช',last:'ครบหมาย'},{id:'m2_4',prefix:'เด็กชาย',first:'ปกรณ์เกียรติ',last:'สาลี'},
+      {id:'m2_5',prefix:'เด็กชาย',first:'เอกบดินทร์',last:'ขุนศรี'},{id:'m2_6',prefix:'เด็กหญิง',first:'อรอุมา',last:'นวนกระโทก'},
+      {id:'m2_7',prefix:'เด็กหญิง',first:'ธวัลรัตน์',last:'ประเสริฐ'},{id:'m2_8',prefix:'เด็กหญิง',first:'เกษร',last:'รักษากุล'},
+      {id:'m2_9',prefix:'เด็กหญิง',first:'ปาริชาติ',last:'ศิริไทย'},{id:'m2_10',prefix:'เด็กหญิง',first:'ปราณี',last:'ศิริไทย'},
+      {id:'m2_11',prefix:'เด็กหญิง',first:'กนกวรรณ',last:'มีวิธี'},{id:'m2_12',prefix:'เด็กหญิง',first:'ธันยรัตน์',last:'แก้งคำ'},
+      {id:'m2_13',prefix:'เด็กชาย',first:'ตุลา',last:'แซ่โจ๋ว'},
+    ]},
+    'ม.3':{type:'secondary',students:[
+      {id:'m3_1',prefix:'เด็กชาย',first:'อัครเดช',last:'ชัยสามารถ'},{id:'m3_2',prefix:'เด็กชาย',first:'ณรงค์ชัย',last:'เสาโกมุท'},
+      {id:'m3_3',prefix:'เด็กชาย',first:'พงษ์พิพัฒน์',last:'ปิ่นตำนัก'},{id:'m3_4',prefix:'เด็กชาย',first:'พุฒินันท์',last:'พบโชค'},
+      {id:'m3_5',prefix:'เด็กชาย',first:'รัตนเทพ',last:'มะเรืองศูนย์'},{id:'m3_6',prefix:'เด็กชาย',first:'นพนันท์',last:'ขำเส็ง'},
+      {id:'m3_7',prefix:'เด็กหญิง',first:'กัญญาภรณ์',last:'วิชัยรัมย์'},{id:'m3_8',prefix:'เด็กหญิง',first:'อมลวรรณ',last:'ทุมพันธ์'},
+      {id:'m3_9',prefix:'เด็กหญิง',first:'จิราวรรณ',last:'กองพา'},{id:'m3_10',prefix:'เด็กชาย',first:'ธนกร',last:'หอมหวล'},
+    ]},
+  },
+  subjects:['ภาษาไทย','คณิตศาสตร์','วิทยาศาสตร์','สังคมศึกษา','ภาษาอังกฤษ'],
+  scores:{},schoolInfo:{}
+};
+
+let state={};
+let currentClass='ป.4';
+let syncTimeout=null;
+let isTeacher=false;
+
+// ==================== FIREBASE SYNC ====================
+async function loadFromFirebase(){
+  try{
+    const snap=await getDoc(doc(db,'score_system',FB_DOC));
+    if(snap.exists()){
+      state=snap.data().data||JSON.parse(JSON.stringify(INITIAL_DATA));
+      localStorage.setItem(STORE_KEY,JSON.stringify(state));
+      setStatus('sync','✅ โหลดจาก Firebase แล้ว · บันทึกอัตโนมัติ');
+    } else {
+      loadFromLocal();
+    }
+  }catch(e){loadFromLocal();}
+}
+
+function loadFromLocal(){
+  try{
+    const s=localStorage.getItem(STORE_KEY);
+    if(s){state=JSON.parse(s);setStatus('ok','✅ โหลดจาก Local Storage · กด ☁️ เพื่อบันทึก Firebase');}
+    else{state=JSON.parse(JSON.stringify(INITIAL_DATA));setStatus('warn','⚠️ ใช้ข้อมูลเริ่มต้น');}
+  }catch(e){state=JSON.parse(JSON.stringify(INITIAL_DATA));}
+}
+
+async function syncToFirebase(){
+  try{
+    await setDoc(doc(db,'score_system',FB_DOC),{data:state,updatedAt:serverTimestamp()});
+    localStorage.setItem(STORE_KEY,JSON.stringify(state));
+    setStatus('sync','☁️ บันทึก Firebase เรียบร้อย · '+new Date().toLocaleTimeString('th-TH'));
+  }catch(e){
+    localStorage.setItem(STORE_KEY,JSON.stringify(state));
+    setStatus('ok','💾 บันทึก Local · Firebase ล้มเหลว ('+e.code+')');
+  }
+}
+
+window.manualSync=async function(){
+  document.getElementById('btnSync').textContent='⏳ กำลังบันทึก...';
+  await syncToFirebase();
+  document.getElementById('btnSync').textContent='☁️ บันทึก Firebase';
+};
+
+function saveState(){
+  localStorage.setItem(STORE_KEY,JSON.stringify(state));
+  clearTimeout(syncTimeout);
+  syncTimeout=setTimeout(()=>syncToFirebase(),3000);
+  setStatus('sync','⏳ กำลังบันทึก...');
+}
+
+function setStatus(type,text){
+  const dot=document.getElementById('statusDot'),txt=document.getElementById('statusText');
+  dot.className='dot '+(type==='sync'?'dot-sync':type==='ok'?'dot-ok':'dot-warn');
+  txt.innerHTML=text;
+}
+
+// ==================== EXPORT/IMPORT ====================
+window.exportData=function(){
+  const now=new Date();
+  const ts=`${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`คะแนน_หินฝนวิทยาคม_${ts}.json`;a.click();
+};
+window.importData=function(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!data.classes||!data.subjects)throw new Error('ไฟล์ไม่ถูกต้อง');
+      state=data;saveState();
+      currentClass=Object.keys(state.classes)[0]||'';
+      renderTabs();renderSubjectSelect();renderTable();
+      alert('✅ นำเข้าข้อมูลสำเร็จ!');
+    }catch(err){alert('❌ ไฟล์ไม่ถูกต้อง');}
+  };
+  reader.readAsText(file);e.target.value='';
+};
+
+// ==================== GRADE ====================
+function calcGrade(t){t=parseFloat(t)||0;if(t>=80)return 4;if(t>=75)return 3.5;if(t>=70)return 3;if(t>=65)return 2.5;if(t>=60)return 2;if(t>=55)return 1.5;if(t>=50)return 1;return 0;}
+function gc(g){return g===4?'grade-4':g===0?'grade-0':'';}
+
+// ==================== SCORE ====================
+function getS(cls,sub,sid){
+  if(!state.scores[cls])state.scores[cls]={};
+  if(!state.scores[cls][sub])state.scores[cls][sub]={};
+  if(!state.scores[cls][sub][sid]){
+    const p=state.classes[cls].type==='primary';
+    state.scores[cls][sub][sid]=p?{collect:new Array(20).fill(''),mid1:'',final1:'',mid2:'',final2:''}:{collect:new Array(15).fill(''),mid:'',final:''};
+  }
+  return state.scores[cls][sub][sid];
+}
+function calcTotal(cls,sub,sid){
+  const s=getS(cls,sub,sid);const p=state.classes[cls].type==='primary';
+  let sum=s.collect.reduce((a,v)=>a+(parseFloat(v)||0),0);
+  if(p)sum+=(parseFloat(s.mid1)||0)+(parseFloat(s.final1)||0)+(parseFloat(s.mid2)||0)+(parseFloat(s.final2)||0);
+  else sum+=(parseFloat(s.mid)||0)+(parseFloat(s.final)||0);
+  return Math.round(sum*100)/100;
+}
+
+// ==================== TABS ====================
+window.switchClass=function(c){currentClass=c;renderTabs();renderTable();};
+function renderTabs(){
+  document.getElementById('classTabs').innerHTML=Object.keys(state.classes).map(c=>`<button class="tab ${c===currentClass?'active':''}" onclick="switchClass('${c}')">${c}</button>`).join('');
+}
+
+// ==================== TABLE ====================
+window.renderTable=function(){
+  const sub=document.getElementById('subjectSelect').value;
+  const wrap=document.getElementById('tableWrap');
+  if(!sub){wrap.innerHTML='<div class="notice">กรุณาเลือกวิชาเพื่อเริ่มกรอกคะแนน</div>';return;}
+  const cls=state.classes[currentClass];if(!cls)return;
+  const p=cls.type==='primary',cc=p?20:15;
+  let h='<table><thead>';
+  if(p){
+    h+=`<tr><th rowspan="2">ที่</th><th rowspan="2" style="text-align:left;min-width:120px">ชื่อ - สกุล</th>
+      <th colspan="${cc}" class="grp">คะแนนเก็บ (20 ช่อง)</th>
+      <th colspan="2" class="grp">ภาค 1</th><th colspan="2" class="grp">ภาค 2</th>
+      <th rowspan="2" style="background:#7c2800">รวม</th><th rowspan="2" style="background:#7c2800">เกรด</th>
+      <th rowspan="2" class="no-print"></th></tr>
+    <tr>${Array.from({length:cc},(_,i)=>`<th style="min-width:28px">ก${i+1}</th>`).join('')}<th>กลาง1</th><th>ปลาย1</th><th>กลาง2</th><th>ปลาย2</th></tr>`;
+  } else {
+    h+=`<tr><th rowspan="2">ที่</th><th rowspan="2" style="text-align:left;min-width:120px">ชื่อ - สกุล</th>
+      <th colspan="${cc}" class="grp">คะแนนเก็บ (15 ช่อง)</th>
+      <th rowspan="2">กลางภาค</th><th rowspan="2">ปลายภาค</th>
+      <th rowspan="2" style="background:#7c2800">รวม</th><th rowspan="2" style="background:#7c2800">เกรด</th>
+      <th rowspan="2" class="no-print"></th></tr>
+    <tr>${Array.from({length:cc},(_,i)=>`<th style="min-width:28px">ก${i+1}</th>`).join('')}</tr>`;
+  }
+  h+='</thead><tbody>';
+  cls.students.forEach((stu,idx)=>{
+    const s=getS(currentClass,sub,stu.id);
+    const total=calcTotal(currentClass,sub,stu.id),grade=calcGrade(total),has=total>0;
+    h+=`<tr><td class="num-col">${idx+1}</td><td class="name-col">${stu.prefix} ${stu.first} ${stu.last}</td>
+      ${s.collect.map((v,i)=>`<td><input type="number" class="si" min="0" max="999" value="${v}" oninput="UC('${stu.id}',${i},this.value)"></td>`).join('')}`;
+    if(p){['mid1','final1','mid2','final2'].forEach(f=>{h+=`<td><input type="number" class="si wide" min="0" max="999" value="${s[f]}" oninput="UF('${stu.id}','${f}',this.value)"></td>`});}
+    else{['mid','final'].forEach(f=>{h+=`<td><input type="number" class="si wide" min="0" max="999" value="${s[f]}" oninput="UF('${stu.id}','${f}',this.value)"></td>`});}
+    h+=`<td class="total-cell" id="tot_${stu.id}">${has?total:''}</td><td class="grade-cell ${gc(grade)}" id="grd_${stu.id}">${has?grade:''}</td>
+        <td class="no-print"><button class="btn btn-red btn-sm" onclick="removeStudent('${stu.id}')">✕</button></td></tr>`;
+  });
+  h+='</tbody></table>';
+  wrap.innerHTML=h;
+};
+window.UC=function(sid,i,v){const sub=document.getElementById('subjectSelect').value;if(!sub)return;getS(currentClass,sub,sid).collect[i]=v;RT(sid);saveState();};
+window.UF=function(sid,f,v){const sub=document.getElementById('subjectSelect').value;if(!sub)return;getS(currentClass,sub,sid)[f]=v;RT(sid);saveState();};
+function RT(sid){
+  const sub=document.getElementById('subjectSelect').value;
+  const total=calcTotal(currentClass,sub,sid),grade=calcGrade(total),has=total>0;
+  const tc=document.getElementById('tot_'+sid),gd=document.getElementById('grd_'+sid);
+  if(tc)tc.textContent=has?total:'';
+  if(gd){gd.textContent=has?grade:'';gd.className='grade-cell '+gc(grade);}
+}
+
+// ==================== SUBJECTS ====================
+function renderSubjectSelect(){
+  const sel=document.getElementById('subjectSelect'),cur=sel.value;
+  sel.innerHTML='<option value="">-- เลือกวิชา --</option>'+state.subjects.map(s=>`<option value="${s}"${s===cur?' selected':''}>${s}</option>`).join('');
+}
+window.openAddSubjectModal=function(){document.getElementById('newSubjectName').value='';document.getElementById('subjectModal').classList.add('show');};
+window.addSubject=function(){
+  const name=document.getElementById('newSubjectName').value.trim();
+  if(!name){alert('กรุณากรอกชื่อวิชา');return;}
+  if(state.subjects.includes(name)){alert('มีวิชานี้อยู่แล้ว');return;}
+  state.subjects.push(name);saveState();renderSubjectSelect();document.getElementById('subjectSelect').value=name;closeModal('subjectModal');renderTable();
+};
+window.deleteSubject=function(){
+  const sub=document.getElementById('subjectSelect').value;if(!sub)return;
+  if(!confirm(`ลบวิชา "${sub}"? คะแนนทั้งหมดจะหาย`))return;
+  state.subjects=state.subjects.filter(s=>s!==sub);
+  Object.keys(state.scores).forEach(c=>{if(state.scores[c][sub])delete state.scores[c][sub];});
+  saveState();renderSubjectSelect();document.getElementById('subjectSelect').value='';renderTable();
+};
+
+// ==================== CLASSES ====================
+window.openAddClassModal=function(){document.getElementById('newClassName').value='';document.getElementById('addClassModal').classList.add('show');};
+window.addClass=function(){
+  const name=document.getElementById('newClassName').value.trim(),type=document.getElementById('newClassType').value;
+  if(!name){alert('กรุณากรอกชื่อชั้นเรียน');return;}
+  if(state.classes[name]){alert('มีชั้นเรียนนี้แล้ว');return;}
+  state.classes[name]={type,students:[]};saveState();renderTabs();closeModal('addClassModal');switchClass(name);
+};
+window.deleteCurrentClass=function(){
+  if(!confirm(`ลบชั้น "${currentClass}"?`))return;
+  delete state.classes[currentClass];if(state.scores[currentClass])delete state.scores[currentClass];
+  const rem=Object.keys(state.classes);saveState();currentClass=rem[0]||'';renderTabs();
+  if(currentClass)renderTable();else document.getElementById('tableWrap').innerHTML='<div class="notice">ไม่มีชั้นเรียน</div>';
+};
+
+// ==================== STUDENTS ====================
+window.openAddStudentModal=function(){document.getElementById('newStudentFirst').value='';document.getElementById('newStudentLast').value='';document.getElementById('addStudentModal').classList.add('show');};
+window.addStudent=function(){
+  const prefix=document.getElementById('newStudentPrefix').value;
+  const first=document.getElementById('newStudentFirst').value.trim();
+  const last=document.getElementById('newStudentLast').value.trim();
+  if(!first||!last){alert('กรุณากรอกชื่อและนามสกุล');return;}
+  const id=currentClass.replace(/\./g,'')+'_'+Date.now();
+  state.classes[currentClass].students.push({id,prefix,first,last});
+  saveState();closeModal('addStudentModal');renderTable();
+};
+window.removeStudent=function(id){
+  if(!confirm('ลบนักเรียนคนนี้?'))return;
+  state.classes[currentClass].students=state.classes[currentClass].students.filter(s=>s.id!==id);
+  if(state.scores[currentClass])Object.keys(state.scores[currentClass]).forEach(sub=>{if(state.scores[currentClass][sub][id])delete state.scores[currentClass][sub][id];});
+  saveState();renderTable();
+};
+
+// ==================== MODAL ====================
+window.closeModal=function(id){document.getElementById(id).classList.remove('show');};
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show');}));
+
+// ==================== SCHOOL INFO ====================
+window.saveSchoolInfo=function(){
+  if(!state.schoolInfo)state.schoolInfo={};
+  state.schoolInfo.teacher=document.getElementById('printTeacher').value;
+  state.schoolInfo.academic=document.getElementById('printAcademic').value;
+  state.schoolInfo.principal=document.getElementById('printPrincipal').value;
+  saveState();
+};
+function loadSchoolInfo(){
+  if(!state.schoolInfo)return;
+  document.getElementById('printTeacher').value=state.schoolInfo.teacher||'';
+  document.getElementById('printAcademic').value=state.schoolInfo.academic||'';
+  document.getElementById('printPrincipal').value=state.schoolInfo.principal||'';
+}
+
+// ==================== PRINT ====================
+window.openPrintModal=function(){
+  const pc=document.getElementById('printClass'),ps=document.getElementById('printSubject');
+  pc.innerHTML='<option value="">-- เลือกชั้น --</option>'+Object.keys(state.classes).map(c=>`<option value="${c}"${c===currentClass?' selected':''}>${c}</option>`).join('');
+  ps.innerHTML='<option value="">-- เลือกวิชา --</option>'+state.subjects.map(s=>`<option value="${s}">${s}</option>`).join('');
+  const cs=document.getElementById('subjectSelect').value;if(cs)ps.value=cs;
+  loadSchoolInfo();document.getElementById('printModal').classList.add('show');updatePrintPreview();
+};
+window.updatePrintPreview=function(){
+  const cn=document.getElementById('printClass').value,sub=document.getElementById('printSubject').value,area=document.getElementById('printPreviewArea');
+  if(!cn||!sub){area.innerHTML='<p style="color:#888;padding:10px">กรุณาเลือกชั้นเรียนและวิชา</p>';return;}
+  area.innerHTML=buildReport(cn,sub);
+};
+function buildReport(cn,sub){
+  const cls=state.classes[cn];if(!cls)return 'ไม่พบข้อมูล';
+  const p=cls.type==='primary',cc=p?20:15;
+  const today=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+  const yr=new Date().getFullYear()+543;
+  const teacher=(state.schoolInfo&&state.schoolInfo.teacher)||'....................................';
+  const academic=(state.schoolInfo&&state.schoolInfo.academic)||'....................................';
+  const principal=(state.schoolInfo&&state.schoolInfo.principal)||'....................................';
+  let male=0,female=0;
+  cls.students.forEach(s=>{if(s.prefix==='เด็กชาย'||s.prefix==='นาย')male++;else female++;});
+  const collectHeaders=Array.from({length:cc},(_,i)=>`<th style="${rTH()}font-size:10px;min-width:26px">ก${i+1}</th>`).join('');
+  const examHeadersTop=p?`<th colspan="2" style="${rTH('group')}">ภาคเรียนที่ 1</th><th colspan="2" style="${rTH('group')}">ภาคเรียนที่ 2</th>`:`<th rowspan="2" style="${rTH()}">กลางภาค</th><th rowspan="2" style="${rTH()}">ปลายภาค</th>`;
+  const examHeadersBot=p?`<th style="${rTH()}font-size:10px">กลาง1</th><th style="${rTH()}font-size:10px">ปลาย1</th><th style="${rTH()}font-size:10px">กลาง2</th><th style="${rTH()}font-size:10px">ปลาย2</th>`:'';
+  let html=`<div style="font-family:'Sarabun',sans-serif;color:#222;font-size:12px">
+  <div style="text-align:center;margin-bottom:6px;border-bottom:2px solid #c94b00;padding-bottom:6px">
+    <div style="font-size:16px;font-weight:800;color:#c94b00">รายงานผลการเรียนรายวิชา</div>
+    <div style="font-size:13px;font-weight:600">โรงเรียนหินฝนวิทยาคม</div>
+    <div style="font-size:11px;color:#666">ปีการศึกษา ${yr}</div>
+  </div>
+  <div style="display:flex;border:1.5px solid #c94b00;border-radius:5px;overflow:hidden;margin-bottom:7px;font-size:11.5px">
+    <div style="flex:1;background:#fff3e0;padding:5px 8px;border-right:1px solid #ffd0a0"><b style="color:#7c4700">ชั้น:</b> ${cn}</div>
+    <div style="flex:2;background:#fff3e0;padding:5px 8px;border-right:1px solid #ffd0a0"><b style="color:#7c4700">วิชา:</b> ${sub}</div>
+    <div style="flex:1.5;background:#fff3e0;padding:5px 8px;border-right:1px solid #ffd0a0"><b style="color:#7c4700">จำนวน:</b> ${cls.students.length} คน (ช.${male}/ญ.${female})</div>
+    <div style="flex:1.5;background:#fff3e0;padding:5px 8px"><b style="color:#7c4700">วันที่:</b> ${today}</div>
+  </div>
+  <div style="overflow-x:auto">
+  <table style="border-collapse:collapse;font-size:11px;width:max-content;min-width:100%">
+  <thead><tr>
+    <th rowspan="2" style="${rTH()}min-width:22px">ที่</th>
+    <th rowspan="2" style="${rTH()}text-align:left;min-width:120px">ชื่อ - สกุล</th>
+    <th colspan="${cc}" style="${rTH('group')}">คะแนนเก็บ (${cc} ช่อง)</th>
+    ${examHeadersTop}
+    <th rowspan="2" style="${rTH('dark')}">รวม</th><th rowspan="2" style="${rTH('dark')}">เกรด</th>
+    <th rowspan="2" style="${rTH()}font-size:10px">ผล</th>
+  </tr><tr>${collectHeaders}${examHeadersBot}</tr></thead><tbody>`;
+  let passC=0,failC=0;
+  cls.students.forEach((stu,idx)=>{
+    const s=getS(cn,sub,stu.id);const total=calcTotal(cn,sub,stu.id),grade=calcGrade(total),has=total>0;
+    const pass=grade>0;if(has){pass?passC++:failC++;}
+    const rowBg=idx%2===0?'#fff':'#fff8f2';
+    const gc_=grade===4?'#1b5e20':grade===0?'#b71c1c':'#c94b00';
+    html+=`<tr style="background:${rowBg}">
+      <td style="${rTD()}color:#777">${idx+1}</td>
+      <td style="${rTD()}text-align:left;padding-left:6px">${stu.prefix} ${stu.first} ${stu.last}</td>
+      ${s.collect.map(v=>`<td style="${rTD()}">${v||''}</td>`).join('')}
+      ${p?`<td style="${rTD()}">${s.mid1||''}</td><td style="${rTD()}">${s.final1||''}</td><td style="${rTD()}">${s.mid2||''}</td><td style="${rTD()}">${s.final2||''}</td>`:`<td style="${rTD()}">${s.mid||''}</td><td style="${rTD()}">${s.final||''}</td>`}
+      <td style="${rTD()}font-weight:800;font-size:12px;color:#c94b00">${has?total:''}</td>
+      <td style="${rTD()}font-weight:900;font-size:13px;color:${gc_}">${has?grade:''}</td>
+      <td style="${rTD()}font-weight:700;font-size:10px;color:${pass?'#1b5e20':'#b71c1c'}">${has?(pass?'✓':'✗'):''}</td>
+    </tr>`;
+  });
+  html+=`</tbody></table></div>
+  <div style="display:flex;gap:6px;margin-top:7px;font-size:11.5px;flex-wrap:wrap">
+    <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;padding:4px 10px;color:#1b5e20;font-weight:700">✓ ผ่าน ${passC} คน</div>
+    <div style="background:#ffebee;border:1px solid #ef9a9a;border-radius:4px;padding:4px 10px;color:#b71c1c;font-weight:700">✗ ไม่ผ่าน ${failC} คน</div>
+    <div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:4px;padding:4px 10px;color:#7c4700;font-weight:700">รวม ${cls.students.length} คน</div>
+  </div>
+  <div style="display:flex;justify-content:space-around;margin-top:20px;gap:16px;font-size:12px;flex-wrap:wrap">
+    <div style="text-align:center;min-width:160px">
+      <div style="margin-bottom:30px;color:#444">ลงชื่อ ......................................</div>
+      <div style="font-weight:700">(${teacher})</div><div style="color:#666;font-size:11px">ครูผู้สอน</div>
+    </div>
+    <div style="text-align:center;min-width:160px">
+      <div style="margin-bottom:30px;color:#444">ลงชื่อ ......................................</div>
+      <div style="font-weight:700">(${academic})</div><div style="color:#666;font-size:11px">หัวหน้างานบริหารวิชาการ</div>
+    </div>
+    <div style="text-align:center;min-width:160px">
+      <div style="margin-bottom:30px;color:#444">ลงชื่อ ......................................</div>
+      <div style="font-weight:700">(${principal})</div><div style="color:#666;font-size:11px">ผู้อำนวยการโรงเรียน</div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:10px;padding-top:7px;border-top:1px dashed #ffd0a0;font-size:10px;color:#bbb">
+    ครู รณฤทธิ์ ศรีสองเมือง · โรงเรียนหินฝนวิทยาคม · ระบบเก็บคะแนนรายวิชา ปีการศึกษา ${yr}
+  </div></div>`;
+  return html;
+}
+function rTH(t){
+  if(t==='group')return 'border:1.5px solid #a33b00;padding:5px 3px;background:#e65c00;color:#fff;text-align:center;white-space:nowrap;';
+  if(t==='dark')return 'border:1.5px solid #7c2800;padding:5px 3px;background:#7c2800;color:#fff;text-align:center;white-space:nowrap;';
+  return 'border:1.5px solid #a33b00;padding:5px 3px;background:#c94b00;color:#fff;text-align:center;white-space:nowrap;';
+}
+function rTD(){return 'border:1px solid #ddd;padding:3px 2px;text-align:center;vertical-align:middle;';}
+
+window.doPrint=function(){
+  const cn=document.getElementById('printClass').value,sub=document.getElementById('printSubject').value;
+  if(!cn||!sub){alert('กรุณาเลือกชั้นเรียนและวิชา');return;}
+  const area=document.getElementById('print-area');
+  area.innerHTML=buildReport(cn,sub);area.style.display='block';
+  setTimeout(()=>{window.print();area.style.display='none';},200);
+};
+
+// ==================== INIT ====================
+onAuthStateChanged(auth, async user=>{
+  isTeacher=!!user;
+  if(user){await loadFromFirebase();}
+  else{loadFromLocal();}
+  currentClass=Object.keys(state.classes)[0]||'';
+  renderTabs();renderSubjectSelect();renderTable();
+});
+</script>
+</body>
+</html>
