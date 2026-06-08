@@ -1,8 +1,3 @@
-// ====================================================
-// ⚙️ Firebase Configuration
-// กรุณาแทนที่ค่าด้านล่างด้วย Firebase Config ของคุณ
-// ดูขั้นตอนใน README.md
-// ====================================================
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 // TODO: Add SDKs for Firebase products that you want to use
