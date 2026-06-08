@@ -65,7 +65,7 @@
 <nav class="navbar navbar-custom">
   <div class="container-fluid d-flex align-items-center justify-content-between">
     <div class="d-flex align-items-center gap-2">
-      <img src="images/logo.png" class="nav-logo" alt="โลโก้โรงเรียน" onerror="this.style.display='none'"/>
+      <img src="images/logo.png" class="nav-logo" alt="โลโก้โรงเรียน" data-site="logo" onerror="this.style.display='none'"/>
       <span class="navbar-brand m-0">ห้องเรียนครูโอม</span>
     </div>
     <div class="d-flex gap-2">
@@ -80,10 +80,10 @@
     <div class="row align-items-center">
       <div class="col-md-8">
         <div class="d-flex align-items-center gap-3 mb-3">
-          <img src="images/logo.png" class="school-logo" alt="โลโก้" onerror="this.outerHTML='<div class=&quot;school-logo d-flex align-items-center justify-content-center&quot; style=&quot;font-size:2rem;color:#c94b00&quot;>🏫</div>'"/>
+          <img src="images/logo.png" class="school-logo" alt="โลโก้" data-site="logo" onerror="this.outerHTML='<div class=&quot;school-logo d-flex align-items-center justify-content-center&quot; style=&quot;font-size:2rem;color:#c94b00&quot;>🏫</div>'"/>
           <div>
             <h1 class="hero-title mb-0">ห้องเรียนออนไลน์ครูโอม</h1>
-            <div class="hero-school">🏫 โรงเรียนหินฝนวิทยาคม</div>
+            <div class="hero-school">🏫 <span data-site="school-name">โรงเรียนหินฝนวิทยาคม</span></div>
           </div>
         </div>
         <p class="hero-sub mb-0">Aomsensei Classroom · เรียนรู้ได้ทุกที่ ทุกเวลา</p>
@@ -98,9 +98,9 @@
         </div>
       </div>
       <div class="col-md-4 text-center d-none d-md-block">
-        <img src="images/teacher.jpg" class="teacher-avatar" alt="ครูโอม" style="width:130px;height:130px" onerror="this.outerHTML='<div style=&quot;width:130px;height:130px;border-radius:50%;border:4px solid rgba(255,255,255,.85);background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:3.5rem;margin:0 auto&quot;>👨‍🏫</div>'"/>
-        <div style="margin-top:.8rem;font-size:.9rem;font-weight:600;opacity:.9">ครู รณฤทธิ์ ศรีสองเมือง</div>
-        <div style="font-size:.78rem;opacity:.75">ครูประจำชั้น มัธยมศึกษาปีที่ 3</div>
+        <img src="images/teacher.jpg" class="teacher-avatar" alt="ครูโอม" data-site="teacher-photo" style="width:130px;height:130px" onerror="this.outerHTML='<div style=&quot;width:130px;height:130px;border-radius:50%;border:4px solid rgba(255,255,255,.85);background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:3.5rem;margin:0 auto&quot;>👨‍🏫</div>'"/>
+        <div data-site="teacher-name" style="margin-top:.8rem;font-size:.9rem;font-weight:600;opacity:.9">ครู รณฤทธิ์ ศรีสองเมือง</div>
+        <div data-site="teacher-role" style="font-size:.78rem;opacity:.75">ครูประจำชั้น มัธยมศึกษาปีที่ 3</div>
       </div>
     </div>
   </div>
@@ -172,8 +172,8 @@
 
 <footer>
   <div class="container">
-    <img src="images/logo.png" style="width:40px;height:40px;border-radius:50%;margin-bottom:.5rem;background:#fff;padding:3px;object-fit:contain" alt="logo" onerror="this.style.display='none'"/>
-    <p class="mb-1"><strong>ห้องเรียนออนไลน์ครูโอม</strong> · โรงเรียนหินฝนวิทยาคม</p>
+    <img src="images/logo.png" data-site="logo" style="width:40px;height:40px;border-radius:50%;margin-bottom:.5rem;background:#fff;padding:3px;object-fit:contain" alt="logo" onerror="this.style.display='none'"/>
+    <p class="mb-1"><strong>ห้องเรียนออนไลน์ครูโอม</strong> · <span data-site="school-name">โรงเรียนหินฝนวิทยาคม</span></p>
     <p class="mb-0" style="font-size:.78rem">
       <a href="student.html"><i class="fas fa-user-graduate me-1"></i>นักเรียนเข้าระบบ</a> &nbsp;|&nbsp;
       <a href="scores.html"><i class="fas fa-chart-line me-1"></i>ระบบคะแนน</a> &nbsp;|&nbsp;
@@ -184,7 +184,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
   import { FIREBASE_CONFIG } from "./js/config.js";
 
   const app = initializeApp(FIREBASE_CONFIG);
@@ -251,7 +251,20 @@
     }catch(e){c.innerHTML='<div class="col-12"><div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดห้องเรียนไม่ได้</p></div></div>'}
   }
 
-  loadStats();loadAnnouncements();loadClassrooms();
+  async function loadSiteSettings(){
+    try{
+      const snap = await getDoc(doc(db,'settings','site'));
+      if(!snap.exists()) return;
+      const s = snap.data();
+      if(s.logoUrl) document.querySelectorAll('[data-site="logo"]').forEach(el=>el.src=s.logoUrl);
+      if(s.teacherPhotoUrl) document.querySelectorAll('[data-site="teacher-photo"]').forEach(el=>el.src=s.teacherPhotoUrl);
+      if(s.teacherName) document.querySelectorAll('[data-site="teacher-name"]').forEach(el=>el.textContent=s.teacherName);
+      if(s.teacherRole) document.querySelectorAll('[data-site="teacher-role"]').forEach(el=>el.textContent=s.teacherRole);
+      if(s.schoolName) document.querySelectorAll('[data-site="school-name"]').forEach(el=>el.textContent=s.schoolName);
+    }catch(e){ console.warn('loadSiteSettings:',e); }
+  }
+
+  loadSiteSettings();loadStats();loadAnnouncements();loadClassrooms();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
