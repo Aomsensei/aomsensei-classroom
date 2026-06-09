@@ -39,7 +39,7 @@ tr:nth-child(even) td{background:#fff8f3}
   <div class="warning">
     ⚠️ <b>สำหรับครูเท่านั้น</b> — ไฟล์นี้จะเพิ่มชื่อนักเรียน "ทดสอบ" เข้าทุกชั้น<br>
     ชื่อถูกตั้งให้ <b>ดูเหมือนนักเรียนจริง</b> นักเรียนทั่วไปไม่ทราบว่าเป็นบัญชีทดสอบ<br>
-    รหัสผ่านถูกตั้งล่วงหน้าแล้ว — <b>ครูเป็นผู้รู้รหัสเท่านั้น</b>
+    🔐 รหัสผ่านพิเศษ: <b>226005</b> — <b>แอดมินรู้คนเดียว</b> ห้ามเปิดเผย
   </div>
 
   <!-- ตารางบัญชีทดสอบ -->
@@ -48,12 +48,12 @@ tr:nth-child(even) td{background:#fff8f3}
     <table>
       <thead><tr><th>#</th><th>ชั้น</th><th>ชื่อ-นามสกุล</th><th>รหัสผ่าน</th></tr></thead>
       <tbody>
-        <tr><td>1</td><td>ป.4</td><td>เด็กชาย ทดสอบ ระบบ</td><td><span class="pwd-col">test1234</span></td></tr>
-        <tr><td>2</td><td>ป.5</td><td>เด็กชาย ทดสอบ ระบบ</td><td><span class="pwd-col">test1234</span></td></tr>
-        <tr><td>3</td><td>ป.6</td><td>เด็กชาย ทดสอบ ระบบ</td><td><span class="pwd-col">test1234</span></td></tr>
-        <tr><td>4</td><td>ม.1</td><td>เด็กชาย ทดสอบ ระบบ</td><td><span class="pwd-col">test1234</span></td></tr>
-        <tr><td>5</td><td>ม.2</td><td>เด็กชาย ทดสอบ ระบบ</td><td><span class="pwd-col">test1234</span></td></tr>
-        <tr><td>6</td><td>ม.3</td><td>เด็กชาย ทดสอบ ระบบ</td><td><span class="pwd-col">test1234</span></td></tr>
+        <tr><td>1</td><td>ป.4</td><td>เด็กชาย ทดสอบ ระบบ</td><td><span class="pwd-col">226005</span></td></tr>
+        <tr><td>2</td><td>ป.5</td><td>เด็กชาย ทดสอบ ระบบ</td><td><span class="pwd-col">226005</span></td></tr>
+        <tr><td>3</td><td>ป.6</td><td>เด็กชาย ทดสอบ ระบบ</td><td><span class="pwd-col">226005</span></td></tr>
+        <tr><td>4</td><td>ม.1</td><td>เด็กชาย ทดสอบ ระบบ</td><td><span class="pwd-col">226005</span></td></tr>
+        <tr><td>5</td><td>ม.2</td><td>เด็กชาย ทดสอบ ระบบ</td><td><span class="pwd-col">226005</span></td></tr>
+        <tr><td>6</td><td>ม.3</td><td>เด็กชาย ทดสอบ ระบบ</td><td><span class="pwd-col">226005</span></td></tr>
       </tbody>
     </table>
   </div>
@@ -72,7 +72,7 @@ tr:nth-child(even) td{background:#fff8f3}
     ✅ <b>นำเข้าสำเร็จทั้งหมด!</b><br>
     ตอนนี้สามารถทดสอบระบบได้ที่ <a href="student.html" style="color:#1b5e20;font-weight:700">student.html</a>
     โดยใช้ชื่อ <code style="background:#c8e6c9;padding:1px 6px;border-radius:4px">เด็กชาย ทดสอบ ระบบ</code>
-    รหัสผ่าน <code style="background:#c8e6c9;padding:1px 6px;border-radius:4px">test1234</code>
+    รหัสผ่าน <code style="background:#c8e6c9;padding:1px 6px;border-radius:4px">226005</code>
   </div>
 </div>
 
@@ -88,7 +88,7 @@ const auth = getAuth(app);
 const db   = getFirestore(app);
 
 // ===================== ข้อมูลทดสอบ =====================
-const TEST_PASSWORD = 'test1234';
+const TEST_PASSWORD = '226005';
 const TEST_STUDENT  = { prefix: 'เด็กชาย', first: 'ทดสอบ', last: 'ระบบ' };
 
 const CLASSES = [
@@ -151,22 +151,24 @@ window.runImport = async function(){
       }
     }
 
-    // ===== STEP 2: ตั้งรหัสผ่านล่วงหน้าใน students collection =====
+    // ===== STEP 2: ตั้ง/อัปเดตรหัสผ่านพิเศษใน students collection =====
     log('', 'info');
-    log('🔑 STEP 2: ตั้งรหัสผ่านบัญชีทดสอบ...', 'info');
+    log('🔑 STEP 2: ตั้งรหัสผ่านพิเศษบัญชีทดสอบ...', 'info');
 
     for(const cls of CLASSES){
       for(const s of cls.students){
         const fullName = `${s.prefix} ${s.first} ${s.last}`;
         const studentId = `${cls.id}_${fullName}`;
+        // ใช้ setDoc โดยไม่ merge เพื่อให้รหัสผ่านถูกอัปเดตเสมอ
         await setDoc(doc(db, 'students', studentId), {
-          name:     fullName,
-          roomId:   cls.id,
-          password: TEST_PASSWORD,
-          isTest:   true,
-          createdAt: serverTimestamp()
-        }, { merge: true });
-        log(`  🔑 ${cls.name} → ${fullName}`, 'ok');
+          name:        fullName,
+          roomId:      cls.id,
+          password:    TEST_PASSWORD,
+          adminCode:   TEST_PASSWORD,
+          isTest:      true,
+          createdAt:   serverTimestamp()
+        });
+        log(`  🔑 ${cls.name} → ${fullName} [รหัส: ${TEST_PASSWORD}]`, 'ok');
       }
     }
 
