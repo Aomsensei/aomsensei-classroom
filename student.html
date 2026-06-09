@@ -474,10 +474,35 @@ async function loadClassrooms(){
 initPage();
 
 window.loadStudentNames = async function(){
-  const roomId = document.getElementById('loginRoom').value;
+  const roomSel = document.getElementById('loginRoom');
+  const roomId = roomSel.value;
+  const roomName = roomSel.options[roomSel.selectedIndex]?.text || '';
   const sel = document.getElementById('loginName');
-  sel.innerHTML = '<option value="">-- เลือกชื่อนักเรียน --</option>';
-  if(!roomId) return;
+  sel.innerHTML = '<option value="">⏳ กำลังโหลด...</option>';
+  if(!roomId){ sel.innerHTML = '<option value="">-- เลือกชื่อนักเรียน --</option>'; return; }
+
+  // === ดึงรายชื่อจากระบบเก็บคะแนน (score_system) ก่อน ===
+  try{
+    const scoreSnap = await getDoc(doc(db,'score_system','hinfon_scores'));
+    if(scoreSnap.exists()){
+      const classes = scoreSnap.data()?.data?.classes || {};
+      // จับคู่ชื่อห้อง (ป.5 / ม.1 / ม.3/1 → ม.3 ฯลฯ)
+      const matchKey = Object.keys(classes).find(k =>
+        k === roomName || roomName.startsWith(k+'/') || roomName.startsWith(k+' ')
+      );
+      if(matchKey && classes[matchKey].students?.length){
+        const names = classes[matchKey].students.map(s =>
+          [s.prefix, s.first, s.last].filter(Boolean).join(' ')
+        );
+        names.sort((a,b) => a.localeCompare(b,'th'));
+        sel.innerHTML = '<option value="">-- เลือกชื่อนักเรียน --</option>' +
+          names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+        return;
+      }
+    }
+  }catch(e){ console.warn('loadStudentNames (scores):',e); }
+
+  // === fallback: classrooms subcollection ===
   try{
     const snap = await getDocs(collection(db,'classrooms',roomId,'students'));
     if(snap.empty){
@@ -487,7 +512,8 @@ window.loadStudentNames = async function(){
     const names = [];
     snap.forEach(d => names.push(d.data().name||d.id));
     names.sort((a,b) => a.localeCompare(b,'th'));
-    names.forEach(n => sel.innerHTML += `<option value="${esc(n)}">${esc(n)}</option>`);
+    sel.innerHTML = '<option value="">-- เลือกชื่อนักเรียน --</option>' +
+      names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
   }catch(e){
     sel.innerHTML = '<option value="">โหลดไม่ได้</option>';
     console.warn('loadStudentNames:',e);
