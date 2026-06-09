@@ -167,6 +167,7 @@ tbody tr:hover td{background:#fff3e8}
     <button class="nav-item" onclick="showPage('chat',this)"><i class="fas fa-comments"></i> แชทนักเรียน</button>
     <a href="scores.html" class="nav-item"><i class="fas fa-star"></i> ระบบเก็บคะแนน</a>
     <button class="nav-item" onclick="showPage('settings',this)"><i class="fas fa-cog"></i> ตั้งค่าเว็บไซต์</button>
+    <button class="nav-item" onclick="showPage('guide',this)"><i class="fas fa-book-open"></i> คู่มือแอดมิน</button>
   </nav>
   <div class="sidebar-footer"><button class="btn-logout" onclick="doLogout()">🚪 ออกจากระบบ</button></div>
 </div>
@@ -323,6 +324,138 @@ tbody tr:hover td{background:#fff3e8}
   </div>
 </div>
 
+    <!-- GUIDE -->
+    <div id="page-guide" class="page">
+      <div class="section-hd"><h2><i class="fas fa-book-open"></i> คู่มือการใช้งาน Admin Panel</h2></div>
+      <style>
+        .guide-step{background:#fff;border-radius:12px;padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(201,75,0,.08);border-left:4px solid #f39800}
+        .guide-step-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+        .guide-num{width:30px;height:30px;background:#c94b00;color:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0}
+        .guide-title{font-size:15px;font-weight:800;color:#c94b00}
+        .guide-body{font-size:13px;color:#555;line-height:1.9;padding-left:40px}
+        .guide-body li{margin-bottom:3px}
+        .guide-note{background:#fff3e0;border-left:3px solid #f39800;border-radius:0 8px 8px 0;padding:9px 13px;font-size:12.5px;color:#7c4700;margin:8px 0 4px 40px}
+        .guide-tip{background:#e8f5e9;border-left:3px solid #43a047;border-radius:0 8px 8px 0;padding:9px 13px;font-size:12.5px;color:#1b5e20;margin:8px 0 4px 40px}
+      </style>
+
+      <div style="background:#fff3e0;border:1.5px solid #f39800;border-radius:10px;padding:13px 16px;margin-bottom:16px;font-size:13px;color:#7c4700">
+        <b>📌 ภาพรวม:</b> Admin Panel จัดการเนื้อหาทั้งหมดของเว็บไซต์ห้องเรียนออนไลน์
+        ตั้งแต่ห้องเรียน รายชื่อนักเรียน ประกาศ ใบงาน ข้อสอบ วิดีโอ ผลสอบ ไปจนถึงแชทและการตั้งค่าเว็บ
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-hd"><span class="guide-num">1</span><span class="guide-title">🏫 ห้องเรียน — จัดการชั้นเรียนและรายชื่อนักเรียน</span></div>
+        <div class="guide-body">
+          <ol>
+            <li>กดปุ่ม <b>➕ เพิ่มห้อง</b> → กรอกชื่อห้อง (เช่น <code>ป.5</code>, <code>ม.3/1</code>) และรหัสห้อง</li>
+            <li>กดปุ่ม <b>👥 รายชื่อ</b> ข้างชื่อห้อง → เพิ่ม/ลบชื่อนักเรียนในห้องนั้น</li>
+            <li>ชื่อนักเรียนที่เพิ่มที่นี่ จะปรากฏในดรอปดาวน์หน้า Login ของนักเรียนโดยอัตโนมัติ</li>
+          </ol>
+          <div class="guide-note">⚠️ ชื่อห้องเรียนต้องตรงกับชื่อชั้นในระบบเก็บคะแนน (scores.html) เช่น <b>ป.5</b> หรือ <b>ม.3</b> เพื่อให้รายชื่อโหลดได้ถูกต้อง</div>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-hd"><span class="guide-num">2</span><span class="guide-title">📢 ประกาศ — แจ้งข่าวสารและมอบหมายงาน</span></div>
+        <div class="guide-body">
+          <ol>
+            <li>กด <b>➕ เพิ่มประกาศ</b> → กรอกหัวข้อ เนื้อหา เลือกห้อง และวิชา</li>
+            <li>ใส่ <b>URL รูปภาพ</b> (ไม่บังคับ) เพื่อแนบรูปประกอบ</li>
+            <li>เลือก <b>ทุกห้องเรียน</b> เพื่อส่งประกาศถึงทุกชั้นพร้อมกัน</li>
+            <li>กด ✏️ แก้ไข หรือ 🗑️ ลบ ที่ท้ายแถวได้เลย</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-hd"><span class="guide-num">3</span><span class="guide-title">📄 ใบงาน — แนบเนื้อหาและไฟล์สำหรับนักเรียน</span></div>
+        <div class="guide-body">
+          <ol>
+            <li>กด <b>➕ เพิ่มใบงาน</b> → กรอกชื่อใบงาน วิชา และคำอธิบาย</li>
+            <li><b>ลิงก์ไฟล์</b>: ใส่ URL Google Drive (ตั้งให้ใครก็ดูได้ก่อน) หรือลิงก์อื่นๆ</li>
+            <li><b>HTML Content</b>: วางโค้ด HTML ใบงานที่สร้างโดย Claude ได้โดยตรง</li>
+          </ol>
+          <div class="guide-tip">💡 สร้างใบงาน HTML ด้วย Claude แล้ววางในช่อง HTML Content — นักเรียนเปิดอ่านได้ทันทีโดยไม่ต้องดาวน์โหลด</div>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-hd"><span class="guide-num">4</span><span class="guide-title">📝 ข้อสอบ — สร้างและจัดการข้อสอบ</span></div>
+        <div class="guide-body">
+          <b>มี 2 ประเภท:</b>
+          <ul style="margin:6px 0 8px 0">
+            <li><b>ปรนัย (ตัวเลือก)</b> — สร้างคำถาม+ตัวเลือกในระบบ ระบบตรวจให้อัตโนมัติ</li>
+            <li><b>ไฟล์ HTML</b> — ใส่ URL ไฟล์ข้อสอบ HTML ที่อัปโหลดบน GitHub Pages นักเรียนกดแล้วเปิดไฟล์นั้น คำตอบส่งกลับมาให้ครูตรวจในหน้า <b>ผลสอบ</b></li>
+          </ul>
+          <ol>
+            <li>กด <b>➕ สร้างข้อสอบ</b> → เลือกประเภท กรอกรายละเอียด กำหนดห้อง/วิชา</li>
+            <li>สำหรับประเภทปรนัย: กด <b>➕ เพิ่มคำถาม</b> เพื่อเพิ่มทีละข้อ กดวงกลมหน้าตัวเลือกเพื่อเลือกเฉลย</li>
+          </ol>
+          <div class="guide-note">⚠️ ไฟล์ข้อสอบ HTML ต้องอัปโหลดขึ้น GitHub Pages ก่อน แล้วค่อยนำ URL มาใส่ในระบบ</div>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-hd"><span class="guide-num">5</span><span class="guide-title">📊 ผลสอบ — ตรวจ ให้คะแนน และลบผลสอบ</span></div>
+        <div class="guide-body">
+          <ol>
+            <li>ดูรายการที่นักเรียนส่งทั้งหมด กรองได้ตามข้อสอบ ชั้น หรือวิชา</li>
+            <li>กดปุ่ม <b>✏️ ตรวจ/ให้คะแนน</b> เพื่อดูคำตอบรายข้อ แล้วกรอก <b>คะแนนที่ได้ / คะแนนเต็ม</b></li>
+            <li>กด <b>💾 บันทึกคะแนน</b> → คะแนนจะแสดงในหน้าคะแนนของนักเรียนทันที</li>
+            <li>กดปุ่ม <b>🗑️ ลบ</b> เพื่อลบผลสอบที่ส่งมา (นักเรียนสามารถส่งใหม่ได้)</li>
+          </ol>
+          <div class="guide-tip">💡 ผลสอบที่ตรวจแล้วจะมีป้าย ✅ ตรวจแล้ว ผลสอบที่ยังไม่ตรวจจะมีป้าย ⏳ รอตรวจ</div>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-hd"><span class="guide-num">6</span><span class="guide-title">💬 แชทนักเรียน — ตอบคำถามนักเรียน</span></div>
+        <div class="guide-body">
+          <ol>
+            <li>เลือกห้องเรียนที่ต้องการจากแถบปุ่มด้านบน</li>
+            <li>กรอกข้อความในช่องด้านล่าง กด Enter หรือปุ่มส่ง</li>
+            <li>ถ้ามีข้อความใหม่จากนักเรียน จะมี 🔴 แจ้งเตือนที่เมนู แชทนักเรียน และตัวเลขบนปุ่มห้องนั้น</li>
+          </ol>
+          <div class="guide-note">⚠️ ระบบจะล้างแชทอัตโนมัติทุก 2 เดือน วันที่ 1 เพื่อประหยัดพื้นที่ Firestore</div>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-hd"><span class="guide-num">7</span><span class="guide-title">🎬 วิดีโอ — แนบคลิปการเรียน</span></div>
+        <div class="guide-body">
+          <ol>
+            <li>กด <b>➕ เพิ่มวิดีโอ</b> → ใส่ชื่อและ URL ของ YouTube</li>
+            <li>ระบบจะแปลง URL เป็น embed อัตโนมัติ นักเรียนดูได้ในแอปเลยโดยไม่ต้องออกไป</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-hd"><span class="guide-num">8</span><span class="guide-title">⚙️ ตั้งค่าเว็บไซต์</span></div>
+        <div class="guide-body">
+          <ul>
+            <li><b>โลโก้โรงเรียน</b> และ <b>รูปโปรไฟล์ครู</b>: ใส่ path เช่น <code>images/logo.png</code> หรือ URL รูปภาพออนไลน์</li>
+            <li><b>ชื่อโรงเรียน / ชื่อครู / ตำแหน่ง</b>: อัปเดตแล้วบันทึก — ทุกหน้าจะอัปเดตทันที</li>
+            <li>กด <b>💾 บันทึกการตั้งค่า</b> เพื่อบันทึกทุกการเปลี่ยนแปลงลง Firestore</li>
+          </ul>
+          <div class="guide-tip">💡 เปลี่ยนชื่อครูในตั้งค่า → ชื่อในแชท ส่วนหัว และทุกที่จะเปลี่ยนพร้อมกันอัตโนมัติ</div>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-hd"><span class="guide-num">9</span><span class="guide-title">⭐ ระบบเก็บคะแนน (scores.html)</span></div>
+        <div class="guide-body">
+          <ul>
+            <li>ระบบเก็บคะแนนรายวิชาแบบตารางสรุป — เพิ่ม/แก้ไขคะแนนรายคนรายวิชาได้โดยตรง</li>
+            <li>ข้อมูลซิงค์ขึ้น Firestore อัตโนมัติ ทุกอุปกรณ์เห็นคะแนนเดียวกัน</li>
+            <li>กด <b>🔙 Admin</b> เพื่อกลับมาหน้านี้</li>
+          </ul>
+          <div class="guide-note">⚠️ รายชื่อนักเรียนในระบบเก็บคะแนนจะถูกดึงมาใช้เป็นดรอปดาวน์ในหน้า Login ของนักเรียน (student.html) โดยอัตโนมัติ</div>
+        </div>
+      </div>
+
+    </div>
+
 <!-- MODALS -->
 <div class="overlay" id="mCls"><div class="modal">
   <h2>🏫 ห้องเรียน</h2><input type="hidden" id="clsId"/>
@@ -441,7 +574,7 @@ onAuthStateChanged(auth, user => {
 });
 
 // ==================== PAGES ====================
-const pageTitles = {dashboard:'🏠 Dashboard',classrooms:'🏫 ห้องเรียน',announcements:'📢 ประกาศ',worksheets:'📄 ใบงาน',quizzes:'📝 ข้อสอบ',videos:'🎬 วิดีโอ',results:'📊 ผลสอบ',chat:'💬 แชทนักเรียน',settings:'⚙️ ตั้งค่าเว็บไซต์'};
+const pageTitles = {dashboard:'🏠 Dashboard',classrooms:'🏫 ห้องเรียน',announcements:'📢 ประกาศ',worksheets:'📄 ใบงาน',quizzes:'📝 ข้อสอบ',videos:'🎬 วิดีโอ',results:'📊 ผลสอบ',chat:'💬 แชทนักเรียน',settings:'⚙️ ตั้งค่าเว็บไซต์',guide:'📖 คู่มือแอดมิน'};
 window.showPage = function(p, navEl){
   document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
