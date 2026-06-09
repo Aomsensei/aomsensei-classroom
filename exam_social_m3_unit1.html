@@ -561,111 +561,24 @@
   </div>
 
   <!-- SUBJECTIVE SCORING -->
-  <div class="subj-score-section" style="margin-top:24px;">
-    <div class="subj-score-locked" id="scoreLockedBar">
-      <div class="lock-icon">🔒</div>
-      <div class="lock-text">
-        <strong>ช่องลงคะแนนข้อสอบอัตนัย (สำหรับครูผู้สอน)</strong>
-        <span>ต้องใส่รหัสผ่านเพื่อเข้าถึงส่วนนี้</span>
-      </div>
-      <button class="btn-unlock" onclick="askPassword('score')">🔑 ปลดล็อก</button>
-    </div>
-    <div class="subj-score-content" id="scoreContent">
-      <div class="score-section-title">📊 ลงคะแนนข้อสอบอัตนัย (ครูผู้สอน)</div>
-      <div class="subj-score-grid">
-        <!-- Q21 -->
-        <div class="ss-card">
-          <div class="ss-card-title">ข้อ 21 — ความแตกต่างกฎหมายแพ่ง vs อาญา</div>
-          <div class="ss-card-desc">อธิบายความแตกต่างทั้งด้านลักษณะ วัตถุประสงค์ และผลทางกฎหมาย / เต็ม 5 คะแนน</div>
-          <div class="ss-criteria">
-            <div class="ss-crit-row">
-              <span class="ss-crit-label">อธิบายความแตกต่างได้ถูกต้อง (2 คะแนน)</span>
-              <input class="ss-crit-score" type="number" min="0" max="2" placeholder="0" id="q21c1" oninput="calcSubj(21)" />
-            </div>
-            <div class="ss-crit-row">
-              <span class="ss-crit-label">ยกตัวอย่างได้ถูกต้องอย่างละ 1 (2 คะแนน)</span>
-              <input class="ss-crit-score" type="number" min="0" max="2" placeholder="0" id="q21c2" oninput="calcSubj(21)" />
-            </div>
-            <div class="ss-crit-row">
-              <span class="ss-crit-label">ภาษาถูกต้อง สื่อความได้ชัดเจน (1 คะแนน)</span>
-              <input class="ss-crit-score" type="number" min="0" max="1" placeholder="0" id="q21c3" oninput="calcSubj(21)" />
-            </div>
-          </div>
-          <div class="ss-total-row">
-            <span>รวม</span><span class="ss-total-val" id="q21total">0</span>
-            <span style="font-size:13px;font-weight:400;color:#8d6e63;">/ 5</span>
-          </div>
-          <div style="margin-top:10px;">
-            <label style="font-size:12.5px;font-weight:600;color:var(--primary);display:block;margin-bottom:5px;">หมายเหตุ / ข้อเสนอแนะ</label>
-            <textarea class="comment-field" id="q21note" placeholder="บันทึกความเห็นของครู..."></textarea>
-          </div>
-        </div>
-        <!-- Q22 -->
-        <div class="ss-card">
-          <div class="ss-card-title">ข้อ 22 — องค์ประกอบความผิดอาญาและโทษ 5 สถาน</div>
-          <div class="ss-card-desc">อธิบายองค์ประกอบ + ระบุโทษ 5 สถานครบถ้วน / เต็ม 5 คะแนน</div>
-          <div class="ss-criteria">
-            <div class="ss-crit-row">
-              <span class="ss-crit-label">อธิบายองค์ประกอบความผิดอาญา (2 คะแนน)</span>
-              <input class="ss-crit-score" type="number" min="0" max="2" placeholder="0" id="q22c1" oninput="calcSubj(22)" />
-            </div>
-            <div class="ss-crit-row">
-              <span class="ss-crit-label">ระบุโทษ 5 สถานครบถ้วน (2 คะแนน)</span>
-              <input class="ss-crit-score" type="number" min="0" max="2" placeholder="0" id="q22c2" oninput="calcSubj(22)" />
-            </div>
-            <div class="ss-crit-row">
-              <span class="ss-crit-label">อธิบายความหมายได้ถูกต้อง (1 คะแนน)</span>
-              <input class="ss-crit-score" type="number" min="0" max="1" placeholder="0" id="q22c3" oninput="calcSubj(22)" />
-            </div>
-          </div>
-          <div class="ss-total-row">
-            <span>รวม</span><span class="ss-total-val" id="q22total">0</span>
-            <span style="font-size:13px;font-weight:400;color:#8d6e63;">/ 5</span>
-          </div>
-          <div style="margin-top:10px;">
-            <label style="font-size:12.5px;font-weight:600;color:var(--primary);display:block;margin-bottom:5px;">หมายเหตุ / ข้อเสนอแนะ</label>
-            <textarea class="comment-field" id="q22note" placeholder="บันทึกความเห็นของครู..."></textarea>
-          </div>
-        </div>
-      </div>
-      <div class="ss-grand-total">
-        <div class="ss-grand-label">🏆 คะแนนอัตนัยรวมทั้งสิ้น</div>
-        <div><span class="ss-grand-score" id="grandSubjTotal">0</span>
-          <span style="font-size:16px;opacity:.85;"> / 10 คะแนน</span></div>
-      </div>
-      <button class="btn-lock-again" onclick="lockScore()">🔒 ล็อกช่องคะแนน</button>
+  
+  <!-- ANSWER KEY + PRINT -->
+    <!-- ส่งคำตอบ -->
+  <div class="answer-section" style="margin-top:32px;text-align:center;">
+    <button id="btnSubmit" onclick="submitAnswers()" style="
+      background:linear-gradient(90deg,#c94b00,#f39800);color:#fff;border:none;
+      border-radius:12px;padding:14px 40px;font-size:17px;font-weight:700;
+      font-family:'Sarabun',sans-serif;cursor:pointer;
+      box-shadow:0 4px 16px rgba(201,75,0,.35);transition:transform .15s;">
+      📤 ส่งคำตอบ
+    </button>
+    <div id="submitMsg" style="display:none;margin-top:16px;background:#e8f5e9;
+      border:1.5px solid #66bb6a;border-radius:10px;padding:14px 24px;
+      color:#2e7d32;font-size:15px;font-weight:600;">
+      ✅ ส่งคำตอบเรียบร้อยแล้ว! ครูจะตรวจและแจ้งคะแนนภายหลัง
     </div>
   </div>
 
-  <!-- ANSWER KEY + PRINT -->
-  <div class="answer-section">
-    <button class="answer-toggle" onclick="askPassword('answer')">🔑 แสดง / ซ่อน เฉลย (สำหรับครู)</button>
-    <button class="answer-toggle" style="background:linear-gradient(90deg,#1565c0,#1976d2)" onclick="askPassword('autograde')">🔍 ตรวจข้อสอบอัตโนมัติ</button>
-    <button class="answer-toggle" style="background:linear-gradient(90deg,#2e7d32,#388e3c)" onclick="askPassword('save')">💾 บันทึกผลสอบ</button>
-    <button class="print-btn" onclick="openPrintModal()">🖨️ ปริ๊นท์รายงานผลคะแนน</button>
-    <div class="answer-key-grid" id="answerGrid">
-      <div class="ans-cell"><div class="ans-q">ข้อ 1</div><div class="ans-a">ค</div></div>
-      <div class="ans-cell"><div class="ans-q">ข้อ 2</div><div class="ans-a">ข</div></div>
-      <div class="ans-cell"><div class="ans-q">ข้อ 3</div><div class="ans-a">ค</div></div>
-      <div class="ans-cell"><div class="ans-q">ข้อ 4</div><div class="ans-a">ข</div></div>
-      <div class="ans-cell"><div class="ans-q">ข้อ 5</div><div class="ans-a">ค</div></div>
-      <div class="ans-cell"><div class="ans-q">ข้อ 6</div><div class="ans-a">ก</div></div>
-      <div class="ans-cell"><div class="ans-q">ข้อ 7</div><div class="ans-a">ค</div></div>
-      <div class="ans-cell"><div class="ans-q">ข้อ 8</div><div class="ans-a">ข</div></div>
-      <div class="ans-cell"><div class="ans-q">ข้อ 9</div><div class="ans-a">ก</div></div>
-      <div class="ans-cell"><div class="ans-q">ข้อ 10</div><div class="ans-a">ก</div></div>
-      <div class="ans-cell"><div class="ans-q">ข้อ 11</div><div class="ans-a">ข</div></div>
-      <div class="ans-cell"><div class="ans-q">ข้อ 12</div><div class="ans-a">ข</div></div>
-      <div class="ans-cell"><div class="ans-q">ข้อ 13</div><div class="ans-a">ข</div></div>
-      <div class="ans-cell"><div class="ans-q">ข้อ 14</div><div class="ans-a">ค</div></div>
-      <div class="ans-cell"><div class="ans-q">ข้อ 15</div><div class="ans-a">ข</div></div>
-      <div class="ans-cell"><div class="ans-q">ข้อ 16</div><div class="ans-a">ข</div></div>
-      <div class="ans-cell"><div class="ans-q">ข้อ 17</div><div class="ans-a">ก</div></div>
-      <div class="ans-cell"><div class="ans-q">ข้อ 18</div><div class="ans-a">ง</div></div>
-      <div class="ans-cell"><div class="ans-q">ข้อ 19</div><div class="ans-a">ค</div></div>
-      <div class="ans-cell"><div class="ans-q">ข้อ 20</div><div class="ans-a">ง</div></div>
-    </div>
-  </div>
 
   <!-- SIGNATURE -->
   <div class="sig-section">
@@ -703,206 +616,61 @@
 </div><!-- end page-wrapper -->
 
 <!-- PASSWORD MODAL -->
-<div class="pw-modal-overlay" id="pwModal">
-  <div class="pw-box">
-    <div class="pw-icon">🔐</div>
-    <div class="pw-title">ยืนยันรหัสผ่านครูผู้สอน</div>
-    <div class="pw-sub">กรุณากรอกรหัสผ่านเพื่อเข้าถึงส่วนนี้</div>
-    <input class="pw-input" type="password" id="pwInput" maxlength="10"
-      placeholder="••••••" onkeydown="if(event.key==='Enter') checkPassword()" />
-    <div class="pw-error" id="pwError"></div>
-    <div class="pw-actions">
-      <button class="pw-btn-cancel" onclick="closePwModal()">ยกเลิก</button>
-      <button class="pw-btn-ok" onclick="checkPassword()">✅ ยืนยัน</button>
-    </div>
-  </div>
-</div>
 
 <!-- PRINT MODAL -->
-<div class="modal-overlay" id="printModal">
-  <div class="modal-box">
-    <div class="modal-title">🖨️ รายงานผลคะแนน</div>
-    <div class="modal-sub">กรอกข้อมูลนักเรียนและคะแนนที่ได้รับ แล้วกดพิมพ์</div>
-    <div class="score-input-row">
-      <div class="si-field"><label>ชื่อ–นามสกุลนักเรียน</label><input type="text" id="rptName" placeholder="ชื่อ นามสกุล" /></div>
-      <div class="si-field"><label>ชั้น / ห้อง / เลขที่</label><input type="text" id="rptClass" placeholder="ม.3/1 เลขที่ 1" /></div>
-      <div class="si-field"><label>คะแนนปรนัย (เต็ม 20)</label><input type="number" id="rptScore1" placeholder="0" min="0" max="20" /></div>
-      <div class="si-field"><label>คะแนนอัตนัย (เต็ม 10)</label><input type="number" id="rptScore2" placeholder="0" min="0" max="10" /></div>
-      <div class="si-field"><label>วันที่สอบ</label><input type="text" id="rptDate" placeholder="วว/ดด/ปปปป" /></div>
-      <div class="si-field"><label>หมายเหตุ</label><input type="text" id="rptNote" placeholder="(ถ้ามี)" /></div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closePrintModal()">ยกเลิก</button>
-      <button class="btn-print-confirm" onclick="doPrint()">🖨️ พิมพ์รายงาน</button>
-    </div>
-  </div>
-</div>
 
 <!-- PRINT REPORT -->
-<div id="printReport">
-  <style>
-    #printReport { font-family:'Sarabun',sans-serif; padding:32px 40px; color:#2c1500; }
-    .rpt-header { text-align:center; border-bottom:3px solid #e65100; padding-bottom:16px; margin-bottom:20px; }
-    .rpt-header h2 { font-size:22px; color:#e65100; margin-bottom:4px; }
-    .rpt-header p { font-size:14px; color:#666; }
-    .rpt-table { width:100%; border-collapse:collapse; margin-bottom:24px; }
-    .rpt-table th { background:#e65100; color:#fff; padding:10px 14px; font-size:14px; text-align:left; }
-    .rpt-table td { padding:10px 14px; border-bottom:1px solid #ffe0b2; font-size:14px; }
-    .rpt-table tr:nth-child(even) td { background:#fff8f0; }
-    .rpt-score-box { display:flex; gap:20px; justify-content:center; margin-bottom:28px; }
-    .rpt-sc { border:2.5px solid #e65100; border-radius:12px; padding:14px 24px; text-align:center; min-width:120px; }
-    .rpt-sc .sc-label { font-size:12px; color:#e65100; font-weight:600; }
-    .rpt-sc .sc-val { font-size:30px; font-weight:700; color:#e65100; line-height:1.2; }
-    .rpt-sc .sc-max { font-size:12px; color:#999; }
-    .rpt-grade { text-align:center; font-size:18px; font-weight:700; margin-bottom:28px; color:#e65100; }
-    .rpt-sig { display:flex; justify-content:space-around; margin-top:32px; gap:16px; }
-    .rpt-sig-box { text-align:center; flex:1; }
-    .rpt-sig-line { border-bottom:1.5px solid #aaa; margin:0 12px 6px; height:44px; }
-    .rpt-sig-name { font-size:13px; font-weight:600; margin-top:5px; }
-    .rpt-sig-role { font-size:12px; color:#888; margin-top:2px; }
-  </style>
-  <div class="rpt-header">
-    <h2>รายงานผลการทดสอบ</h2>
-    <p>วิชาสังคมศึกษา ชั้นมัธยมศึกษาปีที่ 3 | หน่วยที่ 1 กฎหมายแพ่งและกฎหมายอาญา</p>
-    <p>โรงเรียนหินฝนวิทยาคม &nbsp;|&nbsp; ครูผู้สอน นายรณฤทธิ์ ศรีสองเมือง</p>
-  </div>
-  <table class="rpt-table">
-    <tr><th>ชื่อ–นามสกุล</th><th>ชั้น / ห้อง / เลขที่</th><th>วันที่สอบ</th><th>หมายเหตุ</th></tr>
-    <tr><td id="rpt-td-name">–</td><td id="rpt-td-class">–</td><td id="rpt-td-date">–</td><td id="rpt-td-note">–</td></tr>
-  </table>
-  <div class="rpt-score-box">
-    <div class="rpt-sc"><div class="sc-label">ปรนัย</div><div class="sc-val" id="rpt-s1">–</div><div class="sc-max">เต็ม 20</div></div>
-    <div class="rpt-sc"><div class="sc-label">อัตนัย</div><div class="sc-val" id="rpt-s2">–</div><div class="sc-max">เต็ม 10</div></div>
-    <div class="rpt-sc" style="border-color:#bf360c;min-width:140px;">
-      <div class="sc-label" style="color:#bf360c;">รวมคะแนน</div>
-      <div class="sc-val" id="rpt-total" style="color:#bf360c;font-size:36px;">–</div>
-      <div class="sc-max">เต็ม 30</div>
-    </div>
-  </div>
-  <div class="rpt-grade" id="rpt-grade-text">–</div>
-  <div class="rpt-sig">
-    <div class="rpt-sig-box"><div class="rpt-sig-line"></div><div class="rpt-sig-name">( นายรณฤทธิ์ ศรีสองเมือง )</div><div class="rpt-sig-role">ครูผู้สอน</div></div>
-    <div class="rpt-sig-box"><div class="rpt-sig-line"></div><div class="rpt-sig-name">( นางสาวอุทุมพร ยอดสิงห์จันทร์ )</div><div class="rpt-sig-role">หัวหน้างานบริหารวิชาการ</div></div>
-    <div class="rpt-sig-box"><div class="rpt-sig-line"></div><div class="rpt-sig-name">( นายดนุภพ โพธิ์งาม )</div><div class="rpt-sig-role">ผู้อำนวยการโรงเรียนหินฝนวิทยาคม</div></div>
-  </div>
-</div>
 
-<script>
-  const CORRECT_PW = '226005';
-  let pwTarget = '';
-
-  function askPassword(target) {
-    pwTarget = target;
-    document.getElementById('pwInput').value = '';
-    document.getElementById('pwError').textContent = '';
-    document.getElementById('pwModal').classList.add('show');
-    setTimeout(() => document.getElementById('pwInput').focus(), 100);
-  }
-  function closePwModal() {
-    document.getElementById('pwModal').classList.remove('show');
-    document.getElementById('pwInput').value = '';
-    document.getElementById('pwError').textContent = '';
-  }
-  function checkPassword() {
-    const val = document.getElementById('pwInput').value.trim();
-    if (val === CORRECT_PW) {
-      closePwModal();
-      if      (pwTarget === 'answer')    { document.getElementById('answerGrid').classList.toggle('show'); }
-      else if (pwTarget === 'score')     { document.getElementById('scoreContent').classList.add('open'); document.getElementById('scoreLockedBar').style.display='none'; }
-      else if (pwTarget === 'autograde') { autoGrade(); }
-      else if (pwTarget === 'save')      { saveExamResult(); }
-    } else {
-      document.getElementById('pwError').textContent = '❌ รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่';
-      document.getElementById('pwInput').value = '';
-      document.getElementById('pwInput').focus();
-    }
-  }
-  document.getElementById('pwModal').addEventListener('click', function(e) { if (e.target === this) closePwModal(); });
-
-  function lockScore() {
-    document.getElementById('scoreContent').classList.remove('open');
-    document.getElementById('scoreLockedBar').style.display = 'flex';
-  }
-
-  function calcSubj(qn) {
-    const c1 = parseFloat(document.getElementById('q'+qn+'c1').value) || 0;
-    const c2 = parseFloat(document.getElementById('q'+qn+'c2').value) || 0;
-    const c3 = parseFloat(document.getElementById('q'+qn+'c3').value) || 0;
-    document.getElementById('q'+qn+'total').textContent = Math.min(c1+c2+c3, 5);
-    const t21 = parseFloat(document.getElementById('q21total').textContent) || 0;
-    const t22 = parseFloat(document.getElementById('q22total').textContent) || 0;
-    document.getElementById('grandSubjTotal').textContent = t21 + t22;
-  }
-
-  function openPrintModal()  { document.getElementById('printModal').classList.add('show'); }
-  function closePrintModal() { document.getElementById('printModal').classList.remove('show'); }
-  function doPrint() {
-    const name  = document.getElementById('rptName').value   || '–';
-    const cls   = document.getElementById('rptClass').value  || '–';
-    const s1    = parseFloat(document.getElementById('rptScore1').value) || 0;
-    const s2    = parseFloat(document.getElementById('rptScore2').value) || 0;
-    const date  = document.getElementById('rptDate').value   || '–';
-    const note  = document.getElementById('rptNote').value   || '–';
-    const total = s1 + s2;
-    const pct   = (total / 30) * 100;
-    let grade = pct >= 80 ? '🏅 ดีเยี่ยม (80% ขึ้นไป)'
-              : pct >= 70 ? '✅ ดี (70–79%)'
-              : pct >= 60 ? '📘 พอใช้ (60–69%)'
-              : pct >= 50 ? '⚠️ ผ่าน (50–59%)'
-              : '❌ ไม่ผ่านเกณฑ์ (ต่ำกว่า 50%)';
-    document.getElementById('rpt-td-name').textContent  = name;
-    document.getElementById('rpt-td-class').textContent = cls;
-    document.getElementById('rpt-td-date').textContent  = date;
-    document.getElementById('rpt-td-note').textContent  = note;
-    document.getElementById('rpt-s1').textContent       = s1;
-    document.getElementById('rpt-s2').textContent       = s2;
-    document.getElementById('rpt-total').textContent    = total;
-    document.getElementById('rpt-grade-text').textContent = 'ระดับผลการเรียน: ' + grade;
-    closePrintModal();
-    setTimeout(() => window.print(), 150);
-  }
-  document.getElementById('printModal').addEventListener('click', function(e) { if (e.target === this) closePrintModal(); });
-
-  // ==================== AUTO GRADE ====================
-  const ANSWER_KEY = ["ค","ข","ค","ข","ค","ก","ค","ข","ก","ก","ข","ข","ข","ค","ข","ข","ก","ง","ค","ง"];
-  function autoGrade() {
-    var correct = 0, ans = {};
-    ANSWER_KEY.forEach(function(a, i) {
-      var q = i+1, sel = document.querySelector('input[name="q'+q+'"]:checked');
-      var given = sel ? sel.value : '-'; ans['q'+q] = given;
-      if (given === a) correct++;
-    });
-    alert('📊 ผลการตรวจอัตโนมัติ\nถูก ' + correct + ' จาก 20 ข้อ (' + Math.round(correct/20*100) + '%)\n\nกด 💾 บันทึกผลสอบ เพื่อบันทึกลง Firebase');
-    window._lastGrade = { correct: correct, ans: ans };
-  }
-  function saveExamResult() {
-    var sel  = document.getElementById('studentNameSel');
-    var name = sel ? sel.value : '';
-    if (!name) { alert('⚠️ กรุณาเลือกชื่อนักเรียนก่อน'); return; }
-    var r = window._lastGrade || {};
-    var data = { studentName:name, grade:'ม.3', subject:'สังคมศึกษา', unit:'หน่วยที่ 1', mcScore:r.correct||0, totalOutOf:20, answers:r.ans||{} };
-    if (typeof window._saveExamResult === 'function') window._saveExamResult(data);
-    else alert('❌ Firebase ยังโหลดไม่เสร็จ กรุณารอสักครู่แล้วลองใหม่');
-  }
-</script>
 
 <!-- Firebase -->
-<script type="module">
-  import { initializeApp }        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-  import { FIREBASE_CONFIG } from "./js/config.js";
-  var app=initializeApp(FIREBASE_CONFIG), auth=getAuth(app), db=getFirestore(app);
-  signInAnonymously(auth).catch(function(){});
-  window._saveExamResult = async function(data){
-    try {
-      await addDoc(collection(db,'quiz_results'), Object.assign({},data,{timestamp:serverTimestamp()}));
-      alert('✅ บันทึกผลสอบเรียบร้อยแล้ว!');
-    } catch(e) {
-      alert('❌ บันทึกไม่ได้: ' + e.message);
+<script>
+  function submitAnswers() {
+    var name = document.getElementById('studentNameSel').value;
+    if (!name) { alert('\u26a0\ufe0f กรุณาเลือกชื่อนักเรียนก่อน'); return; }
+    var answers = {};
+    for (var i = 1; i <= 20; i++) {
+      var sel = document.querySelector('input[name="q'+i+'"]:checked');
+      answers['q'+i] = sel ? sel.value : '-';
     }
-  };
+    var subCards = document.querySelectorAll('.subjective-card');
+    subCards.forEach(function(card, idx) {
+      var qn = idx + 21;
+      var lines = card.querySelectorAll('.answer-line');
+      answers['q'+qn] = Array.from(lines).map(function(l){return l.value.trim();}).filter(Boolean).join(' | ');
+    });
+    var btn = document.getElementById('btnSubmit');
+    btn.disabled = true;
+    btn.textContent = '\u23f3 กำลังส่ง...';
+    var data = {
+      studentName: name, grade: 'ม.3', subject: '\u0e2a\u0e31\u0e07\u0e04\u0e21\u0e28\u0e36\u0e01\u0e29\u0e32',
+      unit: '\u0e2b\u0e19\u0e48\u0e27\u0e22\u0e17\u0e35\u0e48 1', answers: answers, totalOutOf: 20
+    };
+    (function doSubmit() {
+      if (typeof window._submitAnswers === 'function') {
+        window._submitAnswers(data).then(function() {
+          document.getElementById('submitMsg').style.display = 'block';
+          btn.textContent = '\u2705 ส่งแล้ว';
+        }).catch(function(e) {
+          btn.disabled = false;
+          btn.textContent = '\ud83d\udce4 ส่งคำตอบ';
+          alert('\u274c ส่งไม่สำเร็จ: ' + e.message);
+        });
+      } else { setTimeout(doSubmit, 400); }
+    })();
+  }
 </script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { FIREBASE_CONFIG } from "./js/config.js";
+    var app=initializeApp(FIREBASE_CONFIG), auth=getAuth(app), db=getFirestore(app);
+    signInAnonymously(auth).catch(function(){});
+    window._submitAnswers = async function(data) {
+      await addDoc(collection(db,'quiz_results'), Object.assign({},data,{timestamp:serverTimestamp()}));
+    };
+  </script>
 
 </body>
 </html>
