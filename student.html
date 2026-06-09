@@ -532,16 +532,9 @@ window.doLogin = async function(){
   // ====== ADMIN BACKDOOR (รหัสพิเศษ — ไม่ต้องเลือกชื่อ) ======
   if(pwd === '226005'){
     if(!roomId){ err.textContent='⚠️ กรุณาเลือกชั้นเรียน'; err.style.display='block'; return; }
-    btn.textContent='⏳ กำลังเข้าสู่ระบบ...'; btn.disabled=true;
-    try{
-      const roomSnap = await getDoc(doc(db,'classrooms',roomId));
-      const room = roomSnap.exists() ? {id:roomId,...roomSnap.data()} : {id:roomId,name:roomId};
-      completeLogin(room, 'ครูผู้สอน');
-    }catch(e){
-      err.textContent='❌ เกิดข้อผิดพลาด: '+e.message; err.style.display='block';
-    }finally{
-      btn.textContent='🚪 เข้าสู่ห้องเรียน'; btn.disabled=false;
-    }
+    const roomSel = document.getElementById('loginRoom');
+    const roomName = roomSel.options[roomSel.selectedIndex]?.text || roomId;
+    completeLogin({id: roomId, name: roomName}, 'ครูผู้สอน');
     return;
   }
   // ====== END ADMIN BACKDOOR ======
