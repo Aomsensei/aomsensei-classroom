@@ -11,31 +11,36 @@
 body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:100vh}
 :root{--primary:#c94b00;--secondary:#f39800;--gradient:linear-gradient(135deg,#c94b00 0%,#f39800 100%)}
 
+/* LOGIN */
 .login-screen{min-height:100vh;background:var(--gradient);display:flex;align-items:center;justify-content:center;padding:20px}
 .login-card{background:#fff;border-radius:20px;padding:36px 32px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);text-align:center}
 .login-logo{width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:12px;border:3px solid #f39800}
 .login-card h1{font-size:22px;font-weight:800;color:#c94b00;margin-bottom:3px}
 .login-card .sub{font-size:13px;color:#999;margin-bottom:22px}
 .input-group{position:relative;margin-bottom:12px}
-.input-group i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#ffa040;font-size:15px}
-.input-group input{width:100%;padding:12px 14px 12px 38px;border:2px solid #ffd0a0;border-radius:10px;font-size:15px;font-family:inherit;outline:none;transition:.2s}
-.input-group input:focus{border-color:#c94b00;background:#fffaf7}
+.input-group i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#ffa040;font-size:15px;z-index:1;pointer-events:none}
+.input-group input,.input-group select{width:100%;padding:12px 14px 12px 38px;border:2px solid #ffd0a0;border-radius:10px;font-size:15px;font-family:inherit;outline:none;transition:.2s;background:#fff;appearance:none;cursor:pointer}
+.input-group input{cursor:text}
+.input-group input:focus,.input-group select:focus{border-color:#c94b00;background:#fffaf7}
 .btn-login{width:100%;padding:14px;background:var(--gradient);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;transition:.15s;margin-top:4px}
 .btn-login:hover{opacity:.9;transform:translateY(-1px)}
 .login-err{background:#ffebee;color:#c62828;padding:10px 14px;border-radius:8px;font-size:13px;margin-top:10px;display:none;border-left:3px solid #c62828}
 .login-hint{font-size:12px;color:#bbb;margin-top:12px}
 
+/* APP */
 .app-screen{display:none;flex-direction:column;min-height:100vh}
-.top-bar{background:var(--gradient);color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 3px 12px rgba(201,75,0,.4);position:sticky;top:0;z-index:50}
+.top-bar{background:var(--gradient);color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;box-shadow:0 3px 12px rgba(201,75,0,.4);position:sticky;top:0;z-index:50}
 .top-bar-left{display:flex;align-items:center;gap:10px}
 .top-bar-left img{width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,255,255,.4);object-fit:cover}
 .top-bar-left .name{font-size:14px;font-weight:800}
 .top-bar-left .cls{font-size:11px;opacity:.85}
-.btn-logout{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3);padding:6px 12px;border-radius:20px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700}
+.top-bar-right{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.btn-topbar{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.3);padding:5px 10px;border-radius:20px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap}
+.btn-topbar:hover{background:rgba(255,255,255,.28)}
 
 .nav-tabs{display:flex;background:#e65c00;overflow-x:auto;scrollbar-width:none;position:sticky;top:57px;z-index:40}
 .nav-tabs::-webkit-scrollbar{display:none}
-.nav-tab{flex:1;min-width:58px;padding:9px 4px 7px;text-align:center;color:rgba(255,255,255,.7);cursor:pointer;font-size:11.5px;font-weight:700;border:none;background:none;white-space:nowrap;transition:.15s}
+.nav-tab{flex:1;min-width:52px;padding:9px 4px 7px;text-align:center;color:rgba(255,255,255,.7);cursor:pointer;font-size:11px;font-weight:700;border:none;background:none;white-space:nowrap;transition:.15s;position:relative}
 .nav-tab.active{background:#fff8f3;color:#c94b00;border-radius:8px 8px 0 0}
 .nav-tab i{display:block;font-size:16px;margin-bottom:2px}
 
@@ -82,18 +87,32 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
 .grade-badge{background:#f39800;color:#fff;border-radius:12px;padding:2px 10px;font-weight:800;font-size:13px}
 
 /* Chat */
-.chat-wrap{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(201,75,0,.1);display:flex;flex-direction:column;height:calc(100vh - 175px);min-height:320px}
+.chat-wrap{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(201,75,0,.1);display:flex;flex-direction:column;height:calc(100vh - 185px);min-height:320px}
 .chat-head{background:var(--gradient);color:#fff;padding:10px 14px;border-radius:12px 12px 0 0;display:flex;align-items:center;gap:10px}
 .chat-head img{width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,255,255,.4);object-fit:cover}
 .chat-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
-.msg{max-width:78%;display:flex;flex-direction:column;gap:2px}
+.msg{max-width:80%;display:flex;flex-direction:column;gap:2px}
 .msg.mine{align-self:flex-end;align-items:flex-end}
 .msg.theirs{align-self:flex-start;align-items:flex-start}
 .bubble{padding:9px 13px;border-radius:16px;font-size:14px;line-height:1.5;word-break:break-word}
 .msg.mine .bubble{background:#c94b00;color:#fff;border-radius:16px 16px 4px 16px}
 .msg.theirs .bubble{background:#f0f0f0;color:#333;border-radius:16px 16px 16px 4px}
+.bubble-reply{border-radius:8px;padding:5px 8px;font-size:11.5px;margin-bottom:5px;max-width:100%}
+.msg.mine .bubble-reply{background:rgba(255,255,255,.2);color:rgba(255,255,255,.85);border-left:3px solid rgba(255,255,255,.5)}
+.msg.theirs .bubble-reply{background:#e0e0e0;color:#555;border-left:3px solid #c94b00}
+.bubble-reply .reply-from{font-weight:800;font-size:10.5px;margin-bottom:2px}
+.bubble-reply .reply-txt{font-size:11.5px;line-height:1.4}
 .msg-time{font-size:10px;color:#bbb}
 .msg-sender{font-size:10px;color:#c94b00;font-weight:700}
+.msg-actions{display:flex;gap:4px;margin-top:1px}
+.msg-act-btn{background:none;border:none;cursor:pointer;font-size:11px;color:#ccc;padding:2px 5px;border-radius:4px;font-family:inherit;line-height:1.3}
+.msg-act-btn:hover{background:#f0f0f0;color:#c94b00}
+.msg.mine .msg-act-btn:hover{background:rgba(201,75,0,.1)}
+.reply-bar{padding:7px 12px;border-top:1px solid #ffd0a0;background:#fff8f3;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:#888}
+.reply-bar-text{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reply-bar strong{color:#c94b00;font-weight:700}
+.reply-bar-cancel{background:none;border:none;cursor:pointer;color:#aaa;font-size:16px;line-height:1;padding:2px 4px}
+.reply-bar-cancel:hover{color:#c62828}
 .chat-inp{padding:10px;border-top:1px solid #ffd0a0;display:flex;gap:8px}
 .chat-inp input{flex:1;padding:10px 14px;border:1.5px solid #ffd0a0;border-radius:20px;font-size:14px;font-family:inherit;outline:none}
 .chat-inp input:focus{border-color:#c94b00}
@@ -105,6 +124,30 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
 /* Chat tab badge */
 .chat-tab-badge{background:#c62828;color:#fff;border-radius:50%;min-width:17px;height:17px;font-size:9px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;margin-left:3px;vertical-align:middle;animation:pulse-badge .8s infinite alternate}
 @keyframes pulse-badge{from{opacity:1;transform:scale(1)}to{opacity:.7;transform:scale(1.2)}}
+
+/* Help tab */
+.help-step{background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 12px rgba(201,75,0,.1);border-left:4px solid #f39800}
+.help-step-hd{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.step-num{width:28px;height:28px;background:#c94b00;color:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0}
+.step-title{font-size:15px;font-weight:700;color:#c94b00}
+.step-body{font-size:13px;color:#555;line-height:1.9;padding-left:38px}
+.step-body li{margin-bottom:2px}
+.help-note{background:#fff3e0;border-left:3px solid #f39800;border-radius:0 8px 8px 0;padding:10px 13px;font-size:12.5px;color:#7c4700;margin:10px 0 10px 38px}
+
+/* Modals */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center;padding:16px}
+.overlay.show{display:flex}
+.modal{background:#fff;border-radius:16px;padding:24px 22px;width:100%;max-width:380px;box-shadow:0 10px 50px rgba(0,0,0,.25)}
+.modal h3{color:#c94b00;margin-bottom:14px;font-size:16px;font-weight:800}
+.modal p{font-size:13px;color:#666;margin-bottom:14px;line-height:1.6}
+.m-inp{width:100%;padding:11px 14px;border:2px solid #ffd0a0;border-radius:10px;font-size:14px;font-family:inherit;outline:none;margin-bottom:10px;transition:.2s}
+.m-inp:focus{border-color:#c94b00;background:#fffaf7}
+.m-err{background:#ffebee;color:#c62828;padding:8px 12px;border-radius:8px;font-size:13px;margin-bottom:10px;border-left:3px solid #c62828;display:none}
+.btn-row{display:flex;gap:8px;margin-top:4px}
+.btn-full{flex:1;padding:11px;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700}
+.btn-ok{background:#c94b00;color:#fff}
+.btn-cancel{background:#f5f5f5;color:#555}
+
 /* PDF overlay */
 #pdfOverlay{display:none;position:fixed;inset:0;background:#fff;z-index:9999;padding:20px;overflow:auto}
 .pdf-toolbar{display:flex;gap:10px;margin-bottom:16px}
@@ -124,16 +167,24 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
     <h1>ห้องเรียนออนไลน์</h1>
     <div class="sub"><span data-site="school-name">โรงเรียนหินฝนวิทยาคม</span> · <span data-site="teacher-name">ครู รณฤทธิ์ ศรีสองเมือง</span></div>
     <div class="input-group">
-      <i class="fas fa-key"></i>
-      <input type="text" id="loginCode" placeholder="รหัสห้องเรียน" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <i class="fas fa-school"></i>
+      <select id="loginRoom" onchange="loadStudentNames()">
+        <option value="">⏳ กำลังโหลดห้องเรียน...</option>
+      </select>
     </div>
     <div class="input-group">
       <i class="fas fa-user"></i>
-      <input type="text" id="loginName" placeholder="ชื่อของนักเรียน" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <select id="loginName">
+        <option value="">-- เลือกชื่อนักเรียน --</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <i class="fas fa-lock"></i>
+      <input type="password" id="loginPwd" placeholder="รหัสผ่าน" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
     </div>
     <button class="btn-login" onclick="doLogin()">🚪 เข้าสู่ห้องเรียน</button>
     <div id="loginErr" class="login-err"></div>
-    <div class="login-hint">ขอรหัสห้องเรียนจากครูผู้สอน</div>
+    <div class="login-hint">ครั้งแรก: กรอกรหัสผ่านที่ต้องการตั้ง · ครั้งถัดไป: ใช้รหัสเดิม</div>
     <a href="index.html" style="display:inline-block;margin-top:14px;color:#c94b00;font-size:13px;font-weight:700;text-decoration:none;opacity:.7">← กลับสู่หน้าหลัก</a>
   </div>
 </div>
@@ -146,17 +197,21 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
         onerror="this.onerror=null;this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22><circle cx=%2220%22 cy=%2220%22 r=%2220%22 fill=%22rgba(255,255,255,.3)%22/><text x=%2220%22 y=%2227%22 font-size=%2218%22 text-anchor=%22middle%22 fill=%22white%22>🏫</text></svg>'"/>
       <div><div class="name" id="welcomeName">สวัสดี</div><div class="cls" id="welcomeCls">โรงเรียนหินฝนวิทยาคม</div></div>
     </div>
-    <a href="index.html" class="btn-logout" style="text-decoration:none;margin-right:6px">🏠 หน้าหลัก</a>
-    <button class="btn-logout" onclick="doLogout()">🚪 ออก</button>
+    <div class="top-bar-right">
+      <button class="btn-topbar" onclick="openChangePwd()">🔑 เปลี่ยนรหัสผ่าน</button>
+      <a href="index.html" class="btn-topbar">🏠 หน้าหลัก</a>
+      <button class="btn-topbar" onclick="doLogout()">🚪 ออก</button>
+    </div>
   </div>
 
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="switchTab('ann')" id="tab-ann"><i class="fas fa-bullhorn"></i>ประกาศ</button>
-    <button class="nav-tab" onclick="switchTab('ws')" id="tab-ws"><i class="fas fa-file-alt"></i>ใบงานและใบความรู้</button>
+    <button class="nav-tab" onclick="switchTab('ws')" id="tab-ws"><i class="fas fa-file-alt"></i>ใบงาน</button>
     <button class="nav-tab" onclick="switchTab('quiz')" id="tab-quiz"><i class="fas fa-pen-to-square"></i>ข้อสอบ</button>
     <button class="nav-tab" onclick="switchTab('vid')" id="tab-vid"><i class="fas fa-play-circle"></i>วิดีโอ</button>
     <button class="nav-tab" onclick="switchTab('score')" id="tab-score"><i class="fas fa-chart-bar"></i>คะแนน</button>
     <button class="nav-tab" onclick="switchTab('chat')" id="tab-chat"><i class="fas fa-comments"></i>แชทครู</button>
+    <button class="nav-tab" onclick="switchTab('help')" id="tab-help"><i class="fas fa-question-circle"></i>วิธีใช้</button>
   </div>
 
   <div id="content-ann" class="tab-content active">
@@ -197,9 +252,117 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
       <div id="chatMsgs" class="chat-msgs">
         <div class="empty-state"><i class="fas fa-comments" style="color:#ffd0a0"></i><p style="font-size:13px">ยังไม่มีข้อความ<br>ส่งคำถามให้ครูได้เลย!</p></div>
       </div>
+      <div id="replyBar" style="display:none" class="reply-bar">
+        <div class="reply-bar-text">↩️ ตอบกลับ: <strong id="replyPreviewSender"></strong> — <span id="replyPreviewText"></span></div>
+        <button class="reply-bar-cancel" onclick="clearReply()" title="ยกเลิกตอบกลับ">✕</button>
+      </div>
       <div class="chat-inp">
         <input type="text" id="chatInput" placeholder="พิมพ์คำถาม..." onkeydown="if(event.key==='Enter')sendChat()"/>
         <button class="chat-send-btn" onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="content-help" class="tab-content">
+    <div class="section-title"><i class="fas fa-question-circle"></i> วิธีใช้งานเว็บไซต์</div>
+
+    <div class="help-step">
+      <div class="help-step-hd"><span class="step-num">1</span><span class="step-title">การเข้าสู่ระบบ</span></div>
+      <div class="step-body">
+        <ol>
+          <li>เลือก <b>ชั้นเรียน</b> ของคุณจากเมนูดร็อปดาวน์</li>
+          <li>เลือก <b>ชื่อนักเรียน</b> จากรายชื่อในชั้นเรียน</li>
+          <li>กรอก <b>รหัสผ่าน</b> — ครั้งแรกให้ตั้งรหัสที่ต้องการ (อย่างน้อย 4 ตัวอักษร) ระบบจะให้ยืนยันอีกครั้ง</li>
+          <li>กดปุ่ม <b>เข้าสู่ห้องเรียน</b></li>
+        </ol>
+        <div class="help-note">⚠️ จำรหัสผ่านของคุณไว้ เพราะนักเรียนคนอื่นจะไม่สามารถใช้ชื่อของคุณได้หากไม่รู้รหัสผ่าน</div>
+      </div>
+    </div>
+
+    <div class="help-step">
+      <div class="help-step-hd"><span class="step-num">2</span><span class="step-title">แท็บประกาศ 📢</span></div>
+      <div class="step-body">
+        <ul>
+          <li>ดูประกาศ ข่าวสาร และงานที่มอบหมายจากครู</li>
+          <li>ประกาศอาจมีรูปภาพประกอบ</li>
+          <li>เรียงจากใหม่ไปเก่า</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="help-step">
+      <div class="help-step-hd"><span class="step-num">3</span><span class="step-title">แท็บใบงาน 📄</span></div>
+      <div class="step-body">
+        <ul>
+          <li>กดปุ่ม <b>เปิดใบงาน</b> เพื่อดูเนื้อหาใบงาน/ใบความรู้</li>
+          <li>กดปุ่ม <b>เปิดไฟล์</b> เพื่อดาวน์โหลดไฟล์จาก Google Drive</li>
+          <li>กดปุ่ม <b>พิมพ์ PDF</b> เพื่อสั่งพิมพ์หรือบันทึกเป็น PDF</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="help-step">
+      <div class="help-step-hd"><span class="step-num">4</span><span class="step-title">แท็บข้อสอบ 📝</span></div>
+      <div class="step-body">
+        <ul>
+          <li>กดปุ่ม <b>เปิดข้อสอบ</b> หรือ <b>เริ่มสอบ</b> เพื่อเข้าทำข้อสอบ</li>
+          <li>ตอบคำถามให้ครบทุกข้อ แล้วกดปุ่ม <b>ส่งคำตอบ</b></li>
+          <li>เมื่อส่งแล้ว ครูจะเป็นผู้ตรวจและบันทึกคะแนนให้</li>
+        </ul>
+        <div class="help-note">⚠️ ส่งได้ครั้งเดียว! ถ้าส่งซ้ำ ครูจะลบการส่งก่อนหน้าและเก็บเฉพาะอันล่าสุด</div>
+      </div>
+    </div>
+
+    <div class="help-step">
+      <div class="help-step-hd"><span class="step-num">5</span><span class="step-title">แท็บวิดีโอ 🎬</span></div>
+      <div class="step-body">
+        <ul>
+          <li>ดูวิดีโอประกอบการเรียนที่ครูแนะนำ</li>
+          <li>ถ้าไม่โหลด ให้กดลิงก์เพื่อเปิดใน YouTube โดยตรง</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="help-step">
+      <div class="help-step-hd"><span class="step-num">6</span><span class="step-title">แท็บคะแนน 📊</span></div>
+      <div class="step-body">
+        <ul>
+          <li>ดูผลคะแนนและประวัติการสอบของตนเอง</li>
+          <li>คะแนนจะปรากฏหลังจากครูตรวจและบันทึกแล้ว</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="help-step">
+      <div class="help-step-hd"><span class="step-num">7</span><span class="step-title">แท็บแชทครู 💬</span></div>
+      <div class="step-body">
+        <ul>
+          <li>พิมพ์คำถามหรือข้อความแล้วกด <b>Enter</b> หรือปุ่มส่ง</li>
+          <li>กดปุ่ม <b>↩️ ตอบ</b> ใต้ข้อความเพื่อตอบกลับข้อความนั้น</li>
+          <li>กดปุ่ม <b>🗑️ ลบ</b> ใต้ข้อความของตัวเองเพื่อลบ (ไม่สามารถลบข้อความของคนอื่นได้)</li>
+          <li>แชทถูกล้างอัตโนมัติทุก 2 เดือน เพื่อประหยัดพื้นที่</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="help-step">
+      <div class="help-step-hd"><span class="step-num">8</span><span class="step-title">การเปลี่ยนรหัสผ่าน 🔑</span></div>
+      <div class="step-body">
+        <ol>
+          <li>กดปุ่ม <b>🔑 เปลี่ยนรหัสผ่าน</b> ที่แถบด้านบน</li>
+          <li>กรอก <b>รหัสผ่านเดิม</b></li>
+          <li>กรอก <b>รหัสผ่านใหม่</b> และ <b>ยืนยันรหัสผ่านใหม่</b></li>
+          <li>กดปุ่ม <b>เปลี่ยนรหัสผ่าน</b></li>
+        </ol>
+        <div class="help-note">💡 หากลืมรหัสผ่าน ให้ติดต่อครูผู้สอนเพื่อรีเซ็ตรหัสผ่าน</div>
+      </div>
+    </div>
+
+    <div style="background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 12px rgba(201,75,0,.1);border-top:3px solid #c94b00">
+      <div style="font-size:14px;font-weight:800;color:#c94b00;margin-bottom:8px">📞 ติดต่อครู</div>
+      <div style="font-size:13px;color:#555;line-height:1.8">
+        มีปัญหาการใช้งาน ลืมรหัสผ่าน หรือต้องการความช่วยเหลือ<br>
+        ให้ติดต่อ <b data-site="teacher-name">ครู รณฤทธิ์ ศรีสองเมือง</b> โดยตรง
       </div>
     </div>
   </div>
@@ -214,16 +377,61 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
   <div id="pdfContent" style="max-width:800px;margin:0 auto"></div>
 </div>
 
+<!-- Modal: ตั้งรหัสผ่านครั้งแรก -->
+<div class="overlay" id="modalSetPwd">
+  <div class="modal">
+    <h3>🔐 ตั้งรหัสผ่านครั้งแรก</h3>
+    <p>ยังไม่มีรหัสผ่านสำหรับบัญชีนี้<br>กรุณาตั้งรหัสผ่านเพื่อป้องกันคนอื่นใช้ชื่อของคุณ</p>
+    <div class="m-err" id="setPwdErr"></div>
+    <input type="password" class="m-inp" id="newPwd1" placeholder="รหัสผ่านใหม่ (อย่างน้อย 4 ตัว)"/>
+    <input type="password" class="m-inp" id="newPwd2" placeholder="ยืนยันรหัสผ่านอีกครั้ง"/>
+    <div class="btn-row">
+      <button class="btn-full btn-cancel" onclick="cancelSetPwd()">ยกเลิก</button>
+      <button class="btn-full btn-ok" onclick="confirmSetPwd()">✅ บันทึกรหัสผ่าน</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: เปลี่ยนรหัสผ่าน -->
+<div class="overlay" id="modalChangePwd">
+  <div class="modal">
+    <h3>🔑 เปลี่ยนรหัสผ่าน</h3>
+    <div class="m-err" id="changePwdErr"></div>
+    <input type="password" class="m-inp" id="oldPwd" placeholder="รหัสผ่านเดิม"/>
+    <input type="password" class="m-inp" id="chgPwd1" placeholder="รหัสผ่านใหม่ (อย่างน้อย 4 ตัว)"/>
+    <input type="password" class="m-inp" id="chgPwd2" placeholder="ยืนยันรหัสผ่านใหม่"/>
+    <div class="btn-row">
+      <button class="btn-full btn-cancel" onclick="closeChangePwd()">ยกเลิก</button>
+      <button class="btn-full btn-ok" onclick="doChangePwd()">✅ เปลี่ยนรหัสผ่าน</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, getDocs, addDoc, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs, addDoc, deleteDoc, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { FIREBASE_CONFIG } from "./js/config.js";
 
 const app = initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+let student = null;  // { roomId, roomName, name }
+let chatUnsub = null;
+let _quizCache = {};
+window._worksheets = {};
+let _isChatTabActive = false;
+let _prevTeacherCount = 0;
+let _chatInitialized = false;
+let _replyTo = null;  // { docId, text, sender }
+let _pendingLoginData = null;  // for first-time password setup
+let _chatDocs = {}; // docId → message data (for delete/reply reference)
+
+// ==================== UTILS ====================
+function esc(s){ return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+// ==================== SITE SETTINGS ====================
 async function loadSiteSettings(){
   try{
     const snap = await getDoc(doc(db,'settings','site'));
@@ -236,51 +444,185 @@ async function loadSiteSettings(){
     if(s.schoolName) document.querySelectorAll('[data-site="school-name"]').forEach(el=>el.textContent=s.schoolName);
   }catch(e){ console.warn('loadSiteSettings:',e); }
 }
-loadSiteSettings();
 
-let student = null;  // { roomId, roomName, name }
-let chatUnsub = null;
-let _quizCache = {};
-window._worksheets = {};
-let _isChatTabActive = false;
-let _prevTeacherCount = 0;
-let _chatInitialized = false;
+// ==================== LOAD CLASSROOMS (pre-login) ====================
+async function initPage(){
+  try{ await signInAnonymously(auth); }catch(_){}
+  loadSiteSettings();
+  loadClassrooms();
+}
 
-// ==================== LOGIN ====================
-window.doLogin = async function(){
-  const code = document.getElementById('loginCode').value.trim().toUpperCase();
-  const name = document.getElementById('loginName').value.trim();
-  const err = document.getElementById('loginErr');
-  if(!code || !name){ err.textContent = '⚠️ กรุณากรอกรหัสห้องและชื่อ'; err.style.display='block'; return; }
-  err.style.display='none';
+async function loadClassrooms(){
+  const sel = document.getElementById('loginRoom');
   try{
     const snap = await getDocs(collection(db,'classrooms'));
-    let room = null;
-    snap.forEach(d => {
-      const r = d.data();
-      if((r.code||'').toUpperCase() === code) room = {id: d.id, ...r};
+    const rooms = [];
+    snap.forEach(d => rooms.push({id: d.id, ...d.data()}));
+    rooms.sort((a,b)=>{
+      const na=a.name||'', nb=b.name||'';
+      const ta=na.startsWith('ป')?0:1, tb=nb.startsWith('ป')?0:1;
+      if(ta!==tb) return ta-tb;
+      return parseFloat(na.replace(/[^\d.]/g,''))-parseFloat(nb.replace(/[^\d.]/g,''));
     });
-    if(!room){ err.textContent = '❌ ไม่พบรหัสห้อง "'+code+'" กรุณาตรวจสอบใหม่'; err.style.display='block'; return; }
-    try{ await signInAnonymously(auth); }catch(_){}
-    student = { roomId: room.id, roomName: room.name || room.id, name };
-    document.getElementById('welcomeName').textContent = 'สวัสดี ' + name;
-    document.getElementById('welcomeCls').textContent = room.name + ' · โรงเรียนหินฝนวิทยาคม';
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('appScreen').style.display = 'flex';
-    loadAll();
+    sel.innerHTML = '<option value="">-- เลือกชั้นเรียน --</option>' +
+      rooms.map(r=>`<option value="${esc(r.id)}">${esc(r.name||r.id)}</option>`).join('');
   }catch(e){
-    err.textContent = '❌ เกิดข้อผิดพลาด: ' + e.message;
-    err.style.display='block';
+    sel.innerHTML = '<option value="">ไม่สามารถโหลดได้ ลองใหม่อีกครั้ง</option>';
+    console.warn('loadClassrooms:',e);
+  }
+}
+initPage();
+
+window.loadStudentNames = async function(){
+  const roomId = document.getElementById('loginRoom').value;
+  const sel = document.getElementById('loginName');
+  sel.innerHTML = '<option value="">-- เลือกชื่อนักเรียน --</option>';
+  if(!roomId) return;
+  try{
+    const snap = await getDocs(collection(db,'classrooms',roomId,'students'));
+    if(snap.empty){
+      sel.innerHTML = '<option value="">ยังไม่มีรายชื่อ ติดต่อครู</option>';
+      return;
+    }
+    const names = [];
+    snap.forEach(d => names.push(d.data().name||d.id));
+    names.sort((a,b) => a.localeCompare(b,'th'));
+    names.forEach(n => sel.innerHTML += `<option value="${esc(n)}">${esc(n)}</option>`);
+  }catch(e){
+    sel.innerHTML = '<option value="">โหลดไม่ได้</option>';
+    console.warn('loadStudentNames:',e);
   }
 };
 
+// ==================== LOGIN ====================
+window.doLogin = async function(){
+  const roomId = document.getElementById('loginRoom').value;
+  const name = document.getElementById('loginName').value;
+  const pwd = document.getElementById('loginPwd').value;
+  const err = document.getElementById('loginErr');
+  if(!roomId || !name){ err.textContent='⚠️ กรุณาเลือกชั้นเรียนและชื่อนักเรียน'; err.style.display='block'; return; }
+  if(!pwd){ err.textContent='⚠️ กรุณากรอกรหัสผ่าน'; err.style.display='block'; return; }
+  err.style.display='none';
+  const btn = document.querySelector('.btn-login');
+  btn.textContent = '⏳ กำลังเข้าสู่ระบบ...'; btn.disabled = true;
+  try{
+    const roomSnap = await getDoc(doc(db,'classrooms',roomId));
+    if(!roomSnap.exists()){ err.textContent='❌ ไม่พบห้องเรียนนี้'; err.style.display='block'; return; }
+    const room = {id:roomId, ...roomSnap.data()};
+    const studentId = roomId+'_'+name;
+    const studentRef = doc(db,'students',studentId);
+    const studentSnap = await getDoc(studentRef);
+    if(!studentSnap.exists()){
+      // First time — show set-password modal
+      _pendingLoginData = {room, name, studentId, studentRef, firstPwd: pwd};
+      document.getElementById('newPwd1').value = '';
+      document.getElementById('newPwd2').value = '';
+      document.getElementById('setPwdErr').style.display='none';
+      document.getElementById('modalSetPwd').classList.add('show');
+      return;
+    }
+    const sData = studentSnap.data();
+    if(sData.password !== pwd){
+      err.textContent='❌ รหัสผ่านไม่ถูกต้อง กรุณาลองอีกครั้ง';
+      err.style.display='block'; return;
+    }
+    completeLogin(room, name);
+  }catch(e){
+    err.textContent='❌ เกิดข้อผิดพลาด: '+e.message;
+    err.style.display='block';
+  } finally {
+    btn.textContent='🚪 เข้าสู่ห้องเรียน'; btn.disabled=false;
+  }
+};
+
+function completeLogin(room, name){
+  student = {roomId: room.id, roomName: room.name||room.id, name};
+  document.getElementById('welcomeName').textContent = 'สวัสดี '+name;
+  document.getElementById('welcomeCls').textContent = room.name+' · โรงเรียนหินฝนวิทยาคม';
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = 'flex';
+  loadAll();
+}
+
 window.doLogout = function(){
-  if(chatUnsub){ chatUnsub(); chatUnsub = null; }
-  student = null;
+  if(chatUnsub){ chatUnsub(); chatUnsub=null; }
+  student=null; _replyTo=null; _pendingLoginData=null;
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('appScreen').style.display = 'none';
-  document.getElementById('loginCode').value = '';
-  document.getElementById('loginName').value = '';
+  document.getElementById('loginRoom').value = '';
+  document.getElementById('loginName').innerHTML = '<option value="">-- เลือกชื่อนักเรียน --</option>';
+  document.getElementById('loginPwd').value = '';
+  loadClassrooms();
+};
+
+// ==================== SET PASSWORD (first login) ====================
+window.confirmSetPwd = async function(){
+  const p1 = document.getElementById('newPwd1').value;
+  const p2 = document.getElementById('newPwd2').value;
+  const err = document.getElementById('setPwdErr');
+  if(p1.length < 4){ err.textContent='⚠️ รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร'; err.style.display='block'; return; }
+  if(p1 !== p2){ err.textContent='⚠️ รหัสผ่านสองช่องไม่ตรงกัน'; err.style.display='block'; return; }
+  if(!_pendingLoginData) return;
+  err.style.display='none';
+  const btn = document.querySelector('#modalSetPwd .btn-ok');
+  btn.textContent='⏳ กำลังบันทึก...'; btn.disabled=true;
+  try{
+    await setDoc(_pendingLoginData.studentRef,{
+      name: _pendingLoginData.name,
+      roomId: _pendingLoginData.room.id,
+      password: p1,
+      createdAt: serverTimestamp()
+    });
+    document.getElementById('modalSetPwd').classList.remove('show');
+    completeLogin(_pendingLoginData.room, _pendingLoginData.name);
+    _pendingLoginData=null;
+  }catch(e){
+    err.textContent='❌ บันทึกไม่ได้: '+e.message; err.style.display='block';
+  } finally {
+    btn.textContent='✅ บันทึกรหัสผ่าน'; btn.disabled=false;
+  }
+};
+window.cancelSetPwd = function(){
+  document.getElementById('modalSetPwd').classList.remove('show');
+  _pendingLoginData=null;
+};
+
+// ==================== CHANGE PASSWORD ====================
+window.openChangePwd = function(){
+  if(!student){ alert('กรุณาเข้าสู่ระบบก่อน'); return; }
+  ['oldPwd','chgPwd1','chgPwd2'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('changePwdErr').style.display='none';
+  document.getElementById('modalChangePwd').classList.add('show');
+};
+window.closeChangePwd = function(){
+  document.getElementById('modalChangePwd').classList.remove('show');
+};
+window.doChangePwd = async function(){
+  const oldP = document.getElementById('oldPwd').value;
+  const p1 = document.getElementById('chgPwd1').value;
+  const p2 = document.getElementById('chgPwd2').value;
+  const err = document.getElementById('changePwdErr');
+  if(!oldP||!p1||!p2){ err.textContent='⚠️ กรุณากรอกให้ครบทุกช่อง'; err.style.display='block'; return; }
+  if(p1.length<4){ err.textContent='⚠️ รหัสผ่านใหม่ต้องมีอย่างน้อย 4 ตัวอักษร'; err.style.display='block'; return; }
+  if(p1!==p2){ err.textContent='⚠️ รหัสผ่านใหม่ทั้งสองช่องไม่ตรงกัน'; err.style.display='block'; return; }
+  err.style.display='none';
+  const btn = document.querySelector('#modalChangePwd .btn-ok');
+  btn.textContent='⏳ กำลังเปลี่ยน...'; btn.disabled=true;
+  try{
+    const studentId = student.roomId+'_'+student.name;
+    const studentRef = doc(db,'students',studentId);
+    const snap = await getDoc(studentRef);
+    if(!snap.exists()||snap.data().password!==oldP){
+      err.textContent='❌ รหัสผ่านเดิมไม่ถูกต้อง'; err.style.display='block'; return;
+    }
+    await setDoc(studentRef,{password:p1},{merge:true});
+    closeChangePwd();
+    alert('✅ เปลี่ยนรหัสผ่านสำเร็จ!');
+  }catch(e){
+    err.textContent='❌ '+e.message; err.style.display='block';
+  } finally {
+    btn.textContent='✅ เปลี่ยนรหัสผ่าน'; btn.disabled=false;
+  }
 };
 
 // ==================== TABS ====================
@@ -294,14 +636,14 @@ function _setChatBadge(count){
 }
 
 window.switchTab = function(t){
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
   document.getElementById('content-'+t).classList.add('active');
   document.getElementById('tab-'+t).classList.add('active');
-  if(t === 'chat'){
+  if(t==='chat'){
     _isChatTabActive=true;
-    _setChatBadge(0); // clear badge on open
-    _prevTeacherCount=0;_chatInitialized=false;
+    _setChatBadge(0);
+    _prevTeacherCount=0; _chatInitialized=false;
     initChat();
   } else {
     _isChatTabActive=false;
@@ -315,112 +657,111 @@ function loadAll(){
 
 // ==================== ANNOUNCEMENTS ====================
 async function loadAnn(){
-  const el = document.getElementById('listAnn');
+  const el=document.getElementById('listAnn');
   try{
-    const q = query(collection(db,'announcements'), orderBy('createdAt','desc'));
-    const snap = await getDocs(q);
-    let h = '';
-    snap.forEach(d => {
-      const a = d.data();
-      if(a.roomId && a.roomId!=='all' && a.roomId!==student.roomId) return;
-      const dt = a.createdAt?.toDate?.()?.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'}) || '';
-      h += `<div class="ann-card">${a.imageUrl?`<img src="${a.imageUrl}" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px;margin-bottom:8px" onerror="this.style.display='none'">`:''}<div class="ann-title">${a.title||'ประกาศ'}</div><div class="ann-body">${a.content||''}</div><div class="ann-date">📅 ${dt}</div></div>`;
+    const q=query(collection(db,'announcements'),orderBy('createdAt','desc'));
+    const snap=await getDocs(q);
+    let h='';
+    snap.forEach(d=>{
+      const a=d.data();
+      if(a.roomId&&a.roomId!=='all'&&a.roomId!==student.roomId) return;
+      const dt=a.createdAt?.toDate?.()?.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'})||'';
+      h+=`<div class="ann-card">${a.imageUrl?`<img src="${a.imageUrl}" style="width:100%;max-height:220px;object-fit:cover;border-radius:8px;margin-bottom:8px" onerror="this.style.display='none'">`:''}<div class="ann-title">${esc(a.title||'ประกาศ')}</div><div class="ann-body">${esc(a.content||'')}</div><div class="ann-date">📅 ${dt}</div></div>`;
     });
-    el.innerHTML = h || '<div class="empty-state"><i class="fas fa-bullhorn"></i><p>ยังไม่มีประกาศ</p></div>';
-  }catch(e){ el.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`; }
+    el.innerHTML=h||'<div class="empty-state"><i class="fas fa-bullhorn"></i><p>ยังไม่มีประกาศ</p></div>';
+  }catch(e){ el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`; }
 }
 
 // ==================== WORKSHEETS ====================
 async function loadWs(){
-  const el = document.getElementById('listWs');
+  const el=document.getElementById('listWs');
   try{
-    const q = query(collection(db,'worksheets'), orderBy('createdAt','desc'));
-    const snap = await getDocs(q);
-    let h = '';
-    snap.forEach(d => {
-      const w = d.data();
-      if(w.roomId && w.roomId!=='all' && w.roomId!==student.roomId) return;
-      window._worksheets[d.id] = w;
-      const dt = w.createdAt?.toDate?.()?.toLocaleDateString('th-TH') || '';
-      h += `<div class="card">
-        <div class="card-title">📄 ${w.title||'ใบงาน'}</div>
-        <div class="card-meta">📅 ${dt}${w.subject?' · '+w.subject:''}</div>
-        <div class="card-desc">${w.description||''}</div>
+    const q=query(collection(db,'worksheets'),orderBy('createdAt','desc'));
+    const snap=await getDocs(q);
+    let h='';
+    snap.forEach(d=>{
+      const w=d.data();
+      if(w.roomId&&w.roomId!=='all'&&w.roomId!==student.roomId) return;
+      window._worksheets[d.id]=w;
+      const dt=w.createdAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
+      h+=`<div class="card">
+        <div class="card-title">📄 ${esc(w.title||'ใบงาน')}</div>
+        <div class="card-meta">📅 ${dt}${w.subject?' · '+esc(w.subject):''}</div>
+        <div class="card-desc">${esc(w.description||'')}</div>
         <div class="card-actions">
           ${w.fileUrl?`<a href="${w.fileUrl}" target="_blank" class="btn btn-orange btn-sm">📖 เปิดไฟล์</a>`:''}
           ${w.htmlContent?`<button class="btn btn-orange btn-sm" onclick="openWs('${d.id}')">📖 เปิดใบงาน</button>`:''}
           <button class="btn btn-blue btn-sm" onclick="printWs('${d.id}')">🖨️ พิมพ์ PDF</button>
         </div></div>`;
     });
-    el.innerHTML = h || '<div class="empty-state"><i class="fas fa-file-alt"></i><p>ยังไม่มีใบงาน/ใบความรู้</p></div>';
-  }catch(e){ el.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`; }
+    el.innerHTML=h||'<div class="empty-state"><i class="fas fa-file-alt"></i><p>ยังไม่มีใบงาน/ใบความรู้</p></div>';
+  }catch(e){ el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`; }
 }
-window.openWs = function(id){ const w = window._worksheets[id]; if(!w?.htmlContent) return; const b = window.open('','_blank'); b.document.write(w.htmlContent); b.document.close(); };
-window.printWs = function(id){
-  const w = window._worksheets[id]; if(!w) return;
-  const content = w.htmlContent || `<div style="font-family:'Sarabun',sans-serif;padding:30px">
-    <h2 style="color:#c94b00;border-bottom:2px solid #f39800;padding-bottom:8px">${w.title||'ใบงาน'}</h2>
-    ${w.subject?`<p style="color:#888;margin:6px 0">วิชา: ${w.subject}</p>`:''}
-    ${w.description?`<div style="margin-top:14px;line-height:2;font-size:15px">${w.description}</div>`:''}
+window.openWs=function(id){ const w=window._worksheets[id]; if(!w?.htmlContent) return; const b=window.open('','_blank'); b.document.write(w.htmlContent); b.document.close(); };
+window.printWs=function(id){
+  const w=window._worksheets[id]; if(!w) return;
+  const content=w.htmlContent||`<div style="font-family:'Sarabun',sans-serif;padding:30px">
+    <h2 style="color:#c94b00;border-bottom:2px solid #f39800;padding-bottom:8px">${esc(w.title||'ใบงาน')}</h2>
+    ${w.subject?`<p style="color:#888;margin:6px 0">วิชา: ${esc(w.subject)}</p>`:''}
+    ${w.description?`<div style="margin-top:14px;line-height:2;font-size:15px">${esc(w.description)}</div>`:''}
     <p style="margin-top:40px;border-top:1px dashed #ccc;padding-top:16px;color:#aaa;font-size:12px;text-align:center">โรงเรียนหินฝนวิทยาคม · ครู รณฤทธิ์ ศรีสองเมือง</p>
   </div>`;
-  document.getElementById('pdfContent').innerHTML = content;
-  document.getElementById('pdfOverlay').style.display = 'block';
-  document.title = w.title || 'ใบงาน';
+  document.getElementById('pdfContent').innerHTML=content;
+  document.getElementById('pdfOverlay').style.display='block';
+  document.title=w.title||'ใบงาน';
 };
-window.closePdf = function(){ document.getElementById('pdfOverlay').style.display = 'none'; document.title = 'ห้องเรียนออนไลน์ | นักเรียน'; };
+window.closePdf=function(){ document.getElementById('pdfOverlay').style.display='none'; document.title='ห้องเรียนออนไลน์ | นักเรียน'; };
 
 // ==================== QUIZZES ====================
 async function loadQuiz(){
-  const el = document.getElementById('listQuiz');
+  const el=document.getElementById('listQuiz');
   try{
-    const q = query(collection(db,'quizzes'), orderBy('createdAt','desc'));
-    const snap = await getDocs(q);
-    const results = {};
+    const q=query(collection(db,'quizzes'),orderBy('createdAt','desc'));
+    const snap=await getDocs(q);
+    const results={};
     try{
-      const rq = query(collection(db,'quiz_results'), where('studentId','==', student.name+'_'+student.roomId));
-      const rs = await getDocs(rq);
-      rs.forEach(d => results[d.data().quizId] = d.data());
+      const rq=query(collection(db,'quiz_results'),where('studentId','==',student.name+'_'+student.roomId));
+      const rs=await getDocs(rq);
+      rs.forEach(d=>results[d.data().quizId]=d.data());
     }catch(e){}
-    let h = ''; _quizCache = {};
-    snap.forEach(d => {
-      const qz = d.data();
-      if(qz.roomId && qz.roomId!=='all' && qz.roomId!==student.roomId) return;
-      _quizCache[d.id] = qz; const done = results[d.id];
-      const dt = qz.createdAt?.toDate?.()?.toLocaleDateString('th-TH') || '';
-      const isHtml = qz.quizType === 'html';
+    let h=''; _quizCache={};
+    snap.forEach(d=>{
+      const qz=d.data();
+      if(qz.roomId&&qz.roomId!=='all'&&qz.roomId!==student.roomId) return;
+      _quizCache[d.id]=qz; const done=results[d.id];
+      const dt=qz.createdAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
+      const isHtml=qz.quizType==='html';
       if(isHtml){
-        h += `<div class="quiz-card">
+        h+=`<div class="quiz-card">
           <div class="quiz-info">
-            <div class="quiz-title">📄 ${qz.title||'ข้อสอบ'} <span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 5px;font-size:10px;vertical-align:middle">HTML</span></div>
+            <div class="quiz-title">📄 ${esc(qz.title||'ข้อสอบ')} <span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 5px;font-size:10px;vertical-align:middle">HTML</span></div>
             <div class="quiz-meta">ข้อสอบรูปแบบไฟล์${dt?' · '+dt:''}</div>
           </div>
           <button class="btn btn-blue btn-sm" onclick="openHtmlQuiz('${d.id}')">เปิดข้อสอบ</button>
         </div>`;
       } else {
-        const pass = done && done.score >= (qz.passingScore||60);
-        h += `<div class="quiz-card">
+        const pass=done&&done.score>=(qz.passingScore||60);
+        h+=`<div class="quiz-card">
           <div class="quiz-info">
-            <div class="quiz-title">📝 ${qz.title||'ข้อสอบ'}</div>
+            <div class="quiz-title">📝 ${esc(qz.title||'ข้อสอบ')}</div>
             <div class="quiz-meta">⏱️ ${qz.timeLimit||30} นาที · ${(qz.questions||[]).length} ข้อ · ผ่าน ${qz.passingScore||60}%${dt?' · '+dt:''}</div>
           </div>
           ${done
-            ? `<span class="score-badge ${pass?'pass':'fail'}">${done.score}%${pass?' ✓':' ✗'}</span>`
-            : `<button class="btn btn-orange btn-sm" onclick="startQuiz('${d.id}')">เริ่มสอบ</button>`}
+            ?`<span class="score-badge ${pass?'pass':'fail'}">${done.score}%${pass?' ✓':' ✗'}</span>`
+            :`<button class="btn btn-orange btn-sm" onclick="startQuiz('${d.id}')">เริ่มสอบ</button>`}
         </div>`;
       }
     });
-    el.innerHTML = h || '<div class="empty-state"><i class="fas fa-pen-to-square"></i><p>ยังไม่มีข้อสอบ</p></div>';
-  }catch(e){ el.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`; }
+    el.innerHTML=h||'<div class="empty-state"><i class="fas fa-pen-to-square"></i><p>ยังไม่มีข้อสอบ</p></div>';
+  }catch(e){ el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`; }
 }
-window.startQuiz = function(id){
-  window.location.href = `quiz.html?id=${id}&student=${encodeURIComponent(student.name)}&room=${encodeURIComponent(student.roomId)}`;
+window.startQuiz=function(id){
+  window.location.href=`quiz.html?id=${id}&student=${encodeURIComponent(student.name)}&room=${encodeURIComponent(student.roomId)}`;
 };
-window.openHtmlQuiz = function(id){
-  const qz = _quizCache && _quizCache[id];
-  if(qz && qz.htmlUrl) window.open(qz.htmlUrl, '_blank');
-  else {
-    // fallback: ดึงจาก Firestore
+window.openHtmlQuiz=function(id){
+  const qz=_quizCache&&_quizCache[id];
+  if(qz&&qz.htmlUrl) window.open(qz.htmlUrl,'_blank');
+  else{
     import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js").then(({getDoc,doc:fiDoc})=>{
       getDoc(fiDoc(db,'quizzes',id)).then(snap=>{
         if(snap.exists()&&snap.data().htmlUrl) window.open(snap.data().htmlUrl,'_blank');
@@ -431,101 +772,153 @@ window.openHtmlQuiz = function(id){
 
 // ==================== VIDEOS ====================
 async function loadVid(){
-  const el = document.getElementById('listVid');
+  const el=document.getElementById('listVid');
   try{
-    const q = query(collection(db,'videos'), orderBy('createdAt','desc'));
-    const snap = await getDocs(q);
-    let h = '';
-    snap.forEach(d => {
-      const v = d.data();
-      if(v.roomId && v.roomId!=='all' && v.roomId!==student.roomId) return;
-      const embed = ytEmbed(v.url||'');
-      h += `<div class="video-card">
+    const q=query(collection(db,'videos'),orderBy('createdAt','desc'));
+    const snap=await getDocs(q);
+    let h='';
+    snap.forEach(d=>{
+      const v=d.data();
+      if(v.roomId&&v.roomId!=='all'&&v.roomId!==student.roomId) return;
+      const embed=ytEmbed(v.url||'');
+      h+=`<div class="video-card">
         ${embed
-          ? `<iframe src="${embed}" allowfullscreen loading="lazy"></iframe>`
-          : `<div style="background:#f5f5f5;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center"><a href="${v.url}" target="_blank" style="color:#c94b00;font-weight:700;font-size:15px;text-decoration:none">▶️ เปิดวิดีโอ</a></div>`}
-        <div class="video-info"><div class="video-title">${v.title||'วิดีโอ'}</div><div class="video-desc">${v.description||''}</div></div>
+          ?`<iframe src="${embed}" allowfullscreen loading="lazy"></iframe>`
+          :`<div style="background:#f5f5f5;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center"><a href="${v.url}" target="_blank" style="color:#c94b00;font-weight:700;font-size:15px;text-decoration:none">▶️ เปิดวิดีโอ</a></div>`}
+        <div class="video-info"><div class="video-title">${esc(v.title||'วิดีโอ')}</div><div class="video-desc">${esc(v.description||'')}</div></div>
       </div>`;
     });
-    el.innerHTML = h || '<div class="empty-state"><i class="fas fa-play-circle"></i><p>ยังไม่มีวิดีโอ</p></div>';
-  }catch(e){ el.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`; }
+    el.innerHTML=h||'<div class="empty-state"><i class="fas fa-play-circle"></i><p>ยังไม่มีวิดีโอ</p></div>';
+  }catch(e){ el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`; }
 }
 function ytEmbed(url){
-  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
-  return m ? 'https://www.youtube.com/embed/'+m[1] : '';
+  const m=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
+  return m?'https://www.youtube.com/embed/'+m[1]:'';
 }
 
 // ==================== SCORES ====================
 async function loadScore(){
-  const el = document.getElementById('listScore');
+  const el=document.getElementById('listScore');
   try{
-    const q = query(collection(db,'quiz_results'), where('studentId','==', student.name+'_'+student.roomId));
-    const snap = await getDocs(q);
-    if(snap.empty){ el.innerHTML = '<div class="empty-state"><i class="fas fa-chart-bar"></i><p>ยังไม่มีคะแนน<br>ลองทำข้อสอบก่อนนะ!</p></div>'; return; }
-    let h = `<table class="score-table"><thead><tr><th>ข้อสอบ</th><th>คะแนน</th><th>ถูก/ทั้งหมด</th><th>วันที่สอบ</th></tr></thead><tbody>`;
-    let total = 0, count = 0;
-    snap.forEach(d => {
-      const r = d.data();
-      const dt = r.submittedAt?.toDate?.()?.toLocaleDateString('th-TH') || '';
-      const pass = r.score >= (r.passingScore||60);
-      total += r.score||0; count++;
-      h += `<tr><td>${r.quizTitle||r.quizId||'-'}</td><td><span class="grade-badge" style="background:${pass?'#2e7d32':'#c62828'}">${r.score||0}%</span></td><td>${r.correct||0}/${r.total||0}</td><td>${dt}</td></tr>`;
+    const q=query(collection(db,'quiz_results'),where('studentId','==',student.name+'_'+student.roomId));
+    const snap=await getDocs(q);
+    if(snap.empty){ el.innerHTML='<div class="empty-state"><i class="fas fa-chart-bar"></i><p>ยังไม่มีคะแนน<br>ลองทำข้อสอบก่อนนะ!</p></div>'; return; }
+    let h=`<table class="score-table"><thead><tr><th>ข้อสอบ</th><th>คะแนน</th><th>ถูก/ทั้งหมด</th><th>วันที่สอบ</th></tr></thead><tbody>`;
+    snap.forEach(d=>{
+      const r=d.data();
+      const dt=r.submittedAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
+      // รองรับ 2 รูปแบบ: format A (score%) และ format B (mcScore/totalOutOf)
+      const isFormatB = r.mcScore!==undefined||r.grade!==undefined;
+      let scoreLabel, correctLabel, quizTitle;
+      if(isFormatB){
+        const pct=r.totalOutOf?Math.round((r.mcScore||0)/r.totalOutOf*100):0;
+        const pass=pct>=60;
+        scoreLabel=`<span class="grade-badge" style="background:${pass?'#2e7d32':'#c62828'}">${r.mcScore||0}/${r.totalOutOf||0}</span>`;
+        correctLabel=`${r.mcScore||0}/${r.totalOutOf||0}`;
+        quizTitle=r.unit||r.quizTitle||'-';
+      }else{
+        const pass=(r.score||0)>=(r.passingScore||60);
+        scoreLabel=`<span class="grade-badge" style="background:${pass?'#2e7d32':'#c62828'}">${r.score||0}%</span>`;
+        correctLabel=`${r.correct||0}/${r.total||0}`;
+        quizTitle=r.quizTitle||r.quizId||'-';
+      }
+      h+=`<tr><td>${esc(quizTitle)}</td><td>${scoreLabel}</td><td>${correctLabel}</td><td>${dt}</td></tr>`;
     });
-    h += `</tbody></table>`;
-    if(count > 1) h += `<div style="margin-top:10px;padding:10px 14px;background:#fff3e0;border-radius:8px;font-size:13px;font-weight:700;color:#7c4700">📊 คะแนนเฉลี่ย: ${Math.round(total/count)}%</div>`;
-    el.innerHTML = h;
-  }catch(e){ el.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`; }
+    h+=`</tbody></table>`;
+    el.innerHTML=h;
+  }catch(e){ el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`; }
 }
 
 // ==================== CHAT ====================
 function initChat(){
-  if(!student || chatUnsub) return;
-  _chatInitialized=false;
-  const q = query(collection(db,'chats', student.roomId,'messages'), orderBy('createdAt','asc'));
-  chatUnsub = onSnapshot(q, snap => {
-    const el = document.getElementById('chatMsgs');
-    // Count teacher messages for badge tracking
+  if(!student||chatUnsub) return;
+  _chatInitialized=false; _chatDocs={};
+  const q=query(collection(db,'chats',student.roomId,'messages'),orderBy('createdAt','asc'));
+  chatUnsub=onSnapshot(q,snap=>{
+    const el=document.getElementById('chatMsgs');
     let teacherCount=0;
-    snap.forEach(d=>{if(d.data().role==='teacher')teacherCount++;});
-    // Baseline on first snapshot
-    if(!_chatInitialized){_prevTeacherCount=teacherCount;_chatInitialized=true;}
-    // Show badge if new teacher messages arrived while tab was inactive
+    snap.forEach(d=>{ if(d.data().role==='teacher') teacherCount++; });
+    if(!_chatInitialized){ _prevTeacherCount=teacherCount; _chatInitialized=true; }
     else if(!_isChatTabActive&&teacherCount>_prevTeacherCount){
       _setChatBadge(teacherCount-_prevTeacherCount);
     }
-    if(_isChatTabActive)_prevTeacherCount=teacherCount;
+    if(_isChatTabActive) _prevTeacherCount=teacherCount;
     if(snap.empty){
-      el.innerHTML = '<div class="empty-state"><i class="fas fa-comments" style="color:#ffd0a0"></i><p style="font-size:13px">ยังไม่มีข้อความ ส่งคำถามให้ครูได้เลย!</p></div>';
+      _chatDocs={};
+      el.innerHTML='<div class="empty-state"><i class="fas fa-comments" style="color:#ffd0a0"></i><p style="font-size:13px">ยังไม่มีข้อความ ส่งคำถามให้ครูได้เลย!</p></div>';
       return;
     }
-    let h = '';
-    snap.forEach(d => {
-      const m = d.data();
-      const mine = m.role === 'student' && m.sender === student.name;
-      const dt = m.createdAt?.toDate?.()?.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}) || '';
-      h += `<div class="msg ${mine?'mine':'theirs'}">
-        ${!mine ? `<div class="msg-sender">${m.sender||'ครู'}</div>` : ''}
-        <div class="bubble">${m.text}</div>
+    _chatDocs={};
+    let h='';
+    snap.forEach(d=>{
+      const m=d.data(); const docId=d.id;
+      _chatDocs[docId]=m;
+      const mine=m.role==='student'&&m.sender===student.name;
+      const dt=m.createdAt?.toDate?.()?.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})||'';
+      const replyHtml=m.replyTo?`<div class="bubble-reply"><div class="reply-from">↩️ ${esc(m.replyTo.sender||'ครู')}</div><div class="reply-txt">${esc((m.replyTo.text||'').substring(0,80)+(m.replyTo.text?.length>80?'...':''))}</div></div>`:'';
+      // safe refs for onclick
+      const safeText=esc(m.text).replace(/'/g,'&#39;');
+      const safeSender=esc(m.sender||'ครู').replace(/'/g,'&#39;');
+      h+=`<div class="msg ${mine?'mine':'theirs'}">
+        ${!mine?`<div class="msg-sender">${esc(m.sender||'ครู')}</div>`:''}
+        <div class="bubble">${replyHtml}${esc(m.text)}</div>
+        <div class="msg-actions">
+          ${mine?`<button class="msg-act-btn" onclick="deleteMsg('${docId}')">🗑️ ลบ</button>`:''}
+          <button class="msg-act-btn" onclick="setReplyTo('${docId}','${safeText}','${safeSender}')">↩️ ตอบ</button>
+        </div>
         <div class="msg-time">${dt}</div>
       </div>`;
     });
-    el.innerHTML = h;
-    el.scrollTop = el.scrollHeight;
-  }, err => {
-    document.getElementById('chatMsgs').innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p style="font-size:13px">โหลดแชทไม่ได้: ${err.message}</p></div>`;
+    el.innerHTML=h;
+    el.scrollTop=el.scrollHeight;
+  },err=>{
+    document.getElementById('chatMsgs').innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p style="font-size:13px">โหลดแชทไม่ได้: ${err.message}</p></div>`;
   });
 }
 
-window.sendChat = async function(){
-  const inp = document.getElementById('chatInput');
-  const text = inp.value.trim();
-  if(!text || !student) return;
-  inp.value = '';
+window.setReplyTo=function(docId,text,sender){
+  _replyTo={docId,text,sender};
+  document.getElementById('replyPreviewSender').textContent=sender||'ครู';
+  document.getElementById('replyPreviewText').textContent=text.substring(0,60)+(text.length>60?'...':'');
+  document.getElementById('replyBar').style.display='flex';
+  document.getElementById('chatInput').focus();
+};
+window.clearReply=function(){
+  _replyTo=null;
+  document.getElementById('replyBar').style.display='none';
+};
+
+window.deleteMsg=async function(docId){
+  if(!confirm('ลบข้อความนี้?')) return;
   try{
-    await addDoc(collection(db,'chats', student.roomId,'messages'),{
-      text, sender: student.name, role: 'student', createdAt: serverTimestamp()
-    });
-  }catch(e){ alert('ส่งข้อความไม่ได้: '+e.message); }
+    await deleteDoc(doc(db,'chats',student.roomId,'messages',docId));
+  }catch(e){ alert('ลบไม่ได้: '+e.message); }
+};
+
+window.sendChat=async function(){
+  const inp=document.getElementById('chatInput');
+  const text=inp.value.trim();
+  if(!text||!student) return;
+  if(!student.roomId){ alert('ยังไม่ได้เข้าห้องเรียน'); return; }
+  inp.value='';
+  const btn=document.querySelector('.chat-send-btn');
+  if(btn) btn.disabled=true;
+  const msgData={text,sender:student.name,role:'student',createdAt:serverTimestamp()};
+  if(_replyTo){
+    msgData.replyTo={text:_replyTo.text,sender:_replyTo.sender,docId:_replyTo.docId};
+    clearReply();
+  }
+  try{
+    await addDoc(collection(db,'chats',student.roomId,'messages'),msgData);
+  }catch(e){
+    inp.value=text;
+    console.error('sendChat:',e.code,e.message);
+    if(e.code==='permission-denied'||String(e.message).includes('permission')){
+      alert('❌ ส่งข้อความไม่ได้: ไม่มีสิทธิ์เขียน\n\n🔧 วิธีแก้:\nFirebase Console → Firestore → Rules\nเพิ่ม allow create: if true; ใน /chats/{roomId}/messages/{msgId}');
+    } else { alert('❌ ส่งข้อความไม่ได้: '+e.message); }
+  } finally {
+    if(btn) btn.disabled=false;
+  }
 };
 </script>
 </body>
