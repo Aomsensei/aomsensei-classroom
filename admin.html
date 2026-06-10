@@ -1122,6 +1122,13 @@ function startRoomNotifications(rooms){
   });
 }
 
+const _origTitle = document.title;
+function _updateTitleBadge(){
+  const total=[...document.querySelectorAll('.notif-badge')]
+    .reduce((s,b)=>s+(parseInt(b.textContent)||0),0);
+  document.title = total>0 ? `(${total}) ${_origTitle}` : _origTitle;
+}
+
 function updateRoomBadge(roomId,count){
   const tab=document.getElementById('rtab_'+roomId);if(!tab)return;
   let badge=tab.querySelector('.notif-badge');
@@ -1129,6 +1136,7 @@ function updateRoomBadge(roomId,count){
     if(!badge){badge=document.createElement('span');badge.className='notif-badge';tab.appendChild(badge);}
     badge.textContent=count>9?'9+':String(count);
   } else if(badge){badge.remove();}
+  _updateTitleBadge();
 }
 
 function showChatNavDot(){
@@ -1143,6 +1151,7 @@ function showChatNavDot(){
 
 function clearChatNavDot(){
   document.querySelectorAll('.nav-notif-dot').forEach(el=>el.remove());
+  _updateTitleBadge();
 }
 window.openRoom=function(id){
   document.querySelectorAll('.room-tab').forEach(t=>t.classList.remove('active'));
