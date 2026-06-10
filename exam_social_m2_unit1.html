@@ -763,9 +763,19 @@
 
 
   <script>
+  
+  // ==================== เฉลยข้อสอบปรนัย (ครูกรอก) ====================
+  // ใส่คำตอบที่ถูกต้อง: 'ก', 'ข', 'ค', หรือ 'ง' (ถ้ายังไม่กรอก ใส่ '')
+  var ANSWER_KEY_M2 = {
+    q1:'', q2:'', q3:'', q4:'', q5:'',
+    q6:'', q7:'', q8:'', q9:'', q10:'',
+    q11:'', q12:'', q13:'', q14:'', q15:'',
+    q16:'', q17:'', q18:'', q19:'', q20:''
+  };
+
   function submitAnswers() {
     var name = document.getElementById('studentNameSel').value;
-    if (!name) { alert('\u26a0\ufe0f กรุณาเลือกชื่อนักเรียนก่อน'); return; }
+    if (!name) { alert('⚠️ กรุณาเลือกชื่อนักเรียนก่อน'); return; }
     var answers = {};
     for (var i = 1; i <= 20; i++) {
       var sel = document.querySelector('input[name="q'+i+'"]:checked');
@@ -777,26 +787,41 @@
       var lines = card.querySelectorAll('.answer-line');
       answers['q'+qn] = Array.from(lines).map(function(l){return l.value.trim();}).filter(Boolean).join(' | ');
     });
+    // ตรวจข้อปรนัยอัตโนมัติ
+    var mcDetails = {}, mcScore = 0;
+    var hasKey = Object.values(ANSWER_KEY_M2).some(function(v){ return v !== ''; });
+    if (hasKey) {
+      for (var j = 1; j <= 20; j++) {
+        var k = 'q'+j;
+        if (ANSWER_KEY_M2[k]) {
+          var correct = (answers[k]||'').trim() === ANSWER_KEY_M2[k].trim();
+          mcDetails[k] = correct;
+          if (correct) mcScore++;
+        }
+      }
+    }
     var btn = document.getElementById('btnSubmit');
     btn.disabled = true;
-    btn.textContent = '\u23f3 กำลังส่ง...';
+    btn.textContent = '⏳ กำลังส่ง...';
     var data = {
-      studentName: name, grade: 'ม.2', subject: '\u0e2a\u0e31\u0e07\u0e04\u0e21\u0e28\u0e36\u0e01\u0e29\u0e32',
-      unit: '\u0e2b\u0e19\u0e48\u0e27\u0e22\u0e17\u0e35\u0e48 1', answers: answers, totalOutOf: 20
+      studentName: name, grade: 'ม.2', subject: 'สังคมศึกษา',
+      unit: 'หน่วยที่ 1', answers: answers, totalOutOf: 20
     };
+    if (hasKey) { data.mcScore = mcScore; data.mcDetails = mcDetails; }
     (function doSubmit() {
       if (typeof window._submitAnswers === 'function') {
         window._submitAnswers(data).then(function() {
           document.getElementById('submitMsg').style.display = 'block';
-          btn.textContent = '\u2705 ส่งแล้ว';
+          btn.textContent = '✅ ส่งแล้ว';
         }).catch(function(e) {
           btn.disabled = false;
-          btn.textContent = '\ud83d\udce4 ส่งคำตอบ';
-          alert('\u274c ส่งไม่สำเร็จ: ' + e.message);
+          btn.textContent = '📤 ส่งคำตอบ';
+          alert('❌ ส่งไม่สำเร็จ: ' + e.message);
         });
       } else { setTimeout(doSubmit, 400); }
     })();
   }
+
 </script>
 
 <script type="module">
