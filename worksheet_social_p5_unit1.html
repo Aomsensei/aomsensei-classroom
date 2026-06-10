@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ใบงานที่ 1 — พุทธประวัติ ป.5</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sarabun',sans-serif;background:#fffde7;min-height:100vh;overflow-x:hidden}
+
+/* ===== DECORATIVE BG ===== */
+body::before{
+  content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(255,213,79,.25) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(129,199,132,.2) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(100,181,246,.15) 0%, transparent 60%);
+  pointer-events:none;z-index:0;
+}
+
+.page-wrap{max-width:720px;margin:0 auto;padding:16px;position:relative;z-index:1}
+
+/* ===== HEADER ===== */
+.ws-header{
+  background:linear-gradient(135deg,#ff8f00 0%,#ffd740 50%,#ff6f00 100%);
+  border-radius:24px;padding:20px 22px 16px;margin-bottom:20px;
+  box-shadow:0 6px 24px rgba(255,111,0,.35);
+  position:relative;overflow:hidden;
+}
+.ws-header::before{
+  content:'🌟';font-size:80px;position:absolute;right:-10px;top:-10px;opacity:.18;transform:rotate(15deg);
+}
+.ws-header::after{
+  content:'✨';font-size:60px;position:absolute;left:-5px;bottom:-15px;opacity:.15;transform:rotate(-10deg);
+}
+.ws-header .badge-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.badge{background:rgba(255,255,255,.3);color:#fff;border-radius:20px;padding:3px 12px;font-size:12px;font-weight:700;backdrop-filter:blur(4px)}
+.ws-header h1{font-size:22px;font-weight:800;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.2);line-height:1.3}
+.ws-header .subtitle{font-size:13px;color:rgba(255,255,255,.9);margin-top:4px}
+.score-box{
+  position:absolute;top:16px;right:20px;
+  background:rgba(255,255,255,.3);backdrop-filter:blur(6px);
+  border-radius:14px;padding:8px 14px;text-align:center;color:#fff;
+}
+.score-box .sc-num{font-size:22px;font-weight:800;line-height:1}
+.score-box .sc-lbl{font-size:10px;opacity:.9}
+
+/* ===== STUDENT INFO ===== */
+.info-card{
+  background:#fff;border-radius:16px;padding:14px 16px;
+  box-shadow:0 3px 12px rgba(0,0,0,.08);margin-bottom:18px;
+  border:2.5px dashed #ffd740;
+}
+.info-card h3{font-size:13px;font-weight:800;color:#f57f17;margin-bottom:10px}
+.info-row{display:flex;gap:10px;flex-wrap:wrap}
+.info-field{flex:1;min-width:140px}
+.info-field label{font-size:12px;color:#888;font-weight:700;display:block;margin-bottom:4px}
+.info-field input{
+  width:100%;padding:8px 12px;border:2px solid #ffe082;border-radius:10px;
+  font-size:13px;font-family:inherit;background:#fffde7;transition:.2s;
+}
+.info-field input:focus{outline:none;border-color:#ffa000;background:#fff}
+
+/* ===== SECTION CARDS ===== */
+.section{
+  background:#fff;border-radius:20px;padding:18px;margin-bottom:18px;
+  box-shadow:0 4px 16px rgba(0,0,0,.07);position:relative;overflow:hidden;
+}
+.section-label{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,#ff8f00,#ffd740);color:#fff;
+  border-radius:20px;padding:4px 14px;font-size:12px;font-weight:800;
+  margin-bottom:14px;box-shadow:0 2px 8px rgba(255,143,0,.3);
+}
+.section h3{font-size:15px;font-weight:800;color:#333;margin-bottom:14px;line-height:1.5}
+.section-img{
+  width:100%;border-radius:14px;overflow:hidden;margin-bottom:14px;
+  border:3px solid #ffe082;box-shadow:0 3px 12px rgba(0,0,0,.1);
+}
+.section-img img{width:100%;display:block;max-height:200px;object-fit:cover}
+.img-caption{
+  background:#fff9c4;padding:7px 12px;font-size:11.5px;color:#666;
+  text-align:center;border-top:1px solid #ffe082;font-weight:700;
+}
+
+/* ===== MCQ (choice cards) ===== */
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.choice-inp{display:none}
+.choice-lbl{
+  display:flex;align-items:center;gap:8px;
+  background:#f5f5f5;border:2.5px solid #e0e0e0;border-radius:14px;
+  padding:10px 14px;cursor:pointer;transition:.2s;font-size:13px;font-weight:700;
+}
+.choice-lbl .num{
+  width:26px;height:26px;border-radius:50%;background:#e0e0e0;color:#555;
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;
+  transition:.2s;
+}
+.choice-inp:checked + .choice-lbl{background:#fff8e1;border-color:#ffa000;color:#e65100}
+.choice-inp:checked + .choice-lbl .num{background:#ffa000;color:#fff}
+.choice-lbl:hover{border-color:#ffd740;background:#fffde7}
+
+/* ===== TRUE / FALSE ===== */
+.tf-group{display:flex;gap:12px;margin-top:8px}
+.tf-inp{display:none}
+.tf-lbl{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  border:2.5px solid #e0e0e0;border-radius:16px;padding:12px 10px;cursor:pointer;transition:.2s;
+}
+.tf-lbl .tf-icon{font-size:28px}
+.tf-lbl .tf-text{font-size:12px;font-weight:800}
+.tf-inp.tf-true:checked + .tf-lbl{background:#e8f5e9;border-color:#66bb6a;color:#2e7d32}
+.tf-inp.tf-false:checked + .tf-lbl{background:#ffebee;border-color:#ef5350;color:#c62828}
+.tf-lbl:hover{background:#f5f5f5}
+
+/* ===== FILL IN BLANK ===== */
+.blank-inp{
+  border:none;border-bottom:3px solid #ffa000;background:transparent;
+  font-size:14px;font-family:inherit;padding:2px 8px;min-width:120px;
+  color:#333;font-weight:700;text-align:center;outline:none;
+}
+.blank-inp:focus{border-color:#ff6f00;background:#fff9c4;border-radius:4px 4px 0 0}
+.fill-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:14px;line-height:2.2;margin-bottom:10px}
+.fill-row .fill-num{
+  background:#ffa000;color:#fff;border-radius:50%;
+  width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;flex-shrink:0;
+}
+
+/* ===== MATCHING ===== */
+.match-wrap{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:10px}
+.match-col h4{font-size:12px;color:#888;font-weight:800;margin-bottom:8px;text-align:center}
+.match-item{
+  background:#f9f9f9;border:2px solid #e0e0e0;border-radius:12px;
+  padding:10px 12px;margin-bottom:8px;font-size:13px;font-weight:700;
+  cursor:pointer;transition:.2s;display:flex;align-items:center;gap:8px;
+}
+.match-item .match-num{
+  width:24px;height:24px;border-radius:8px;background:#ff8f00;color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;
+}
+.match-answer{width:100%;display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.match-answer label{font-size:13px;font-weight:700;width:130px;flex-shrink:0}
+.match-answer select{
+  flex:1;padding:7px 10px;border:2px solid #ffe082;border-radius:10px;
+  font-family:inherit;font-size:13px;background:#fffde7;
+}
+.match-answer select:focus{outline:none;border-color:#ffa000}
+
+/* ===== OPEN ENDED ===== */
+.open-textarea{
+  width:100%;padding:12px;border:2.5px solid #ffe082;border-radius:12px;
+  font-size:13px;font-family:inherit;resize:vertical;min-height:90px;
+  background:#fffde7;transition:.2s;line-height:1.8;
+}
+.open-textarea:focus{outline:none;border-color:#ffa000;background:#fff}
+.lines-bg{
+  background-image:repeating-linear-gradient(transparent,transparent 31px,#ffe082 31px,#ffe082 33px);
+  line-height:2;
+}
+
+/* ===== IMAGE Q ===== */
+.img-q-wrap{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.img-q-pic{width:140px;flex-shrink:0;border-radius:14px;overflow:hidden;border:3px solid #ffe082}
+.img-q-pic img{width:100%;display:block}
+.img-q-body{flex:1;min-width:180px}
+
+/* ===== SUBMIT ===== */
+.submit-area{text-align:center;padding:10px 0 20px}
+.btn-submit{
+  background:linear-gradient(135deg,#ff8f00,#ffd740);color:#fff;
+  border:none;padding:14px 48px;border-radius:30px;font-size:16px;font-weight:800;
+  cursor:pointer;font-family:inherit;box-shadow:0 4px 18px rgba(255,111,0,.4);
+  transition:.2s;letter-spacing:.5px;
+}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(255,111,0,.5)}
+.btn-submit:active{transform:translateY(0)}
+.btn-submit:disabled{opacity:.55;cursor:default;transform:none}
+#submitMsg{display:none;margin:16px auto;max-width:400px;padding:16px 20px;border-radius:16px;background:#e8f5e9;border:2px solid #a5d6a7;text-align:center}
+
+/* ===== CARTOON DECO ===== */
+.deco{position:absolute;opacity:.08;pointer-events:none;font-size:60px}
+.deco-tl{top:-10px;left:-10px;transform:rotate(-15deg)}
+.deco-br{bottom:-10px;right:-10px;transform:rotate(20deg)}
+.stars-deco{position:absolute;top:8px;right:12px;font-size:18px;opacity:.4}
+
+/* ===== PROGRESS ===== */
+.progress-bar-wrap{background:#ffe082;border-radius:20px;height:10px;margin-bottom:18px;overflow:hidden}
+.progress-bar{background:linear-gradient(90deg,#ff8f00,#ffd740);height:100%;border-radius:20px;width:0%;transition:.4s}
+.progress-label{font-size:12px;color:#888;text-align:right;margin-bottom:4px;font-weight:700}
+
+/* responsive */
+@media(max-width:520px){
+  .choices{grid-template-columns:1fr}
+  .match-wrap{grid-template-columns:1fr}
+  .img-q-wrap{flex-direction:column}
+  .img-q-pic{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+<!-- ===== HEADER ===== -->
+<div class="ws-header">
+  <div class="badge-row">
+    <span class="badge">📚 สังคมศึกษา</span>
+    <span class="badge">🏫 ชั้น ป.5</span>
+    <span class="badge">🌸 หน่วยที่ 1</span>
+  </div>
+  <h1>🙏 ใบงานที่ 1<br>พุทธประวัติ — เจ้าชายสิทธัตถะ</h1>
+  <div class="subtitle">เรียนรู้เรื่องราวของพระพุทธเจ้าตั้งแต่ประสูติจนถึงตรัสรู้</div>
+  <div class="score-box">
+    <div class="sc-num" id="scoreDisp">0</div>
+    <div class="sc-lbl">/ 30 คะแนน</div>
+  </div>
+</div>
+
+<!-- ===== STUDENT INFO ===== -->
+<div class="info-card">
+  <h3>🐣 ข้อมูลนักเรียน — กรอกก่อนเริ่มทำนะ!</h3>
+  <div class="info-row">
+    <div class="info-field">
+      <label>✏️ ชื่อ-นามสกุล</label>
+      <input type="text" id="studentName" placeholder="ชื่อของคุณ..."/>
+    </div>
+    <div class="info-field">
+      <label>🏫 ชั้น</label>
+      <input type="text" id="studentGrade" value="ป.5"/>
+    </div>
+    <div class="info-field">
+      <label>📅 วันที่</label>
+      <input type="text" id="studentDate" placeholder="วัน/เดือน/ปี"/>
+    </div>
+  </div>
+</div>
+
+<!-- progress -->
+<div class="progress-label">ความคืบหน้า: <span id="pctLbl">0%</span></div>
+<div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+
+<!-- ===================================
+     ส่วนที่ 1 — ดูภาพแล้วตอบ
+=================================== -->
+<div class="section">
+  <span class="deco deco-tl">🌳</span>
+  <span class="stars-deco">⭐⭐⭐</span>
+  <div class="section-label">🖼️ ส่วนที่ 1 — ดูภาพแล้วตอบ (5 คะแนน)</div>
+
+  <!-- ภาพสวนลุมพินีวัน -->
+  <div class="section-img">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Maya_devi_temple_lumbini.jpg/800px-Maya_devi_temple_lumbini.jpg"
+         alt="สวนลุมพินีวัน" onerror="this.src='https://via.placeholder.com/700x200?text=สวนลุมพินีวัน'"/>
+    <div class="img-caption">🌺 สวนลุมพินีวัน ประเทศเนปาล — สถานที่ประสูติของเจ้าชายสิทธัตถะ</div>
+  </div>
+
+  <div class="img-q-wrap">
+    <div class="img-q-pic">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Lord_Buddha%2C_Bodhgaya%2C_Bihar.jpg/400px-Lord_Buddha%2C_Bodhgaya%2C_Bihar.jpg"
+           alt="พระพุทธรูป" onerror="this.src='https://via.placeholder.com/140x160?text=ภาพพระพุทธ'"/>
+    </div>
+    <div class="img-q-body">
+      <h3>1. จากภาพด้านซ้าย นักเรียนเห็นอะไร? และเกี่ยวข้องกับพุทธประวัติอย่างไร?</h3>
+      <textarea class="open-textarea lines-bg" id="q1_img" rows="4" placeholder="เขียนสิ่งที่เห็นและความเกี่ยวข้อง..." oninput="updateProgress()"></textarea>
+    </div>
+  </div>
+
+  <div style="margin-top:12px">
+    <h3>2. เจ้าชายสิทธัตถะประสูติ ณ สถานที่ใด?</h3>
+    <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+      <input type="radio" name="q2" id="q2a" value="สวนลุมพินีวัน" class="choice-inp" oninput="updateProgress()">
+      <label for="q2a" class="choice-lbl"><span class="num">ก</span>สวนลุมพินีวัน</label>
+      <input type="radio" name="q2" id="q2b" value="แม่น้ำคงคา" class="choice-inp" oninput="updateProgress()">
+      <label for="q2b" class="choice-lbl"><span class="num">ข</span>แม่น้ำคงคา</label>
+      <input type="radio" name="q2" id="q2c" value="เมืองพาราณสี" class="choice-inp" oninput="updateProgress()">
+      <label for="q2c" class="choice-lbl"><span class="num">ค</span>เมืองพาราณสี</label>
+      <input type="radio" name="q2" id="q2d" value="กรุงราชคฤห์" class="choice-inp" oninput="updateProgress()">
+      <label for="q2d" class="choice-lbl"><span class="num">ง</span>กรุงราชคฤห์</label>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================
+     ส่วนที่ 2 — ปรนัย (MCQ)
+=================================== -->
+<div class="section">
+  <span class="deco deco-br">🌸</span>
+  <div class="section-label">✅ ส่วนที่ 2 — เลือกคำตอบที่ถูกต้อง (8 คะแนน)</div>
+
+  <div style="margin-bottom:18px">
+    <h3>3. พระบิดาของเจ้าชายสิทธัตถะทรงพระนามว่าอะไร?</h3>
+    <div class="choices">
+      <input type="radio" name="q3" id="q3a" value="สุทโธทนะ" class="choice-inp" oninput="updateProgress()">
+      <label for="q3a" class="choice-lbl"><span class="num">ก</span>พระเจ้าสุทโธทนะ</label>
+      <input type="radio" name="q3" id="q3b" value="อโศกมหาราช" class="choice-inp" oninput="updateProgress()">
+      <label for="q3b" class="choice-lbl"><span class="num">ข</span>พระเจ้าอโศกมหาราช</label>
+      <input type="radio" name="q3" id="q3c" value="พิมพิสาร" class="choice-inp" oninput="updateProgress()">
+      <label for="q3c" class="choice-lbl"><span class="num">ค</span>พระเจ้าพิมพิสาร</label>
+      <input type="radio" name="q3" id="q3d" value="ทศรถ" class="choice-inp" oninput="updateProgress()">
+      <label for="q3d" class="choice-lbl"><span class="num">ง</span>พระเจ้าทศรถ</label>
+    </div>
+  </div>
+
+  <div style="margin-bottom:18px">
+    <h3>4. พระแม่ของเจ้าชายสิทธัตถะทรงพระนามว่าอะไร?</h3>
+    <div class="choices">
+      <input type="radio" name="q4" id="q4a" value="พระนางมายาเทวี" class="choice-inp" oninput="updateProgress()">
+      <label for="q4a" class="choice-lbl"><span class="num">ก</span>พระนางมายาเทวี</label>
+      <input type="radio" name="q4" id="q4b" value="พระนางปชาบดี" class="choice-inp" oninput="updateProgress()">
+      <label for="q4b" class="choice-lbl"><span class="num">ข</span>พระนางปชาบดี</label>
+      <input type="radio" name="q4" id="q4c" value="พระนางยโสธรา" class="choice-inp" oninput="updateProgress()">
+      <label for="q4c" class="choice-lbl"><span class="num">ค</span>พระนางยโสธรา</label>
+      <input type="radio" name="q4" id="q4d" value="พระนางสิริมหามายา" class="choice-inp" oninput="updateProgress()">
+      <label for="q4d" class="choice-lbl"><span class="num">ง</span>พระนางสิริมหามายา</label>
+    </div>
+  </div>
+
+  <div style="margin-bottom:18px">
+    <h3>5. เจ้าชายสิทธัตถะตรัสรู้ภายใต้ต้นอะไร?</h3>
+    <div class="choices">
+      <input type="radio" name="q5" id="q5a" value="ต้นมะม่วง" class="choice-inp" oninput="updateProgress()">
+      <label for="q5a" class="choice-lbl"><span class="num">ก</span>🥭 ต้นมะม่วง</label>
+      <input type="radio" name="q5" id="q5b" value="ต้นโพธิ์" class="choice-inp" oninput="updateProgress()">
+      <label for="q5b" class="choice-lbl"><span class="num">ข</span>🌳 ต้นโพธิ์</label>
+      <input type="radio" name="q5" id="q5c" value="ต้นไผ่" class="choice-inp" oninput="updateProgress()">
+      <label for="q5c" class="choice-lbl"><span class="num">ค</span>🎋 ต้นไผ่</label>
+      <input type="radio" name="q5" id="q5d" value="ต้นสาละ" class="choice-inp" oninput="updateProgress()">
+      <label for="q5d" class="choice-lbl"><span class="num">ง</span>🌿 ต้นสาละ</label>
+    </div>
+  </div>
+
+  <div>
+    <h3>6. สังเวชนียสถาน 4 แห่ง ได้แก่ สถานที่ประสูติ ตรัสรู้ แสดงปฐมเทศนา และข้อใดอีก?</h3>
+    <div class="choices">
+      <input type="radio" name="q6" id="q6a" value="สถานที่บำเพ็ญทุกรกิริยา" class="choice-inp" oninput="updateProgress()">
+      <label for="q6a" class="choice-lbl"><span class="num">ก</span>สถานที่บำเพ็ญทุกรกิริยา</label>
+      <input type="radio" name="q6" id="q6b" value="สถานที่เสด็จดับขันธปรินิพพาน" class="choice-inp" oninput="updateProgress()">
+      <label for="q6b" class="choice-lbl"><span class="num">ข</span>สถานที่เสด็จดับขันธปรินิพพาน</label>
+      <input type="radio" name="q6" id="q6c" value="สถานที่เสด็จออกผนวช" class="choice-inp" oninput="updateProgress()">
+      <label for="q6c" class="choice-lbl"><span class="num">ค</span>สถานที่เสด็จออกผนวช</label>
+      <input type="radio" name="q6" id="q6d" value="สถานที่แสดงปาฏิหาริย์" class="choice-inp" oninput="updateProgress()">
+      <label for="q6d" class="choice-lbl"><span class="num">ง</span>สถานที่แสดงปาฏิหาริย์</label>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================
+     ส่วนที่ 3 — ถูกหรือผิด
+=================================== -->
+<div class="section">
+  <span class="deco deco-tl">⭐</span>
+  <div class="section-label">🤔 ส่วนที่ 3 — ถูก หรือ ผิด? (6 คะแนน)</div>
+
+  <div style="margin-bottom:16px">
+    <h3>7. เจ้าชายสิทธัตถะทรงออกผนวชเมื่อพระชนมายุ 29 พรรษา</h3>
+    <div class="tf-group">
+      <input type="radio" name="q7" id="q7t" value="ถูก" class="tf-inp tf-true" oninput="updateProgress()">
+      <label for="q7t" class="tf-lbl"><span class="tf-icon">👍</span><span class="tf-text">ถูก</span></label>
+      <input type="radio" name="q7" id="q7f" value="ผิด" class="tf-inp tf-false" oninput="updateProgress()">
+      <label for="q7f" class="tf-lbl"><span class="tf-icon">👎</span><span class="tf-text">ผิด</span></label>
+    </div>
+  </div>
+
+  <div style="margin-bottom:16px">
+    <h3>8. พระพุทธเจ้าทรงแสดงปฐมเทศนาที่ป่าอิสิปตนมฤคทายวัน เมืองพาราณสี</h3>
+    <div class="tf-group">
+      <input type="radio" name="q8" id="q8t" value="ถูก" class="tf-inp tf-true" oninput="updateProgress()">
+      <label for="q8t" class="tf-lbl"><span class="tf-icon">👍</span><span class="tf-text">ถูก</span></label>
+      <input type="radio" name="q8" id="q8f" value="ผิด" class="tf-inp tf-false" oninput="updateProgress()">
+      <label for="q8f" class="tf-lbl"><span class="tf-icon">👎</span><span class="tf-text">ผิด</span></label>
+    </div>
+  </div>
+
+  <div>
+    <h3>9. พระพุทธเจ้าใช้เวลาบำเพ็ญเพียรอยู่ 6 วันจึงตรัสรู้</h3>
+    <div class="tf-group">
+      <input type="radio" name="q9" id="q9t" value="ถูก" class="tf-inp tf-true" oninput="updateProgress()">
+      <label for="q9t" class="tf-lbl"><span class="tf-icon">👍</span><span class="tf-text">ถูก</span></label>
+      <input type="radio" name="q9" id="q9f" value="ผิด" class="tf-inp tf-false" oninput="updateProgress()">
+      <label for="q9f" class="tf-lbl"><span class="tf-icon">👎</span><span class="tf-text">ผิด</span></label>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================
+     ส่วนที่ 4 — เติมคำในช่องว่าง
+=================================== -->
+<div class="section">
+  <span class="deco deco-br">✏️</span>
+  <div class="section-label">📝 ส่วนที่ 4 — เติมคำในช่องว่าง (6 คะแนน)</div>
+  <p style="font-size:13px;color:#888;margin-bottom:14px">💡 เลือกคำจากกล่องด้านล่างมาเติมให้ถูกต้อง</p>
+
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;padding:10px;background:#fff9c4;border-radius:12px;border:2px dashed #ffd740">
+    <span style="font-size:11px;color:#888;width:100%;font-weight:700;margin-bottom:2px">🗂️ คำที่ใช้เติม:</span>
+    <span style="background:#ff8f00;color:#fff;border-radius:20px;padding:3px 12px;font-size:13px;font-weight:700">โพธิ์</span>
+    <span style="background:#43a047;color:#fff;border-radius:20px;padding:3px 12px;font-size:13px;font-weight:700">พุทธคยา</span>
+    <span style="background:#1e88e5;color:#fff;border-radius:20px;padding:3px 12px;font-size:13px;font-weight:700">ตรัสรู้</span>
+    <span style="background:#8e24aa;color:#fff;border-radius:20px;padding:3px 12px;font-size:13px;font-weight:700">ปัญจวัคคีย์</span>
+    <span style="background:#e53935;color:#fff;border-radius:20px;padding:3px 12px;font-size:13px;font-weight:700">ลุมพินีวัน</span>
+    <span style="background:#f57f17;color:#fff;border-radius:20px;padding:3px 12px;font-size:13px;font-weight:700">29</span>
+  </div>
+
+  <div class="fill-row"><span class="fill-num">10</span>
+    เจ้าชายสิทธัตถะประสูติที่สวน
+    <input type="text" class="blank-inp" id="q10" placeholder="......" oninput="updateProgress()">
+    ซึ่งอยู่ในประเทศเนปาลในปัจจุบัน
+  </div>
+
+  <div class="fill-row"><span class="fill-num">11</span>
+    เมื่อพระชนมายุ
+    <input type="text" class="blank-inp" id="q11" placeholder="......" style="min-width:60px" oninput="updateProgress()">
+    พรรษา ทรงออกผนวชแสวงหาโมกษธรรม
+  </div>
+
+  <div class="fill-row"><span class="fill-num">12</span>
+    พระองค์ทรง
+    <input type="text" class="blank-inp" id="q12" placeholder="......" oninput="updateProgress()">
+    ภายใต้ต้น
+    <input type="text" class="blank-inp" id="q12b" placeholder="......" style="min-width:80px" oninput="updateProgress()">
+    ที่เมือง
+    <input type="text" class="blank-inp" id="q12c" placeholder="......" oninput="updateProgress()">
+  </div>
+
+  <div class="fill-row"><span class="fill-num">13</span>
+    ผู้ฟังปฐมเทศนาครั้งแรก คือ นักบวช
+    <input type="text" class="blank-inp" id="q13" placeholder="......" oninput="updateProgress()">
+    ทั้งห้า
+  </div>
+</div>
+
+<!-- ===================================
+     ส่วนที่ 5 — จับคู่
+=================================== -->
+<div class="section">
+  <span class="deco deco-tl">🎯</span>
+  <div class="section-label">🔗 ส่วนที่ 5 — จับคู่ให้ถูกต้อง (5 คะแนน)</div>
+
+  <div style="margin-bottom:14px">
+    <div style="background:#fff9c4;border-radius:12px;padding:12px;border:2px solid #ffe082;font-size:13px;margin-bottom:14px">
+      <b>📌 คำชี้แจง:</b> เลือกตัวเลือกด้านขวาให้ตรงกับความหมายทางซ้าย
+    </div>
+
+    <div class="match-answer">
+      <label>14. สวนลุมพินีวัน</label>
+      <select oninput="updateProgress()" id="m1">
+        <option value="">-- เลือก --</option>
+        <option>สถานที่ประสูติ</option>
+        <option>สถานที่ตรัสรู้</option>
+        <option>สถานที่แสดงปฐมเทศนา</option>
+        <option>สถานที่ปรินิพพาน</option>
+        <option>สถานที่บำเพ็ญทุกรกิริยา</option>
+      </select>
+    </div>
+    <div class="match-answer">
+      <label>15. พุทธคยา</label>
+      <select oninput="updateProgress()" id="m2">
+        <option value="">-- เลือก --</option>
+        <option>สถานที่ประสูติ</option>
+        <option>สถานที่ตรัสรู้</option>
+        <option>สถานที่แสดงปฐมเทศนา</option>
+        <option>สถานที่ปรินิพพาน</option>
+        <option>สถานที่บำเพ็ญทุกรกิริยา</option>
+      </select>
+    </div>
+    <div class="match-answer">
+      <label>16. ป่าอิสิปตนมฤคทายวัน</label>
+      <select oninput="updateProgress()" id="m3">
+        <option value="">-- เลือก --</option>
+        <option>สถานที่ประสูติ</option>
+        <option>สถานที่ตรัสรู้</option>
+        <option>สถานที่แสดงปฐมเทศนา</option>
+        <option>สถานที่ปรินิพพาน</option>
+        <option>สถานที่บำเพ็ญทุกรกิริยา</option>
+      </select>
+    </div>
+    <div class="match-answer">
+      <label>17. กุสินารา</label>
+      <select oninput="updateProgress()" id="m4">
+        <option value="">-- เลือก --</option>
+        <option>สถานที่ประสูติ</option>
+        <option>สถานที่ตรัสรู้</option>
+        <option>สถานที่แสดงปฐมเทศนา</option>
+        <option>สถานที่ปรินิพพาน</option>
+        <option>สถานที่บำเพ็ญทุกรกิริยา</option>
+      </select>
+    </div>
+    <div class="match-answer">
+      <label>18. ป่าอุรุเวลาเสนานิคม</label>
+      <select oninput="updateProgress()" id="m5">
+        <option value="">-- เลือก --</option>
+        <option>สถานที่ประสูติ</option>
+        <option>สถานที่ตรัสรู้</option>
+        <option>สถานที่แสดงปฐมเทศนา</option>
+        <option>สถานที่ปรินิพพาน</option>
+        <option>สถานที่บำเพ็ญทุกรกิริยา</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================
+     ส่วนที่ 6 — อัตนัย
+=================================== -->
+<div class="section">
+  <span class="deco deco-br">💭</span>
+  <div class="section-label">💬 ส่วนที่ 6 — ความคิดของฉัน (อัตนัย)</div>
+
+  <div style="margin-bottom:16px">
+    <div style="margin-bottom:8px;padding:10px 14px;background:#e3f2fd;border-radius:12px;font-size:13px;display:flex;gap:10px;align-items:flex-start">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Buddha_in_Sarnath_Museum_%28Dhammajak_Mutra%29.jpg/200px-Buddha_in_Sarnath_Museum_%28Dhammajak_Mutra%29.jpg"
+           style="width:60px;border-radius:10px;flex-shrink:0" alt="พระพุทธรูป"
+           onerror="this.style.display='none'"/>
+      <div>
+        <b style="color:#1565c0">🖼️ ดูภาพนี้:</b> พระพุทธรูปปางสมาธิ แสดงถึงการบำเพ็ญเพียรของพระพุทธเจ้า
+      </div>
+    </div>
+    <h3>19. นักเรียนคิดว่าทำไมเจ้าชายสิทธัตถะจึงตัดสินใจออกผนวช ทั้ง ๆ ที่มีชีวิตที่สุขสบาย? อธิบายในมุมมองของนักเรียน</h3>
+    <textarea class="open-textarea lines-bg" id="q19" rows="5" placeholder="เขียนความคิดของนักเรียน..." oninput="updateProgress()"></textarea>
+  </div>
+
+  <div>
+    <h3>20. หลักธรรมที่พระพุทธเจ้าทรงสอนข้อใดที่นักเรียนนำมาใช้ในชีวิตประจำวันได้มากที่สุด? เพราะเหตุใด?</h3>
+    <textarea class="open-textarea lines-bg" id="q20" rows="5" placeholder="เขียนคำตอบ พร้อมยกตัวอย่างจากชีวิตจริง..." oninput="updateProgress()"></textarea>
+  </div>
+</div>
+
+<!-- ===================================
+     ปุ่มส่งงาน
+=================================== -->
+<div class="submit-area">
+  <div style="font-size:14px;color:#888;margin-bottom:12px">🌟 ตรวจสอบคำตอบให้ครบก่อนกดส่งนะ!</div>
+  <button class="btn-submit" id="submitBtn" onclick="submitWorksheet()">
+    📤 ส่งใบงาน
+  </button>
+  <div id="submitMsg"></div>
+</div>
+
+</div><!-- end page-wrap -->
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { FIREBASE_CONFIG } from './js/config.js';
+
+const app = initializeApp(FIREBASE_CONFIG);
+const db  = getFirestore(app);
+
+// ===== Progress tracking =====
+const TOTAL_FIELDS = 20;
+window.updateProgress = function(){
+  let filled = 0;
+  // radios
+  ['q2','q3','q4','q5','q6','q7','q8','q9'].forEach(name=>{
+    if(document.querySelector(`input[name="${name}"]:checked`)) filled++;
+  });
+  // text inputs
+  ['q10','q11','q12','q12b','q12c','q13'].forEach(id=>{
+    if((document.getElementById(id)?.value||'').trim()) filled++;
+  });
+  // selects
+  ['m1','m2','m3','m4','m5'].forEach(id=>{
+    if(document.getElementById(id)?.value) filled++;
+  });
+  // textareas
+  ['q1_img','q19','q20'].forEach(id=>{
+    if((document.getElementById(id)?.value||'').trim()) filled++;
+  });
+  const pct = Math.round(filled / TOTAL_FIELDS * 100);
+  document.getElementById('progressBar').style.width = pct+'%';
+  document.getElementById('pctLbl').textContent = pct+'%';
+};
+
+// ===== Submit =====
+window.submitWorksheet = async function(){
+  const studentName = document.getElementById('studentName').value.trim();
+  const grade       = document.getElementById('studentGrade').value.trim()||'ป.5';
+  const date        = document.getElementById('studentDate').value.trim();
+  if(!studentName){ alert('🌟 กรุณากรอกชื่อของคุณก่อนนะ!'); document.getElementById('studentName').focus(); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = '⏳ กำลังส่ง...';
+
+  const getVal = id => (document.getElementById(id)?.value||'').trim();
+  const getRadio = name => (document.querySelector(`input[name="${name}"]:checked`)?.value||'');
+
+  const fields = [
+    {label:'1. สิ่งที่เห็นในภาพ', value: getVal('q1_img')||'ไม่ตอบ'},
+    {label:'2. สถานที่ประสูติ (MCQ)', value: getRadio('q2')||'ไม่ตอบ'},
+    {label:'3. พระบิดา (MCQ)', value: getRadio('q3')||'ไม่ตอบ'},
+    {label:'4. พระมารดา (MCQ)', value: getRadio('q4')||'ไม่ตอบ'},
+    {label:'5. ต้นที่ตรัสรู้ (MCQ)', value: getRadio('q5')||'ไม่ตอบ'},
+    {label:'6. สังเวชนียสถาน (MCQ)', value: getRadio('q6')||'ไม่ตอบ'},
+    {label:'7. ออกผนวชอายุ 29 (T/F)', value: getRadio('q7')||'ไม่ตอบ'},
+    {label:'8. ปฐมเทศนาป่าอิสิปตน (T/F)', value: getRadio('q8')||'ไม่ตอบ'},
+    {label:'9. บำเพ็ญเพียร 6 วัน (T/F)', value: getRadio('q9')||'ไม่ตอบ'},
+    {label:'10. เติมคำ: สวนลุมพินีวัน', value: getVal('q10')||'ไม่ตอบ'},
+    {label:'11. เติมคำ: พระชนมายุ', value: getVal('q11')||'ไม่ตอบ'},
+    {label:'12. เติมคำ: ตรัสรู้/ต้น/เมือง', value: [getVal('q12'),getVal('q12b'),getVal('q12c')].join(' / ')||'ไม่ตอบ'},
+    {label:'13. เติมคำ: ปัญจวัคคีย์', value: getVal('q13')||'ไม่ตอบ'},
+    {label:'14. จับคู่ สวนลุมพินีวัน', value: getVal('m1')||'ไม่ตอบ'},
+    {label:'15. จับคู่ พุทธคยา', value: getVal('m2')||'ไม่ตอบ'},
+    {label:'16. จับคู่ ป่าอิสิปตน', value: getVal('m3')||'ไม่ตอบ'},
+    {label:'17. จับคู่ กุสินารา', value: getVal('m4')||'ไม่ตอบ'},
+    {label:'18. จับคู่ ป่าอุรุเวลา', value: getVal('m5')||'ไม่ตอบ'},
+    {label:'19. เหตุผลออกผนวช (อัตนัย)', value: getVal('q19')||'ไม่ตอบ'},
+    {label:'20. หลักธรรมในชีวิต (อัตนัย)', value: getVal('q20')||'ไม่ตอบ'},
+  ];
+
+  const data = {
+    studentName,
+    grade,
+    subject: 'สังคมศึกษา',
+    worksheetTitle: 'ใบงานที่ 1 — พุทธประวัติ เจ้าชายสิทธัตถะ',
+    worksheetId: 'ws_social_p5_unit1',
+    submittedDate: date,
+    fields,
+    submittedAt: serverTimestamp(),
+  };
+
+  try{
+    await addDoc(collection(db,'worksheet_submissions'), data);
+    const msg = document.getElementById('submitMsg');
+    msg.innerHTML = `
+      <div style="font-size:22px;margin-bottom:8px">🎉</div>
+      <div style="font-size:16px;font-weight:800;color:#2e7d32;margin-bottom:6px">ส่งใบงานสำเร็จแล้ว!</div>
+      <div style="font-size:13px;color:#555">ขอบคุณ ${studentName} ที่ทำใบงานอย่างตั้งใจ 🌟<br>ครูจะตรวจและแจ้งคะแนนภายหลังนะ</div>`;
+    msg.style.display='block';
+    btn.textContent='✅ ส่งแล้ว';
+    btn.style.background='#66bb6a';
+    document.querySelectorAll('input,textarea,select,button:not(#submitBtn)').forEach(el=>el.disabled=true);
+    msg.scrollIntoView({behavior:'smooth',block:'center'});
+  }catch(e){
+    btn.disabled=false; btn.textContent='📤 ส่งใบงาน';
+    alert('❌ ส่งไม่สำเร็จ: '+e.message);
+  }
+};
+</script>
+</body>
+</html>
