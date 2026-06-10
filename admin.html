@@ -114,6 +114,19 @@ tbody tr:hover td{background:#fff3e8}
 .chat-inp input{flex:1;padding:9px 12px;border:1.5px solid #ffd0a0;border-radius:20px;font-size:14px;font-family:inherit;outline:none}
 .chat-inp input:focus{border-color:#c94b00}
 .chat-send{background:#c94b00;color:#fff;border:none;border-radius:50%;width:38px;height:38px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.msg-actions{display:flex;gap:3px;margin-top:2px;opacity:0;transition:.15s}
+.msg:hover .msg-actions{opacity:1}
+.msg-action-btn{background:none;border:none;cursor:pointer;font-size:11px;padding:2px 7px;border-radius:10px;color:#bbb;font-family:inherit;font-weight:700}
+.msg-action-btn:hover{background:#f0f0f0;color:#c94b00}
+.msg.mine .msg-action-btn{color:rgba(255,255,255,.5)}
+.msg.mine .msg-action-btn:hover{background:rgba(255,255,255,.2);color:#fff}
+.bubble-reply{background:rgba(0,0,0,.07);border-left:3px solid rgba(0,0,0,.2);border-radius:6px;padding:4px 8px;font-size:11.5px;margin-bottom:5px;opacity:.8;max-width:100%}
+.msg.mine .bubble-reply{background:rgba(255,255,255,.15);border-left-color:rgba(255,255,255,.5);color:rgba(255,255,255,.9)}
+.reply-bar{padding:7px 12px;background:#fff8f3;border-top:1px solid #ffd0a0;display:none;align-items:center;gap:8px;font-size:12px}
+.reply-bar.show{display:flex}
+.reply-bar-text{flex:1;color:#c94b00;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.reply-bar-cancel{background:none;border:none;cursor:pointer;color:#bbb;font-size:17px;line-height:1;padding:2px 4px;font-family:inherit}
+.reply-bar-cancel:hover{color:#c94b00}
 
 .page{display:none}.page.active{display:block}
 .empty-state{text-align:center;padding:36px 20px;color:#ccc}
@@ -264,6 +277,11 @@ tbody tr:hover td{background:#fff3e8}
       <div class="chat-wrap">
         <div class="room-tabs" id="roomTabs"><span style="color:#bbb;font-size:13px">กำลังโหลด...</span></div>
         <div id="chatMsgs" class="chat-msgs"><div class="empty-state"><p style="font-size:13px;color:#bbb">เลือกห้องเรียนด้านบน</p></div></div>
+        <div id="replyBar" class="reply-bar">
+          <i class="fas fa-reply" style="color:#c94b00;font-size:13px"></i>
+          <span class="reply-bar-text" id="replyBarText"></span>
+          <button class="reply-bar-cancel" onclick="cancelTeacherReply()">✕</button>
+        </div>
         <div class="chat-inp">
           <input type="text" id="chatInput" placeholder="ตอบนักเรียน..." onkeydown="if(event.key==='Enter')sendTeacherChat()"/>
           <button class="chat-send" onclick="sendTeacherChat()"><i class="fas fa-paper-plane"></i></button>
@@ -871,8 +889,17 @@ window.loadResults=async function(){
       }
       const hasAns=r.answers&&Object.keys(r.answers).length>0;
       const isGraded=r.gradedAt!==undefined;
-      const gradedTag=isGraded?'<span class="badge badge-green" style="font-size:10px">✅ ตรวจแล้ว</span>':'<span class="badge badge-orange" style="font-size:10px">⏳ รอตรวจ</span>';
-      rows+=`<tr><td>${r.studentName||r.studentId||'-'}</td><td><small>${gradeSubject}</small></td><td>${quizLabel}</td><td>${scoreDisplay} ${gradedTag}</td><td>${correctDisplay}</td><td>${dt}</td><td style="white-space:nowrap">${hasAns?`<button class="btn btn-blue btn-sm" onclick="viewAnswers('${id}')">✏️ ตรวจ/ให้คะแนน</button> `:''}  <button class="btn btn-red btn-sm" onclick="deleteResult('${id}')">🗑️ ลบ</button></td></tr>`;
+      // Show totalScore (mc+essay) if graded, otherwise just mcScore
+      if(isFormatB&&isGraded&&r.totalScore!==undefined){
+        const pct=r.totalOutOf?Math.round(r.totalScore/r.totalOutOf*100):0;
+        const pass=pct>=60;
+        scoreDisplay=`<span class="badge ${pass?'badge-green':'badge-orange'}">${r.totalScore}/${r.totalOutOf||0} (${pct}%)</span>`;
+        correctDisplay=`${r.totalScore}/${r.totalOutOf||0}`;
+      }
+      const gradedTag=isGraded
+        ?'<br><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:800;display:inline-block;margin-top:2px">✅ ตรวจแล้ว</span>'
+        :'<br><span style="background:#fff3e0;color:#f39800;padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:800;display:inline-block;margin-top:2px">⏳ รอตรวจ</span>';
+      rows+=`<tr><td>${r.studentName||r.studentId||'-'}</td><td><small>${gradeSubject}</small></td><td>${quizLabel}</td><td>${scoreDisplay}${gradedTag}</td><td>${correctDisplay}</td><td>${dt}</td><td style="white-space:nowrap">${hasAns?`<button class="btn btn-blue btn-sm" onclick="viewAnswers('${id}')">✏️ ตรวจ/ให้คะแนน</button> `:''}  <button class="btn btn-red btn-sm" onclick="deleteResult('${id}')">🗑️ ลบ</button></td></tr>`;
     });
     tb.innerHTML=rows||'<tr><td colspan="7" style="text-align:center;padding:20px;color:#aaa">ยังไม่มีข้อมูลผลสอบ</td></tr>';
   }catch(e){tb.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:20px;color:#c62828">โหลดไม่ได้: ${e.message}</td></tr>`;}
@@ -887,42 +914,124 @@ window.viewAnswers=function(docId){
   _gradingDocId=docId;
   const r=_resultsDocs[docId];if(!r)return;
   const answers=r.answers||{};
-  const keys=Object.keys(answers).sort((a,b)=>parseInt(a.replace(/\D/g,''))-parseInt(b.replace(/\D/g,'')));
-  const curScore=r.mcScore!==undefined?r.mcScore:r.correct||0;
+  const mcDetails=r.mcDetails||{};
+  const essayScores=r.essayScores||{};
+  const essayMaxScores=r.essayMaxScores||{};
+  // Separate MCQ (q1-q20) vs essay (q21+)
+  const allKeys=Object.keys(answers).sort((a,b)=>parseInt(a.replace(/\D/g,''))-parseInt(b.replace(/\D/g,'')));
+  const mcKeys=allKeys.filter(k=>parseInt(k.replace(/\D/g,''))<=20);
+  const essayKeys=allKeys.filter(k=>parseInt(k.replace(/\D/g,''))>20);
+  const curMcScore=r.mcScore!==undefined?r.mcScore:r.correct||0;
   const curTotal=r.totalOutOf!==undefined?r.totalOutOf:r.total||0;
+  const hasMcDetails=Object.keys(mcDetails).length>0;
+
+  // ===== Header =====
   let h=`<div style="margin-bottom:12px;padding:10px;background:#fff3e0;border-radius:8px;font-size:13px">
-    <b>นักเรียน:</b> ${r.studentName||'-'} &nbsp; <b>ชั้น:</b> ${r.grade||'-'} &nbsp; <b>วิชา:</b> ${r.subject||'-'}<br>
-    <b>หน่วย:</b> ${r.unit||r.quizTitle||'-'} &nbsp; <b>คะแนน:</b> ${curScore}/${curTotal}${r.gradedAt?' <span style="color:#2e7d32">✅ ตรวจแล้ว</span>':' <span style="color:#f39800">⏳ รอตรวจ</span>'}
-  </div>
-  <table style="width:100%;border-collapse:collapse;font-size:13px">
-    <thead><tr><th style="background:#c94b00;color:#fff;padding:7px 10px;text-align:center">ข้อที่</th><th style="background:#c94b00;color:#fff;padding:7px 10px;text-align:center">คำตอบที่ส่ง</th></tr></thead><tbody>`;
-  keys.forEach(k=>{
-    const num=k.replace(/\D/g,'');
-    const val=answers[k]||'-';
-    h+=`<tr style="border-bottom:1px solid #ffd0a0"><td style="padding:5px 10px;text-align:center">${num}</td><td style="padding:5px 10px;text-align:center;font-weight:700">${val}</td></tr>`;
-  });
-  h+='</tbody></table>';
+    <b>นักเรียน:</b> ${esc(r.studentName||'-')} &nbsp; <b>ชั้น:</b> ${esc(r.grade||'-')} &nbsp; <b>วิชา:</b> ${esc(r.subject||'-')}<br>
+    <b>หน่วย:</b> ${esc(r.unit||r.quizTitle||'-')} &nbsp;
+    <b>สถานะ:</b> ${r.gradedAt?'<span style="color:#2e7d32;font-weight:800">✅ ตรวจแล้ว</span>':'<span style="color:#f39800;font-weight:800">⏳ รอตรวจ</span>'}
+  </div>`;
+
+  // ===== MCQ section =====
+  if(mcKeys.length>0){
+    h+=`<div style="font-weight:800;color:#c94b00;font-size:13px;margin-bottom:6px">📝 ข้อปรนัย (${mcKeys.length} ข้อ) — ตรวจอัตโนมัติ: ${hasMcDetails?curMcScore+'/'+mcKeys.length:'ยังไม่มีเฉลย'}</div>
+    <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:14px">
+      <thead><tr>
+        <th style="background:#c94b00;color:#fff;padding:6px 10px;text-align:center;width:60px">ข้อ</th>
+        <th style="background:#c94b00;color:#fff;padding:6px 10px;text-align:center">คำตอบนักเรียน</th>
+        ${hasMcDetails?'<th style="background:#c94b00;color:#fff;padding:6px 10px;text-align:center;width:80px">ผลตรวจ</th>':''}
+      </tr></thead><tbody>`;
+    mcKeys.forEach(k=>{
+      const num=k.replace(/\D/g,'');
+      const val=answers[k]||'-';
+      const res=mcDetails[k];
+      const rowBg=res===false?'background:#fff5f5':res===true?'background:#f0fff4':'';
+      h+=`<tr style="border-bottom:1px solid #ffd0a0;${rowBg}">
+        <td style="padding:5px 10px;text-align:center;color:#777">${num}</td>
+        <td style="padding:5px 10px;text-align:center;font-weight:800;font-size:15px">${esc(val)}</td>
+        ${hasMcDetails?`<td style="text-align:center;font-size:18px">${res===true?'✅':res===false?'❌':'—'}</td>`:''}
+      </tr>`;
+    });
+    h+='</tbody></table>';
+  }
   document.getElementById('answersContent').innerHTML=h;
+
+  // ===== Essay section =====
+  const essaySec=document.getElementById('essaySection');
+  if(essayKeys.length>0){
+    let eHtml=`<table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead><tr>
+        <th style="background:#f39800;color:#fff;padding:6px 10px;text-align:center;width:60px">ข้อ</th>
+        <th style="background:#f39800;color:#fff;padding:6px 10px">คำตอบนักเรียน</th>
+        <th style="background:#f39800;color:#fff;padding:6px 10px;text-align:center;width:80px">คะแนน</th>
+        <th style="background:#f39800;color:#fff;padding:6px 10px;text-align:center;width:80px">เต็ม</th>
+      </tr></thead><tbody>`;
+    essayKeys.forEach(k=>{
+      const num=k.replace(/\D/g,'');
+      const val=answers[k]||'-';
+      eHtml+=`<tr style="border-bottom:1px solid #ffd0a0">
+        <td style="padding:6px 10px;text-align:center;color:#777">${num}</td>
+        <td style="padding:6px 10px;font-size:13px;color:#444">${esc(val)}</td>
+        <td style="padding:4px 6px;text-align:center">
+          <input type="number" class="essay-score-inp" data-key="${k}" min="0"
+            value="${essayScores[k]||''}" placeholder="0"
+            style="width:60px;padding:5px;border:1.5px solid #ffd0a0;border-radius:6px;font-size:13px;font-family:inherit;text-align:center"
+            oninput="updateEssayTotal()"/>
+        </td>
+        <td style="padding:4px 6px;text-align:center">
+          <input type="number" class="essay-max-inp" data-key="${k}" min="1"
+            value="${essayMaxScores[k]||''}" placeholder="10"
+            style="width:60px;padding:5px;border:1.5px solid #ffd0a0;border-radius:6px;font-size:13px;font-family:inherit;text-align:center"
+            oninput="updateEssayTotal()"/>
+        </td>
+      </tr>`;
+    });
+    eHtml+='</tbody></table>';
+    document.getElementById('essayRows').innerHTML=eHtml;
+    essaySec.style.display='block';
+    updateEssayTotal();
+  }else{
+    essaySec.style.display='none';
+    document.getElementById('essayRows').innerHTML='';
+  }
+
   // Pre-fill grade fields
-  document.getElementById('gradeScore').value=curScore||'';
+  document.getElementById('gradeScore').value=curMcScore||'';
   document.getElementById('gradeTotal').value=curTotal||'';
-  document.getElementById('gradeStatus').textContent=r.gradedAt?'✅ ตรวจแล้ว':'';
-  document.getElementById('gradeStatus').style.color='#2e7d32';
+  const st=document.getElementById('gradeStatus');
+  st.textContent=r.gradedAt?'✅ ตรวจแล้ว':'';
+  st.style.color='#2e7d32';
   openModal('mAnswers');
+};
+window.updateEssayTotal=function(){
+  let total=0;
+  document.querySelectorAll('.essay-score-inp').forEach(inp=>{total+=parseInt(inp.value)||0;});
+  document.getElementById('essayTotalDisp').textContent=total;
+  document.getElementById('gradeEssayTotal').value=total;
 };
 window.saveGrade=async function(){
   if(!_gradingDocId)return;
-  const score=parseInt(document.getElementById('gradeScore').value)||0;
+  const mcScore=parseInt(document.getElementById('gradeScore').value)||0;
   const total=parseInt(document.getElementById('gradeTotal').value)||0;
   const st=document.getElementById('gradeStatus');
   if(!total){st.style.color='#c62828';st.textContent='⚠️ กรุณากรอกคะแนนเต็ม';return;}
+  // Collect essay scores
+  const essayScores={};const essayMaxScores={};let essayTotal=0;
+  document.querySelectorAll('.essay-score-inp').forEach(inp=>{
+    const k=inp.dataset.key; essayScores[k]=parseInt(inp.value)||0; essayTotal+=essayScores[k];
+  });
+  document.querySelectorAll('.essay-max-inp').forEach(inp=>{
+    const k=inp.dataset.key; essayMaxScores[k]=parseInt(inp.value)||0;
+  });
+  const totalScore=mcScore+essayTotal;
   st.textContent='⏳ กำลังบันทึก...';st.style.color='#888';
   try{
     await setDoc(doc(db,'quiz_results',_gradingDocId),{
-      mcScore:score,totalOutOf:total,gradedAt:serverTimestamp(),gradedBy:'admin'
+      mcScore,totalOutOf:total,essayScores,essayMaxScores,essayTotal,totalScore,
+      gradedAt:serverTimestamp(),gradedBy:'admin'
     },{merge:true});
-    st.textContent='✅ บันทึกคะแนนสำเร็จ!';st.style.color='#2e7d32';
-    if(_resultsDocs[_gradingDocId]) _resultsDocs[_gradingDocId]={..._resultsDocs[_gradingDocId],mcScore:score,totalOutOf:total,gradedAt:true};
+    st.textContent='✅ ตรวจแล้ว! ('+totalScore+'/'+total+' คะแนน)';st.style.color='#2e7d32';
+    if(_resultsDocs[_gradingDocId]) _resultsDocs[_gradingDocId]={..._resultsDocs[_gradingDocId],mcScore,totalOutOf:total,essayTotal,totalScore,gradedAt:true};
     loadResults();
   }catch(e){st.style.color='#c62828';st.textContent='❌ '+e.message;}
 };
@@ -941,6 +1050,7 @@ function sortRooms(rooms){
 
 let _notifUnsubs={};
 let _roomBaseline={};
+let _teacherReply=null;
 
 async function checkAndCleanOldChats(){
   // ลบแชทอัตโนมัติทุก 2 เดือนในวันที่ 1
@@ -1049,12 +1159,19 @@ window.openRoom=function(id){
     const el=document.getElementById('chatMsgs');
     if(snap.empty){el.innerHTML='<div class="empty-state"><i class="fas fa-comments" style="color:#ffd0a0"></i><p style="font-size:13px;color:#bbb">ยังไม่มีข้อความในห้องนี้</p></div>';return;}
     let h='';
-    snap.forEach(d=>{const m=d.data();
+    snap.forEach(d=>{
+      const m=d.data(); const docId=d.id;
       const mine=m.role==='teacher';
       const dt=m.createdAt?.toDate?.()?.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})||'';
+      const replyHtml=m.replyTo?`<div class="bubble-reply"><b>${esc(m.replyTo.sender||'')}</b>: ${esc(m.replyTo.text||'')}</div>`:'';
+      const senderLabel=!mine?`<div class="msg-sender">${esc(m.sender||'นักเรียน')}</div>`:'';
       h+=`<div class="msg ${mine?'mine':'theirs'}">
-        ${!mine?`<div class="msg-sender">${m.sender||'นักเรียน'}</div>`:''}
-        <div class="bubble">${m.text}</div>
+        ${senderLabel}
+        <div class="bubble">${replyHtml}${esc(m.text)}</div>
+        <div class="msg-actions">
+          <button class="msg-action-btn" onclick="replyTeacherMsg('${docId}','${esc(m.sender||'นักเรียน')}','${esc(m.text)}')">↩ ตอบ</button>
+          <button class="msg-action-btn" onclick="deleteTeacherMsg('${docId}')">🗑️ ลบ</button>
+        </div>
         <div class="msg-time">${dt}</div>
       </div>`;
     });
@@ -1064,9 +1181,26 @@ window.openRoom=function(id){
 window.sendTeacherChat=async function(){
   const inp=document.getElementById('chatInput');const text=inp.value.trim();
   if(!text||!currentRoom)return;inp.value='';
-  await addDoc(collection(db,'chats',currentRoom,'messages'),{
-    text,sender:'ครู รณฤทธิ์ ศรีสองเมือง',role:'teacher',createdAt:serverTimestamp()
-  });
+  const data={text,sender:'ครู รณฤทธิ์ ศรีสองเมือง',role:'teacher',createdAt:serverTimestamp()};
+  if(_teacherReply){data.replyTo={docId:_teacherReply.docId,sender:_teacherReply.sender,text:_teacherReply.text};}
+  cancelTeacherReply();
+  await addDoc(collection(db,'chats',currentRoom,'messages'),data);
+};
+window.replyTeacherMsg=function(docId,sender,text){
+  _teacherReply={docId,sender,text};
+  document.getElementById('replyBarText').textContent=sender+': '+text;
+  document.getElementById('replyBar').classList.add('show');
+  document.getElementById('chatInput').focus();
+};
+window.cancelTeacherReply=function(){
+  _teacherReply=null;
+  document.getElementById('replyBar').classList.remove('show');
+};
+window.deleteTeacherMsg=async function(docId){
+  if(!currentRoom)return;
+  if(!confirm('ลบข้อความนี้?'))return;
+  try{ await deleteDoc(doc(db,'chats',currentRoom,'messages',docId)); }
+  catch(e){ alert('ลบไม่ได้: '+e.message); }
 };
 
 // ==================== EXPOSE LOAD FUNCTIONS ====================
@@ -1141,17 +1275,26 @@ function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace
 </div></div>
 
 <!-- Answers + Grading Modal -->
-<div class="overlay" id="mAnswers"><div class="modal lg">
-  <h2>📋 คำตอบของนักเรียน</h2>
+<div class="overlay" id="mAnswers"><div class="modal lg" style="max-height:90vh;overflow-y:auto">
+  <h2>📋 ตรวจข้อสอบ</h2>
   <div id="answersContent" style="font-size:13px"></div>
+  <!-- Essay scoring section (shown only when essay questions exist) -->
+  <div id="essaySection" style="display:none;margin-top:14px">
+    <div style="font-weight:800;color:#f39800;font-size:13px;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #ffd0a0">✍️ ให้คะแนนข้ออัตนัย</div>
+    <div id="essayRows"></div>
+    <div style="margin-top:8px;font-size:13px;color:#666;text-align:right">รวมอัตนัย: <b id="essayTotalDisp" style="color:#c94b00">0</b> คะแนน</div>
+  </div>
+  <!-- Save section -->
   <div style="margin-top:14px;padding:13px 14px;background:#fff3e0;border-radius:10px;border:1.5px solid #ffd0a0">
-    <div style="font-weight:800;color:#c94b00;font-size:13px;margin-bottom:10px">✏️ บันทึกคะแนน (แอดมินเท่านั้น)</div>
+    <div style="font-weight:800;color:#c94b00;font-size:13px;margin-bottom:10px">📊 บันทึกคะแนน</div>
     <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
-      <div><label style="font-size:12px;color:#777;display:block;margin-bottom:3px">คะแนนที่ได้</label>
+      <div><label style="font-size:12px;color:#777;display:block;margin-bottom:3px">ปรนัย (อัตโนมัติ)</label>
         <input type="number" id="gradeScore" placeholder="0" min="0" style="width:90px;padding:8px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit"/></div>
+      <div><label style="font-size:12px;color:#777;display:block;margin-bottom:3px">อัตนัย</label>
+        <input type="number" id="gradeEssayTotal" placeholder="0" min="0" readonly style="width:90px;padding:8px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit;background:#f9f9f9"/></div>
       <div><label style="font-size:12px;color:#777;display:block;margin-bottom:3px">คะแนนเต็ม</label>
-        <input type="number" id="gradeTotal" placeholder="30" min="1" style="width:90px;padding:8px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit"/></div>
-      <button class="btn btn-green" onclick="saveGrade()">💾 บันทึกคะแนน</button>
+        <input type="number" id="gradeTotal" placeholder="20" min="1" style="width:90px;padding:8px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit"/></div>
+      <button class="btn btn-green" onclick="saveGrade()">💾 บันทึก + ตรวจแล้ว</button>
       <span id="gradeStatus" style="font-size:13px"></span>
     </div>
   </div>
