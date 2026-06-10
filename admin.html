@@ -177,6 +177,7 @@ tbody tr:hover td{background:#fff3e8}
     <button class="nav-item" onclick="showPage('quizzes',this)"><i class="fas fa-pen-to-square"></i> ข้อสอบ</button>
     <button class="nav-item" onclick="showPage('videos',this)"><i class="fas fa-play-circle"></i> วิดีโอ</button>
     <button class="nav-item" onclick="showPage('results',this)"><i class="fas fa-chart-bar"></i> ผลสอบ</button>
+    <button class="nav-item" id="navCheckWork" onclick="showPage('checkwork',this)"><i class="fas fa-tasks"></i> ตรวจงาน <span id="cwNavBadge" style="display:none;background:#e53935;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:4px">0</span></button>
     <button class="nav-item" onclick="showPage('chat',this)"><i class="fas fa-comments"></i> แชทนักเรียน</button>
     <a href="scores.html" class="nav-item"><i class="fas fa-star"></i> ระบบเก็บคะแนน</a>
     <button class="nav-item" onclick="showPage('settings',this)"><i class="fas fa-cog"></i> ตั้งค่าเว็บไซต์</button>
@@ -269,6 +270,35 @@ tbody tr:hover td{background:#fff3e8}
         </div>
       </div>
       <div class="table-wrap"><table><thead><tr><th>นักเรียน</th><th>ชั้น/วิชา</th><th>ข้อสอบ/หน่วย</th><th>คะแนน</th><th>ถูก/ทั้งหมด</th><th>วันที่สอบ</th><th>จัดการ</th></tr></thead><tbody id="tbRes"></tbody></table></div>
+    </div>
+
+    <!-- CHECK WORK -->
+    <div id="page-checkwork" class="page">
+      <div class="section-hd"><h2><i class="fas fa-tasks"></i> ตรวจงาน</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <select id="cwGradeFilter" onchange="loadCheckWork()" style="padding:7px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-family:inherit;font-size:13px">
+            <option value="">ทุกชั้น</option>
+            <option value="ป.4">ป.4</option><option value="ป.5">ป.5</option><option value="ป.6">ป.6</option>
+            <option value="ม.1">ม.1</option><option value="ม.2">ม.2</option><option value="ม.3">ม.3</option>
+          </select>
+          <select id="cwSubjectFilter" onchange="loadCheckWork()" style="padding:7px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-family:inherit;font-size:13px">
+            <option value="">ทุกวิชา</option>
+          </select>
+          <select id="cwStatusFilter" onchange="loadCheckWork()" style="padding:7px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-family:inherit;font-size:13px">
+            <option value="">ทุกสถานะ</option>
+            <option value="pending">⏳ รอตรวจ</option>
+            <option value="graded">✅ ตรวจแล้ว</option>
+          </select>
+          <button class="btn btn-orange" onclick="loadCheckWork()" style="font-size:12px;padding:6px 14px">🔄 รีเฟรช</button>
+        </div>
+      </div>
+      <div id="cwStats" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px"></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>นักเรียน</th><th>ชั้น</th><th>วิชา</th><th>ชื่อใบงาน</th><th>วันที่ส่ง</th><th>คะแนน</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+          <tbody id="tbCW"></tbody>
+        </table>
+      </div>
     </div>
 
     <!-- CHAT -->
@@ -592,7 +622,7 @@ onAuthStateChanged(auth, user => {
 });
 
 // ==================== PAGES ====================
-const pageTitles = {dashboard:'🏠 Dashboard',classrooms:'🏫 ห้องเรียน',announcements:'📢 ประกาศ',worksheets:'📄 ใบงาน',quizzes:'📝 ข้อสอบ',videos:'🎬 วิดีโอ',results:'📊 ผลสอบ',chat:'💬 แชทนักเรียน',settings:'⚙️ ตั้งค่าเว็บไซต์',guide:'📖 คู่มือแอดมิน'};
+const pageTitles = {dashboard:'🏠 Dashboard',classrooms:'🏫 ห้องเรียน',announcements:'📢 ประกาศ',worksheets:'📄 ใบงาน',quizzes:'📝 ข้อสอบ',videos:'🎬 วิดีโอ',results:'📊 ผลสอบ',checkwork:'📋 ตรวจงาน',chat:'💬 แชทนักเรียน',settings:'⚙️ ตั้งค่าเว็บไซต์',guide:'📖 คู่มือแอดมิน'};
 window.showPage = function(p, navEl){
   document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -600,7 +630,7 @@ window.showPage = function(p, navEl){
   if(navEl) navEl.classList.add('active');
   document.getElementById('pageTitle').textContent = pageTitles[p] || p;
   document.getElementById('sidebar').classList.remove('open');
-  const loaders = {dashboard:loadDashboard,classrooms:loadCls,announcements:loadAnn,worksheets:loadWs,quizzes:loadQz,videos:loadVid,results:async()=>{await loadSubjectFilter();loadResults();},chat:initTeacherChat,settings:loadSettingsPage};
+  const loaders = {dashboard:loadDashboard,classrooms:loadCls,announcements:loadAnn,worksheets:loadWs,quizzes:loadQz,videos:loadVid,results:async()=>{await loadSubjectFilter();loadResults();},checkwork:loadCheckWork,chat:initTeacherChat,settings:loadSettingsPage};
   if(loaders[p]) loaders[p]();
 };
 
@@ -1036,6 +1066,143 @@ window.saveGrade=async function(){
   }catch(e){st.style.color='#c62828';st.textContent='❌ '+e.message;}
 };
 
+// ==================== CHECK WORK ====================
+let _cwDocs = {}; // docId → submission data
+
+async function loadCheckWork(){
+  const tb = document.getElementById('tbCW');
+  const stats = document.getElementById('cwStats');
+  const gradeF = document.getElementById('cwGradeFilter').value;
+  const subjectF = document.getElementById('cwSubjectFilter').value;
+  const statusF = document.getElementById('cwStatusFilter').value;
+  tb.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#bbb;padding:20px">กำลังโหลด...</td></tr>';
+  try{
+    const snap = await getDocs(query(collection(db,'worksheet_submissions'),orderBy('submittedAt','desc')));
+    _cwDocs = {};
+    const subjectSet = new Set();
+    let allDocs = [];
+    snap.forEach(d => { _cwDocs[d.id]=d.data(); allDocs.push({id:d.id,...d.data()}); if(d.data().subject) subjectSet.add(d.data().subject); });
+
+    // populate subject filter
+    const subSel = document.getElementById('cwSubjectFilter');
+    const prevSub = subSel.value;
+    subSel.innerHTML = '<option value="">ทุกวิชา</option>';
+    [...subjectSet].sort().forEach(s=>{ const o=document.createElement('option');o.value=s;o.textContent=s;subSel.appendChild(o); });
+    if(prevSub) subSel.value = prevSub;
+
+    // filter
+    let filtered = allDocs;
+    if(gradeF) filtered = filtered.filter(r=>r.grade===gradeF);
+    if(subjectF) filtered = filtered.filter(r=>r.subject===subjectF);
+    if(statusF==='pending') filtered = filtered.filter(r=>!r.gradedAt);
+    else if(statusF==='graded') filtered = filtered.filter(r=>!!r.gradedAt);
+
+    // stats bar
+    const total = allDocs.length;
+    const pending = allDocs.filter(r=>!r.gradedAt).length;
+    const graded = allDocs.filter(r=>!!r.gradedAt).length;
+    stats.innerHTML = `
+      <span style="background:#fff3e0;color:#c94b00;padding:5px 14px;border-radius:20px;font-size:12.5px;font-weight:700">📋 ทั้งหมด ${total}</span>
+      <span style="background:#fff8e1;color:#f57f17;padding:5px 14px;border-radius:20px;font-size:12.5px;font-weight:700">⏳ รอตรวจ ${pending}</span>
+      <span style="background:#e8f5e9;color:#2e7d32;padding:5px 14px;border-radius:20px;font-size:12.5px;font-weight:700">✅ ตรวจแล้ว ${graded}</span>`;
+
+    // update nav badge
+    const cwBadge = document.getElementById('cwNavBadge');
+    if(cwBadge){ if(pending>0){cwBadge.textContent=pending;cwBadge.style.display='';} else{cwBadge.style.display='none';} }
+
+    if(filtered.length===0){
+      tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:#bbb;padding:20px">ไม่มีข้อมูล</td></tr>';
+      return;
+    }
+
+    tb.innerHTML = filtered.map(r=>{
+      const isGraded = !!r.gradedAt;
+      const dt = r.submittedAt?.toDate ? r.submittedAt.toDate().toLocaleDateString('th-TH',{day:'2-digit',month:'short',year:'2-digit',hour:'2-digit',minute:'2-digit'}) : '-';
+      const scoreDisp = isGraded && r.score!==undefined ? `<span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:8px;font-weight:700">${r.score}/${r.maxScore||'-'}</span>` : '-';
+      const statusBadge = isGraded
+        ? '<span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:800">✅ ตรวจแล้ว</span>'
+        : '<span style="background:#fff3e0;color:#f39800;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:800">⏳ รอตรวจ</span>';
+      return `<tr>
+        <td><b>${esc(r.studentName||'-')}</b></td>
+        <td>${esc(r.grade||'-')}</td>
+        <td>${esc(r.subject||'-')}</td>
+        <td>${esc(r.worksheetTitle||'-')}</td>
+        <td style="font-size:11.5px;color:#666">${dt}</td>
+        <td>${scoreDisp}</td>
+        <td>${statusBadge}</td>
+        <td><button class="btn btn-blue" style="font-size:11.5px;padding:4px 10px" onclick="viewWorkSubmission('${r.id}')">🔍 ตรวจ</button>
+            <button class="btn btn-red" style="font-size:11.5px;padding:4px 10px;margin-left:4px" onclick="deleteWorkSubmission('${r.id}')">🗑️</button></td>
+      </tr>`;
+    }).join('');
+  }catch(e){ tb.innerHTML=`<tr><td colspan="8" style="color:red;padding:16px">❌ ${e.message}</td></tr>`; }
+}
+
+let _cwGradingId = null;
+window.viewWorkSubmission = function(docId){
+  _cwGradingId = docId;
+  const r = _cwDocs[docId]; if(!r) return;
+  const isGraded = !!r.gradedAt;
+  const answers = r.answers||{};
+  const fields = r.fields||[]; // array of {label, value}
+
+  let html = `<div style="margin-bottom:14px;padding:12px;background:#fff3e0;border-radius:10px;border:1.5px solid #ffd0a0">
+    <div style="font-size:13px;font-weight:800;color:#c94b00;margin-bottom:6px">📄 ข้อมูลใบงาน</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:13px">
+      <span>👤 <b>${esc(r.studentName||'-')}</b></span>
+      <span>🏫 ชั้น <b>${esc(r.grade||'-')}</b></span>
+      <span>📚 <b>${esc(r.subject||'-')}</b></span>
+      <span>📋 <b>${esc(r.worksheetTitle||'-')}</b></span>
+    </div>
+  </div>`;
+
+  // Display submitted content
+  if(fields.length>0){
+    html += '<div style="font-weight:800;color:#555;font-size:13px;margin-bottom:8px">📝 คำตอบของนักเรียน</div>';
+    html += fields.map(f=>`<div style="margin-bottom:10px;padding:10px;background:#fafafa;border-radius:8px;border:1px solid #eee">
+      <div style="font-size:12px;color:#888;margin-bottom:4px">${esc(f.label||'')}</div>
+      <div style="font-size:13px;white-space:pre-wrap">${esc(f.value||'(ไม่มีคำตอบ)')}</div>
+    </div>`).join('');
+  } else if(Object.keys(answers).length>0){
+    html += '<div style="font-weight:800;color:#555;font-size:13px;margin-bottom:8px">📝 คำตอบของนักเรียน</div>';
+    html += Object.entries(answers).map(([k,v])=>`<div style="margin-bottom:8px;padding:8px 12px;background:#fafafa;border-radius:8px;border:1px solid #eee">
+      <span style="font-size:12px;color:#888;margin-right:8px">${esc(k)}</span><span style="font-size:13px">${esc(String(v))}</span>
+    </div>`).join('');
+  } else {
+    html += '<div style="color:#bbb;font-size:13px;margin-bottom:12px">ไม่มีข้อมูลคำตอบ</div>';
+  }
+
+  if(r.feedback){ html+=`<div style="margin-top:10px;padding:10px;background:#e8f5e9;border-radius:8px;font-size:13px"><b>💬 ความคิดเห็นครู:</b> ${esc(r.feedback)}</div>`; }
+
+  document.getElementById('cwWorkContent').innerHTML = html;
+  document.getElementById('cwGradeScoreInp').value = r.score!==undefined?r.score:'';
+  document.getElementById('cwGradeMaxInp').value = r.maxScore!==undefined?r.maxScore:'10';
+  document.getElementById('cwFeedbackInp').value = r.feedback||'';
+  document.getElementById('cwGradeStatus').textContent = isGraded ? '✅ ตรวจแล้ว' : '';
+  document.getElementById('cwGradeStatus').style.color = '#2e7d32';
+  openModal('mCheckWork');
+};
+
+window.saveWorkGrade = async function(){
+  if(!_cwGradingId) return;
+  const score = parseInt(document.getElementById('cwGradeScoreInp').value)||0;
+  const maxScore = parseInt(document.getElementById('cwGradeMaxInp').value)||10;
+  const feedback = document.getElementById('cwFeedbackInp').value.trim();
+  const st = document.getElementById('cwGradeStatus');
+  st.textContent = 'กำลังบันทึก...'; st.style.color = '#888';
+  try{
+    await setDoc(doc(db,'worksheet_submissions',_cwGradingId),{score,maxScore,feedback,gradedAt:serverTimestamp(),gradedBy:'admin'},{merge:true});
+    _cwDocs[_cwGradingId] = {...(_cwDocs[_cwGradingId]||{}),score,maxScore,feedback,gradedAt:new Date()};
+    st.textContent = '✅ บันทึกแล้ว'; st.style.color = '#2e7d32';
+    loadCheckWork();
+  }catch(e){ st.textContent = '❌ '+e.message; st.style.color = '#c62828'; }
+};
+
+window.deleteWorkSubmission = async function(docId){
+  if(!confirm('ลบใบงานที่ส่งมานี้?')) return;
+  try{ await deleteDoc(doc(db,'worksheet_submissions',docId)); loadCheckWork(); }
+  catch(e){ alert('ลบไม่สำเร็จ: '+e.message); }
+};
+
 // ==================== CHAT ====================
 // Sort classrooms ป.4→ม.3
 function sortRooms(rooms){
@@ -1315,5 +1482,32 @@ function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace
   </div>
   <div class="btn-row"><button class="btn btn-gray" onclick="closeModal('mAnswers')">ปิด</button></div>
 </div></div>
+
+<!-- MODAL: ตรวจใบงาน -->
+<div class="overlay" id="mCheckWork"><div class="modal lg" style="max-height:90vh;overflow-y:auto">
+  <h2>📋 ตรวจใบงาน</h2>
+  <div id="cwWorkContent" style="font-size:13px;margin-bottom:14px"></div>
+  <div style="padding:13px 14px;background:#fff3e0;border-radius:10px;border:1.5px solid #ffd0a0">
+    <div style="font-weight:800;color:#c94b00;font-size:13px;margin-bottom:10px">📊 ให้คะแนน</div>
+    <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+      <div>
+        <label style="font-size:12px;color:#777;display:block;margin-bottom:3px">คะแนนที่ได้</label>
+        <input type="number" id="cwGradeScoreInp" placeholder="0" min="0" style="width:90px;padding:8px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit"/>
+      </div>
+      <div>
+        <label style="font-size:12px;color:#777;display:block;margin-bottom:3px">คะแนนเต็ม</label>
+        <input type="number" id="cwGradeMaxInp" placeholder="10" min="1" value="10" style="width:90px;padding:8px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit"/>
+      </div>
+      <div style="flex:1;min-width:160px">
+        <label style="font-size:12px;color:#777;display:block;margin-bottom:3px">ความคิดเห็น / ข้อแนะนำ</label>
+        <input type="text" id="cwFeedbackInp" placeholder="ความคิดเห็นของครู (ถ้ามี)" style="width:100%;padding:8px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:13px;font-family:inherit;box-sizing:border-box"/>
+      </div>
+      <button class="btn btn-green" onclick="saveWorkGrade()">💾 บันทึก + ตรวจแล้ว</button>
+      <span id="cwGradeStatus" style="font-size:13px"></span>
+    </div>
+  </div>
+  <div class="btn-row"><button class="btn btn-gray" onclick="closeModal('mCheckWork')">ปิด</button></div>
+</div></div>
+
 </body>
 </html>
