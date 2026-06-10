@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ใบงานที่ 1 — กฎหมายในชีวิตประจำวัน ม.3</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sarabun',sans-serif;background:#f3f0ff;min-height:100vh;overflow-x:hidden}
+
+body::before{
+  content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+  background:
+    radial-gradient(circle at 15% 25%,rgba(149,117,205,.2) 0%,transparent 40%),
+    radial-gradient(circle at 85% 75%,rgba(100,181,246,.18) 0%,transparent 40%),
+    radial-gradient(circle at 50% 10%,rgba(129,199,132,.12) 0%,transparent 40%);
+  pointer-events:none;z-index:0
+}
+
+.page-wrap{max-width:720px;margin:0 auto;padding:16px;position:relative;z-index:1}
+
+/* ===== HEADER ===== */
+.ws-header{
+  background:linear-gradient(135deg,#4527a0 0%,#7c4dff 50%,#1565c0 100%);
+  border-radius:24px;padding:20px 22px 16px;margin-bottom:20px;
+  box-shadow:0 6px 24px rgba(69,39,160,.4);position:relative;overflow:hidden
+}
+.ws-header::before{content:'⚖️';font-size:100px;position:absolute;right:-15px;top:-20px;opacity:.12;transform:rotate(10deg)}
+.ws-header::after{content:'📜';font-size:70px;position:absolute;left:-10px;bottom:-20px;opacity:.1;transform:rotate(-8deg)}
+.ws-header .badge-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.badge{background:rgba(255,255,255,.25);color:#fff;border-radius:20px;padding:3px 12px;font-size:12px;font-weight:700;backdrop-filter:blur(4px)}
+.ws-header h1{font-size:22px;font-weight:800;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.25);line-height:1.3}
+.ws-header .subtitle{font-size:13px;color:rgba(255,255,255,.85);margin-top:4px}
+.score-box{
+  position:absolute;top:16px;right:20px;
+  background:rgba(255,255,255,.25);backdrop-filter:blur(6px);
+  border-radius:14px;padding:8px 14px;text-align:center;color:#fff
+}
+.score-box .sc-num{font-size:22px;font-weight:800;line-height:1}
+.score-box .sc-lbl{font-size:10px;opacity:.9}
+
+/* ===== INFO CARD ===== */
+.info-card{
+  background:#fff;border-radius:16px;padding:14px 16px;
+  box-shadow:0 3px 12px rgba(0,0,0,.08);margin-bottom:18px;
+  border:2.5px dashed #b39ddb
+}
+.info-card h3{font-size:13px;font-weight:800;color:#4527a0;margin-bottom:10px}
+.info-row{display:flex;gap:10px;flex-wrap:wrap}
+.info-field{flex:1;min-width:140px}
+.info-field label{font-size:12px;color:#888;font-weight:700;display:block;margin-bottom:4px}
+.info-field input{
+  width:100%;padding:8px 12px;border:2px solid #d1c4e9;border-radius:10px;
+  font-size:13px;font-family:inherit;background:#f9f7ff;transition:.2s
+}
+.info-field input:focus{outline:none;border-color:#7c4dff;background:#fff}
+
+/* ===== PROGRESS ===== */
+.progress-label{font-size:12px;color:#888;text-align:right;margin-bottom:4px;font-weight:700}
+.progress-bar-wrap{background:#d1c4e9;border-radius:20px;height:10px;margin-bottom:18px;overflow:hidden}
+.progress-bar{background:linear-gradient(90deg,#7c4dff,#40c4ff);height:100%;border-radius:20px;width:0%;transition:.4s}
+
+/* ===== SECTION ===== */
+.section{
+  background:#fff;border-radius:20px;padding:18px;margin-bottom:18px;
+  box-shadow:0 4px 16px rgba(0,0,0,.07);position:relative;overflow:hidden
+}
+.section-label{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,#4527a0,#7c4dff);color:#fff;
+  border-radius:20px;padding:4px 14px;font-size:12px;font-weight:800;
+  margin-bottom:14px;box-shadow:0 2px 8px rgba(124,77,255,.35)
+}
+.section h3{font-size:14.5px;font-weight:800;color:#333;margin-bottom:12px;line-height:1.6}
+.section-img{
+  width:100%;border-radius:14px;overflow:hidden;margin-bottom:14px;
+  border:3px solid #d1c4e9;box-shadow:0 3px 12px rgba(0,0,0,.1)
+}
+.section-img img{width:100%;display:block;max-height:200px;object-fit:cover}
+.img-caption{background:#ede7f6;padding:7px 12px;font-size:11.5px;color:#666;text-align:center;border-top:1px solid #d1c4e9;font-weight:700}
+
+/* ===== MCQ ===== */
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.choice-inp{display:none}
+.choice-lbl{
+  display:flex;align-items:center;gap:8px;
+  background:#f5f5f5;border:2.5px solid #e0e0e0;border-radius:14px;
+  padding:10px 12px;cursor:pointer;transition:.2s;font-size:13px;font-weight:700
+}
+.choice-lbl .num{
+  width:26px;height:26px;border-radius:50%;background:#e0e0e0;color:#555;
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;transition:.2s
+}
+.choice-inp:checked + .choice-lbl{background:#ede7f6;border-color:#7c4dff;color:#4527a0}
+.choice-inp:checked + .choice-lbl .num{background:#7c4dff;color:#fff}
+.choice-lbl:hover{border-color:#b39ddb;background:#f3f0ff}
+
+/* ===== TRUE/FALSE ===== */
+.tf-group{display:flex;gap:12px;margin-top:8px}
+.tf-inp{display:none}
+.tf-lbl{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  border:2.5px solid #e0e0e0;border-radius:16px;padding:12px 10px;cursor:pointer;transition:.2s
+}
+.tf-lbl .tf-icon{font-size:28px}
+.tf-lbl .tf-text{font-size:12px;font-weight:800}
+.tf-inp.tf-true:checked + .tf-lbl{background:#e8f5e9;border-color:#66bb6a;color:#2e7d32}
+.tf-inp.tf-false:checked + .tf-lbl{background:#ffebee;border-color:#ef5350;color:#c62828}
+.tf-lbl:hover{background:#f5f5f5}
+
+/* ===== FILL IN BLANK ===== */
+.blank-inp{
+  border:none;border-bottom:3px solid #7c4dff;background:transparent;
+  font-size:14px;font-family:inherit;padding:2px 8px;min-width:120px;
+  color:#333;font-weight:700;text-align:center;outline:none
+}
+.blank-inp:focus{border-color:#4527a0;background:#ede7f6;border-radius:4px 4px 0 0}
+.fill-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:14px;line-height:2.4;margin-bottom:10px}
+.fill-num{
+  background:#7c4dff;color:#fff;border-radius:50%;
+  width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;flex-shrink:0
+}
+.word-bank{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;padding:10px 12px;background:#ede7f6;border-radius:12px;border:2px dashed #b39ddb}
+.word-chip{border-radius:20px;padding:4px 14px;font-size:13px;font-weight:700;color:#fff}
+
+/* ===== MATCHING (dropdown) ===== */
+.match-answer{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.match-answer .match-lbl{font-size:13px;font-weight:700;flex:1;min-width:0}
+.match-answer select{
+  width:200px;flex-shrink:0;padding:8px 10px;border:2px solid #d1c4e9;border-radius:10px;
+  font-family:inherit;font-size:13px;background:#f9f7ff
+}
+.match-answer select:focus{outline:none;border-color:#7c4dff}
+
+/* ===== SCENARIO / CASE STUDY ===== */
+.scenario-box{
+  background:linear-gradient(135deg,#e8eaf6,#e3f2fd);
+  border-radius:14px;padding:14px 16px;margin-bottom:14px;
+  border-left:5px solid #7c4dff;font-size:13.5px;line-height:1.8
+}
+.scenario-box .case-num{font-size:12px;font-weight:800;color:#7c4dff;margin-bottom:6px}
+.scenario-box b{color:#4527a0}
+
+/* ===== OPEN ENDED ===== */
+.open-textarea{
+  width:100%;padding:12px;border:2.5px solid #d1c4e9;border-radius:12px;
+  font-size:13px;font-family:inherit;resize:vertical;min-height:90px;
+  background:#f9f7ff;transition:.2s;line-height:1.8
+}
+.open-textarea:focus{outline:none;border-color:#7c4dff;background:#fff}
+.lines-bg{background-image:repeating-linear-gradient(transparent,transparent 31px,#d1c4e9 31px,#d1c4e9 33px);line-height:2}
+
+/* ===== ORDERING ===== */
+.order-list{list-style:none;margin-top:10px}
+.order-item{
+  display:flex;gap:10px;align-items:center;margin-bottom:8px;
+  background:#f9f7ff;border:2px solid #d1c4e9;border-radius:12px;padding:10px 12px
+}
+.order-item input[type="number"]{
+  width:52px;padding:6px 8px;border:2px solid #b39ddb;border-radius:8px;
+  font-size:14px;font-family:inherit;font-weight:800;text-align:center;background:#fff
+}
+.order-item input:focus{outline:none;border-color:#7c4dff}
+.order-item .order-text{flex:1;font-size:13px}
+
+/* ===== SUBMIT ===== */
+.submit-area{text-align:center;padding:10px 0 24px}
+.btn-submit{
+  background:linear-gradient(135deg,#4527a0,#7c4dff);color:#fff;
+  border:none;padding:14px 48px;border-radius:30px;font-size:16px;font-weight:800;
+  cursor:pointer;font-family:inherit;box-shadow:0 4px 18px rgba(69,39,160,.4);
+  transition:.2s
+}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(69,39,160,.5)}
+.btn-submit:active{transform:translateY(0)}
+.btn-submit:disabled{opacity:.55;cursor:default;transform:none}
+#submitMsg{display:none;margin:16px auto;max-width:420px;padding:18px 20px;border-radius:16px;background:#e8f5e9;border:2px solid #a5d6a7;text-align:center}
+
+/* ===== DECO ===== */
+.deco{position:absolute;opacity:.07;pointer-events:none;font-size:64px}
+.deco-tl{top:-10px;left:-10px;transform:rotate(-12deg)}
+.deco-br{bottom:-10px;right:-10px;transform:rotate(15deg)}
+.stars{position:absolute;top:8px;right:12px;font-size:16px;opacity:.35}
+
+/* ===== INFO BOX ===== */
+.info-box{
+  background:#e8eaf6;border-radius:12px;padding:12px 14px;
+  font-size:13px;line-height:1.8;margin-bottom:14px;
+  border-left:4px solid #7c4dff
+}
+.info-box .info-title{font-weight:800;color:#4527a0;font-size:13px;margin-bottom:6px}
+
+@media(max-width:520px){
+  .choices{grid-template-columns:1fr}
+  .match-answer{flex-direction:column;align-items:flex-start}
+  .match-answer select{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+<!-- ===== HEADER ===== -->
+<div class="ws-header">
+  <div class="badge-row">
+    <span class="badge">📚 สังคมศึกษา</span>
+    <span class="badge">🏫 ชั้น ม.3</span>
+    <span class="badge">⚖️ หน่วยที่ 1</span>
+  </div>
+  <h1>⚖️ ใบงานที่ 1<br>กฎหมายในชีวิตประจำวัน</h1>
+  <div class="subtitle">เรียนรู้กฎหมายพื้นฐาน สิทธิ หน้าที่ และกระบวนการยุติธรรม</div>
+  <div class="score-box">
+    <div class="sc-num">—</div>
+    <div class="sc-lbl">คะแนน</div>
+  </div>
+</div>
+
+<!-- ===== STUDENT INFO ===== -->
+<div class="info-card">
+  <h3>🖊️ ข้อมูลผู้เรียน</h3>
+  <div class="info-row">
+    <div class="info-field">
+      <label>ชื่อ-นามสกุล</label>
+      <input type="text" id="studentName" placeholder="ชื่อของคุณ..."/>
+    </div>
+    <div class="info-field">
+      <label>ชั้น</label>
+      <input type="text" id="studentGrade" value="ม.3"/>
+    </div>
+    <div class="info-field">
+      <label>วันที่ทำใบงาน</label>
+      <input type="text" id="studentDate" placeholder="วัน/เดือน/ปี"/>
+    </div>
+  </div>
+</div>
+
+<!-- progress -->
+<div class="progress-label">ความคืบหน้า: <span id="pctLbl">0%</span></div>
+<div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+
+<!-- ===================================
+     ส่วนที่ 1 — ความรู้พื้นฐาน + ดูภาพ
+=================================== -->
+<div class="section">
+  <span class="deco deco-tl">📜</span>
+  <span class="stars">⭐⭐⭐</span>
+  <div class="section-label">🖼️ ส่วนที่ 1 — ดูภาพและข้อมูล แล้วตอบคำถาม (5 คะแนน)</div>
+
+  <div class="section-img">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Thai_constitution.jpg/800px-Thai_constitution.jpg"
+         alt="รัฐธรรมนูญไทย"
+         onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Scales_of_justice_2.svg/400px-Scales_of_justice_2.svg.png'"/>
+    <div class="img-caption">📜 รัฐธรรมนูญแห่งราชอาณาจักรไทย — กฎหมายสูงสุดของประเทศ</div>
+  </div>
+
+  <div class="info-box">
+    <div class="info-title">📌 ความหมายของกฎหมาย</div>
+    กฎหมาย คือ กฎเกณฑ์หรือข้อบังคับที่รัฐหรือองค์กรที่มีอำนาจสูงสุดของสังคมกำหนดขึ้น
+    เพื่อใช้ควบคุมความประพฤติของบุคคลในสังคม โดยมีสภาพบังคับ คือ มีบทลงโทษแก่ผู้ฝ่าฝืน
+  </div>
+
+  <h3>1. จากภาพและข้อมูลข้างต้น นักเรียนคิดว่าทำไมประเทศจึงต้องมีกฎหมาย? อธิบายด้วยตัวอย่างใกล้ตัว</h3>
+  <textarea class="open-textarea lines-bg" id="q1_open" rows="4" placeholder="เขียนอธิบาย..." oninput="updateProgress()"></textarea>
+
+  <div style="margin-top:16px">
+    <h3>2. รัฐธรรมนูญมีความสำคัญต่อกฎหมายอื่น ๆ อย่างไร?</h3>
+    <div class="choices">
+      <input type="radio" name="q2" id="q2a" value="เป็นกฎหมายสูงสุด กฎหมายอื่นต้องไม่ขัดแย้ง" class="choice-inp" oninput="updateProgress()">
+      <label for="q2a" class="choice-lbl"><span class="num">ก</span>เป็นกฎหมายสูงสุด กฎหมายอื่นต้องไม่ขัดแย้ง</label>
+      <input type="radio" name="q2" id="q2b" value="เป็นกฎหมายเดียวที่ศาลใช้ตัดสิน" class="choice-inp" oninput="updateProgress()">
+      <label for="q2b" class="choice-lbl"><span class="num">ข</span>เป็นกฎหมายเดียวที่ศาลใช้ตัดสิน</label>
+      <input type="radio" name="q2" id="q2c" value="ใช้เฉพาะกับข้าราชการเท่านั้น" class="choice-inp" oninput="updateProgress()">
+      <label for="q2c" class="choice-lbl"><span class="num">ค</span>ใช้เฉพาะกับข้าราชการเท่านั้น</label>
+      <input type="radio" name="q2" id="q2d" value="ออกโดยศาลรัฐธรรมนูญ" class="choice-inp" oninput="updateProgress()">
+      <label for="q2d" class="choice-lbl"><span class="num">ง</span>ออกโดยศาลรัฐธรรมนูญ</label>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================
+     ส่วนที่ 2 — ปรนัย
+=================================== -->
+<div class="section">
+  <span class="deco deco-br">🏛️</span>
+  <div class="section-label">✅ ส่วนที่ 2 — เลือกคำตอบที่ถูกต้อง (8 คะแนน)</div>
+
+  <div style="margin-bottom:18px">
+    <h3>3. กฎหมายแพ่งแตกต่างจากกฎหมายอาญาในข้อใด?</h3>
+    <div class="choices">
+      <input type="radio" name="q3" id="q3a" value="กฎหมายแพ่งเกี่ยวกับความสัมพันธ์ระหว่างเอกชน กฎหมายอาญาเกี่ยวกับความผิดต่อรัฐ" class="choice-inp" oninput="updateProgress()">
+      <label for="q3a" class="choice-lbl"><span class="num">ก</span>กฎหมายแพ่งเกี่ยวกับความสัมพันธ์ระหว่างเอกชน กฎหมายอาญาเกี่ยวกับความผิดต่อรัฐ</label>
+      <input type="radio" name="q3" id="q3b" value="กฎหมายแพ่งมีโทษจำคุก กฎหมายอาญาไม่มี" class="choice-inp" oninput="updateProgress()">
+      <label for="q3b" class="choice-lbl"><span class="num">ข</span>กฎหมายแพ่งมีโทษจำคุก กฎหมายอาญาไม่มี</label>
+      <input type="radio" name="q3" id="q3c" value="กฎหมายแพ่งออกโดยตำรวจ" class="choice-inp" oninput="updateProgress()">
+      <label for="q3c" class="choice-lbl"><span class="num">ค</span>กฎหมายแพ่งออกโดยตำรวจ</label>
+      <input type="radio" name="q3" id="q3d" value="ทั้งสองใช้ศาลเดียวกันตัดสิน" class="choice-inp" oninput="updateProgress()">
+      <label for="q3d" class="choice-lbl"><span class="num">ง</span>ทั้งสองใช้ศาลเดียวกันตัดสิน</label>
+    </div>
+  </div>
+
+  <div style="margin-bottom:18px">
+    <h3>4. บุคคลใดมีสิทธิเลือกตั้งตามกฎหมายไทย?</h3>
+    <div class="choices">
+      <input type="radio" name="q4" id="q4a" value="ผู้มีสัญชาติไทย อายุ 18 ปีขึ้นไป" class="choice-inp" oninput="updateProgress()">
+      <label for="q4a" class="choice-lbl"><span class="num">ก</span>ผู้มีสัญชาติไทย อายุ 18 ปีขึ้นไป</label>
+      <input type="radio" name="q4" id="q4b" value="ผู้พักอาศัยในไทยนาน 5 ปี" class="choice-inp" oninput="updateProgress()">
+      <label for="q4b" class="choice-lbl"><span class="num">ข</span>ผู้พักอาศัยในไทยนาน 5 ปี</label>
+      <input type="radio" name="q4" id="q4c" value="ผู้มีบัตรประชาชน ทุกอายุ" class="choice-inp" oninput="updateProgress()">
+      <label for="q4c" class="choice-lbl"><span class="num">ค</span>ผู้มีบัตรประชาชน ทุกอายุ</label>
+      <input type="radio" name="q4" id="q4d" value="เฉพาะข้าราชการ" class="choice-inp" oninput="updateProgress()">
+      <label for="q4d" class="choice-lbl"><span class="num">ง</span>เฉพาะข้าราชการ</label>
+    </div>
+  </div>
+
+  <div style="margin-bottom:18px">
+    <h3>5. กฎหมายคุ้มครองเด็กกำหนดให้เด็กอายุต่ำกว่าเท่าใดได้รับการคุ้มครองเป็นพิเศษ?</h3>
+    <div class="choices">
+      <input type="radio" name="q5" id="q5a" value="15 ปี" class="choice-inp" oninput="updateProgress()">
+      <label for="q5a" class="choice-lbl"><span class="num">ก</span>15 ปี</label>
+      <input type="radio" name="q5" id="q5b" value="18 ปี" class="choice-inp" oninput="updateProgress()">
+      <label for="q5b" class="choice-lbl"><span class="num">ข</span>18 ปี</label>
+      <input type="radio" name="q5" id="q5c" value="20 ปี" class="choice-inp" oninput="updateProgress()">
+      <label for="q5c" class="choice-lbl"><span class="num">ค</span>20 ปี</label>
+      <input type="radio" name="q5" id="q5d" value="21 ปี" class="choice-inp" oninput="updateProgress()">
+      <label for="q5d" class="choice-lbl"><span class="num">ง</span>21 ปี</label>
+    </div>
+  </div>
+
+  <div>
+    <h3>6. ข้อใดคือหน้าที่ตามกฎหมายที่ประชาชนชาวไทยทุกคนต้องปฏิบัติ?</h3>
+    <div class="choices">
+      <input type="radio" name="q6" id="q6a" value="เสียภาษีตามกฎหมาย" class="choice-inp" oninput="updateProgress()">
+      <label for="q6a" class="choice-lbl"><span class="num">ก</span>💰 เสียภาษีตามกฎหมาย</label>
+      <input type="radio" name="q6" id="q6b" value="เข้าร่วมชมรมทุกชมรม" class="choice-inp" oninput="updateProgress()">
+      <label for="q6b" class="choice-lbl"><span class="num">ข</span>เข้าร่วมชมรมทุกชมรม</label>
+      <input type="radio" name="q6" id="q6c" value="ออกเสียงประชามติทุกครั้ง" class="choice-inp" oninput="updateProgress()">
+      <label for="q6c" class="choice-lbl"><span class="num">ค</span>ออกเสียงประชามติทุกครั้ง</label>
+      <input type="radio" name="q6" id="q6d" value="ดำรงตำแหน่งทางการเมือง" class="choice-inp" oninput="updateProgress()">
+      <label for="q6d" class="choice-lbl"><span class="num">ง</span>ดำรงตำแหน่งทางการเมือง</label>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================
+     ส่วนที่ 3 — ถูก/ผิด
+=================================== -->
+<div class="section">
+  <span class="deco deco-tl">🔍</span>
+  <div class="section-label">🤔 ส่วนที่ 3 — ถูก หรือ ผิด? (6 คะแนน)</div>
+  <p style="font-size:13px;color:#888;margin-bottom:14px">💡 อ่านข้อความแล้วตัดสินว่าถูกหรือผิดตามข้อเท็จจริงของกฎหมายไทย</p>
+
+  <div style="margin-bottom:16px">
+    <h3>7. ผู้ต้องหาทุกคนมีสิทธิได้รับการสันนิษฐานไว้ก่อนว่าเป็นผู้บริสุทธิ์จนกว่าศาลจะตัดสิน</h3>
+    <div class="tf-group">
+      <input type="radio" name="q7" id="q7t" value="ถูก" class="tf-inp tf-true" oninput="updateProgress()">
+      <label for="q7t" class="tf-lbl"><span class="tf-icon">✅</span><span class="tf-text">ถูก</span></label>
+      <input type="radio" name="q7" id="q7f" value="ผิด" class="tf-inp tf-false" oninput="updateProgress()">
+      <label for="q7f" class="tf-lbl"><span class="tf-icon">❌</span><span class="tf-text">ผิด</span></label>
+    </div>
+  </div>
+
+  <div style="margin-bottom:16px">
+    <h3>8. เด็กอายุต่ำกว่า 18 ปีที่กระทำผิดอาญาจะถูกดำเนินคดีเช่นเดียวกับผู้ใหญ่ทุกประการ</h3>
+    <div class="tf-group">
+      <input type="radio" name="q8" id="q8t" value="ถูก" class="tf-inp tf-true" oninput="updateProgress()">
+      <label for="q8t" class="tf-lbl"><span class="tf-icon">✅</span><span class="tf-text">ถูก</span></label>
+      <input type="radio" name="q8" id="q8f" value="ผิด" class="tf-inp tf-false" oninput="updateProgress()">
+      <label for="q8f" class="tf-lbl"><span class="tf-icon">❌</span><span class="tf-text">ผิด</span></label>
+    </div>
+  </div>
+
+  <div style="margin-bottom:16px">
+    <h3>9. กฎหมายทุกฉบับต้องประกาศในราชกิจจานุเบกษาก่อนจึงจะมีผลบังคับใช้</h3>
+    <div class="tf-group">
+      <input type="radio" name="q9" id="q9t" value="ถูก" class="tf-inp tf-true" oninput="updateProgress()">
+      <label for="q9t" class="tf-lbl"><span class="tf-icon">✅</span><span class="tf-text">ถูก</span></label>
+      <input type="radio" name="q9" id="q9f" value="ผิด" class="tf-inp tf-false" oninput="updateProgress()">
+      <label for="q9f" class="tf-lbl"><span class="tf-icon">❌</span><span class="tf-text">ผิด</span></label>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================
+     ส่วนที่ 4 — เติมคำในช่องว่าง
+=================================== -->
+<div class="section">
+  <span class="deco deco-br">✏️</span>
+  <div class="section-label">📝 ส่วนที่ 4 — เติมคำในช่องว่าง (6 คะแนน)</div>
+  <div class="word-bank">
+    <span style="font-size:11px;color:#666;font-weight:800;width:100%;margin-bottom:2px">🗂️ คำที่ใช้เติม:</span>
+    <span class="word-chip" style="background:#4527a0">รัฐธรรมนูญ</span>
+    <span class="word-chip" style="background:#7c4dff">แพ่ง</span>
+    <span class="word-chip" style="background:#1565c0">อาญา</span>
+    <span class="word-chip" style="background:#00838f">ราชกิจจานุเบกษา</span>
+    <span class="word-chip" style="background:#2e7d32">สิทธิ</span>
+    <span class="word-chip" style="background:#c62828">หน้าที่</span>
+    <span class="word-chip" style="background:#e65100">บทลงโทษ</span>
+  </div>
+
+  <div class="fill-row">
+    <span class="fill-num">10</span>
+    กฎหมายจะมีผลบังคับใช้ได้ต้องนำไปประกาศใน
+    <input type="text" class="blank-inp" id="q10" placeholder="......" oninput="updateProgress()">
+  </div>
+  <div class="fill-row">
+    <span class="fill-num">11</span>
+    กฎหมายสูงสุดของประเทศไทยเรียกว่า
+    <input type="text" class="blank-inp" id="q11" placeholder="......" oninput="updateProgress()">
+  </div>
+  <div class="fill-row">
+    <span class="fill-num">12</span>
+    กฎหมายที่ว่าด้วยนิติกรรมสัญญา ซื้อขาย เช่า คือกฎหมาย
+    <input type="text" class="blank-inp" id="q12" placeholder="......" oninput="updateProgress()">
+  </div>
+  <div class="fill-row">
+    <span class="fill-num">13</span>
+    ประชาชนมีทั้ง
+    <input type="text" class="blank-inp" id="q13a" placeholder="......" style="min-width:80px" oninput="updateProgress()">
+    และ
+    <input type="text" class="blank-inp" id="q13b" placeholder="......" style="min-width:80px" oninput="updateProgress()">
+    ตามที่รัฐธรรมนูญกำหนด
+  </div>
+</div>
+
+<!-- ===================================
+     ส่วนที่ 5 — จับคู่
+=================================== -->
+<div class="section">
+  <span class="deco deco-tl">🔗</span>
+  <div class="section-label">🔗 ส่วนที่ 5 — จับคู่ประเภทกฎหมาย (5 คะแนน)</div>
+  <p style="font-size:13px;color:#888;margin-bottom:14px">📌 เลือกประเภทกฎหมายที่ตรงกับตัวอย่างแต่ละข้อ</p>
+
+  <div class="match-answer">
+    <div class="match-lbl">14. นายดำทำสัญญาซื้อขายบ้านกับนายแดง</div>
+    <select id="m1" oninput="updateProgress()">
+      <option value="">-- เลือกประเภท --</option>
+      <option>กฎหมายแพ่งและพาณิชย์</option>
+      <option>กฎหมายอาญา</option>
+      <option>กฎหมายรัฐธรรมนูญ</option>
+      <option>กฎหมายแรงงาน</option>
+      <option>กฎหมายจราจร</option>
+    </select>
+  </div>
+  <div class="match-answer">
+    <div class="match-lbl">15. นายขาวลักทรัพย์ของเพื่อนบ้าน</div>
+    <select id="m2" oninput="updateProgress()">
+      <option value="">-- เลือกประเภท --</option>
+      <option>กฎหมายแพ่งและพาณิชย์</option>
+      <option>กฎหมายอาญา</option>
+      <option>กฎหมายรัฐธรรมนูญ</option>
+      <option>กฎหมายแรงงาน</option>
+      <option>กฎหมายจราจร</option>
+    </select>
+  </div>
+  <div class="match-answer">
+    <div class="match-lbl">16. นายเขียวฝ่าไฟแดงและขับรถโดยไม่มีใบขับขี่</div>
+    <select id="m3" oninput="updateProgress()">
+      <option value="">-- เลือกประเภท --</option>
+      <option>กฎหมายแพ่งและพาณิชย์</option>
+      <option>กฎหมายอาญา</option>
+      <option>กฎหมายรัฐธรรมนูญ</option>
+      <option>กฎหมายแรงงาน</option>
+      <option>กฎหมายจราจร</option>
+    </select>
+  </div>
+  <div class="match-answer">
+    <div class="match-lbl">17. นายฟ้าถูกนายจ้างไม่จ่ายค่าแรงตามสัญญา</div>
+    <select id="m4" oninput="updateProgress()">
+      <option value="">-- เลือกประเภท --</option>
+      <option>กฎหมายแพ่งและพาณิชย์</option>
+      <option>กฎหมายอาญา</option>
+      <option>กฎหมายรัฐธรรมนูญ</option>
+      <option>กฎหมายแรงงาน</option>
+      <option>กฎหมายจราจร</option>
+    </select>
+  </div>
+  <div class="match-answer">
+    <div class="match-lbl">18. รัฐสภาออกกฎหมายที่ขัดต่อสิทธิเสรีภาพของประชาชน</div>
+    <select id="m5" oninput="updateProgress()">
+      <option value="">-- เลือกประเภท --</option>
+      <option>กฎหมายแพ่งและพาณิชย์</option>
+      <option>กฎหมายอาญา</option>
+      <option>กฎหมายรัฐธรรมนูญ</option>
+      <option>กฎหมายแรงงาน</option>
+      <option>กฎหมายจราจร</option>
+    </select>
+  </div>
+</div>
+
+<!-- ===================================
+     ส่วนที่ 6 — วิเคราะห์สถานการณ์
+=================================== -->
+<div class="section">
+  <span class="deco deco-br">🧠</span>
+  <div class="section-label">🧠 ส่วนที่ 6 — วิเคราะห์สถานการณ์ (อัตนัย)</div>
+
+  <div style="margin-bottom:20px">
+    <div class="scenario-box">
+      <div class="case-num">📋 สถานการณ์ที่ 1</div>
+      <b>เด็กชายก้อง อายุ 15 ปี</b> ถูกเพื่อนในกลุ่มชักชวนให้ลักทรัพย์ในห้างสรรพสินค้า
+      เมื่อถูกจับกุม ก้องบอกว่า "ผมยังเด็ก ไม่ต้องรับผิด"
+    </div>
+    <h3>19. นักเรียนคิดว่าคำพูดของก้องถูกต้องหรือไม่? ตามกฎหมายไทยเด็กอายุ 15 ปีต้องรับผิดอย่างไร? อธิบาย</h3>
+    <textarea class="open-textarea lines-bg" id="q19" rows="5" placeholder="วิเคราะห์ตามกฎหมายที่รู้จัก..." oninput="updateProgress()"></textarea>
+  </div>
+
+  <div>
+    <div class="scenario-box">
+      <div class="case-num">📋 สถานการณ์ที่ 2</div>
+      <b>นางสาวแพรว</b> ถูกนายจ้างให้ทำงานวันละ 12 ชั่วโมงโดยไม่มีค่าล่วงเวลา
+      และเมื่อแพรวบ่น นายจ้างขู่ว่าจะไล่ออก
+    </div>
+    <h3>20. แพรวมีสิทธิอะไรบ้างตามกฎหมายแรงงาน? และควรปฏิบัติตัวอย่างไรเพื่อรักษาสิทธิของตนเอง?</h3>
+    <textarea class="open-textarea lines-bg" id="q20" rows="5" placeholder="ระบุสิทธิและวิธีการปกป้องสิทธิ..." oninput="updateProgress()"></textarea>
+  </div>
+</div>
+
+<!-- ===================================
+     ส่วนที่ 7 — เรียงลำดับขั้นตอน
+=================================== -->
+<div class="section">
+  <span class="deco deco-tl">🔢</span>
+  <div class="section-label">🔢 ส่วนที่ 7 — เรียงลำดับ (Bonus)</div>
+  <h3 style="margin-bottom:4px">เรียงลำดับกระบวนการยุติธรรมทางอาญาให้ถูกต้อง (ใส่ตัวเลข 1–5)</h3>
+  <p style="font-size:12.5px;color:#888;margin-bottom:12px">1 = เกิดก่อน, 5 = เกิดสุดท้าย</p>
+  <ul class="order-list">
+    <li class="order-item">
+      <input type="number" id="ord_a" min="1" max="5" placeholder="?" oninput="updateProgress()">
+      <span class="order-text">⚖️ ศาลพิพากษาคดี</span>
+    </li>
+    <li class="order-item">
+      <input type="number" id="ord_b" min="1" max="5" placeholder="?" oninput="updateProgress()">
+      <span class="order-text">🚔 ตำรวจจับกุมผู้ต้องสงสัย</span>
+    </li>
+    <li class="order-item">
+      <input type="number" id="ord_c" min="1" max="5" placeholder="?" oninput="updateProgress()">
+      <span class="order-text">📋 อัยการสั่งฟ้องคดีต่อศาล</span>
+    </li>
+    <li class="order-item">
+      <input type="number" id="ord_d" min="1" max="5" placeholder="?" oninput="updateProgress()">
+      <span class="order-text">🔍 ตำรวจสอบสวนและรวบรวมพยานหลักฐาน</span>
+    </li>
+    <li class="order-item">
+      <input type="number" id="ord_e" min="1" max="5" placeholder="?" oninput="updateProgress()">
+      <span class="order-text">⛓️ ลงโทษผู้กระทำผิด</span>
+    </li>
+  </ul>
+</div>
+
+<!-- ===== SUBMIT ===== -->
+<div class="submit-area">
+  <div style="font-size:13.5px;color:#888;margin-bottom:12px">✅ ตรวจทานคำตอบให้ครบแล้วกดส่ง</div>
+  <button class="btn-submit" id="submitBtn" onclick="submitWorksheet()">📤 ส่งใบงาน</button>
+  <div id="submitMsg"></div>
+</div>
+
+</div><!-- end page-wrap -->
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { FIREBASE_CONFIG } from './js/config.js';
+
+const app = initializeApp(FIREBASE_CONFIG);
+const db  = getFirestore(app);
+
+const TOTAL = 22; // จำนวน fields สำหรับ progress
+
+window.updateProgress = function(){
+  let filled = 0;
+  ['q2','q3','q4','q5','q6','q7','q8','q9'].forEach(n=>{
+    if(document.querySelector(`input[name="${n}"]:checked`)) filled++;
+  });
+  ['q10','q11','q12','q13a','q13b'].forEach(id=>{
+    if((document.getElementById(id)?.value||'').trim()) filled++;
+  });
+  ['m1','m2','m3','m4','m5'].forEach(id=>{
+    if(document.getElementById(id)?.value) filled++;
+  });
+  ['q1_open','q19','q20'].forEach(id=>{
+    if((document.getElementById(id)?.value||'').trim()) filled++;
+  });
+  ['ord_a','ord_b','ord_c','ord_d','ord_e'].forEach(id=>{
+    if((document.getElementById(id)?.value||'').trim()) filled++;
+  });
+  const pct = Math.round(Math.min(filled,TOTAL)/TOTAL*100);
+  document.getElementById('progressBar').style.width = pct+'%';
+  document.getElementById('pctLbl').textContent = pct+'%';
+};
+
+window.submitWorksheet = async function(){
+  const studentName = (document.getElementById('studentName').value||'').trim();
+  const grade = (document.getElementById('studentGrade').value||'').trim()||'ม.3';
+  const date  = (document.getElementById('studentDate').value||'').trim();
+  if(!studentName){ alert('📝 กรุณากรอกชื่อของคุณก่อน'); document.getElementById('studentName').focus(); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled=true; btn.textContent='⏳ กำลังส่ง...';
+
+  const v = id => (document.getElementById(id)?.value||'').trim();
+  const r = name => (document.querySelector(`input[name="${name}"]:checked`)?.value||'ไม่ตอบ');
+
+  const orderMap = {
+    'ศาลพิพากษาคดี': v('ord_a'),
+    'ตำรวจจับกุมผู้ต้องสงสัย': v('ord_b'),
+    'อัยการสั่งฟ้องคดีต่อศาล': v('ord_c'),
+    'ตำรวจสอบสวนและรวบรวมพยานหลักฐาน': v('ord_d'),
+    'ลงโทษผู้กระทำผิด': v('ord_e'),
+  };
+
+  const fields = [
+    {label:'1. เหตุผลที่ต้องมีกฎหมาย (อัตนัย)', value: v('q1_open')||'ไม่ตอบ'},
+    {label:'2. ความสำคัญของรัฐธรรมนูญ (MCQ)', value: r('q2')},
+    {label:'3. กฎหมายแพ่ง vs อาญา (MCQ)', value: r('q3')},
+    {label:'4. สิทธิเลือกตั้ง (MCQ)', value: r('q4')},
+    {label:'5. กฎหมายคุ้มครองเด็ก (MCQ)', value: r('q5')},
+    {label:'6. หน้าที่ของประชาชน (MCQ)', value: r('q6')},
+    {label:'7. สันนิษฐานบริสุทธิ์ (T/F)', value: r('q7')},
+    {label:'8. เด็กทำผิดอาญา (T/F)', value: r('q8')},
+    {label:'9. ราชกิจจานุเบกษา (T/F)', value: r('q9')},
+    {label:'10. เติมคำ: ราชกิจจานุเบกษา', value: v('q10')||'ไม่ตอบ'},
+    {label:'11. เติมคำ: กฎหมายสูงสุด', value: v('q11')||'ไม่ตอบ'},
+    {label:'12. เติมคำ: กฎหมายแพ่ง', value: v('q12')||'ไม่ตอบ'},
+    {label:'13. เติมคำ: สิทธิและหน้าที่', value: (v('q13a')||'?')+' / '+(v('q13b')||'?')},
+    {label:'14. จับคู่: สัญญาซื้อขาย', value: v('m1')||'ไม่ตอบ'},
+    {label:'15. จับคู่: ลักทรัพย์', value: v('m2')||'ไม่ตอบ'},
+    {label:'16. จับคู่: ฝ่าไฟแดง', value: v('m3')||'ไม่ตอบ'},
+    {label:'17. จับคู่: ค่าแรง', value: v('m4')||'ไม่ตอบ'},
+    {label:'18. จับคู่: กฎหมายขัดรัฐธรรมนูญ', value: v('m5')||'ไม่ตอบ'},
+    {label:'19. วิเคราะห์: เด็กก้อง (อัตนัย)', value: v('q19')||'ไม่ตอบ'},
+    {label:'20. วิเคราะห์: สิทธิแรงงาน (อัตนัย)', value: v('q20')||'ไม่ตอบ'},
+    {label:'21-22. เรียงลำดับกระบวนการยุติธรรม', value: Object.entries(orderMap).map(([k,val])=>`${val||'?'}. ${k}`).join(' → ')},
+  ];
+
+  const data = {
+    studentName,
+    grade,
+    subject: 'สังคมศึกษา',
+    worksheetTitle: 'ใบงานที่ 1 — กฎหมายในชีวิตประจำวัน',
+    worksheetId: 'ws_social_m3_unit1',
+    submittedDate: date,
+    fields,
+    submittedAt: serverTimestamp(),
+  };
+
+  try{
+    await addDoc(collection(db,'worksheet_submissions'), data);
+    const msg = document.getElementById('submitMsg');
+    msg.innerHTML = `
+      <div style="font-size:24px;margin-bottom:8px">🎉</div>
+      <div style="font-size:16px;font-weight:800;color:#2e7d32;margin-bottom:6px">ส่งใบงานสำเร็จแล้ว!</div>
+      <div style="font-size:13px;color:#555">ขอบคุณ <b>${studentName}</b> ที่ทำใบงานอย่างตั้งใจ 💜<br>ครูจะตรวจและแจ้งคะแนนภายหลัง</div>`;
+    msg.style.display='block';
+    btn.textContent='✅ ส่งแล้ว';
+    btn.style.background='#66bb6a';
+    document.querySelectorAll('input,textarea,select').forEach(el=>el.disabled=true);
+    msg.scrollIntoView({behavior:'smooth',block:'center'});
+  }catch(e){
+    btn.disabled=false; btn.textContent='📤 ส่งใบงาน';
+    alert('❌ ส่งไม่สำเร็จ: '+e.message);
+  }
+};
+</script>
+</body>
+</html>
