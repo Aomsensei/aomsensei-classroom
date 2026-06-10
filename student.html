@@ -161,6 +161,14 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
 .btn-ok{background:#c94b00;color:#fff}
 .btn-cancel{background:#f5f5f5;color:#555}
 
+/* Worksheet iframe overlay */
+#wsOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9990;flex-direction:column}
+#wsOverlay.show{display:flex}
+#wsOverlay .ws-toolbar{background:#c94b00;color:#fff;display:flex;align-items:center;gap:10px;padding:8px 14px;flex-shrink:0}
+#wsOverlay .ws-toolbar span{flex:1;font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#wsOverlay .ws-close{background:rgba(255,255,255,.2);border:none;color:#fff;padding:7px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit;white-space:nowrap}
+#wsOverlay iframe{flex:1;border:none;width:100%;background:#fff}
+
 /* PDF overlay */
 #pdfOverlay{display:none;position:fixed;inset:0;background:#fff;z-index:9999;padding:20px;overflow:auto}
 .pdf-toolbar{display:flex;gap:10px;margin-bottom:16px}
@@ -379,6 +387,15 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
       </div>
     </div>
   </div>
+</div>
+
+<!-- Worksheet iframe Overlay -->
+<div id="wsOverlay">
+  <div class="ws-toolbar">
+    <span id="wsOverlayTitle">📄 ใบงาน</span>
+    <button class="ws-close" onclick="closeWsOverlay()">✕ ปิด</button>
+  </div>
+  <iframe id="wsIframe" src="" title="ใบงาน"></iframe>
 </div>
 
 <!-- PDF Overlay -->
@@ -780,15 +797,33 @@ async function loadWs(){
         <div class="card-meta">📅 ${dt}${w.subject?' · '+esc(w.subject):''}</div>
         <div class="card-desc">${esc(w.description||'')}</div>
         <div class="card-actions">
-          ${w.fileUrl?`<a href="${w.fileUrl}" target="_blank" class="btn btn-orange btn-sm">📖 เปิดไฟล์</a>`:''}
-          ${w.htmlContent?`<button class="btn btn-orange btn-sm" onclick="openWs('${d.id}')">📖 เปิดใบงาน</button>`:''}
+          ${(w.fileUrl||w.htmlContent)?`<button class="btn btn-orange btn-sm" onclick="openWs('${d.id}')">📖 เปิดใบงาน</button>`:''}
           <button class="btn btn-blue btn-sm" onclick="printWs('${d.id}')">🖨️ พิมพ์ PDF</button>
         </div></div>`;
     });
     el.innerHTML=h||'<div class="empty-state"><i class="fas fa-file-alt"></i><p>ยังไม่มีใบงาน/ใบความรู้</p></div>';
   }catch(e){ el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`; }
 }
-window.openWs=function(id){ const w=window._worksheets[id]; if(!w?.htmlContent) return; const b=window.open('','_blank'); b.document.write(w.htmlContent); b.document.close(); };
+window.openWs=function(id){
+  const w=window._worksheets[id]; if(!w) return;
+  const title = w.title||'ใบงาน';
+  if(w.fileUrl){
+    // URL worksheet → เปิดใน iframe overlay
+    document.getElementById('wsOverlayTitle').textContent='📄 '+title;
+    document.getElementById('wsIframe').src=w.fileUrl;
+    document.getElementById('wsOverlay').classList.add('show');
+  } else if(w.htmlContent){
+    // HTML content → เปิดเป็น blob ใน tab ใหม่
+    const blob=new Blob([w.htmlContent],{type:'text/html;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const win=window.open(url,'_blank');
+    if(win) win.onload=()=>URL.revokeObjectURL(url);
+  }
+};
+window.closeWsOverlay=function(){
+  document.getElementById('wsOverlay').classList.remove('show');
+  document.getElementById('wsIframe').src='';
+};
 window.printWs=function(id){
   const w=window._worksheets[id]; if(!w) return;
   const content=w.htmlContent||`<div style="font-family:'Sarabun',sans-serif;padding:30px">
