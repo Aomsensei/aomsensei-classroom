@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ใบงานที่ 1 — การพัฒนาแอปพลิเคชัน ม.3</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800;900&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ===== ANSWER_KEY =====
+  Q1:  ข) เว็บเบราว์เซอร์
+  Q2:  ค) Java หรือ Kotlin
+  Q3:  ถูก (Line/Facebook คือ Mobile App)
+  Q4:  ผิด (Desktop App ไม่รันบนมือถือโดยตรง)
+  Q5:  Google Maps→Web App, TikTok→Mobile App, Microsoft Word→Desktop App
+  Q6:  ก) วิเคราะห์ปัญหาและความต้องการ
+  Q7:  เขียนโปรแกรม
+  Q8:  1=วิเคราะห์ปัญหา 2=ออกแบบระบบ 3=เขียนโค้ด 4=ทดสอบ 5=บำรุงรักษา
+  Q9:  ผิด (ทดสอบระหว่างพัฒนาด้วย ไม่ใช่แค่หลัง)
+  Q10: ข) ต้นแบบเพื่อทดสอบการออกแบบก่อนพัฒนาจริง
+  Q11: ข) Data Science / AI / Machine Learning
+  Q12: ค) Integrated Development Environment
+  Q13: ถูก (Git ใช้ควบคุมเวอร์ชันโค้ด)
+  Q14: Python→Data/AI, JavaScript→Web Frontend, Swift→iOS, Kotlin→Android
+  Q15: Web Application (Front-end)
+  Q16: ข) User Experience
+  Q17: ถูก (UI ที่ดีต้องใช้งานง่ายและสวยงาม)
+  Q18: ก) ข้อผิดพลาดหรือจุดบกพร่องในโปรแกรม
+  Q19: ถูก (Authentication เพิ่มความปลอดภัย)
+  Q20: อัตนัย
+===== END ANSWER_KEY ===== */
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Sarabun',sans-serif;
+  background:linear-gradient(150deg,#e8eaf6 0%,#ede7f6 50%,#e0f2f1 100%);
+  min-height:100vh;padding-bottom:80px;
+}
+code,pre,.code-font{font-family:'Fira Code',monospace}
+
+/* HEADER */
+.ws-header{
+  background:linear-gradient(135deg,#0d1b4b 0%,#1a237e 35%,#4a148c 70%,#0d47a1 100%);
+  color:#fff;text-align:center;padding:0 0 24px;
+  position:relative;overflow:hidden;
+}
+.hdr-glow{position:absolute;border-radius:50%;background:rgba(0,229,255,.06);pointer-events:none}
+.header-scene{display:flex;justify-content:center;padding:20px 16px 10px;position:relative;z-index:2}
+.header-text{position:relative;z-index:2;padding:0 20px}
+.hdr-badge{display:inline-block;background:rgba(0,229,255,.15);border:2px solid rgba(0,229,255,.35);border-radius:20px;padding:4px 18px;font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:10px;color:#00e5ff}
+.header-text h1{font-size:clamp(20px,5vw,34px);font-weight:900;text-shadow:0 0 20px rgba(0,229,255,.4);line-height:1.2;margin-bottom:8px}
+.header-text p{font-size:15px;opacity:.8;color:#e0e0e0}
+.header-text .code-snippet{
+  display:inline-block;background:rgba(0,0,0,.4);border:1px solid rgba(0,229,255,.3);
+  border-radius:8px;padding:6px 16px;font-family:'Fira Code',monospace;font-size:13px;
+  color:#00e5ff;margin-top:8px;letter-spacing:.5px;
+}
+
+/* PROGRESS */
+.progress-wrap{
+  background:linear-gradient(90deg,#0d1b4b,#1a237e);
+  border-bottom:3px solid #00e5ff;
+  padding:10px 20px;position:sticky;top:0;z-index:200;
+  box-shadow:0 2px 15px rgba(0,229,255,.2);
+}
+.prog-row{display:flex;justify-content:space-between;margin-bottom:5px}
+.prog-lbl{font-size:13px;font-weight:700;color:#00e5ff}
+.prog-pct{font-size:13px;font-weight:800;color:#69f0ae}
+.prog-bg{background:rgba(255,255,255,.15);border-radius:10px;height:10px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#00e5ff,#69f0ae);border-radius:10px;width:0%;transition:width .4s cubic-bezier(.25,.8,.25,1)}
+
+/* CONTAINER */
+.wrap{max-width:720px;margin:0 auto;padding:0 14px}
+
+/* STUDENT INFO */
+.student-card{
+  background:#fff;border-radius:20px;padding:20px;margin:18px 0;
+  box-shadow:0 4px 20px rgba(26,35,126,.12);
+  border:2px solid #c5cae9;
+}
+.sc-title{text-align:center;font-size:17px;font-weight:800;color:#1a237e;margin-bottom:14px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:440px){.info-grid{grid-template-columns:1fr}}
+.if-lbl{display:block;font-size:13px;font-weight:700;color:#555;margin-bottom:5px}
+.if-inp,.if-sel{width:100%;padding:10px 14px;border:2px solid #c5cae9;border-radius:12px;font-family:'Sarabun',sans-serif;font-size:15px;background:#f8f9ff;transition:.2s}
+.if-inp:focus,.if-sel:focus{outline:none;border-color:#3f51b5;background:#fff}
+
+/* SECTIONS */
+.ws-section{background:#fff;border-radius:24px;padding:24px 20px;margin:16px 0;box-shadow:0 4px 16px rgba(0,0,0,.07);position:relative;overflow:hidden}
+.ws-section::before{content:'';position:absolute;top:0;left:0;right:0;height:7px;border-radius:24px 24px 0 0}
+.s-cyan::before   {background:linear-gradient(90deg,#006064,#00e5ff,#006064)}
+.s-purple::before {background:linear-gradient(90deg,#4a148c,#ce93d8,#4a148c)}
+.s-teal::before   {background:linear-gradient(90deg,#004d40,#1de9b6,#004d40)}
+.s-indigo::before {background:linear-gradient(90deg,#1a237e,#7986cb,#1a237e)}
+
+.sec-hd{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.sec-ic{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;box-shadow:0 3px 10px rgba(0,0,0,.12)}
+.s-cyan   .sec-ic{background:linear-gradient(135deg,#006064,#00acc1)}
+.s-purple .sec-ic{background:linear-gradient(135deg,#4a148c,#ab47bc)}
+.s-teal   .sec-ic{background:linear-gradient(135deg,#004d40,#26a69a)}
+.s-indigo .sec-ic{background:linear-gradient(135deg,#1a237e,#5c6bc0)}
+.sec-title{font-size:20px;font-weight:900}
+.s-cyan   .sec-title{color:#006064}
+.s-purple .sec-title{color:#4a148c}
+.s-teal   .sec-title{color:#004d40}
+.s-indigo .sec-title{color:#1a237e}
+.sec-sub{font-size:13px;color:#888;margin-top:2px}
+
+/* QUESTION CARD */
+.q-card{background:#fafafa;border:2px solid #eeeeee;border-radius:16px;padding:16px 18px;margin-bottom:14px;transition:.2s}
+.q-card:hover{border-color:#c5cae9}
+.q-card.answered{border-color:#a5d6a7;background:#f9fff9}
+.q-hd{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+.q-num{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;margin-top:1px}
+.s-cyan   .q-num{background:#00838f}
+.s-purple .q-num{background:#6a1b9a}
+.s-teal   .q-num{background:#00695c}
+.s-indigo .q-num{background:#283593}
+.q-txt{font-size:16px;font-weight:700;color:#333;line-height:1.5}
+
+/* MCQ */
+.mcq-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:440px){.mcq-grid{grid-template-columns:1fr}}
+.mcq-opt{display:flex;align-items:center;gap:8px;padding:10px 12px;border:2.5px solid #e0e0e0;border-radius:12px;cursor:pointer;background:#fff;transition:.2s}
+.mcq-opt:hover{border-color:#7986cb;background:#e8eaf6}
+.mcq-opt.sel{border-color:#3f51b5;background:#e8eaf6}
+.mcq-opt input[type=radio]{width:17px;height:17px;accent-color:#3f51b5;cursor:pointer;flex-shrink:0}
+.mcq-opt label{cursor:pointer;font-size:15px;line-height:1.4}
+
+/* TRUE/FALSE */
+.tf-wrap{display:flex;gap:10px}
+.tf-btn{flex:1;padding:12px;border:2.5px solid #e0e0e0;border-radius:14px;background:#fff;font-family:'Sarabun',sans-serif;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:.2s}
+.tf-btn:hover{border-color:#bbb}
+.tf-yes.active{border-color:#00695c;background:#e0f2f1;color:#004d40}
+.tf-no.active {border-color:#b71c1c;background:#ffebee;color:#b71c1c}
+
+/* FILL BLANK */
+.fill-inp{width:100%;padding:11px 14px;border:2.5px solid #e0e0e0;border-radius:12px;font-family:'Sarabun',sans-serif;font-size:15px;background:#fff;transition:.2s}
+.fill-inp:focus{outline:none;border-color:#3f51b5;background:#e8eaf6}
+
+/* WORD BANK */
+.wb-box{background:#e8eaf6;border:2px dashed #5c6bc0;border-radius:12px;padding:10px 14px;margin-bottom:10px}
+.wb-ttl{font-size:12px;font-weight:800;color:#283593;margin-bottom:7px}
+.wb-chips{display:flex;flex-wrap:wrap;gap:6px}
+.wb-chip{background:#3f51b5;color:#fff;padding:5px 14px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:'Sarabun',sans-serif;transition:.2s}
+.wb-chip:hover{background:#283593}
+.wb-chip.used{background:#90a4ae;cursor:default}
+
+/* MATCHING */
+.match-item{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.match-tag{background:linear-gradient(135deg,#283593,#1a237e);color:#fff;padding:9px 16px;border-radius:12px;font-weight:700;font-size:14px;min-width:150px;text-align:center;flex-shrink:0}
+.match-arr{font-size:18px;color:#bbb;flex-shrink:0}
+.match-sel{flex:1;min-width:130px;padding:9px 12px;border:2px solid #e0e0e0;border-radius:12px;font-family:'Sarabun',sans-serif;font-size:14px;background:#fff;cursor:pointer;transition:.2s}
+.match-sel:focus{outline:none;border-color:#3f51b5}
+
+/* ORDERING */
+.order-item{display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:10px 14px;background:#fff;border:2px solid #e0e0e0;border-radius:12px;transition:.2s}
+.order-item:hover{border-color:#c5cae9}
+.order-num-inp{width:50px;padding:7px 10px;border:2px solid #c5cae9;border-radius:8px;font-family:'Sarabun',sans-serif;font-size:16px;font-weight:800;color:#1a237e;text-align:center;background:#e8eaf6;transition:.2s}
+.order-num-inp:focus{outline:none;border-color:#3f51b5;background:#fff}
+.order-txt{font-size:15px;font-weight:600;color:#333}
+.order-icon{font-size:22px;flex-shrink:0}
+
+/* OPEN TEXTAREA */
+.open-inp{width:100%;padding:12px 14px;border:2.5px solid #e0e0e0;border-radius:12px;font-family:'Sarabun',sans-serif;font-size:15px;resize:vertical;min-height:90px;background:#fff;transition:.2s}
+.open-inp:focus{outline:none;border-color:#4a148c;background:#f3e5f5}
+
+/* INFO BOX */
+.info-box{border-radius:14px;padding:14px 16px;margin-bottom:16px;border-left:5px solid}
+.ib-cyan  {background:#e0f7fa;border-left-color:#00838f}
+.ib-purple{background:#f3e5f5;border-left-color:#6a1b9a}
+.ib-teal  {background:#e0f2f1;border-left-color:#00695c}
+.ib-indigo{background:#e8eaf6;border-left-color:#283593}
+.info-box h4{font-size:15px;font-weight:800;margin-bottom:8px}
+.info-box ul{padding-left:18px}
+.info-box li{font-size:14px;line-height:1.75}
+
+/* DEVICE ICONS ROW */
+.device-row{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:20px;padding:10px 0}
+.device-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 14px;background:#f8f9ff;border-radius:16px;border:2px solid #c5cae9;min-width:90px}
+.device-emoji{font-size:36px;line-height:1}
+.device-lbl{font-size:12px;font-weight:800;color:#1a237e;text-align:center}
+.device-ex{font-size:11px;color:#888;text-align:center}
+
+/* LANGUAGE BADGES */
+.lang-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.lang-badge{border-radius:14px;padding:10px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:80px;box-shadow:0 3px 10px rgba(0,0,0,.1)}
+.lang-badge .l-emoji{font-size:28px;line-height:1}
+.lang-badge .l-name{font-family:'Fira Code',monospace;font-size:12px;font-weight:600;color:#fff}
+.lb-py  {background:linear-gradient(135deg,#306998,#ffe873)}
+.lb-js  {background:linear-gradient(135deg,#f7df1e,#323330);color:#000}
+.lb-js  .l-name{color:#000}
+.lb-java{background:linear-gradient(135deg,#b07219,#f89820)}
+.lb-swift{background:linear-gradient(135deg,#f05138,#ff8c00)}
+.lb-kt  {background:linear-gradient(135deg,#7f52ff,#c311e7)}
+
+/* SDLC Cycle */
+.sdlc-wrap{display:flex;justify-content:center;margin-bottom:18px}
+
+/* SUBMIT */
+.submit-area{text-align:center;padding:24px 0 0}
+.btn-submit{
+  background:linear-gradient(135deg,#1a237e,#4a148c);
+  color:#fff;border:none;padding:16px 50px;border-radius:50px;
+  font-family:'Sarabun',sans-serif;font-size:18px;font-weight:800;
+  cursor:pointer;
+  box-shadow:0 6px 20px rgba(26,35,126,.4), 0 0 20px rgba(0,229,255,.2);
+  transition:.3s;letter-spacing:.3px;
+}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(26,35,126,.5),0 0 30px rgba(0,229,255,.3)}
+.btn-submit:disabled{background:#90a4ae;box-shadow:none;cursor:not-allowed;transform:none}
+.submit-msg{margin-top:14px;font-size:15px;font-weight:700;padding:12px 20px;border-radius:12px;display:none}
+.submit-ok {background:#e0f2f1;color:#004d40;display:block}
+.submit-err{background:#ffebee;color:#b71c1c;display:block}
+
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.blink{animation:blink 1.2s infinite}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="ws-header">
+  <div class="hdr-glow" style="width:250px;height:250px;top:-80px;left:-50px"></div>
+  <div class="hdr-glow" style="width:180px;height:180px;bottom:-40px;right:80px"></div>
+
+  <div class="header-scene">
+    <svg viewBox="0 0 430 175" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:500px">
+      <!-- Floating code symbols -->
+      <text x="12"  y="38"  font-family="monospace" font-size="18" fill="#00e5ff" opacity=".55">{ }</text>
+      <text x="8"   y="72"  font-family="monospace" font-size="14" fill="#69f0ae" opacity=".5">def</text>
+      <text x="14"  y="105" font-family="monospace" font-size="12" fill="#fff176" opacity=".45">0101</text>
+      <text x="370" y="32"  font-family="monospace" font-size="18" fill="#7c4dff" opacity=".55">&lt;/&gt;</text>
+      <text x="376" y="65"  font-family="monospace" font-size="13" fill="#ff8a65" opacity=".5">=&gt;</text>
+      <text x="365" y="100" font-family="monospace" font-size="12" fill="#00e5ff" opacity=".45">fn()</text>
+
+      <!-- ===== LAPTOP ===== -->
+      <!-- Laptop base -->
+      <rect x="125" y="122" width="180" height="12" rx="3" fill="#37474f"/>
+      <rect x="119" y="130" width="192" height="6" rx="2" fill="#263238"/>
+      <!-- Screen bezel -->
+      <rect x="138" y="56" width="154" height="70" rx="6" fill="#263238"/>
+      <!-- Screen -->
+      <rect x="143" y="61" width="144" height="60" rx="4" fill="#0a0e1a"/>
+      <!-- Code on screen -->
+      <rect x="147" y="67" width="60" height="3" rx="1" fill="#7986cb" opacity=".6"/>
+      <text x="147" y="78" font-family="monospace" font-size="7" fill="#00e5ff">def create_app():</text>
+      <text x="151" y="87" font-family="monospace" font-size="7" fill="#69f0ae">  design()</text>
+      <text x="151" y="96" font-family="monospace" font-size="7" fill="#fff176">  code()</text>
+      <text x="151" y="105" font-family="monospace" font-size="7" fill="#ff8a65">  test()</text>
+      <text x="147" y="114" font-family="monospace" font-size="7" fill="#ce93d8">  deploy() 🚀</text>
+      <!-- Cursor blink -->
+      <rect x="147" y="117" width="7" height="3" rx="1" fill="#00e5ff" opacity=".8"/>
+      <!-- Hinge line -->
+      <rect x="130" y="124" width="170" height="2" rx="1" fill="#546e7a"/>
+
+      <!-- ===== CODER ===== -->
+      <!-- Chair/body area -->
+      <!-- Person sitting - head -->
+      <circle cx="215" cy="38" r="16" fill="#ffcc80"/>
+      <!-- Hair -->
+      <path d="M200,32 Q215,18 230,32" fill="#4e342e"/>
+      <rect x="199" y="28" width="6" height="12" rx="3" fill="#4e342e"/>
+      <rect x="225" y="28" width="6" height="12" rx="3" fill="#4e342e"/>
+      <!-- Headphones -->
+      <path d="M200,36 Q200,18 230,18 Q230,18 230,36" fill="none" stroke="#3f51b5" stroke-width="4" stroke-linecap="round"/>
+      <rect x="196" y="34" width="8" height="10" rx="3" fill="#3f51b5"/>
+      <rect x="226" y="34" width="8" height="10" rx="3" fill="#3f51b5"/>
+      <!-- Face -->
+      <circle cx="209" cy="38" r="2" fill="#5d4037"/>
+      <circle cx="221" cy="38" r="2" fill="#5d4037"/>
+      <path d="M208,44 Q215,48 222,44" fill="none" stroke="#8d6e63" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- Body shirt -->
+      <rect x="200" y="54" width="30" height="35" rx="6" fill="#1a237e"/>
+      <!-- Code symbol on shirt -->
+      <text x="206" y="72" font-family="monospace" font-size="9" fill="#00e5ff">&lt;/&gt;</text>
+      <!-- Arms to keyboard -->
+      <path d="M200,62 Q180,75 165,85" fill="none" stroke="#ffcc80" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="163" cy="86" r="5" fill="#ffcc80"/>
+      <path d="M230,62 Q248,75 263,85" fill="none" stroke="#ffcc80" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="265" cy="86" r="5" fill="#ffcc80"/>
+
+      <!-- ===== FLOATING PHONE (right) ===== -->
+      <rect x="325" y="70" width="50" height="85" rx="8" fill="#1a237e"/>
+      <rect x="329" y="78" width="42" height="64" rx="4" fill="#0d1b4b"/>
+      <!-- App grid on phone -->
+      <rect x="333" y="82" width="14" height="14" rx="3" fill="#00e5ff" opacity=".8"/>
+      <rect x="351" y="82" width="14" height="14" rx="3" fill="#69f0ae" opacity=".8"/>
+      <rect x="333" y="100" width="14" height="14" rx="3" fill="#ff8a65" opacity=".8"/>
+      <rect x="351" y="100" width="14" height="14" rx="3" fill="#ce93d8" opacity=".8"/>
+      <rect x="333" y="118" width="14" height="14" rx="3" fill="#fff176" opacity=".8"/>
+      <rect x="351" y="118" width="14" height="14" rx="3" fill="#7986cb" opacity=".8"/>
+      <!-- Home button -->
+      <circle cx="350" cy="148" r="5" fill="#263238"/>
+      <text x="332" y="70" font-size="11" fill="#00e5ff" opacity=".7">📱</text>
+
+      <!-- ===== BROWSER WINDOW (left) ===== -->
+      <rect x="46" y="72" width="72" height="56" rx="6" fill="#fff" opacity=".12"/>
+      <rect x="46" y="72" width="72" height="15" rx="6" fill="#1565c0" opacity=".8"/>
+      <!-- Traffic lights -->
+      <circle cx="54" cy="80" r="3.5" fill="#ef5350"/>
+      <circle cx="63" cy="80" r="3.5" fill="#ffd740"/>
+      <circle cx="72" cy="80" r="3.5" fill="#69f0ae"/>
+      <!-- URL bar -->
+      <rect x="78" y="76" width="34" height="7" rx="3" fill="rgba(255,255,255,.2)"/>
+      <!-- Content lines -->
+      <rect x="52" y="94"  width="60" height="4" rx="2" fill="rgba(0,229,255,.4)"/>
+      <rect x="52" y="102" width="45" height="4" rx="2" fill="rgba(105,240,174,.4)"/>
+      <rect x="52" y="110" width="52" height="4" rx="2" fill="rgba(255,255,255,.25)"/>
+      <rect x="52" y="118" width="36" height="4" rx="2" fill="rgba(255,255,255,.15)"/>
+      <text x="46" y="70" font-size="11" fill="#00e5ff" opacity=".7">🌐</text>
+
+      <!-- Stars -->
+      <text x="100" y="22" font-size="14" fill="#fff176" opacity=".6">✦</text>
+      <text x="295" y="20" font-size="12" fill="#00e5ff" opacity=".5">✦</text>
+      <text x="400" y="150" font-size="16" fill="#ce93d8" opacity=".5">💡</text>
+      <text x="22"  y="148" font-size="14" fill="#69f0ae" opacity=".5">⚡</text>
+    </svg>
+  </div>
+
+  <div class="header-text">
+    <div class="hdr-badge">💻 ชั้นมัธยมศึกษาปีที่ 3</div>
+    <h1>🚀 ใบงานที่ 1<br>การพัฒนาแอปพลิเคชัน</h1>
+    <p>🖥️ วิชาวิทยาการคำนวณ &nbsp;|&nbsp; หน่วยที่ 1</p>
+    <div class="code-snippet">print("เรียนรู้การสร้างแอป 💡")</div>
+  </div>
+</div>
+
+<!-- ===== PROGRESS ===== -->
+<div class="progress-wrap">
+  <div class="prog-row">
+    <span class="prog-lbl" id="progressText">ตอบแล้ว 0/20 ข้อ</span>
+    <span class="prog-pct" id="progressPct">0%</span>
+  </div>
+  <div class="prog-bg"><div class="prog-fill" id="progressFill"></div></div>
+</div>
+
+<div class="wrap">
+
+  <!-- ===== STUDENT INFO ===== -->
+  <div class="student-card">
+    <div class="sc-title">💠 ข้อมูลนักเรียน</div>
+    <div class="info-grid">
+      <div>
+        <label class="if-lbl" for="studentName">ชื่อ-นามสกุล</label>
+        <input class="if-inp" id="studentName" type="text" placeholder="กรอกชื่อ-นามสกุล">
+      </div>
+      <div>
+        <label class="if-lbl" for="gradeSelect">ชั้น</label>
+        <select class="if-sel" id="gradeSelect">
+          <option value="ม.3/1">ม.3/1</option>
+          <option value="ม.3/2">ม.3/2</option>
+          <option value="ม.3/3">ม.3/3</option>
+          <option value="ม.3/4">ม.3/4</option>
+          <option value="ม.3/5">ม.3/5</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- =============================================
+       SECTION 1: ประเภทของแอปพลิเคชัน
+  ============================================= -->
+  <div class="ws-section s-cyan">
+    <div class="sec-hd">
+      <div class="sec-ic">📱</div>
+      <div>
+        <div class="sec-title">ส่วนที่ 1 — ประเภทของแอปพลิเคชัน</div>
+        <div class="sec-sub">ข้อ 1–5 (ปรนัย ถูก/ผิด และจับคู่)</div>
+      </div>
+    </div>
+
+    <!-- Device types illustration -->
+    <div class="device-row">
+      <div class="device-item">
+        <span class="device-emoji">🌐</span>
+        <span class="device-lbl">Web App</span>
+        <span class="device-ex">เปิดผ่านเบราว์เซอร์</span>
+      </div>
+      <div class="device-item">
+        <span class="device-emoji">📱</span>
+        <span class="device-lbl">Mobile App</span>
+        <span class="device-ex">ติดตั้งบนมือถือ</span>
+      </div>
+      <div class="device-item">
+        <span class="device-emoji">🖥️</span>
+        <span class="device-lbl">Desktop App</span>
+        <span class="device-ex">ติดตั้งบนคอมพิวเตอร์</span>
+      </div>
+    </div>
+
+    <!-- Q1 -->
+    <div class="q-card">
+      <div class="q-hd"><span class="q-num">1</span><span class="q-txt">Web Application แตกต่างจากแอปประเภทอื่นตรงที่ผู้ใช้เข้าถึงผ่านอะไร?</span></div>
+      <div class="mcq-grid">
+        <label class="mcq-opt"><input type="radio" name="q1" value="ก"><label>ก) App Store / Play Store</label></label>
+        <label class="mcq-opt"><input type="radio" name="q1" value="ข"><label>ข) เว็บเบราว์เซอร์</label></label>
+        <label class="mcq-opt"><input type="radio" name="q1" value="ค"><label>ค) การติดตั้งบนฮาร์ดดิสก์</label></label>
+        <label class="mcq-opt"><input type="radio" name="q1" value="ง"><label>ง) Bluetooth</label></label>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="q-card">
+      <div class="q-hd"><span class="q-num">2</span><span class="q-txt">การพัฒนาแอปพลิเคชันสำหรับสมาร์ตโฟน Android นิยมใช้ภาษาโปรแกรมใด?</span></div>
+      <div class="mcq-grid">
+        <label class="mcq-opt"><input type="radio" name="q2" value="ก"><label>ก) Swift</label></label>
+        <label class="mcq-opt"><input type="radio" name="q2" value="ข"><label>ข) Objective-C</label></label>
+        <label class="mcq-opt"><input type="radio" name="q2" value="ค"><label>ค) Java หรือ Kotlin</label></label>
+        <label class="mcq-opt"><input type="radio" name="q2" value="ง"><label>ง) Ruby</label></label>
+      </div>
+    </div>
+
+    <!-- Q3 T/F -->
+    <div class="q-card">
+      <div class="q-hd"><span class="q-num">3</span><span class="q-txt">แอปพลิเคชัน LINE และ Facebook Messenger จัดเป็น Mobile Application</span></div>
+      <div class="tf-wrap">
+        <button class="tf-btn tf-yes" data-id="q3" data-val="true">✅ ถูก</button>
+        <button class="tf-btn tf-no"  data-id="q3" data-val="false">❌ ผิด</button>
+      </div>
+    </div>
+
+    <!-- Q4 T/F -->
+    <div class="q-card">
+      <div class="q-hd"><span class="q-num">4</span><span class="q-txt">Desktop Application สามารถใช้งานบนสมาร์ตโฟนได้โดยตรงโดยไม่ต้องแก้ไขโค้ด</span></div>
+      <div class="tf-wrap">
+        <button class="tf-btn tf-yes" data-id="q4" data-val="true">✅ ถูก</button>
+        <button class="tf-btn tf-no"  data-id="q4" data-val="false">❌ ผิด</button>
+      </div>
+    </div>
+
+    <!-- Q5 Matching -->
+    <div class="q-card">
+      <div class="q-hd"><span class="q-num">5</span><span class="q-txt">จับคู่แอปพลิเคชันกับประเภทที่ถูกต้อง</span></div>
+      <div class="match-item">
+        <span class="match-tag">🗺️ Google Maps</span>
+        <span class="match-arr">→</span>
+        <select class="match-sel" id="q5a">
+          <option value="">-- เลือกประเภท --</option>
+          <option>Web Application</option><option>Mobile Application</option><option>Desktop Application</option>
+        </select>
+      </div>
+      <div class="match-item">
+        <span class="match-tag">🎵 TikTok</span>
+        <span class="match-arr">→</span>
+        <select class="match-sel" id="q5b">
+          <option value="">-- เลือกประเภท --</option>
+          <option>Web Application</option><option>Mobile Application</option><option>Desktop Application</option>
+        </select>
+      </div>
+      <div class="match-item">
+        <span class="match-tag">📝 Microsoft Word</span>
+        <span class="match-arr">→</span>
+        <select class="match-sel" id="q5c">
+          <option value="">-- เลือกประเภท --</option>
+          <option>Web Application</option><option>Mobile Application</option><option>Desktop Application</option>
+        </select>
+      </div>
+    </div>
+  </div><!-- end section 1 -->
+
+
+  <!-- =============================================
+       SECTION 2: กระบวนการพัฒนาแอปพลิเคชัน
+  ============================================= -->
+  <div class="ws-section s-purple">
+    <div class="sec-hd">
+      <div class="sec-ic">🔄</div>
+      <div>
+        <div class="sec-title">ส่วนที่ 2 — กระบวนการพัฒนาแอปพลิเคชัน</div>
+        <div class="sec-sub">ข้อ 6–10 (ปรนัย เติมคำ เรียงลำดับ และถูก/ผิด)</div>
+      </div>
+    </div>
+
+    <!-- SDLC SVG -->
+    <div class="sdlc-wrap">
+      <svg viewBox="0 0 340 160" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:380px">
+        <!-- Center -->
+        <circle cx="170" cy="80" r="32" fill="#1a237e" stroke="#7986cb" stroke-width="2"/>
+        <text x="170" y="76" text-anchor="middle" font-family="'Sarabun'" font-size="11" font-weight="800" fill="#fff">SDLC</text>
+        <text x="170" y="89" text-anchor="middle" font-family="'Sarabun'" font-size="9" fill="#90caf9">วงจรพัฒนา</text>
+
+        <!-- Step 1: วิเคราะห์ (top) -->
+        <circle cx="170" cy="16" r="22" fill="#006064"/>
+        <text x="170" y="13" text-anchor="middle" font-size="12">🔍</text>
+        <text x="170" y="24" text-anchor="middle" font-family="'Sarabun'" font-size="8.5" font-weight="700" fill="#fff">วิเคราะห์</text>
+        <!-- arrow 1→2 -->
+        <path d="M 190,22 Q 230,35 240,55" fill="none" stroke="#00e5ff" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+        <!-- Step 2: ออกแบบ (top-right) -->
+        <circle cx="258" cy="58" r="22" fill="#4a148c"/>
+        <text x="258" y="55" text-anchor="middle" font-size="12">🎨</text>
+        <text x="258" y="66" text-anchor="middle" font-family="'Sarabun'" font-size="8.5" font-weight="700" fill="#fff">ออกแบบ</text>
+        <!-- arrow 2→3 -->
+        <path d="M 270,76 Q 274,104 260,122" fill="none" stroke="#00e5ff" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+        <!-- Step 3: พัฒนา (bottom-right) -->
+        <circle cx="240" cy="138" r="22" fill="#283593"/>
+        <text x="240" y="135" text-anchor="middle" font-size="12">💻</text>
+        <text x="240" y="146" text-anchor="middle" font-family="'Sarabun'" font-size="8.5" font-weight="700" fill="#fff">พัฒนา</text>
+        <!-- arrow 3→4 -->
+        <path d="M 218,145 Q 190,155 168,148" fill="none" stroke="#00e5ff" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+        <!-- Step 4: ทดสอบ (bottom-left) -->
+        <circle cx="100" cy="138" r="22" fill="#004d40"/>
+        <text x="100" y="135" text-anchor="middle" font-size="12">🧪</text>
+        <text x="100" y="146" text-anchor="middle" font-family="'Sarabun'" font-size="8.5" font-weight="700" fill="#fff">ทดสอบ</text>
+        <!-- arrow 4→5 -->
+        <path d="M 82,128 Q 70,100 80,76" fill="none" stroke="#00e5ff" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+        <!-- Step 5: บำรุงรักษา (left) -->
+        <circle cx="82" cy="58" r="22" fill="#b71c1c"/>
+        <text x="82" y="55" text-anchor="middle" font-size="12">🔧</text>
+        <text x="82" y="66" text-anchor="middle" font-family="'Sarabun'" font-size="8.5" font-weight="700" fill="#fff">บำรุงรักษา</text>
+        <!-- arrow 5→1 -->
+        <path d="M 96,40 Q 130,20 150,18" fill="none" stroke="#00e5ff" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+        <!-- Arrow marker -->
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#00e5ff"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <!-- Q6 -->
+    <div class="q-card">
+      <div class="q-hd"><span class="q-num">6</span><span class="q-txt">ขั้นตอนแรกในกระบวนการพัฒนาแอปพลิเคชันควรเป็นขั้นตอนใด?</span></div>
+      <div class="mcq-grid">
+        <label class="mcq-opt"><input type="radio" name="q6" value="ก"><label>ก) วิเคราะห์ปัญหาและความต้องการ</label></label>
+        <label class="mcq-opt"><input type="radio" name="q6" value="ข"><label>ข) เขียนโค้ดโปรแกรม</label></label>
+        <label class="mcq-opt"><input type="radio" name="q6" value="ค"><label>ค) เผยแพร่แอปใน Store</label></label>
+        <label class="mcq-opt"><input type="radio" name="q6" value="ง"><label>ง) ทดสอบระบบ</label></label>
+      </div>
+    </div>
+
+    <!-- Q7 fill + word bank -->
+    <div class="q-card">
+      <div class="q-hd"><span class="q-num">7</span><span class="q-txt">ขั้นตอน "_________" คือการแปลงแบบออกแบบให้กลายเป็นโค้ดที่ทำงานได้จริง</span></div>
+      <div class="wb-box">
+        <div class="wb-ttl">💡 คลังคำ — คลิกเพื่อเติม</div>
+        <div class="wb-chips">
+          <button class="wb-chip" onclick="fillWord('q7',this,'เขียนโปรแกรม')">เขียนโปรแกรม</button>
+          <button class="wb-chip" onclick="fillWord('q7',this,'วิเคราะห์')">วิเคราะห์</button>
+          <button class="wb-chip" onclick="fillWord('q7',this,'บำรุงรักษา')">บำรุงรักษา</button>
+          <button class="wb-chip" onclick="fillWord('q7',this,'เผยแพร่เท่านั้น')">เผยแพร่เท่านั้น</button>
+        </div>
+      </div>
+      <input class="fill-inp" id="q7" placeholder="เติมชื่อขั้นตอน...">
+    </div>
+
+    <!-- Q8 Ordering -->
+    <div class="q-card">
+      <div class="q-hd"><span class="q-num">8</span><span class="q-txt">เขียนลำดับที่ถูกต้อง (1–5) ลงในช่องด้านหน้า</span></div>
+      <div class="order-item">
+        <input class="order-num-inp" id="q8a" type="number" min="1" max="5" placeholder="#">
+        <span class="order-icon">🔍</span>
+        <span class="order-txt">วิเคราะห์ปัญหาและความต้องการของผู้ใช้</span>
+      </div>
+      <div class="order-item">
+        <input class="order-num-inp" id="q8b" type="number" min="1" max="5" placeholder="#">
+        <span class="order-icon">🧪</span>
+        <span class="order-txt">ทดสอบระบบและแก้ไขข้อผิดพลาด (Bug Fix)</span>
+      </div>
+      <div class="order-item">
+        <input class="order-num-inp" id="q8c" type="number" min="1" max="5" placeholder="#">
+        <span class="order-icon">🎨</span>
+        <span class="order-txt">ออกแบบระบบและหน้าจอ (UI Design)</span>
+      </div>
+      <div class="order-item">
+        <input class="order-num-inp" id="q8d" type="number" min="1" max="5" placeholder="#">
+        <span class="order-icon">🔧</span>
+        <span class="order-txt">บำรุงรักษาและอัปเดตแอป</span>
+      </div>
+      <div class="order-item">
+        <input class="order-num-inp" id="q8e" type="number" min="1" max="5" placeholder="#">
+        <span class="order-icon">💻</span>
+        <span class="order-txt">เขียนโค้ดโปรแกรม (Coding)</span>
+      </div>
+    </div>
+
+    <!-- Q9 T/F -->
+    <div class="q-card">
+      <div class="q-hd"><span class="q-num">9</span><span class="q-txt">การทดสอบซอฟต์แวร์ (Testing) ควรทำเฉพาะเมื่อพัฒนาเสร็จสมบูรณ์แล้วเท่านั้น</span></div>
+      <div class="tf-wrap">
+        <button class="tf-btn tf-yes" data-id="q9" data-val="true">✅ ถูก</button>
+        <button class="tf-btn tf-no"  data-id="q9" data-val="false">❌ ผิด</button>
+      </div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="q-card">
+      <div class="q-hd"><span class="q-num">10</span><span class="q-txt">Prototype ในขั้นตอนออกแบบ UI/UX หมายถึงอะไร?</span></div>
+      <div class="mcq-grid">
+        <label class="mcq-opt"><input type="radio" name="q10" value="ก"><label>ก) โค้ดโปรแกรมสำเร็จรูป</label></label>
+        <label class="mcq-opt"><input type="radio" name="q10" value="ข"><label>ข) ต้นแบบเพื่อทดสอบการออกแบบก่อนพัฒนาจริง</label></label>
+        <label class="mcq-opt"><input type="radio" name="q10" value="ค"><label>ค) ฐานข้อมูลสำเร็จรูป</label></label>
+        <label class="mcq-opt"><input type="radio" name="q10" value="ง"><label>ง) เซิร์ฟเวอร์สำหรับโฮสต์แอป</label></label>
+      </div>
+    </div>
+  </div><!-- end section 2 -->
+
+
+  <!-- =============================================
+       SECTION 3: ภาษาโปรแกรมและเครื่องมือ
+  ============================================= -->
+  <div class="ws-section s-teal">
+    <div class="sec-hd">
+      <div class="sec-ic">⌨️</div>
+      <div>
+        <div class="sec-title">ส่วนที่ 3 — ภาษาโปรแกรมและเครื่องมือพัฒนา</div>
+        <div class="sec-sub">ข้อ 11–15 (ปรนัย ถูก/ผิด จับคู่ และเติมคำ)</div>
+      </div>
+    </div>
+
+    <!-- Language badges -->
+    <div class="lang-row">
+      <div class="lang-badge lb-py">
+        <span class="l-emoji">🐍</span>
+        <span class="l-name">Python</span>
+      </div>
+      <div class="lang-badge lb-js">
+        <span class="l-emoji">⚡</span>
+        <span class="l-name">JavaScript</span>
+      </div>
+      <div class="lang-badge lb-java">
+        <span class="l-emoji">☕</span>
+        <span class="l-name">Java</span>
+      </div>
+      <div class="lang-badge lb-swift">
+        <span class="l-emoji">🦅</span>
+        <span class="l-name">Swift</span>
+      </div>
+      <div class="lang-badge lb-kt">
+        <span class="l-emoji">🎯</span>
+        <span class="l-name">Kotlin</span>
+      </div>
+    </div>
+
+    <div class="info-box ib-teal">
+      <h4>🛠️ เครื่องมือสำคัญในการพัฒนาแอป</h4>
+      <ul>
+        <li><b>IDE</b> (Integrated Development Environment) — โปรแกรมเขียนโค้ด เช่น VS Code, Android Studio</li>
+        <li><b>Git</b> — ระบบควบคุมเวอร์ชัน ช่วยจัดการโค้ดและทำงานร่วมกับทีม</li>
+        <li><b>Emulator/Simulator</b> — จำลองอุปกรณ์เพื่อทดสอบแอปบนคอมพิวเตอร์</li>
+        <li><b>API</b> — ช่องทางเชื่อมต่อข้อมูลระหว่างแอปกับเซิร์ฟเวอร์</li>
+      </ul>
+    </div>
+
+    <!-- Q11 -->
+    <div class="q-card">
+      <div class="q-hd"><span class="q-num">11</span><span class="q-txt">ภาษา Python เป็นที่นิยมเป็นพิเศษในงานด้านใด?</span></div>
+      <div class="mcq-grid">
+        <label class="mcq-opt"><input type="radio" name="q11" value="ก"><label>ก) พัฒนา iOS App</label></label>
+        <label class="mcq-opt"><input type="radio" name="q11" value="ข"><label>ข) Data Science / AI / Machine Learning</label></label>
+        <label class="mcq-opt"><input type="radio" name="q11" value="ค"><label>ค) ออกแบบเว็บไซต์ (Frontend)</label></label>
+        <label class="mcq-opt"><input type="radio" name="q11" value="ง"><label>ง) พัฒนาเกมบน Console</label></label>
+      </div>
+    </div>
+
+    <!-- Q12 -->
+    <div class="q-card">
+      <div class="q-hd"><span class="q-num">12</span><span class="q-txt">IDE ย่อมาจากอะไร?</span></div>
+      <div class="mcq-grid">
+        <label class="mcq-opt"><input type="radio" name="q12" value="ก"><label>ก) Internet Design Engine</label></label>
+        <label class="mcq-opt"><input type="radio" name="q12" value="ข"><label>ข) Internal Data Environment</label></label>
+        <label class="mcq-opt"><input type="radio" name="q12" value="ค"><label>ค) Integrated Development Environment</label></label>
+        <label class="mcq-opt"><input type="radio" name="q12" value="ง"><label>ง) Interactive Debug Extension</label></label>
+      </div>
+    </div>
+
+    <!-- Q13 T/F -->
+    <div class="q-card">
+      <div class="q-hd"><span class="q-num">13</span><span class="q-txt">Git ใช้สำหรับควบคุมเวอร์ชันโค้ด (Version Control) และช่วยให้ทีมพัฒนาทำงานร่วมกันได้</span></div>
+      <div class="tf-wrap">
+        <button class="tf-btn tf-yes" data-id="q13" data-val="true">✅ ถูก</button>
+        <button class="tf-btn tf-no"  data-id="q13" data-val="false">❌ ผิด</button>
+      </div>
+    </div>
+
+    <!-- Q14 matching -->
+    <div class="q-card">
+      <div class="q-hd"><span class="q-num">14</span><span class="q-txt">จับคู่ภาษาโปรแกรมกับงานที่เหมาะสม</span></div>
+      <div class="match-item">
+        <span class="match-tag">🐍 Python</span>
+        <span class="match-arr">→</span>
+        <select class="match-sel" id="q14a">
+          <option value="">-- เลือก --</option>
+          <option>Data Science / AI</option><option>Web Frontend</option><option>iOS App</option><option>Android App</option>
+        </select>
+      </div>
+      <div class="match-item">
+        <span class="match-tag">⚡ JavaScript</span>
+        <span class="match-arr">→</span>
+        <select class="match-sel" id="q14b">
+          <option value="">-- เลือก --</option>
+          <option>Data Science / AI</option><option>Web Frontend</option><option>iOS App</option><option>Android App</option>
+        </select>
+      </div>
+      <div class="match-item">
+        <span class="match-tag">🦅 Swift</span>
+        <span class="match-arr">→</span>
+        <select class="match-sel" id="q14c">
+          <option value="">-- เลือก --</option>
+          <option>Data Science / AI</option><option>Web Frontend</option><option>iOS App</option><option>Android App</option>
+        </select>
+      </div>
+      <div class="match-item">
+        <span class="match-tag">🎯 Kotlin</span>
+        <span class="match-arr">→</span>
+        <select class="match-sel" id="q14d">
+          <option value="">-- เลือก --</option>
+          <option>Data Science / AI</option><option>Web Frontend</option><option>iOS App</option><option>Android App</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Q15 fill -->
+    <div class="q-card">
+      <div class="q-hd"><span class="q-num">15</span><span class="q-txt">JavaScript ส่วนใหญ่ใช้พัฒนา _________________________ โดยทำให้หน้าเว็บมีการโต้ตอบกับผู้ใช้ได้</span></div>
+      <input class="fill-inp" id="q15" placeholder="พิมพ์คำตอบ...">
+    </div>
+  </div><!-- end section 3 -->
+
+
+  <!-- =============================================
+       SECTION 4: UI/UX และความปลอดภัย
+  ============================================= -->
+  <div class="ws-section s-indigo">
+    <div class="sec-hd">
+      <div class="sec-ic">🎨</div>
+      <div>
+        <div class="sec-title">ส่วนที่ 4 — UI/UX และความปลอดภัยของแอป</div>
+        <div class="sec-sub">ข้อ 16–20 (ปรนัย ถูก/ผิด และอัตนัย)</div>
+      </div>
+    </div>
+
+    <!-- UI/UX illustration -->
+    <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:18px">
+      <div style="background:#e8eaf6;border-radius:16px;padding:14px 18px;text-align:center;min-width:120px;border:2px solid #7986cb">
+        <div style="font-size:32px;margin-bottom:4px">🖼️</div>
+        <div style="font-size:13px;font-weight:800;color:#1a237e">UI</div>
+        <div style="font-size:12px;color:#555">User Interface<br>การออกแบบหน้าจอ</div>
+      </div>
+      <div style="background:#e8eaf6;border-radius:16px;padding:14px 18px;text-align:center;min-width:120px;border:2px solid #7986cb">
+        <div style="font-size:32px;margin-bottom:4px">🧠</div>
+        <div style="font-size:13px;font-weight:800;color:#1a237e">UX</div>
+        <div style="font-size:12px;color:#555">User Experience<br>ประสบการณ์ผู้ใช้</div>
+      </div>
+      <div style="background:#e8eaf6;border-radius:16px;padding:14px 18px;text-align:center;min-width:120px;border:2px solid #7986cb">
+        <div style="font-size:32px;margin-bottom:4px">🛡️</div>
+        <div style="font-size:13px;font-weight:800;color:#1a237e">Security</div>
+        <div style="font-size:12px;color:#555">ความปลอดภัย<br>ของแอป</div>
+      </div>
+    </div>
+
+    <!-- Q16 -->
+    <div class="q-card">
+      <div class="q-hd"><span class="q-num">16</span><span class="q-txt">UX ในการพัฒนาแอปพลิเคชันย่อมาจากอะไร?</span></div>
+      <div class="mcq-grid">
+        <label class="mcq-opt"><input type="radio" name="q16" value="ก"><label>ก) User Extension</label></label>
+        <label class="mcq-opt"><input type="radio" name="q16" value="ข"><label>ข) User Experience</label></label>
+        <label class="mcq-opt"><input type="radio" name="q16" value="ค"><label>ค) Unified eXchange</label></label>
+        <label class="mcq-opt"><input type="radio" name="q16" value="ง"><label>ง) Universal Execution</label></label>
+      </div>
+    </div>
+
+    <!-- Q17 T/F -->
+    <div class="q-card">
+      <div class="q-hd"><span class="q-num">17</span><span class="q-txt">UI (User Interface) ที่ดีควรมีทั้งความสวยงามและใช้งานง่าย (Usability)</span></div>
+      <div class="tf-wrap">
+        <button class="tf-btn tf-yes" data-id="q17" data-val="true">✅ ถูก</button>
+        <button class="tf-btn tf-no"  data-id="q17" data-val="false">❌ ผิด</button>
+      </div>
+    </div>
+
+    <!-- Q18 -->
+    <div class="q-card">
+      <div class="q-hd"><span class="q-num">18</span><span class="q-txt">คำว่า "Bug" ในการเขียนโปรแกรมหมายถึงอะไร?</span></div>
+      <div class="mcq-grid">
+        <label class="mcq-opt"><input type="radio" name="q18" value="ก"><label>ก) ข้อผิดพลาดหรือจุดบกพร่องในโปรแกรม</label></label>
+        <label class="mcq-opt"><input type="radio" name="q18" value="ข"><label>ข) ชื่อไฟล์ประเภทหนึ่ง</label></label>
+        <label class="mcq-opt"><input type="radio" name="q18" value="ค"><label>ค) ภาษาโปรแกรมชนิดใหม่</label></label>
+        <label class="mcq-opt"><input type="radio" name="q18" value="ง"><label>ง) ฟีเจอร์ของแอปพลิเคชัน</label></label>
+      </div>
+    </div>
+
+    <!-- Q19 T/F -->
+    <div class="q-card">
+      <div class="q-hd"><span class="q-num">19</span><span class="q-txt">การตรวจสอบสิทธิ์ผู้ใช้ (Authentication) เช่น รหัสผ่านและ OTP ช่วยเพิ่มความปลอดภัยของแอป</span></div>
+      <div class="tf-wrap">
+        <button class="tf-btn tf-yes" data-id="q19" data-val="true">✅ ถูก</button>
+        <button class="tf-btn tf-no"  data-id="q19" data-val="false">❌ ผิด</button>
+      </div>
+    </div>
+
+    <!-- Q20 Open -->
+    <div class="q-card">
+      <div class="q-hd"><span class="q-num">20</span><span class="q-txt">🤔 อธิบายความสำคัญของการทดสอบแอปพลิเคชัน (Testing) ก่อนเผยแพร่ให้ผู้ใช้จริง พร้อมยกตัวอย่างปัญหาที่อาจเกิดขึ้นหากไม่ทดสอบ</span></div>
+      <textarea class="open-inp" id="q20" placeholder="เขียนคำอธิบาย..."></textarea>
+    </div>
+  </div><!-- end section 4 -->
+
+
+  <!-- ===== SUBMIT ===== -->
+  <div class="submit-area">
+    <button class="btn-submit" id="btnSubmit">📤 ส่งใบงาน</button>
+    <div class="submit-msg" id="submitMsg"></div>
+  </div>
+
+</div><!-- end wrap -->
+
+<script type="module">
+import { initializeApp }  from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { FIREBASE_CONFIG } from './js/config.js';
+
+const app = initializeApp(FIREBASE_CONFIG);
+const db  = getFirestore(app);
+
+// ====== PROGRESS ======
+const TOTAL = 20;
+const _done = {};
+function mark(id, ok){
+  _done[id] = ok;
+  const n   = Object.values(_done).filter(Boolean).length;
+  const pct = Math.round(n / TOTAL * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent  = pct + '%';
+  document.getElementById('progressText').textContent = `ตอบแล้ว ${n}/${TOTAL} ข้อ`;
+}
+
+// ====== MCQ ======
+document.querySelectorAll('.mcq-opt input[type=radio]').forEach(r => {
+  r.addEventListener('change', () => {
+    document.querySelectorAll(`input[name="${r.name}"]`).forEach(x =>
+      x.closest('.mcq-opt').classList.toggle('sel', x === r)
+    );
+    r.closest('.q-card').classList.add('answered');
+    mark(r.name, true);
+  });
+});
+
+// ====== TRUE/FALSE ======
+document.querySelectorAll('.tf-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const id = btn.dataset.id, val = btn.dataset.val;
+    btn.closest('.tf-wrap').querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    btn.closest('.q-card').classList.add('answered');
+    mark(id, true);
+  });
+});
+
+// ====== FILL / TEXTAREA ======
+['q7','q15','q20'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', function(){
+    const ok = this.value.trim().length > 0;
+    this.closest('.q-card').classList.toggle('answered', ok);
+    mark(id, ok);
+  });
+});
+
+// ====== ORDERING ======
+['q8a','q8b','q8c','q8d','q8e'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', function(){
+    const allFilled = ['q8a','q8b','q8c','q8d','q8e'].every(i => document.getElementById(i).value.trim() !== '');
+    const ok = this.value.trim() !== '';
+    mark(id, ok);
+    document.querySelector('[data-card="q8"]')?.classList.toggle('answered', allFilled);
+  });
+});
+
+// ====== MATCHING ======
+['q5a','q5b','q5c','q14a','q14b','q14c','q14d'].forEach(id => {
+  document.getElementById(id)?.addEventListener('change', function(){
+    const ok = this.value !== '';
+    mark(id, ok);
+    const card = this.closest('.q-card');
+    const allSels = [...card.querySelectorAll('.match-sel')];
+    card.classList.toggle('answered', allSels.every(s => s.value !== ''));
+  });
+});
+
+// ====== WORD BANK ======
+window.fillWord = function(inputId, chipEl, word){
+  if(chipEl.classList.contains('used')) return;
+  document.querySelectorAll(`.wb-chip[data-target="${inputId}"]`).forEach(c => c.classList.remove('used'));
+  chipEl.dataset.target = inputId;
+  chipEl.classList.add('used');
+  const inp = document.getElementById(inputId);
+  if(inp){ inp.value = word; inp.dispatchEvent(new Event('input')); }
+};
+
+// ====== SUBMIT ======
+document.getElementById('btnSubmit').addEventListener('click', async () => {
+  const name  = document.getElementById('studentName').value.trim();
+  const grade = document.getElementById('gradeSelect').value;
+  if(!name){ alert('กรุณากรอกชื่อนักเรียนก่อนส่งใบงาน 📝'); return; }
+
+  const getRadio = n => {
+    const el = document.querySelector(`input[name="${n}"]:checked`);
+    return el ? el.closest('.mcq-opt').querySelector('label').textContent.trim() : '';
+  };
+  const getTF   = id => { const b = document.querySelector(`.tf-btn.active[data-id="${id}"]`); return b ? (b.dataset.val==='true'?'ถูก':'ผิด') : ''; };
+  const getVal  = id => (document.getElementById(id)||{}).value?.trim()||'';
+  const getOrd  = id => getVal(id);
+
+  const answers = {
+    q1:  getRadio('q1'),  q2:  getRadio('q2'),
+    q3:  getTF('q3'),     q4:  getTF('q4'),
+    q5:  `Google Maps:${getVal('q5a')} | TikTok:${getVal('q5b')} | Word:${getVal('q5c')}`,
+    q6:  getRadio('q6'),  q7:  getVal('q7'),
+    q8:  `วิเคราะห์:${getOrd('q8a')} ทดสอบ:${getOrd('q8b')} ออกแบบ:${getOrd('q8c')} บำรุงรักษา:${getOrd('q8d')} เขียนโค้ด:${getOrd('q8e')}`,
+    q9:  getTF('q9'),     q10: getRadio('q10'),
+    q11: getRadio('q11'), q12: getRadio('q12'),
+    q13: getTF('q13'),
+    q14: `Python:${getVal('q14a')} | JS:${getVal('q14b')} | Swift:${getVal('q14c')} | Kotlin:${getVal('q14d')}`,
+    q15: getVal('q15'),   q16: getRadio('q16'),
+    q17: getTF('q17'),    q18: getRadio('q18'),
+    q19: getTF('q19'),    q20: getVal('q20'),
+  };
+
+  const fields = Object.entries(answers).map(([label,value]) => ({label,value}));
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = true; btn.textContent = '⏳ กำลังส่ง...';
+
+  try {
+    await addDoc(collection(db,'worksheet_submissions'),{
+      studentName: name, grade,
+      subject: 'วิทยาการคำนวณ',
+      worksheetTitle: 'ใบงานที่ 1 — การพัฒนาแอปพลิเคชัน',
+      worksheetId: 'ws_cs_m3_unit1',
+      submittedDate: new Date().toLocaleDateString('th-TH'),
+      fields, answers,
+      submittedAt: serverTimestamp(),
+      score: null, maxScore: 20, feedback: '',
+    });
+    const msg = document.getElementById('submitMsg');
+    msg.className = 'submit-msg submit-ok';
+    msg.textContent = '✅ ส่งใบงานเรียบร้อยแล้ว! คุณครูจะตรวจและแจ้งคะแนนให้ภายหลัง 🎉';
+    btn.textContent = '✅ ส่งแล้ว';
+  } catch(e) {
+    const msg = document.getElementById('submitMsg');
+    msg.className = 'submit-msg submit-err';
+    msg.textContent = '❌ ส่งไม่ได้: ' + e.message;
+    btn.disabled = false; btn.textContent = '📤 ส่งใบงาน';
+  }
+});
+</script>
+</body>
+</html>
