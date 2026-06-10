@@ -577,11 +577,7 @@
       box-shadow:0 4px 16px rgba(201,75,0,.35);transition:transform .15s;">
       📤 ส่งคำตอบ
     </button>
-    <div id="submitMsg" style="display:none;margin-top:16px;background:#e8f5e9;
-      border:1.5px solid #66bb6a;border-radius:10px;padding:14px 24px;
-      color:#2e7d32;font-size:15px;font-weight:600;">
-      ✅ ส่งคำตอบเรียบร้อยแล้ว! ครูจะตรวจและแจ้งคะแนนภายหลัง
-    </div>
+    <div id="submitMsg" style="display:none;margin-top:16px;border-radius:12px;padding:16px 20px;border:1.5px solid #66bb6a;background:#f1f8e9;font-family:'Sarabun',sans-serif"></div>
   </div>
 
 
@@ -632,10 +628,10 @@
   // ==================== เฉลยข้อสอบปรนัย (ครูกรอก) ====================
   // ใส่คำตอบที่ถูกต้อง: 'ก', 'ข', 'ค', หรือ 'ง' (ถ้ายังไม่กรอก ใส่ '')
   var ANSWER_KEY_P6 = {
-    q1:'', q2:'', q3:'', q4:'', q5:'',
-    q6:'', q7:'', q8:'', q9:'', q10:'',
-    q11:'', q12:'', q13:'', q14:'', q15:'',
-    q16:'', q17:'', q18:'', q19:'', q20:''
+    q1:'ก', q2:'ข', q3:'ค', q4:'ง', q5:'ก',
+    q6:'ค', q7:'ข', q8:'ง', q9:'ก', q10:'ข',
+    q11:'ง', q12:'ค', q13:'ก', q14:'ข', q15:'ง',
+    q16:'ค', q17:'ก', q18:'ข', q19:'ง', q20:'ค'
   };
 
   function submitAnswers() {
@@ -676,8 +672,34 @@
     (function doSubmit() {
       if (typeof window._submitAnswers === 'function') {
         window._submitAnswers(data).then(function() {
-          document.getElementById('submitMsg').style.display = 'block';
+          // Build result display
+          var msg = document.getElementById('submitMsg');
+          var html = '<div style="font-size:16px;font-weight:800;color:#2e7d32;margin-bottom:10px">✅ ส่งคำตอบสำเร็จ!</div>';
+          if (hasKey) {
+            var pct = Math.round(mcScore / 20 * 100);
+            html += '<div style="font-size:15px;margin-bottom:10px">📊 <b>ปรนัย:</b> <span style="font-size:20px;font-weight:800;color:#' + (pct>=60?'2e7d32':'c62828') + '">' + mcScore + '/20</span> (' + pct + '%)</div>';
+            html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">';
+            for (var qi = 1; qi <= 20; qi++) {
+              var qk = 'q'+qi;
+              if (ANSWER_KEY_P6[qk]) {
+                var ok = mcDetails[qk];
+                html += '<span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;font-size:13px;font-weight:800;background:' + (ok?'#e8f5e9':'#ffebee') + ';color:' + (ok?'#2e7d32':'#c62828') + ';border:1.5px solid ' + (ok?'#a5d6a7':'#ef9a9a') + '">' + (ok?'✅':'❌') + qi + '</span>';
+              }
+            }
+            html += '</div>';
+          } else {
+            html += '<div style="color:#777;font-size:13px;margin-bottom:8px">ครูจะแจ้งคะแนนปรนัยภายหลัง</div>';
+          }
+          var essayCards = document.querySelectorAll('.subjective-card');
+          if (essayCards.length > 0) {
+            html += '<div style="background:#fff8e1;border-radius:8px;padding:8px 12px;font-size:13px;color:#f57c00;border:1px solid #ffe082">✍️ อัตนัย ' + essayCards.length + ' ข้อ — ครูจะตรวจและแจ้งคะแนนภายหลัง</div>';
+          }
+          msg.innerHTML = html;
+          msg.style.display = 'block';
           btn.textContent = '✅ ส่งแล้ว';
+          btn.style.background = '#66bb6a';
+          // Scroll to result
+          msg.scrollIntoView({behavior:'smooth', block:'center'});
         }).catch(function(e) {
           btn.disabled = false;
           btn.textContent = '📤 ส่งคำตอบ';
