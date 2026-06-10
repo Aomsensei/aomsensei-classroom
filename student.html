@@ -49,10 +49,23 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
 .section-title{font-size:17px;font-weight:800;color:#c94b00;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 
 /* Cards */
-.ann-card{background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 2px 12px rgba(201,75,0,.1);border-top:3px solid #f39800}
+.ann-card{background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 2px 12px rgba(201,75,0,.1);border-top:3px solid #f39800;cursor:pointer;transition:.15s}
+.ann-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(201,75,0,.2)}
 .ann-title{font-size:15px;font-weight:800;color:#c94b00;margin-bottom:6px}
-.ann-body{font-size:13.5px;color:#444;line-height:1.7;white-space:pre-wrap}
-.ann-date{font-size:11px;color:#bbb;margin-top:6px}
+.ann-body{font-size:13.5px;color:#444;line-height:1.7;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+.ann-date{font-size:11px;color:#bbb;margin-top:6px;display:flex;justify-content:space-between;align-items:center}
+.ann-read-more{color:#c94b00;font-weight:700;font-size:12px}
+/* ANN FULL VIEW MODAL */
+.ann-full-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:700;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 14px}
+.ann-full-overlay.show{display:flex}
+.ann-full-modal{background:#fff;border-radius:16px;width:100%;max-width:600px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35);margin:auto}
+.ann-full-img{width:100%;max-height:420px;object-fit:contain;background:#f0f0f0;display:block;cursor:zoom-in}
+.ann-full-img.zoomed{max-height:none;cursor:zoom-out}
+.ann-full-body{padding:20px 18px}
+.ann-full-title{font-size:18px;font-weight:800;color:#c94b00;margin-bottom:10px}
+.ann-full-content{font-size:14px;color:#444;line-height:1.85;white-space:pre-wrap}
+.ann-full-date{font-size:12px;color:#bbb;margin-top:12px}
+.ann-full-close{width:100%;padding:13px;background:#c94b00;color:#fff;border:none;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;letter-spacing:.5px}
 
 .card{background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 2px 12px rgba(201,75,0,.1);border-left:4px solid #f39800}
 .card-title{font-size:15px;font-weight:700;color:#333;margin-bottom:4px}
@@ -377,6 +390,19 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
   <div id="pdfContent" style="max-width:800px;margin:0 auto"></div>
 </div>
 
+<!-- Modal: ประกาศขนาดเต็ม -->
+<div class="ann-full-overlay" id="annFullModal" onclick="if(event.target===this)closeAnnFull()">
+  <div class="ann-full-modal">
+    <img id="annFullImg" src="" alt="รูปประกาศ" class="ann-full-img" onclick="this.classList.toggle('zoomed')" style="display:none"/>
+    <div class="ann-full-body">
+      <div class="ann-full-title" id="annFullTitle"></div>
+      <div class="ann-full-content" id="annFullContent"></div>
+      <div class="ann-full-date" id="annFullDate"></div>
+    </div>
+    <button class="ann-full-close" onclick="closeAnnFull()">✕ ปิด</button>
+  </div>
+</div>
+
 <!-- Modal: ตั้งรหัสผ่านครั้งแรก -->
 <div class="overlay" id="modalSetPwd">
   <div class="modal">
@@ -693,21 +719,44 @@ function loadAll(){
 }
 
 // ==================== ANNOUNCEMENTS ====================
+let _annList=[];
 async function loadAnn(){
   const el=document.getElementById('listAnn');
   try{
     const q=query(collection(db,'announcements'),orderBy('createdAt','desc'));
     const snap=await getDocs(q);
+    _annList=[];
     let h='';
     snap.forEach(d=>{
       const a=d.data();
       if(a.roomId&&a.roomId!=='all'&&a.roomId!==student.roomId) return;
       const dt=a.createdAt?.toDate?.()?.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'})||'';
-      h+=`<div class="ann-card">${a.imageUrl?`<img src="${a.imageUrl}" style="width:100%;max-height:220px;object-fit:cover;border-radius:8px;margin-bottom:8px" onerror="this.style.display='none'">`:''}<div class="ann-title">${esc(a.title||'ประกาศ')}</div><div class="ann-body">${esc(a.content||'')}</div><div class="ann-date">📅 ${dt}</div></div>`;
+      const idx=_annList.length;
+      _annList.push({...a, dt});
+      const preview=(a.content||'').length>100?(a.content||'').slice(0,100)+'...':a.content||'';
+      h+=`<div class="ann-card" onclick="openAnnFull(${idx})">
+        ${a.imageUrl?`<img src="${esc(a.imageUrl)}" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;margin-bottom:8px" onerror="this.style.display='none'">`:''
+        }<div class="ann-title">${esc(a.title||'ประกาศ')}</div>
+        <div class="ann-body">${esc(preview)}</div>
+        <div class="ann-date"><span>📅 ${dt}</span><span class="ann-read-more">อ่านเพิ่มเติม →</span></div>
+      </div>`;
     });
     el.innerHTML=h||'<div class="empty-state"><i class="fas fa-bullhorn"></i><p>ยังไม่มีประกาศ</p></div>';
   }catch(e){ el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`; }
 }
+window.openAnnFull=function(idx){
+  const a=_annList[idx]; if(!a) return;
+  const img=document.getElementById('annFullImg');
+  if(a.imageUrl){ img.src=a.imageUrl; img.style.display='block'; img.classList.remove('zoomed'); }
+  else{ img.style.display='none'; }
+  document.getElementById('annFullTitle').textContent=a.title||'ประกาศ';
+  document.getElementById('annFullContent').textContent=a.content||'';
+  document.getElementById('annFullDate').textContent=a.dt?'📅 '+a.dt:'';
+  document.getElementById('annFullModal').classList.add('show');
+};
+window.closeAnnFull=function(){
+  document.getElementById('annFullModal').classList.remove('show');
+};
 
 // ==================== WORKSHEETS ====================
 async function loadWs(){
