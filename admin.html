@@ -62,6 +62,8 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
 .btn-sm{padding:5px 10px;font-size:12px}
 
 .section-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.ws-subtab{padding:8px 22px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:#888;border-bottom:3px solid transparent;margin-bottom:-2px}
+.ws-subtab.active{color:#c94b00;border-bottom:3px solid #f39800;background:none}
 .section-hd h2{font-size:17px;font-weight:800;color:#c94b00;display:flex;align-items:center;gap:8px}
 
 /* TABLE */
@@ -173,7 +175,7 @@ tbody tr:hover td{background:#fff3e8}
     <button class="nav-item active" onclick="showPage('dashboard',this)"><i class="fas fa-tachometer-alt"></i> Dashboard</button>
     <button class="nav-item" onclick="showPage('classrooms',this)"><i class="fas fa-school"></i> ห้องเรียน</button>
     <button class="nav-item" onclick="showPage('announcements',this)"><i class="fas fa-bullhorn"></i> ประกาศ</button>
-    <button class="nav-item" onclick="showPage('worksheets',this)"><i class="fas fa-file-alt"></i> ใบงาน</button>
+    <button class="nav-item" onclick="showPage('worksheets',this)"><i class="fas fa-file-alt"></i> ใบงาน / ใบความรู้</button>
     <button class="nav-item" onclick="showPage('quizzes',this)"><i class="fas fa-pen-to-square"></i> ข้อสอบ</button>
     <button class="nav-item" onclick="showPage('videos',this)"><i class="fas fa-play-circle"></i> วิดีโอ</button>
     <button class="nav-item" onclick="showPage('results',this)"><i class="fas fa-chart-bar"></i> ผลสอบ</button>
@@ -240,8 +242,22 @@ tbody tr:hover td{background:#fff3e8}
 
     <!-- WORKSHEETS -->
     <div id="page-worksheets" class="page">
-      <div class="section-hd"><h2><i class="fas fa-file-alt"></i> ใบงาน</h2><button class="btn btn-orange" onclick="openModal('mWs');clearForm('ws')">➕ เพิ่มใบงาน</button></div>
-      <div class="table-wrap"><table><thead><tr><th>ชื่อ</th><th>ห้อง</th><th>วิชา</th><th>คำอธิบาย</th><th>วันที่</th><th>การจัดการ</th></tr></thead><tbody id="tbWs"></tbody></table></div>
+      <div class="section-hd">
+        <h2><i class="fas fa-file-alt"></i> ใบงาน / ใบความรู้</h2>
+        <button class="btn btn-orange" onclick="openAddWsModal('worksheet')">➕ เพิ่มใบงาน</button>
+        <button class="btn btn-orange" style="background:#7b1fa2;border-color:#7b1fa2" onclick="openAddWsModal('knowledge')">➕ เพิ่มใบความรู้</button>
+      </div>
+      <!-- Sub-tabs -->
+      <div style="display:flex;gap:0;margin-bottom:12px;border-bottom:2px solid #ffd0a0">
+        <button id="wsTab-worksheet" class="ws-subtab active" onclick="switchWsTab('worksheet')">📄 ใบงาน</button>
+        <button id="wsTab-knowledge" class="ws-subtab" onclick="switchWsTab('knowledge')">📖 ใบความรู้</button>
+      </div>
+      <div id="wsPanel-worksheet">
+        <div class="table-wrap"><table><thead><tr><th>ชื่อ</th><th>ห้อง</th><th>วิชา</th><th>คำอธิบาย</th><th>วันที่</th><th>การจัดการ</th></tr></thead><tbody id="tbWs"></tbody></table></div>
+      </div>
+      <div id="wsPanel-knowledge" style="display:none">
+        <div class="table-wrap"><table><thead><tr><th>ชื่อ</th><th>ห้อง</th><th>วิชา</th><th>คำอธิบาย</th><th>วันที่</th><th>การจัดการ</th></tr></thead><tbody id="tbKn"></tbody></table></div>
+      </div>
     </div>
 
     <!-- QUIZZES -->
@@ -525,13 +541,13 @@ tbody tr:hover td{background:#fff3e8}
 </div></div>
 
 <div class="overlay" id="mWs"><div class="modal lg">
-  <h2>📄 ใบงาน</h2><input type="hidden" id="wsId"/>
-  <div class="frow"><label>ชื่อใบงาน</label><input type="text" id="wsTitle"/></div>
+  <h2 id="mWsTitle">📄 ใบงาน</h2><input type="hidden" id="wsId"/><input type="hidden" id="wsType" value="worksheet"/>
+  <div class="frow"><label id="mWsTitleLabel">ชื่อใบงาน</label><input type="text" id="wsTitle"/></div>
   <div style="display:flex;gap:10px;flex-wrap:wrap">
     <div class="frow" style="flex:1;min-width:170px"><label>🏫 ห้องเรียน</label><select id="wsRoom"><option value="all">ทุกห้องเรียน</option></select></div>
     <div class="frow" style="flex:1;min-width:130px"><label>📚 วิชา</label><input type="text" id="wsSubject" placeholder="เช่น คณิตศาสตร์"/></div>
   </div>
-  <div class="frow"><label>คำอธิบาย / โจทย์</label><textarea id="wsDesc" rows="3"></textarea></div>
+  <div class="frow"><label>คำอธิบาย</label><textarea id="wsDesc" rows="3"></textarea></div>
   <div class="frow"><label>ลิงก์ไฟล์ (Google Drive / URL)</label><input type="url" id="wsUrl" placeholder="https://..."/></div>
   <div class="frow"><label>HTML Content (ไม่บังคับ)</label><textarea id="wsHtml" rows="2" placeholder="วาง HTML ที่นี่"></textarea></div>
   <div class="btn-row"><button class="btn btn-gray" onclick="closeModal('mWs')">ยกเลิก</button><button class="btn btn-orange" onclick="saveWs()">บันทึก</button></div>
@@ -689,7 +705,7 @@ window.closeModal = id => document.getElementById(id).classList.remove('show');
 window.clearForm = function(t){
   if(t==='cls'){document.getElementById('clsId').value='';document.getElementById('clsName').value='';document.getElementById('clsCode').value='';}
   if(t==='ann'){document.getElementById('annId').value='';document.getElementById('annTitle').value='';document.getElementById('annContent').value='';document.getElementById('annImageUrl').value='';}
-  if(t==='ws'){document.getElementById('wsId').value='';['wsTitle','wsSubject','wsDesc','wsUrl','wsHtml'].forEach(id=>document.getElementById(id).value='');}
+  if(t==='ws'){document.getElementById('wsId').value='';document.getElementById('wsType').value='worksheet';['wsTitle','wsSubject','wsDesc','wsUrl','wsHtml'].forEach(id=>document.getElementById(id).value='');document.getElementById('mWsTitle').textContent='📄 ใบงาน';document.getElementById('mWsTitleLabel').textContent='ชื่อใบงาน';}
   if(t==='qz'){document.getElementById('qzId').value='';document.getElementById('qzTitle').value='';document.getElementById('qzType').value='questions';toggleQzType('questions');document.getElementById('qzTime').value=30;document.getElementById('qzPass').value=60;document.getElementById('qzHtmlUrl').value='';qzQuestions=[];renderQ();}
   if(t==='vid'){document.getElementById('vidId').value='';['vidTitle','vidUrl','vidDesc'].forEach(id=>document.getElementById(id).value='');}
 };
@@ -759,23 +775,56 @@ window.saveAnn=async function(){
 
 // ==================== WORKSHEETS ====================
 let _ws={};
+let _wsCurrentTab='worksheet';
+window.switchWsTab=function(tab){
+  _wsCurrentTab=tab;
+  document.getElementById('wsTab-worksheet').classList.toggle('active',tab==='worksheet');
+  document.getElementById('wsTab-knowledge').classList.toggle('active',tab==='knowledge');
+  document.getElementById('wsPanel-worksheet').style.display=tab==='worksheet'?'':'none';
+  document.getElementById('wsPanel-knowledge').style.display=tab==='knowledge'?'':'none';
+};
+window.openAddWsModal=function(type){
+  clearForm('ws');
+  document.getElementById('wsType').value=type;
+  document.getElementById('mWsTitle').textContent=type==='knowledge'?'📖 ใบความรู้':'📄 ใบงาน';
+  document.getElementById('mWsTitleLabel').textContent=type==='knowledge'?'ชื่อใบความรู้':'ชื่อใบงาน';
+  openModal('mWs');
+};
 async function loadWs(){
-  const tb=document.getElementById('tbWs');tb.innerHTML='';_ws={};
+  const tb=document.getElementById('tbWs');tb.innerHTML='';
+  const tkn=document.getElementById('tbKn');tkn.innerHTML='';_ws={};
   const q=query(collection(db,'worksheets'),orderBy('createdAt','desc'));
   const snap=await getDocs(q);
   snap.forEach(d=>{const w=d.data();_ws[d.id]=w;const dt=w.createdAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
     const rname=w.roomId==='all'||!w.roomId?'ทุกห้อง':(_clsMap[w.roomId]?.name||w.roomId);
-    tb.innerHTML+=`<tr><td><b>${w.title||'-'}</b></td><td><small>${rname}</small></td><td><small>${w.subject||'-'}</small></td><td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${w.description||''}</td><td>${dt}</td><td><button class="btn btn-gray btn-sm" onclick="editWs('${d.id}')">✏️</button> <button class="btn btn-red btn-sm" onclick="delDoc('worksheets','${d.id}',loadWs)">🗑️</button></td></tr>`;
+    const row=`<tr><td><b>${w.title||'-'}</b></td><td><small>${rname}</small></td><td><small>${w.subject||'-'}</small></td><td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${w.description||''}</td><td>${dt}</td><td><button class="btn btn-gray btn-sm" onclick="editWs('${d.id}')">✏️</button> <button class="btn btn-red btn-sm" onclick="delDoc('worksheets','${d.id}',loadWs)">🗑️</button></td></tr>`;
+    if(w.type==='knowledge') tkn.innerHTML+=row;
+    else tb.innerHTML+=row;
   });
 }
-window.editWs=function(id){const w=_ws[id]||{};document.getElementById('wsId').value=id;document.getElementById('wsTitle').value=w.title||'';document.getElementById('wsRoom').value=w.roomId||'all';document.getElementById('wsSubject').value=w.subject||'';document.getElementById('wsDesc').value=w.description||'';document.getElementById('wsUrl').value=w.fileUrl||'';document.getElementById('wsHtml').value=w.htmlContent||'';openModal('mWs');};
+window.editWs=function(id){
+  const w=_ws[id]||{};
+  const type=w.type||'worksheet';
+  document.getElementById('wsId').value=id;
+  document.getElementById('wsType').value=type;
+  document.getElementById('mWsTitle').textContent=type==='knowledge'?'📖 ใบความรู้':'📄 ใบงาน';
+  document.getElementById('mWsTitleLabel').textContent=type==='knowledge'?'ชื่อใบความรู้':'ชื่อใบงาน';
+  document.getElementById('wsTitle').value=w.title||'';
+  document.getElementById('wsRoom').value=w.roomId||'all';
+  document.getElementById('wsSubject').value=w.subject||'';
+  document.getElementById('wsDesc').value=w.description||'';
+  document.getElementById('wsUrl').value=w.fileUrl||'';
+  document.getElementById('wsHtml').value=w.htmlContent||'';
+  openModal('mWs');
+};
 window.saveWs=async function(){
   const id=document.getElementById('wsId').value;
-  const data={title:document.getElementById('wsTitle').value.trim(),roomId:document.getElementById('wsRoom').value,subject:document.getElementById('wsSubject').value.trim(),description:document.getElementById('wsDesc').value.trim(),fileUrl:document.getElementById('wsUrl').value.trim(),htmlContent:document.getElementById('wsHtml').value.trim()};
+  const data={type:document.getElementById('wsType').value||'worksheet',title:document.getElementById('wsTitle').value.trim(),roomId:document.getElementById('wsRoom').value,subject:document.getElementById('wsSubject').value.trim(),description:document.getElementById('wsDesc').value.trim(),fileUrl:document.getElementById('wsUrl').value.trim(),htmlContent:document.getElementById('wsHtml').value.trim()};
   if(!data.title)return;
   if(id)await setDoc(doc(db,'worksheets',id),data,{merge:true});
   else await addDoc(collection(db,'worksheets'),{...data,createdAt:serverTimestamp()});
   closeModal('mWs');loadWs();
+  switchWsTab(data.type);
 };
 
 // ==================== QUIZZES ====================
