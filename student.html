@@ -450,6 +450,7 @@ window._worksheets = {};
 let _isChatTabActive = false;
 let _prevTeacherCount = 0;
 let _chatInitialized = false;
+const _origStudentTitle = document.title;
 let _replyTo = null;  // { docId, text, sender }
 let _pendingLoginData = null;  // for first-time password setup
 let _chatDocs = {}; // docId → message data (for delete/reply reference)
@@ -695,7 +696,11 @@ function _setChatBadge(count){
   if(count>0){
     if(!badge){badge=document.createElement('span');badge.className='chat-tab-badge';tab.appendChild(badge);}
     badge.textContent=count>9?'9+':String(count);
-  } else if(badge){badge.remove();}
+    document.title=`(${count>9?'9+':count}) ${_origStudentTitle}`;
+  } else {
+    if(badge){badge.remove();}
+    document.title=_origStudentTitle;
+  }
 }
 
 window.switchTab = function(t){
