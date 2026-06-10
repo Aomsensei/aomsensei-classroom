@@ -1051,6 +1051,7 @@ function sortRooms(rooms){
 let _notifUnsubs={};
 let _roomBaseline={};
 let _teacherReply=null;
+let _chatMsgCache={}; // docId → message data
 
 async function checkAndCleanOldChats(){
   // ลบแชทอัตโนมัติทุก 2 เดือนในวันที่ 1
@@ -1158,9 +1159,11 @@ window.openRoom=function(id){
   chatUnsub=onSnapshot(q,snap=>{
     const el=document.getElementById('chatMsgs');
     if(snap.empty){el.innerHTML='<div class="empty-state"><i class="fas fa-comments" style="color:#ffd0a0"></i><p style="font-size:13px;color:#bbb">ยังไม่มีข้อความในห้องนี้</p></div>';return;}
+    _chatMsgCache={};
     let h='';
     snap.forEach(d=>{
       const m=d.data(); const docId=d.id;
+      _chatMsgCache[docId]=m; // cache for safe access
       const mine=m.role==='teacher';
       const dt=m.createdAt?.toDate?.()?.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})||'';
       const replyHtml=m.replyTo?`<div class="bubble-reply"><b>${esc(m.replyTo.sender||'')}</b>: ${esc(m.replyTo.text||'')}</div>`:'';
@@ -1169,7 +1172,7 @@ window.openRoom=function(id){
         ${senderLabel}
         <div class="bubble">${replyHtml}${esc(m.text)}</div>
         <div class="msg-actions">
-          <button class="msg-action-btn" onclick="replyTeacherMsg('${docId}','${esc(m.sender||'นักเรียน')}','${esc(m.text)}')">↩ ตอบ</button>
+          <button class="msg-action-btn" onclick="replyTeacherMsg('${docId}')">↩ ตอบ</button>
           <button class="msg-action-btn" onclick="deleteTeacherMsg('${docId}')">🗑️ ลบ</button>
         </div>
         <div class="msg-time">${dt}</div>
@@ -1186,7 +1189,10 @@ window.sendTeacherChat=async function(){
   cancelTeacherReply();
   await addDoc(collection(db,'chats',currentRoom,'messages'),data);
 };
-window.replyTeacherMsg=function(docId,sender,text){
+window.replyTeacherMsg=function(docId){
+  const m=_chatMsgCache[docId]; if(!m) return;
+  const sender=m.sender||'นักเรียน';
+  const text=m.text||'';
   _teacherReply={docId,sender,text};
   document.getElementById('replyBarText').textContent=sender+': '+text;
   document.getElementById('replyBar').classList.add('show');
