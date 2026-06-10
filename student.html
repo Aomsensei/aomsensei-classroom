@@ -228,6 +228,7 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="switchTab('ann')" id="tab-ann"><i class="fas fa-bullhorn"></i>ประกาศ</button>
     <button class="nav-tab" onclick="switchTab('ws')" id="tab-ws"><i class="fas fa-file-alt"></i>ใบงาน</button>
+    <button class="nav-tab" onclick="switchTab('kn')" id="tab-kn"><i class="fas fa-book-open"></i>ใบความรู้</button>
     <button class="nav-tab" onclick="switchTab('quiz')" id="tab-quiz"><i class="fas fa-pen-to-square"></i>ข้อสอบ</button>
     <button class="nav-tab" onclick="switchTab('vid')" id="tab-vid"><i class="fas fa-play-circle"></i>วิดีโอ</button>
     <button class="nav-tab" onclick="switchTab('score')" id="tab-score"><i class="fas fa-chart-bar"></i>คะแนน</button>
@@ -241,8 +242,13 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
   </div>
 
   <div id="content-ws" class="tab-content">
-    <div class="section-title"><i class="fas fa-file-alt"></i> ใบงานและใบความรู้</div>
+    <div class="section-title"><i class="fas fa-file-alt"></i> ใบงาน</div>
     <div id="listWs"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i></div></div>
+  </div>
+
+  <div id="content-kn" class="tab-content">
+    <div class="section-title"><i class="fas fa-book-open"></i> ใบความรู้</div>
+    <div id="listKn"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i></div></div>
   </div>
 
   <div id="content-quiz" class="tab-content">
@@ -783,27 +789,36 @@ window.closeAnnFull=function(){
 
 // ==================== WORKSHEETS ====================
 async function loadWs(){
-  const el=document.getElementById('listWs');
+  const elWs=document.getElementById('listWs');
+  const elKn=document.getElementById('listKn');
   try{
     const q=query(collection(db,'worksheets'),orderBy('createdAt','desc'));
     const snap=await getDocs(q);
-    let h='';
+    let hWs='', hKn='';
     snap.forEach(d=>{
       const w=d.data();
       if(w.roomId&&w.roomId!=='all'&&w.roomId!==student.roomId) return;
       window._worksheets[d.id]=w;
       const dt=w.createdAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
-      h+=`<div class="card">
-        <div class="card-title">📄 ${esc(w.title||'ใบงาน')}</div>
+      const isKn=w.type==='knowledge';
+      const icon=isKn?'📖':'📄';
+      const btnLabel=isKn?'📖 เปิดใบความรู้':'📖 เปิดใบงาน';
+      const card=`<div class="card">
+        <div class="card-title">${icon} ${esc(w.title||'ใบงาน')}</div>
         <div class="card-meta">📅 ${dt}${w.subject?' · '+esc(w.subject):''}</div>
         <div class="card-desc">${esc(w.description||'')}</div>
         <div class="card-actions">
-          ${(w.fileUrl||w.htmlContent)?`<button class="btn btn-orange btn-sm" onclick="openWs('${d.id}')">📖 เปิดใบงาน</button>`:''}
+          ${(w.fileUrl||w.htmlContent)?`<button class="btn btn-orange btn-sm" onclick="openWs('${d.id}')">${btnLabel}</button>`:''}
           <button class="btn btn-blue btn-sm" onclick="printWs('${d.id}')">🖨️ พิมพ์ PDF</button>
         </div></div>`;
+      if(isKn) hKn+=card; else hWs+=card;
     });
-    el.innerHTML=h||'<div class="empty-state"><i class="fas fa-file-alt"></i><p>ยังไม่มีใบงาน/ใบความรู้</p></div>';
-  }catch(e){ el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`; }
+    elWs.innerHTML=hWs||'<div class="empty-state"><i class="fas fa-file-alt"></i><p>ยังไม่มีใบงาน</p></div>';
+    elKn.innerHTML=hKn||'<div class="empty-state"><i class="fas fa-book-open"></i><p>ยังไม่มีใบความรู้</p></div>';
+  }catch(e){
+    elWs.innerHTML=`<div class="empty-state"><p>โหลดไม่ได้: ${e.message}</p></div>`;
+    elKn.innerHTML=elWs.innerHTML;
+  }
 }
 // แปลง Google Drive URL เป็น preview URL ที่ embed ได้
 function _toEmbedUrl(url){
