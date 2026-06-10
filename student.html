@@ -393,6 +393,7 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
 <div id="wsOverlay">
   <div class="ws-toolbar">
     <span id="wsOverlayTitle">📄 ใบงาน</span>
+    <a id="wsOpenNewTab" href="#" target="_blank" style="background:rgba(255,255,255,.2);color:#fff;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap">🔗 เปิดในหน้าต่างใหม่</a>
     <button class="ws-close" onclick="closeWsOverlay()">✕ ปิด</button>
   </div>
   <iframe id="wsIframe" src="" title="ใบงาน"></iframe>
@@ -804,16 +805,40 @@ async function loadWs(){
     el.innerHTML=h||'<div class="empty-state"><i class="fas fa-file-alt"></i><p>ยังไม่มีใบงาน/ใบความรู้</p></div>';
   }catch(e){ el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`; }
 }
+// แปลง Google Drive URL เป็น preview URL ที่ embed ได้
+function _toEmbedUrl(url){
+  // Google Drive: /file/d/ID/view  → /file/d/ID/preview
+  // Google Docs/Sheets/Slides share link → embed link
+  if(!url) return url;
+  const gDriveFile = url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)/);
+  if(gDriveFile) return 'https://drive.google.com/file/d/'+gDriveFile[1]+'/preview';
+  const gDocsEdit = url.match(/docs\.google\.com\/(document|spreadsheets|presentation)\/d\/([^\/\?]+)/);
+  if(gDocsEdit) return url.replace(/\/(edit|view)[^]*$/, '/preview');
+  return url; // URL อื่น ส่งตรง
+}
+
+// ตรวจว่าเป็น URL ที่ embed ได้ หรือต้อง open new tab
+function _canEmbed(url){
+  if(!url) return false;
+  // Google Drive/Docs → embed ได้หลัง convert
+  if(/drive\.google\.com|docs\.google\.com/.test(url)) return true;
+  // GitHub Pages / raw.githubusercontent → embed ได้
+  if(/github\.io|raw\.githubusercontent/.test(url)) return true;
+  // URL อื่นๆ → พยายาม embed (อาจบล็อก แต่มี fallback)
+  return true;
+}
+
 window.openWs=function(id){
   const w=window._worksheets[id]; if(!w) return;
   const title = w.title||'ใบงาน';
   if(w.fileUrl){
-    // URL worksheet → เปิดใน iframe overlay
+    const embedUrl = _toEmbedUrl(w.fileUrl);
     document.getElementById('wsOverlayTitle').textContent='📄 '+title;
-    document.getElementById('wsIframe').src=w.fileUrl;
+    document.getElementById('wsIframe').src=embedUrl;
     document.getElementById('wsOverlay').classList.add('show');
+    // ปุ่ม fallback เผื่อ iframe บล็อก
+    document.getElementById('wsOpenNewTab').href=w.fileUrl;
   } else if(w.htmlContent){
-    // HTML content → เปิดเป็น blob ใน tab ใหม่
     const blob=new Blob([w.htmlContent],{type:'text/html;charset=utf-8'});
     const url=URL.createObjectURL(blob);
     const win=window.open(url,'_blank');
