@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ใบงานที่ 1 — ความสำคัญของศาสนา ป.4</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ===== ANSWER_KEY =====
+  Q1:  ค) พระพุทธศาสนา
+  Q2:  ง) วัด
+  Q3:  ถูก (ธรรมจักรเป็นสัญลักษณ์พุทธ)
+  Q4:  ผิด (มัสยิดเป็นศาสนสถานอิสลาม ไม่ใช่คริสต์)
+  Q5:  ข) หลักในการดำเนินชีวิต
+  Q6:  ก) สร้างความสามัคคีในสังคม
+  Q7:  ถูก (ทุกศาสนาสอนให้ทำดี)
+  Q8:  ผิด (ศาสนาสร้างความสามัคคี ไม่ใช่แตกแยก)
+  Q9:  ยึดเหนี่ยว
+  Q10: ธรรมจักร → พระพุทธศาสนา
+  Q11: กางเขน → คริสต์ศาสนา
+  Q12: พระจันทร์เสี้ยว → อิสลาม
+  Q13: โอม → พราหมณ์-ฮินดู
+  Q14: ข) อิหม่าม
+  Q15: ปฏิบัติธรรม
+  Q16: ข) วันวิสาขบูชา
+  Q17: ถูก (ควรเคารพศาสนาผู้อื่น)
+  Q18: ข) ไหว้พระสวดมนต์ก่อนนอน
+  Q19: ผิด (ทุกศาสนาปฏิบัติได้อย่างเสรีในไทย)
+  Q20: อัตนัย
+===== END ANSWER_KEY ===== */
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sarabun',sans-serif;background:linear-gradient(150deg,#fff8e1 0%,#fce4ec 55%,#e8f5e9 100%);min-height:100vh;padding-bottom:80px}
+
+/* HEADER */
+.ws-header{background:linear-gradient(135deg,#ff8f00 0%,#e65100 55%,#bf360c 100%);color:#fff;text-align:center;padding:0 0 20px;position:relative;overflow:hidden}
+.header-deco{position:absolute;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none}
+.header-scene{display:flex;justify-content:center;padding:18px 16px 8px;position:relative;z-index:2}
+.header-text{position:relative;z-index:2;padding:0 20px 0}
+.grade-badge{display:inline-block;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.35);border-radius:20px;padding:4px 18px;font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:8px}
+.header-text h1{font-size:clamp(20px,5vw,34px);font-weight:900;text-shadow:2px 2px 0 rgba(0,0,0,.2);line-height:1.2;margin-bottom:6px}
+.header-text p{font-size:15px;opacity:.85}
+
+/* PROGRESS */
+.progress-bar-wrap{background:#fff;border-bottom:3px solid #ff8f00;padding:10px 20px;position:sticky;top:0;z-index:200;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.progress-row{display:flex;justify-content:space-between;margin-bottom:5px}
+.progress-lbl{font-size:13px;font-weight:700;color:#ff8f00}
+.progress-pct{font-size:13px;font-weight:800;color:#e65100}
+.progress-bg{background:#f0f0f0;border-radius:10px;height:10px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#ff8f00,#ffd740);border-radius:10px;width:0%;transition:width .4s cubic-bezier(.25,.8,.25,1)}
+
+/* CONTAINER */
+.wrap{max-width:720px;margin:0 auto;padding:0 14px}
+
+/* STUDENT INFO */
+.student-card{background:#fff;border-radius:20px;padding:20px;margin:18px 0;box-shadow:0 4px 16px rgba(255,143,0,.15);border:2px solid #ffe082}
+.sc-title{text-align:center;font-size:17px;font-weight:800;color:#e65100;margin-bottom:14px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:440px){.info-grid{grid-template-columns:1fr}}
+.if-label{display:block;font-size:13px;font-weight:700;color:#555;margin-bottom:5px}
+.if-input,.if-select{width:100%;padding:10px 14px;border:2px solid #ffe082;border-radius:12px;font-family:'Sarabun',sans-serif;font-size:15px;background:#fffde7;transition:.2s}
+.if-input:focus,.if-select:focus{outline:none;border-color:#ff8f00;background:#fff}
+
+/* SECTION */
+.ws-section{background:#fff;border-radius:24px;padding:24px 20px;margin:16px 0;box-shadow:0 4px 16px rgba(0,0,0,.07);position:relative;overflow:hidden}
+.ws-section::before{content:'';position:absolute;top:0;left:0;right:0;height:7px;border-radius:24px 24px 0 0}
+.s-orange::before{background:linear-gradient(90deg,#ff8f00,#ffd740,#ff8f00)}
+.s-green::before{background:linear-gradient(90deg,#2e7d32,#a5d6a7,#2e7d32)}
+.s-blue::before{background:linear-gradient(90deg,#1565c0,#80deea,#1565c0)}
+.s-purple::before{background:linear-gradient(90deg,#6a1b9a,#ea80fc,#6a1b9a)}
+
+.sec-hd{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.sec-ic{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;box-shadow:0 3px 8px rgba(0,0,0,.1)}
+.s-orange .sec-ic{background:linear-gradient(135deg,#ff8f00,#ffd740)}
+.s-green  .sec-ic{background:linear-gradient(135deg,#2e7d32,#a5d6a7)}
+.s-blue   .sec-ic{background:linear-gradient(135deg,#1565c0,#80deea)}
+.s-purple .sec-ic{background:linear-gradient(135deg,#6a1b9a,#ea80fc)}
+.sec-title{font-size:20px;font-weight:900}
+.s-orange .sec-title{color:#e65100}
+.s-green  .sec-title{color:#1b5e20}
+.s-blue   .sec-title{color:#0d47a1}
+.s-purple .sec-title{color:#4a148c}
+.sec-sub{font-size:13px;color:#888;margin-top:2px}
+
+/* BUILDINGS ILLUSTRATION */
+.bldg-row{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:20px;padding:12px 0}
+.bldg-item{display:flex;flex-direction:column;align-items:center;gap:6px}
+.bldg-lbl{font-size:12px;font-weight:800;padding:3px 12px;border-radius:10px;color:#fff}
+.lbl-orange{background:#ff8f00}
+.lbl-blue{background:#1e88e5}
+.lbl-green{background:#2e7d32}
+.lbl-pink{background:#e91e63}
+
+/* SYMBOLS ROW */
+.sym-row{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-bottom:20px;padding:10px 0}
+.sym-item{display:flex;flex-direction:column;align-items:center;gap:4px;background:#f9f9f9;border-radius:14px;padding:10px 14px}
+.sym-emoji{font-size:40px;line-height:1}
+.sym-lbl{font-size:12px;font-weight:700;color:#555}
+
+/* QUESTION CARD */
+.q-card{background:#fafafa;border:2px solid #f0f0f0;border-radius:16px;padding:16px 18px;margin-bottom:14px;transition:.2s}
+.q-card:hover{border-color:#ffe082}
+.q-card.answered{border-color:#a5d6a7;background:#f9fff9}
+.q-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+.q-n{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;margin-top:1px}
+.s-orange .q-n{background:#ff8f00}
+.s-green  .q-n{background:#2e7d32}
+.s-blue   .q-n{background:#1565c0}
+.s-purple .q-n{background:#6a1b9a}
+.q-txt{font-size:16px;font-weight:700;color:#333;line-height:1.5}
+
+/* MCQ */
+.mcq-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:440px){.mcq-grid{grid-template-columns:1fr}}
+.mcq-opt{display:flex;align-items:center;gap:8px;padding:10px 12px;border:2.5px solid #e0e0e0;border-radius:12px;cursor:pointer;background:#fff;transition:.2s}
+.mcq-opt:hover{border-color:#ffd740;background:#fffde7}
+.mcq-opt.sel{border-color:#ff8f00;background:#fff8e1}
+.mcq-opt input[type=radio]{width:17px;height:17px;accent-color:#ff8f00;cursor:pointer;flex-shrink:0}
+.mcq-opt label{cursor:pointer;font-size:15px;line-height:1.4}
+
+/* TRUE/FALSE */
+.tf-wrap{display:flex;gap:10px}
+.tf-btn{flex:1;padding:12px;border:2.5px solid #e0e0e0;border-radius:14px;background:#fff;font-family:'Sarabun',sans-serif;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:.2s}
+.tf-btn:hover{border-color:#ccc}
+.tf-yes.active{border-color:#2e7d32;background:#e8f5e9;color:#1b5e20}
+.tf-no.active{border-color:#c62828;background:#ffebee;color:#b71c1c}
+
+/* FILL */
+.fill-input{width:100%;padding:11px 14px;border:2.5px solid #e0e0e0;border-radius:12px;font-family:'Sarabun',sans-serif;font-size:15px;background:#fff;transition:.2s}
+.fill-input:focus{outline:none;border-color:#ff8f00;background:#fffde7}
+
+/* WORD BANK */
+.wb-box{background:#e8f5e9;border:2px dashed #43a047;border-radius:12px;padding:10px 14px;margin-bottom:10px}
+.wb-ttl{font-size:12px;font-weight:800;color:#2e7d32;margin-bottom:7px}
+.wb-chips{display:flex;flex-wrap:wrap;gap:6px}
+.wb-chip{background:#2e7d32;color:#fff;padding:5px 14px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:'Sarabun',sans-serif;transition:.2s}
+.wb-chip:hover{background:#1b5e20}
+.wb-chip.used{background:#b0bec5;cursor:default}
+
+/* MATCHING */
+.match-item{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.match-tag{background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff;padding:9px 16px;border-radius:12px;font-weight:700;font-size:14px;min-width:140px;text-align:center;flex-shrink:0}
+.match-arr{font-size:18px;color:#bbb;flex-shrink:0}
+.match-sel{flex:1;min-width:130px;padding:9px 12px;border:2px solid #e0e0e0;border-radius:12px;font-family:'Sarabun',sans-serif;font-size:14px;background:#fff;cursor:pointer;transition:.2s}
+.match-sel:focus{outline:none;border-color:#1565c0}
+
+/* OPEN TEXTAREA */
+.open-input{width:100%;padding:12px 14px;border:2.5px solid #e0e0e0;border-radius:12px;font-family:'Sarabun',sans-serif;font-size:15px;resize:vertical;min-height:80px;background:#fff;transition:.2s}
+.open-input:focus{outline:none;border-color:#8e24aa;background:#fce4ec}
+
+/* INFO BOX */
+.info-box{border-radius:14px;padding:14px 16px;margin-bottom:16px;border-left:5px solid}
+.ib-orange{background:#fff8e1;border-left-color:#ff8f00}
+.ib-green{background:#e8f5e9;border-left-color:#43a047}
+.ib-blue{background:#e3f2fd;border-left-color:#1e88e5}
+.info-box h4{font-size:15px;font-weight:800;margin-bottom:8px}
+.info-box ul{padding-left:18px}
+.info-box li{font-size:14px;line-height:1.75}
+
+/* SUBMIT */
+.submit-area{text-align:center;padding:24px 0 0}
+.btn-submit{background:linear-gradient(135deg,#ff8f00,#e65100);color:#fff;border:none;padding:16px 50px;border-radius:50px;font-family:'Sarabun',sans-serif;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 6px 20px rgba(255,143,0,.4);transition:.3s;letter-spacing:.3px}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(255,143,0,.5)}
+.btn-submit:disabled{background:#bdbdbd;box-shadow:none;cursor:not-allowed;transform:none}
+.submit-msg{margin-top:14px;font-size:15px;font-weight:700;padding:12px 20px;border-radius:12px;display:none}
+.submit-ok{background:#e8f5e9;color:#1b5e20;display:block}
+.submit-err{background:#ffebee;color:#b71c1c;display:block}
+
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.float{animation:float 3s ease-in-out infinite}
+@keyframes spin-slow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="ws-header">
+  <div class="header-deco" style="width:180px;height:180px;top:-60px;left:-40px"></div>
+  <div class="header-deco" style="width:120px;height:120px;bottom:-30px;right:60px"></div>
+  <div class="header-deco" style="width:80px;height:80px;top:20px;right:20%"></div>
+
+  <!-- Scene SVG -->
+  <div class="header-scene">
+    <svg viewBox="0 0 420 160" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:480px">
+      <!-- Clouds -->
+      <ellipse cx="55" cy="28" rx="34" ry="16" fill="rgba(255,255,255,.3)"/>
+      <ellipse cx="38" cy="33" rx="20" ry="12" fill="rgba(255,255,255,.25)"/>
+      <ellipse cx="75" cy="33" rx="20" ry="12" fill="rgba(255,255,255,.25)"/>
+      <ellipse cx="330" cy="20" rx="28" ry="12" fill="rgba(255,255,255,.25)"/>
+      <ellipse cx="312" cy="25" rx="18" ry="10" fill="rgba(255,255,255,.2)"/>
+      <ellipse cx="350" cy="25" rx="18" ry="10" fill="rgba(255,255,255,.2)"/>
+      <!-- Sun -->
+      <circle cx="385" cy="35" r="22" fill="rgba(255,255,255,.25)"/>
+      <circle cx="385" cy="35" r="16" fill="rgba(255,255,255,.3)"/>
+      <!-- Star sparkles -->
+      <text x="120" y="22" font-size="14" fill="rgba(255,255,255,.6)">✨</text>
+      <text x="270" y="30" font-size="12" fill="rgba(255,255,255,.5)">⭐</text>
+      <text x="170" y="15" font-size="10" fill="rgba(255,255,255,.5)">✦</text>
+
+      <!-- ====== Temple (center-left) ====== -->
+      <!-- Base -->
+      <rect x="120" y="125" width="80" height="28" rx="4" fill="#ffe082"/>
+      <rect x="116" y="117" width="88" height="12" rx="3" fill="#ffca28"/>
+      <!-- Walls -->
+      <rect x="134" y="90" width="52" height="30" fill="#fff9c4"/>
+      <!-- Door -->
+      <rect x="149" y="103" width="22" height="17" rx="3" fill="#8d6e63"/>
+      <!-- Windows -->
+      <rect x="137" y="96" width="9" height="9" rx="2" fill="#81d4fa"/>
+      <rect x="174" y="96" width="9" height="9" rx="2" fill="#81d4fa"/>
+      <!-- Roof tiers -->
+      <polygon points="160,83 185,102 135,102" fill="#ef5350"/>
+      <polygon points="160,71 182,90 138,90" fill="#e53935"/>
+      <polygon points="160,59 177,77 143,77" fill="#c62828"/>
+      <polygon points="160,47 172,63 148,63" fill="#b71c1c"/>
+      <!-- Spire -->
+      <rect x="157" y="38" width="6" height="12" rx="3" fill="#ffd600"/>
+      <circle cx="160" cy="36" r="5" fill="#ffb300"/>
+      <!-- Trees -->
+      <rect x="106" y="128" width="8" height="18" fill="#6d4c41"/>
+      <circle cx="110" cy="122" r="12" fill="#43a047"/>
+      <circle cx="110" cy="118" r="9" fill="#66bb6a"/>
+      <rect x="206" y="128" width="8" height="18" fill="#6d4c41"/>
+      <circle cx="210" cy="122" r="12" fill="#43a047"/>
+      <circle cx="210" cy="118" r="9" fill="#66bb6a"/>
+
+      <!-- ====== Mosque (right side) ====== -->
+      <!-- Base walls -->
+      <rect x="265" y="112" width="56" height="40" rx="3" fill="#f1f8e9"/>
+      <!-- Side walls up -->
+      <rect x="272" y="96" width="42" height="20" fill="#f1f8e9"/>
+      <!-- Central dome -->
+      <ellipse cx="293" cy="96" rx="21" ry="14" fill="#2e7d32"/>
+      <ellipse cx="293" cy="95" rx="17" ry="11" fill="#388e3c"/>
+      <!-- Crescent -->
+      <path d="M290,83 A5,5 0 1 1 296,83" fill="none" stroke="#ffd600" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="298" cy="81.5" r="1.8" fill="#ffd600"/>
+      <!-- Side minarets -->
+      <rect x="253" y="116" width="12" height="36" rx="3" fill="#c8e6c9"/>
+      <ellipse cx="259" cy="116" rx="6" ry="4" fill="#388e3c"/>
+      <rect x="321" y="116" width="12" height="36" rx="3" fill="#c8e6c9"/>
+      <ellipse cx="327" cy="116" rx="6" ry="4" fill="#388e3c"/>
+      <!-- Door arch -->
+      <rect x="283" y="124" width="20" height="28" fill="#795548"/>
+      <ellipse cx="293" cy="124" rx="10" ry="7" fill="#795548"/>
+      <!-- Windows -->
+      <rect x="269" y="118" width="10" height="12" rx="5" fill="#fff"/>
+      <rect x="307" y="118" width="10" height="12" rx="5" fill="#fff"/>
+
+      <!-- ====== Kid left (waving) ====== -->
+      <!-- Monk robe kid -->
+      <circle cx="72" cy="95" r="13" fill="#ffcc80"/>
+      <!-- robe -->
+      <rect x="62" y="107" width="20" height="28" rx="4" fill="#ff8f00"/>
+      <!-- arm wave -->
+      <path d="M62,113 Q52,105 48,98" fill="none" stroke="#ffcc80" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="48" cy="97" r="4" fill="#ffcc80"/>
+      <!-- other arm -->
+      <line x1="82" y1="113" x2="90" y2="120" stroke="#ff8f00" stroke-width="4" stroke-linecap="round"/>
+      <!-- legs -->
+      <line x1="67" y1="133" x2="64" y2="148" stroke="#ff8f00" stroke-width="5" stroke-linecap="round"/>
+      <line x1="75" y1="133" x2="78" y2="148" stroke="#ff8f00" stroke-width="5" stroke-linecap="round"/>
+      <!-- face -->
+      <circle cx="68" cy="93" r="2" fill="#5d4037"/>
+      <circle cx="76" cy="93" r="2" fill="#5d4037"/>
+      <path d="M67,99 Q72,104 77,99" fill="none" stroke="#8d6e63" stroke-width="2" stroke-linecap="round"/>
+      <!-- Hair (monk - bald rounded) -->
+      <circle cx="72" cy="86" r="8" fill="#ffb74d"/>
+
+      <!-- ====== Kid right (hijab girl waving) ====== -->
+      <!-- Hijab -->
+      <ellipse cx="360" cy="93" rx="15" ry="17" fill="#43a047"/>
+      <!-- face -->
+      <ellipse cx="360" cy="92" rx="11" ry="12" fill="#ffcc80"/>
+      <!-- body green dress -->
+      <rect x="349" y="107" width="22" height="30" rx="4" fill="#43a047"/>
+      <!-- arm wave -->
+      <path d="M349,112 Q340,104 336,96" fill="none" stroke="#43a047" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="336" cy="95" r="4" fill="#ffcc80"/>
+      <!-- other arm -->
+      <line x1="371" y1="112" x2="379" y2="120" stroke="#43a047" stroke-width="4" stroke-linecap="round"/>
+      <!-- legs -->
+      <line x1="355" y1="135" x2="352" y2="150" stroke="#43a047" stroke-width="5" stroke-linecap="round"/>
+      <line x1="363" y1="135" x2="366" y2="150" stroke="#43a047" stroke-width="5" stroke-linecap="round"/>
+      <!-- face -->
+      <circle cx="355" cy="90" r="2" fill="#5d4037"/>
+      <circle cx="365" cy="90" r="2" fill="#5d4037"/>
+      <path d="M354,96 Q360,101 366,96" fill="none" stroke="#8d6e63" stroke-width="2" stroke-linecap="round"/>
+
+      <!-- Flowers on ground -->
+      <text x="28" y="150" font-size="16" opacity=".8">🌸</text>
+      <text x="220" y="152" font-size="14" opacity=".7">🌼</text>
+      <text x="390" y="148" font-size="14" opacity=".7">🌸</text>
+    </svg>
+  </div>
+
+  <div class="header-text">
+    <div class="grade-badge">🏫 ชั้นประถมศึกษาปีที่ 4</div>
+    <h1>🙏 ใบงานที่ 1<br>ความสำคัญของศาสนา</h1>
+    <p>📚 วิชาสังคมศึกษา ศาสนา และวัฒนธรรม &nbsp;|&nbsp; หน่วยที่ 1</p>
+  </div>
+</div>
+
+<!-- ===== PROGRESS ===== -->
+<div class="progress-bar-wrap">
+  <div class="progress-row">
+    <span class="progress-lbl" id="progressText">ตอบแล้ว 0/20 ข้อ</span>
+    <span class="progress-pct" id="progressPct">0%</span>
+  </div>
+  <div class="progress-bg"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+
+<div class="wrap">
+
+  <!-- ===== STUDENT INFO ===== -->
+  <div class="student-card">
+    <div class="sc-title">✏️ ข้อมูลนักเรียน</div>
+    <div class="info-grid">
+      <div>
+        <label class="if-label" for="studentName">ชื่อ-นามสกุล</label>
+        <input class="if-input" id="studentName" type="text" placeholder="กรอกชื่อ-นามสกุล">
+      </div>
+      <div>
+        <label class="if-label" for="gradeSelect">ชั้น</label>
+        <select class="if-select" id="gradeSelect">
+          <option value="ป.4/1">ป.4/1</option>
+          <option value="ป.4/2">ป.4/2</option>
+          <option value="ป.4/3">ป.4/3</option>
+          <option value="ป.4/4">ป.4/4</option>
+          <option value="ป.4/5">ป.4/5</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===========================
+       SECTION 1: รู้จักศาสนา
+  =========================== -->
+  <div class="ws-section s-orange">
+    <div class="sec-hd">
+      <div class="sec-ic">🛕</div>
+      <div>
+        <div class="sec-title">ส่วนที่ 1 — รู้จักศาสนาต่างๆ ในสังคมไทย</div>
+        <div class="sec-sub">ข้อ 1–4 (ปรนัย และ ถูก/ผิด)</div>
+      </div>
+    </div>
+
+    <!-- Building illustrations -->
+    <div class="bldg-row">
+      <div class="bldg-item">
+        <svg viewBox="0 0 100 100" width="85" height="85" xmlns="http://www.w3.org/2000/svg">
+          <rect x="18" y="74" width="64" height="20" rx="4" fill="#ffe082"/>
+          <rect x="14" y="67" width="72" height="11" rx="3" fill="#ffca28"/>
+          <rect x="26" y="47" width="48" height="24" fill="#fff9c4"/>
+          <rect x="38" y="60" width="24" height="11" rx="3" fill="#8d6e63"/>
+          <rect x="29" y="53" width="8" height="8" rx="2" fill="#81d4fa"/>
+          <rect x="63" y="53" width="8" height="8" rx="2" fill="#81d4fa"/>
+          <polygon points="50,42 74,59 26,59" fill="#ef5350"/>
+          <polygon points="50,30 70,48 30,48" fill="#e53935"/>
+          <polygon points="50,18 65,35 35,35" fill="#c62828"/>
+          <rect x="48" y="9" width="4" height="11" rx="2" fill="#ffd600"/>
+          <circle cx="50" cy="7" r="4" fill="#ffb300"/>
+          <rect x="5" y="76" width="6" height="14" fill="#6d4c41"/>
+          <circle cx="8" cy="71" r="9" fill="#43a047"/>
+          <rect x="89" y="76" width="6" height="14" fill="#6d4c41"/>
+          <circle cx="92" cy="71" r="9" fill="#43a047"/>
+        </svg>
+        <span class="bldg-lbl lbl-orange">วัด (พุทธ)</span>
+      </div>
+      <div class="bldg-item">
+        <svg viewBox="0 0 100 100" width="85" height="85" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="88" width="100" height="12" rx="2" fill="#a5d6a7"/>
+          <rect x="18" y="44" width="64" height="46" rx="3" fill="#e3f2fd"/>
+          <polygon points="50,8 82,44 18,44" fill="#1565c0"/>
+          <rect x="47" y="12" width="6" height="20" rx="2" fill="#fff"/>
+          <rect x="40" y="19" width="20" height="6" rx="2" fill="#fff"/>
+          <rect x="40" y="64" width="20" height="26" fill="#8d6e63"/>
+          <ellipse cx="50" cy="64" rx="10" ry="7" fill="#8d6e63"/>
+          <rect x="24" y="52" width="14" height="18" rx="7" fill="#bbdefb" stroke="#1e88e5" stroke-width="1.5"/>
+          <rect x="62" y="52" width="14" height="18" rx="7" fill="#bbdefb" stroke="#1e88e5" stroke-width="1.5"/>
+          <line x1="31" y1="52" x2="31" y2="70" stroke="#1e88e5" stroke-width="1.5"/>
+          <line x1="24" y1="61" x2="38" y2="61" stroke="#1e88e5" stroke-width="1.5"/>
+          <line x1="69" y1="52" x2="69" y2="70" stroke="#1e88e5" stroke-width="1.5"/>
+          <line x1="62" y1="61" x2="76" y2="61" stroke="#1e88e5" stroke-width="1.5"/>
+        </svg>
+        <span class="bldg-lbl lbl-blue">โบสถ์ (คริสต์)</span>
+      </div>
+      <div class="bldg-item">
+        <svg viewBox="0 0 100 100" width="85" height="85" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="88" width="100" height="12" rx="2" fill="#a5d6a7"/>
+          <rect x="22" y="46" width="56" height="44" rx="3" fill="#f1f8e9"/>
+          <rect x="30" y="30" width="40" height="20" fill="#f1f8e9"/>
+          <ellipse cx="50" cy="30" rx="20" ry="14" fill="#2e7d32"/>
+          <ellipse cx="50" cy="29" rx="17" ry="11" fill="#388e3c"/>
+          <path d="M47,18 A5.5,5.5 0 1 1 53,18" fill="none" stroke="#ffd600" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="55" cy="16.5" r="1.8" fill="#ffd600"/>
+          <rect x="10" y="52" width="12" height="38" rx="3" fill="#c8e6c9"/>
+          <ellipse cx="16" cy="52" rx="6" ry="4" fill="#388e3c"/>
+          <rect x="78" y="52" width="12" height="38" rx="3" fill="#c8e6c9"/>
+          <ellipse cx="84" cy="52" rx="6" ry="4" fill="#388e3c"/>
+          <rect x="42" y="62" width="16" height="28" fill="#795548"/>
+          <ellipse cx="50" cy="62" rx="8" ry="6" fill="#795548"/>
+          <rect x="27" y="56" width="10" height="12" rx="5" fill="#fff"/>
+          <rect x="63" y="56" width="10" height="12" rx="5" fill="#fff"/>
+        </svg>
+        <span class="bldg-lbl lbl-green">มัสยิด (อิสลาม)</span>
+      </div>
+      <div class="bldg-item">
+        <svg viewBox="0 0 100 100" width="85" height="85" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="88" width="100" height="12" rx="2" fill="#a5d6a7"/>
+          <rect x="12" y="76" width="76" height="12" rx="3" fill="#fce4ec"/>
+          <rect x="8" y="68" width="84" height="12" rx="3" fill="#f8bbd0"/>
+          <rect x="22" y="46" width="56" height="26" fill="#fce4ec"/>
+          <polygon points="50,40 72,58 28,58" fill="#e91e63"/>
+          <polygon points="50,29 70,48 30,48" fill="#ec407a"/>
+          <polygon points="50,18 66,37 34,37" fill="#f06292"/>
+          <polygon points="50,8 62,26 38,26" fill="#f48fb1"/>
+          <circle cx="50" cy="5" r="5" fill="#ff8f00"/>
+          <rect x="40" y="58" width="20" height="20" fill="#8d6e63"/>
+          <circle cx="30" cy="54" r="4" fill="none" stroke="#e91e63" stroke-width="2"/>
+          <circle cx="70" cy="54" r="4" fill="none" stroke="#e91e63" stroke-width="2"/>
+        </svg>
+        <span class="bldg-lbl lbl-pink">เทวสถาน (พราหมณ์)</span>
+      </div>
+    </div>
+
+    <!-- Q1 -->
+    <div class="q-card">
+      <div class="q-head"><span class="q-n">1</span><span class="q-txt">ศาสนาที่ประชากรไทยส่วนใหญ่นับถือคือศาสนาใด?</span></div>
+      <div class="mcq-grid">
+        <label class="mcq-opt"><input type="radio" name="q1" value="ก"><label>ก) คริสต์ศาสนา</label></label>
+        <label class="mcq-opt"><input type="radio" name="q1" value="ข"><label>ข) อิสลาม</label></label>
+        <label class="mcq-opt"><input type="radio" name="q1" value="ค"><label>ค) พระพุทธศาสนา</label></label>
+        <label class="mcq-opt"><input type="radio" name="q1" value="ง"><label>ง) พราหมณ์-ฮินดู</label></label>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="q-card">
+      <div class="q-head"><span class="q-n">2</span><span class="q-txt">ศาสนสถานของพระพุทธศาสนาเรียกว่าอะไร?</span></div>
+      <div class="mcq-grid">
+        <label class="mcq-opt"><input type="radio" name="q2" value="ก"><label>ก) มัสยิด</label></label>
+        <label class="mcq-opt"><input type="radio" name="q2" value="ข"><label>ข) โบสถ์คริสต์</label></label>
+        <label class="mcq-opt"><input type="radio" name="q2" value="ค"><label>ค) เทวสถาน</label></label>
+        <label class="mcq-opt"><input type="radio" name="q2" value="ง"><label>ง) วัด</label></label>
+      </div>
+    </div>
+
+    <!-- Q3 T/F -->
+    <div class="q-card">
+      <div class="q-head"><span class="q-n">3</span><span class="q-txt">สัญลักษณ์ของพระพุทธศาสนาคือ "ธรรมจักร" ☸️</span></div>
+      <div class="tf-wrap">
+        <button class="tf-btn tf-yes" data-id="q3" data-val="true">👍 ถูก</button>
+        <button class="tf-btn tf-no"  data-id="q3" data-val="false">👎 ผิด</button>
+      </div>
+    </div>
+
+    <!-- Q4 T/F -->
+    <div class="q-card">
+      <div class="q-head"><span class="q-n">4</span><span class="q-txt">มัสยิดเป็นศาสนสถานของศาสนาคริสต์</span></div>
+      <div class="tf-wrap">
+        <button class="tf-btn tf-yes" data-id="q4" data-val="true">👍 ถูก</button>
+        <button class="tf-btn tf-no"  data-id="q4" data-val="false">👎 ผิด</button>
+      </div>
+    </div>
+  </div><!-- end section 1 -->
+
+
+  <!-- ===========================
+       SECTION 2: ความสำคัญ
+  =========================== -->
+  <div class="ws-section s-green">
+    <div class="sec-hd">
+      <div class="sec-ic">🌟</div>
+      <div>
+        <div class="sec-title">ส่วนที่ 2 — ความสำคัญของศาสนา</div>
+        <div class="sec-sub">ข้อ 5–9 (ปรนัย ถูก/ผิด และเติมคำ)</div>
+      </div>
+    </div>
+
+    <div class="info-box ib-green">
+      <h4>🌿 ประโยชน์และความสำคัญของศาสนา</h4>
+      <ul>
+        <li>ให้หลักในการดำเนินชีวิต สอนให้ทำดี ละเว้นความชั่ว</li>
+        <li>เป็นที่ยึดเหนี่ยวจิตใจ ให้กำลังใจในยามทุกข์</li>
+        <li>สร้างความสามัคคีในสังคมและชุมชน</li>
+        <li>สืบทอดวัฒนธรรม ประเพณี และมรดกทางจิตวิญญาณ</li>
+      </ul>
+    </div>
+
+    <!-- Q5 -->
+    <div class="q-card">
+      <div class="q-head"><span class="q-n">5</span><span class="q-txt">ศาสนาช่วยให้คนมีสิ่งใดในการดำเนินชีวิต?</span></div>
+      <div class="mcq-grid">
+        <label class="mcq-opt"><input type="radio" name="q5" value="ก"><label>ก) ความโลภ</label></label>
+        <label class="mcq-opt"><input type="radio" name="q5" value="ข"><label>ข) หลักในการดำเนินชีวิต</label></label>
+        <label class="mcq-opt"><input type="radio" name="q5" value="ค"><label>ค) ความเกียจคร้าน</label></label>
+        <label class="mcq-opt"><input type="radio" name="q5" value="ง"><label>ง) ความโกรธ</label></label>
+      </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="q-card">
+      <div class="q-head"><span class="q-n">6</span><span class="q-txt">ข้อใดเป็นประโยชน์ของศาสนาต่อสังคม?</span></div>
+      <div class="mcq-grid">
+        <label class="mcq-opt"><input type="radio" name="q6" value="ก"><label>ก) สร้างความสามัคคีในสังคม</label></label>
+        <label class="mcq-opt"><input type="radio" name="q6" value="ข"><label>ข) ทำให้คนแตกแยก</label></label>
+        <label class="mcq-opt"><input type="radio" name="q6" value="ค"><label>ค) ไม่มีประโยชน์ใดๆ</label></label>
+        <label class="mcq-opt"><input type="radio" name="q6" value="ง"><label>ง) ทำให้คนขี้เกียจ</label></label>
+      </div>
+    </div>
+
+    <!-- Q7 T/F -->
+    <div class="q-card">
+      <div class="q-head"><span class="q-n">7</span><span class="q-txt">ศาสนาทุกศาสนาสอนให้คนทำความดี ละเว้นความชั่ว</span></div>
+      <div class="tf-wrap">
+        <button class="tf-btn tf-yes" data-id="q7" data-val="true">👍 ถูก</button>
+        <button class="tf-btn tf-no"  data-id="q7" data-val="false">👎 ผิด</button>
+      </div>
+    </div>
+
+    <!-- Q8 T/F -->
+    <div class="q-card">
+      <div class="q-head"><span class="q-n">8</span><span class="q-txt">ศาสนาเป็นสาเหตุหลักที่ทำให้คนในสังคมแตกแยก</span></div>
+      <div class="tf-wrap">
+        <button class="tf-btn tf-yes" data-id="q8" data-val="true">👍 ถูก</button>
+        <button class="tf-btn tf-no"  data-id="q8" data-val="false">👎 ผิด</button>
+      </div>
+    </div>
+
+    <!-- Q9 fill blank with word bank -->
+    <div class="q-card">
+      <div class="q-head"><span class="q-n">9</span><span class="q-txt">ศาสนาช่วย __________ จิตใจของมนุษย์ในยามที่รู้สึกท้อแท้หรือเศร้าหมอง</span></div>
+      <div class="wb-box">
+        <div class="wb-ttl">🗂 คลังคำ — คลิกเพื่อเติม</div>
+        <div class="wb-chips">
+          <button class="wb-chip" onclick="fillWord('q9',this,'ยึดเหนี่ยว')">ยึดเหนี่ยว</button>
+          <button class="wb-chip" onclick="fillWord('q9',this,'บั่นทอน')">บั่นทอน</button>
+          <button class="wb-chip" onclick="fillWord('q9',this,'เพิกเฉย')">เพิกเฉย</button>
+          <button class="wb-chip" onclick="fillWord('q9',this,'สร้างสรร')">สร้างสรร</button>
+        </div>
+      </div>
+      <input class="fill-input" id="q9" placeholder="เติมคำตอบที่นี่...">
+    </div>
+  </div><!-- end section 2 -->
+
+
+  <!-- ===========================
+       SECTION 3: ศาสนสถานและสัญลักษณ์
+  =========================== -->
+  <div class="ws-section s-blue">
+    <div class="sec-hd">
+      <div class="sec-ic">☸️</div>
+      <div>
+        <div class="sec-title">ส่วนที่ 3 — ศาสนสถานและสัญลักษณ์</div>
+        <div class="sec-sub">ข้อ 10–14 (จับคู่และปรนัย)</div>
+      </div>
+    </div>
+
+    <!-- Symbols -->
+    <div class="sym-row">
+      <div class="sym-item"><span class="sym-emoji">☸️</span><span class="sym-lbl">ธรรมจักร</span></div>
+      <div class="sym-item"><span class="sym-emoji">✝️</span><span class="sym-lbl">กางเขน</span></div>
+      <div class="sym-item"><span class="sym-emoji">☪️</span><span class="sym-lbl">พระจันทร์เสี้ยว</span></div>
+      <div class="sym-item"><span class="sym-emoji">🕉️</span><span class="sym-lbl">โอม</span></div>
+    </div>
+
+    <div class="info-box ib-blue">
+      <h4>📌 สัญลักษณ์แต่ละศาสนา</h4>
+      <ul>
+        <li><b>พระพุทธศาสนา</b> — ธรรมจักร (วงล้อธรรม) 🔘</li>
+        <li><b>คริสต์ศาสนา</b> — กางเขน ✝️</li>
+        <li><b>อิสลาม</b> — พระจันทร์เสี้ยวและดาว ☪️</li>
+        <li><b>พราหมณ์-ฮินดู</b> — โอม (OM) 🕉️</li>
+      </ul>
+    </div>
+
+    <!-- Q10–13 Matching -->
+    <div class="q-card">
+      <div class="q-head"><span class="q-n">10–13</span><span class="q-txt">จับคู่สัญลักษณ์กับศาสนาที่ถูกต้อง</span></div>
+      <div class="match-item">
+        <span class="match-tag">☸️ ธรรมจักร</span>
+        <span class="match-arr">→</span>
+        <select class="match-sel" id="q10">
+          <option value="">-- เลือกศาสนา --</option>
+          <option>พระพุทธศาสนา</option>
+          <option>คริสต์ศาสนา</option>
+          <option>อิสลาม</option>
+          <option>พราหมณ์-ฮินดู</option>
+        </select>
+      </div>
+      <div class="match-item">
+        <span class="match-tag">✝️ กางเขน</span>
+        <span class="match-arr">→</span>
+        <select class="match-sel" id="q11">
+          <option value="">-- เลือกศาสนา --</option>
+          <option>พระพุทธศาสนา</option>
+          <option>คริสต์ศาสนา</option>
+          <option>อิสลาม</option>
+          <option>พราหมณ์-ฮินดู</option>
+        </select>
+      </div>
+      <div class="match-item">
+        <span class="match-tag">☪️ พระจันทร์เสี้ยว</span>
+        <span class="match-arr">→</span>
+        <select class="match-sel" id="q12">
+          <option value="">-- เลือกศาสนา --</option>
+          <option>พระพุทธศาสนา</option>
+          <option>คริสต์ศาสนา</option>
+          <option>อิสลาม</option>
+          <option>พราหมณ์-ฮินดู</option>
+        </select>
+      </div>
+      <div class="match-item">
+        <span class="match-tag">🕉️ โอม</span>
+        <span class="match-arr">→</span>
+        <select class="match-sel" id="q13">
+          <option value="">-- เลือกศาสนา --</option>
+          <option>พระพุทธศาสนา</option>
+          <option>คริสต์ศาสนา</option>
+          <option>อิสลาม</option>
+          <option>พราหมณ์-ฮินดู</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Q14 -->
+    <div class="q-card">
+      <div class="q-head"><span class="q-n">14</span><span class="q-txt">ผู้นำศาสนาของอิสลามที่ทำหน้าที่นำละหมาดในมัสยิดเรียกว่าอะไร?</span></div>
+      <div class="mcq-grid">
+        <label class="mcq-opt"><input type="radio" name="q14" value="ก"><label>ก) บาทหลวง</label></label>
+        <label class="mcq-opt"><input type="radio" name="q14" value="ข"><label>ข) อิหม่าม</label></label>
+        <label class="mcq-opt"><input type="radio" name="q14" value="ค"><label>ค) พระสงฆ์</label></label>
+        <label class="mcq-opt"><input type="radio" name="q14" value="ง"><label>ง) พราหมณ์</label></label>
+      </div>
+    </div>
+  </div><!-- end section 3 -->
+
+
+  <!-- ===========================
+       SECTION 4: การปฏิบัติตน
+  =========================== -->
+  <div class="ws-section s-purple">
+    <div class="sec-hd">
+      <div class="sec-ic">🙏</div>
+      <div>
+        <div class="sec-title">ส่วนที่ 4 — การปฏิบัติตนที่ดีในฐานะชาวพุทธ</div>
+        <div class="sec-sub">ข้อ 15–20 (เติมคำ ปรนัย ถูก/ผิด และอัตนัย)</div>
+      </div>
+    </div>
+
+    <!-- Q15 fill + word bank -->
+    <div class="q-card">
+      <div class="q-head"><span class="q-n">15</span><span class="q-txt">การสวดมนต์ ตักบาตร และทำบุญที่วัด ล้วนเป็นการ __________ ของชาวพุทธ</span></div>
+      <div class="wb-box">
+        <div class="wb-ttl">🗂 คลังคำ — คลิกเพื่อเติม</div>
+        <div class="wb-chips">
+          <button class="wb-chip" onclick="fillWord('q15',this,'ปฏิบัติธรรม')">ปฏิบัติธรรม</button>
+          <button class="wb-chip" onclick="fillWord('q15',this,'ทำบาป')">ทำบาป</button>
+          <button class="wb-chip" onclick="fillWord('q15',this,'ละเว้นศาสนา')">ละเว้นศาสนา</button>
+          <button class="wb-chip" onclick="fillWord('q15',this,'ดูหมิ่น')">ดูหมิ่น</button>
+        </div>
+      </div>
+      <input class="fill-input" id="q15" placeholder="เติมคำตอบที่นี่...">
+    </div>
+
+    <!-- Q16 -->
+    <div class="q-card">
+      <div class="q-head"><span class="q-n">16</span><span class="q-txt">วันสำคัญทางพระพุทธศาสนาที่เป็นวันประสูติ ตรัสรู้ และปรินิพพานของพระพุทธเจ้าคือวันใด?</span></div>
+      <div class="mcq-grid">
+        <label class="mcq-opt"><input type="radio" name="q16" value="ก"><label>ก) วันคริสต์มาส</label></label>
+        <label class="mcq-opt"><input type="radio" name="q16" value="ข"><label>ข) วันวิสาขบูชา</label></label>
+        <label class="mcq-opt"><input type="radio" name="q16" value="ค"><label>ค) วันอีดิ้ลฟิตร์</label></label>
+        <label class="mcq-opt"><input type="radio" name="q16" value="ง"><label>ง) วันสงกรานต์</label></label>
+      </div>
+    </div>
+
+    <!-- Q17 T/F -->
+    <div class="q-card">
+      <div class="q-head"><span class="q-n">17</span><span class="q-txt">เราควรเคารพและให้เกียรติศาสนาของผู้อื่น แม้ตนเองจะนับถือต่างศาสนา</span></div>
+      <div class="tf-wrap">
+        <button class="tf-btn tf-yes" data-id="q17" data-val="true">👍 ถูก</button>
+        <button class="tf-btn tf-no"  data-id="q17" data-val="false">👎 ผิด</button>
+      </div>
+    </div>
+
+    <!-- Q18 -->
+    <div class="q-card">
+      <div class="q-head"><span class="q-n">18</span><span class="q-txt">ข้อใดเป็นการปฏิบัติตนที่ดีของนักเรียนชาวพุทธ?</span></div>
+      <div class="mcq-grid">
+        <label class="mcq-opt"><input type="radio" name="q18" value="ก"><label>ก) ทำร้ายสัตว์เล็ก</label></label>
+        <label class="mcq-opt"><input type="radio" name="q18" value="ข"><label>ข) ไหว้พระสวดมนต์ก่อนนอน</label></label>
+        <label class="mcq-opt"><input type="radio" name="q18" value="ค"><label>ค) พูดโกหกผู้ใหญ่</label></label>
+        <label class="mcq-opt"><input type="radio" name="q18" value="ง"><label>ง) ไม่เคารพพระสงฆ์</label></label>
+      </div>
+    </div>
+
+    <!-- Q19 T/F -->
+    <div class="q-card">
+      <div class="q-head"><span class="q-n">19</span><span class="q-txt">ในประเทศไทย ห้ามนับถือศาสนาคริสต์และศาสนาอิสลาม</span></div>
+      <div class="tf-wrap">
+        <button class="tf-btn tf-yes" data-id="q19" data-val="true">👍 ถูก</button>
+        <button class="tf-btn tf-no"  data-id="q19" data-val="false">👎 ผิด</button>
+      </div>
+    </div>
+
+    <!-- Q20 Open -->
+    <div class="q-card">
+      <div class="q-head"><span class="q-n">20</span><span class="q-txt">นักเรียนคิดว่าศาสนามีความสำคัญต่อชีวิตประจำวันอย่างไร? ยกตัวอย่าง 2 ข้อ</span></div>
+      <textarea class="open-input" id="q20" placeholder="เขียนคำตอบของนักเรียนที่นี่..."></textarea>
+    </div>
+  </div><!-- end section 4 -->
+
+
+  <!-- ===== SUBMIT ===== -->
+  <div class="submit-area">
+    <button class="btn-submit" id="btnSubmit">📤 ส่งใบงาน</button>
+    <div class="submit-msg" id="submitMsg"></div>
+  </div>
+
+</div><!-- end wrap -->
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { FIREBASE_CONFIG } from './js/config.js';
+
+const app = initializeApp(FIREBASE_CONFIG);
+const db  = getFirestore(app);
+
+// ====== PROGRESS ======
+const TOTAL = 20;
+const _filled = {};
+function markFilled(id, done){
+  _filled[id] = done;
+  const count = Object.values(_filled).filter(Boolean).length;
+  const pct = Math.round(count / TOTAL * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent  = pct + '%';
+  document.getElementById('progressText').textContent = `ตอบแล้ว ${count}/${TOTAL} ข้อ`;
+}
+
+// ====== MCQ ======
+document.querySelectorAll('.mcq-opt input[type=radio]').forEach(r => {
+  r.addEventListener('change', () => {
+    const name = r.name;
+    document.querySelectorAll(`input[name="${name}"]`).forEach(x =>
+      x.closest('.mcq-opt').classList.toggle('sel', x === r)
+    );
+    r.closest('.q-card').classList.add('answered');
+    markFilled(name, true);
+  });
+});
+
+// ====== TRUE/FALSE ======
+document.querySelectorAll('.tf-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const id  = btn.dataset.id;
+    const val = btn.dataset.val;
+    const pair = btn.closest('.tf-wrap');
+    pair.querySelectorAll('.tf-btn').forEach(b => {
+      b.classList.remove('active');
+      if (b.classList.contains('tf-yes')) b.classList.remove('active');
+      if (b.classList.contains('tf-no'))  b.classList.remove('active');
+    });
+    if (val === 'true')  btn.classList.add('active');
+    if (val === 'false') btn.classList.add('active');
+    btn.closest('.q-card').classList.add('answered');
+    markFilled(id, true);
+  });
+});
+
+// ====== FILL INPUTS ======
+document.querySelectorAll('.fill-input').forEach(inp => {
+  inp.addEventListener('input', () => {
+    const ok = inp.value.trim().length > 0;
+    inp.closest('.q-card').classList.toggle('answered', ok);
+    markFilled(inp.id, ok);
+  });
+});
+
+// ====== MATCHING SELECTS ======
+document.querySelectorAll('.match-sel').forEach(sel => {
+  sel.addEventListener('change', () => {
+    const ok = sel.value !== '';
+    // check if entire q-card (all selects in it) answered
+    const card = sel.closest('.q-card');
+    const allDone = [...card.querySelectorAll('.match-sel')].every(s => s.value !== '');
+    card.classList.toggle('answered', allDone);
+    markFilled(sel.id, ok);
+  });
+});
+
+// ====== OPEN TEXTAREA ======
+document.getElementById('q20').addEventListener('input', function(){
+  const ok = this.value.trim().length > 0;
+  this.closest('.q-card').classList.toggle('answered', ok);
+  markFilled('q20', ok);
+});
+
+// ====== WORD BANK (global) ======
+window.fillWord = function(inputId, chipEl, word){
+  if(chipEl.classList.contains('used')) return;
+  const inp = document.getElementById(inputId);
+  if(!inp) return;
+  // clear previous chip for same input
+  document.querySelectorAll(`.wb-chip`).forEach(c => {
+    if(c !== chipEl && c.dataset.target === inputId) c.classList.remove('used');
+  });
+  chipEl.dataset.target = inputId;
+  chipEl.classList.add('used');
+  inp.value = word;
+  inp.dispatchEvent(new Event('input'));
+};
+
+// ====== SUBMIT ======
+document.getElementById('btnSubmit').addEventListener('click', async () => {
+  const name  = document.getElementById('studentName').value.trim();
+  const grade = document.getElementById('gradeSelect').value;
+  if(!name){ alert('กรุณากรอกชื่อนักเรียนก่อนส่งใบงาน 📝'); return; }
+
+  const getRadio = n => {
+    const el = document.querySelector(`input[name="${n}"]:checked`);
+    return el ? el.closest('.mcq-opt').querySelector('label').textContent.trim() : '';
+  };
+  const getTF = id => {
+    const btn = document.querySelector(`.tf-btn.active[data-id="${id}"]`);
+    return btn ? (btn.dataset.val === 'true' ? 'ถูก' : 'ผิด') : '';
+  };
+  const getVal = id => (document.getElementById(id)||{}).value?.trim() || '';
+
+  const answers = {
+    q1: getRadio('q1'),  q2: getRadio('q2'),
+    q3: getTF('q3'),     q4: getTF('q4'),
+    q5: getRadio('q5'),  q6: getRadio('q6'),
+    q7: getTF('q7'),     q8: getTF('q8'),
+    q9: getVal('q9'),
+    q10: getVal('q10'), q11: getVal('q11'),
+    q12: getVal('q12'), q13: getVal('q13'),
+    q14: getRadio('q14'),
+    q15: getVal('q15'),
+    q16: getRadio('q16'),
+    q17: getTF('q17'),
+    q18: getRadio('q18'),
+    q19: getTF('q19'),
+    q20: getVal('q20'),
+  };
+
+  const fields = Object.entries(answers).map(([label, value]) => ({ label, value }));
+
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = true; btn.textContent = '⏳ กำลังส่ง...';
+
+  try {
+    await addDoc(collection(db, 'worksheet_submissions'), {
+      studentName: name,
+      grade,
+      subject: 'สังคมศึกษา',
+      worksheetTitle: 'ใบงานที่ 1 — ความสำคัญของศาสนา',
+      worksheetId: 'ws_social_p4_unit1',
+      submittedDate: new Date().toLocaleDateString('th-TH'),
+      fields,
+      answers,
+      submittedAt: serverTimestamp(),
+      score: null,
+      maxScore: 20,
+      feedback: '',
+    });
+    const msg = document.getElementById('submitMsg');
+    msg.className = 'submit-msg submit-ok';
+    msg.textContent = '✅ ส่งใบงานเรียบร้อยแล้ว! คุณครูจะตรวจและแจ้งคะแนนให้ภายหลัง 🎉';
+    btn.textContent = '✅ ส่งแล้ว';
+  } catch(e) {
+    const msg = document.getElementById('submitMsg');
+    msg.className = 'submit-msg submit-err';
+    msg.textContent = '❌ ส่งไม่ได้: ' + e.message;
+    btn.disabled = false; btn.textContent = '📤 ส่งใบงาน';
+  }
+});
+</script>
+</body>
+</html>
