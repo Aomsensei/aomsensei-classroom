@@ -253,9 +253,10 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
     <h3>🖼️ นำเข้ารูปภาพ</h3>
     <label class="m-lbl">อัปโหลดไฟล์รูปภาพ (jpg, png, gif, webp)</label>
     <input type="file" id="imgFile" accept="image/*" style="color:#ddd;font-size:12px;width:100%;margin-bottom:12px" onchange="loadImageFile(this)"/>
-    <div style="text-align:center;color:#4b5563;font-size:11px;margin:6px 0">— หรือใช้ URL —</div>
-    <label class="m-lbl">URL รูปภาพ</label>
-    <input type="url" class="m-inp" id="imgUrl" placeholder="https://example.com/image.jpg"/>
+    <div style="text-align:center;color:#4b5563;font-size:11px;margin:6px 0">— หรือใช้ URL / Google Drive —</div>
+    <label class="m-lbl">URL รูปภาพ หรือลิงก์ Google Drive</label>
+    <input type="url" class="m-inp" id="imgUrl" placeholder="https://... หรือ https://drive.google.com/file/d/.../view"/>
+    <div style="font-size:9px;color:#6b7280;margin-top:-6px;margin-bottom:6px">💡 Google Drive: ต้องแชร์เป็น "ทุกคนที่มีลิงก์" ก่อนวาง URL</div>
     <div id="imgErr" class="m-err"></div>
     <div class="btn-row">
       <button class="btn-cancel" onclick="closeOverlay('mImg')">ยกเลิก</button>
@@ -742,6 +743,37 @@ function floodFillOnMerged(bgCtxRef, drCtx, x, y, colorHex, alpha){
   drCtx.putImageData(drData,0,0);
 }
 
+// ========== GOOGLE DRIVE + CORS HELPERS ==========
+// Convert Google Drive share URL → direct viewable URL
+function convertGDriveUrl(url){
+  if(!url) return url;
+  if(!url.includes('drive.google.com') && !url.includes('docs.google.com')) return url;
+  let m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if(m) return 'https://lh3.googleusercontent.com/d/' + m[1];
+  m = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if(m) return 'https://lh3.googleusercontent.com/d/' + m[1];
+  return url;
+}
+
+// Load image with 3 fallbacks: direct+CORS → proxy+CORS → direct no-CORS (tainted)
+// onSuccess(imgEl, isTainted)
+function loadImgWithCORS(url, onSuccess, onFail){
+  const direct = convertGDriveUrl(url);
+  const proxy  = 'https://images.weserv.nl/?url=' + encodeURIComponent(direct) + '&output=jpg&il';
+  function tryLoad(src, withCORS, tainted, nextFn){
+    const img = new Image();
+    if(withCORS) img.crossOrigin = 'anonymous';
+    img.onload  = () => onSuccess(img, tainted);
+    img.onerror = nextFn;
+    img.src = src;
+  }
+  tryLoad(direct, true,  false, () =>
+    tryLoad(proxy,  true,  false, () =>
+      tryLoad(direct, false, true,  onFail || (()=>{}))
+    )
+  );
+}
+
 // ========== IMPORT IMAGE ==========
 window.openImgModal = () => document.getElementById('mImg').classList.add('show');
 
@@ -756,16 +788,11 @@ window.loadImageFile = function(input){
 window.loadImageUrl = function(){
   const url = document.getElementById('imgUrl').value.trim();
   if(!url){ showMErr('imgErr','กรุณาใส่ URL'); return; }
-  const img = new Image();
-  img.crossOrigin = 'anonymous';
-  img.onload = () => { applyBgImage(null, img); closeOverlay('mImg'); };
-  img.onerror = () => {
-    const img2 = new Image();
-    img2.onload = () => { applyBgImage(null, img2); closeOverlay('mImg'); };
-    img2.onerror = () => showMErr('imgErr','โหลดรูปไม่ได้ (CORS หรือ URL ผิด)');
-    img2.src = url;
-  };
-  img.src = url;
+  showMErr('imgErr','⏳ กำลังโหลด...');
+  loadImgWithCORS(url,
+    (img) => { applyBgImage(null, img); closeOverlay('mImg'); showMErr('imgErr',''); },
+    ()    => showMErr('imgErr','โหลดรูปไม่ได้ — ตรวจสอบว่าไฟล์ตั้งค่าเป็น "ทุกคนที่มีลิงก์" และ URL ถูกต้อง')
+  );
 };
 
 function applyBgImage(src, imgEl){
@@ -854,8 +881,23 @@ window.doSubmit = async function(){
     mCtx.drawImage(bgCanvas,0,0);
     for(const l of layers){ if(l.visible) mCtx.drawImage(l.canvas,0,0); }
 
-    // Compress to JPEG base64
-    const imageData = merged.toDataURL('image/jpeg', 0.82);
+    // Compress to JPEG — keep under Firestore 1MB limit
+    let imageData;
+    try {
+      imageData = merged.toDataURL('image/jpeg', 0.5);
+    } catch(secErr) {
+      // Canvas tainted by cross-origin image (Google Drive / non-CORS)
+      // Fall back: save drawing layers only (no background)
+      const drawOnly = document.createElement('canvas');
+      drawOnly.width = bgCanvas.width; drawOnly.height = bgCanvas.height;
+      const dCtx = drawOnly.getContext('2d');
+      dCtx.fillStyle = '#ffffff';
+      dCtx.fillRect(0, 0, drawOnly.width, drawOnly.height);
+      for(const l of layers){ if(l.visible) dCtx.drawImage(l.canvas, 0, 0); }
+      imageData = drawOnly.toDataURL('image/jpeg', 0.5);
+    }
+    // If still over 900KB, compress further
+    if(imageData.length > 900000) imageData = merged.toDataURL('image/jpeg', 0.25);
 
     await addDoc(collection(db,'game_submissions'),{
       gameId:    urlGameId,
@@ -877,7 +919,11 @@ window.doSubmit = async function(){
     document.getElementById('btnSubmit').textContent = '✅ ส่งแล้ว';
     document.getElementById('btnSubmit').style.background = '#388e3c';
   } catch(err){
-    errEl.textContent = '❌ ส่งไม่ได้: '+err.message;
+    let msg = err.message || String(err);
+    if(msg.toLowerCase().includes('permission') || msg.includes('PERMISSION_DENIED')){
+      msg = 'ไม่มีสิทธิ์บันทึก — ครูต้องเพิ่ม Firestore Rules:\nmatch /game_submissions/{id} { allow create: if true; }';
+    }
+    errEl.textContent = '❌ ส่งไม่ได้: ' + msg;
     errEl.style.display = 'block';
   } finally {
     btn.textContent='✅ ส่งงาน'; btn.disabled=false;
@@ -937,13 +983,14 @@ async function loadTeacherAssets(){
     const section = document.getElementById('teacherAssetsSection');
     section.style.display = '';
     list.innerHTML = assets.map(a => {
-      const safeName = (a.name||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
-      const safeUrl  = (a.url||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+      const safeName   = (a.name||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+      const safeUrl    = (a.url||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+      const thumbUrl   = convertGDriveUrl(a.url||'') || a.url || '';
       if(a.type==='pdf'){
         return `<button class="asset-pdf-btn" onclick="loadTeacherAssetDirect('pdf','${safeUrl}','${safeName}')">📄 ${a.name||'PDF'}</button>`;
       } else {
         return `<div>
-          <img class="asset-thumb" src="${a.url||''}" alt="${a.name||''}"
+          <img class="asset-thumb" src="${thumbUrl}" alt="${a.name||''}"
                loading="lazy"
                onclick="loadTeacherAssetDirect('image','${safeUrl}','')"
                title="${a.name||'รูปภาพ'}"/>
@@ -951,21 +998,24 @@ async function loadTeacherAssets(){
         </div>`;
       }
     }).join('');
-  }catch(ex){ console.warn('loadTeacherAssets:', ex); }
+  }catch(ex){
+    console.warn('loadTeacherAssets:', ex);
+    const msg = ex.message || String(ex);
+    const isPermission = msg.toLowerCase().includes('permission') || msg.includes('PERMISSION_DENIED');
+    list.innerHTML = `<div style="font-size:10px;color:#f87171;text-align:center;line-height:1.6;padding:4px">
+      ❌ ${isPermission ? 'ไม่มีสิทธิ์อ่านข้อมูล' : 'โหลดไม่ได้: '+msg}<br>
+      ${isPermission ? `<span style="color:#9ca3af">ครูต้องตั้งค่า Firestore Rules:<br>
+      <code style="color:#fbbf24;font-size:9px">match /games/{id} {<br>&nbsp;&nbsp;allow read: if true;<br>}</code></span>` : ''}
+    </div>`;
+  }
 }
 
 window.loadTeacherAssetDirect = function(type, url, name){
   if(type==='image'){
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => applyBgImage(null, img);
-    img.onerror = () => {
-      // retry without CORS header (no crossOrigin)
-      const img2 = new Image();
-      img2.onload = () => applyBgImage(null, img2);
-      img2.src = url;
-    };
-    img.src = url;
+    loadImgWithCORS(url,
+      (img) => applyBgImage(null, img),
+      ()    => alert('โหลดรูปไม่ได้ — ตรวจสอบว่าไฟล์ใน Drive ตั้งค่าเป็น "ทุกคนที่มีลิงก์"')
+    );
   } else {
     // PDF via PDF.js
     if(typeof pdfjsLib === 'undefined'){ alert('PDF.js ยังไม่พร้อม'); return; }
