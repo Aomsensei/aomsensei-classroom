@@ -1754,7 +1754,10 @@ async function refreshStudentList(){
     rows.sort((a,b)=>a.name.localeCompare(b.name,'th'));
     el.innerHTML=rows.map((s,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:1px solid #ffd0a0;background:${i%2===0?'#fff':'#fff8f3'}">
       <span style="font-size:14px;font-weight:600">${esc(s.name)}</span>
-      <button class="btn btn-red btn-sm" onclick="removeStudent('${esc(s.id)}','${esc(s.name)}')">🗑️ ลบ</button>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-sm" style="background:#e65100;color:#fff;font-size:12px" onclick="resetStudentPwd('${esc(s.name)}')">🔑 รีเซ็ต</button>
+        <button class="btn btn-red btn-sm" onclick="removeStudent('${esc(s.id)}','${esc(s.name)}')">🗑️ ลบ</button>
+      </div>
     </div>`).join('');
   }catch(e){el.innerHTML=`<div style="color:#c62828;padding:12px">โหลดไม่ได้: ${e.message}</div>`;}
 }
@@ -1776,6 +1779,21 @@ window.removeStudent=async function(docId,name){
     await deleteDoc(doc(db,'classrooms',_currentStudentRoomId,'students',docId));
     await refreshStudentList();
   }catch(e){alert('ลบไม่ได้: '+e.message);}
+};
+window.resetStudentPwd=async function(name){
+  if(!confirm(`รีเซ็ตรหัสผ่านของ "${name}"?\nนักเรียนจะต้องตั้งรหัสผ่านใหม่เมื่อ Login ครั้งถัดไป`))return;
+  try{
+    const studentId = _currentStudentRoomId+'_'+name;
+    const studentRef = doc(db,'students',studentId);
+    const snap = await getDoc(studentRef);
+    if(snap.exists()){
+      // ลบ record รหัสผ่าน → นักเรียนจะเข้าหน้า "ตั้งรหัสผ่านใหม่" โดยอัตโนมัติ
+      await deleteDoc(studentRef);
+      alert(`✅ รีเซ็ตสำเร็จ\n"${name}" จะต้องตั้งรหัสผ่านใหม่เมื่อ Login ครั้งถัดไป`);
+    } else {
+      alert(`ℹ️ "${name}" ยังไม่เคย Login\n(ไม่มีรหัสผ่านในระบบ)`);
+    }
+  }catch(e){alert('รีเซ็ตไม่ได้: '+e.message);}
 };
 
 // ==================== UTILS ====================
