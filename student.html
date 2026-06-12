@@ -478,7 +478,7 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs, addDoc, deleteDoc, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, addDoc, deleteDoc, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { FIREBASE_CONFIG } from "./js/config.js";
 
 const app = initializeApp(FIREBASE_CONFIG);
@@ -705,9 +705,9 @@ window.closeChangePwd = function(){
 };
 window.doChangePwd = async function(){
   const oldP = document.getElementById('oldPwd').value;
-  const p1 = document.getElementById('chgPwd1').value;
-  const p2 = document.getElementById('chgPwd2').value;
-  const err = document.getElementById('changePwdErr');
+  const p1   = document.getElementById('chgPwd1').value;
+  const p2   = document.getElementById('chgPwd2').value;
+  const err  = document.getElementById('changePwdErr');
   if(!oldP||!p1||!p2){ err.textContent='⚠️ กรุณากรอกให้ครบทุกช่อง'; err.style.display='block'; return; }
   if(p1.length<4){ err.textContent='⚠️ รหัสผ่านใหม่ต้องมีอย่างน้อย 4 ตัวอักษร'; err.style.display='block'; return; }
   if(p1!==p2){ err.textContent='⚠️ รหัสผ่านใหม่ทั้งสองช่องไม่ตรงกัน'; err.style.display='block'; return; }
@@ -715,17 +715,30 @@ window.doChangePwd = async function(){
   const btn = document.querySelector('#modalChangePwd .btn-ok');
   btn.textContent='⏳ กำลังเปลี่ยน...'; btn.disabled=true;
   try{
-    const studentId = student.roomId+'_'+student.name;
+    const studentId  = student.roomId+'_'+student.name;
     const studentRef = doc(db,'students',studentId);
     const snap = await getDoc(studentRef);
     if(!snap.exists()||snap.data().password!==oldP){
       err.textContent='❌ รหัสผ่านเดิมไม่ถูกต้อง'; err.style.display='block'; return;
     }
-    await setDoc(studentRef,{password:p1},{merge:true});
+    // ลอง updateDoc ก่อน ถ้าไม่ได้ (Firestore rule อนุญาตแค่ create) ให้ delete+recreate
+    const saved = snap.data();
+    try{
+      await updateDoc(studentRef, {password: p1});
+    }catch(updateErr){
+      if(updateErr.code==='permission-denied'){
+        // delete แล้ว recreate เพื่อหลีกเลี่ยง update rule
+        await deleteDoc(studentRef);
+        await setDoc(studentRef, {...saved, password: p1});
+      } else { throw updateErr; }
+    }
     closeChangePwd();
     alert('✅ เปลี่ยนรหัสผ่านสำเร็จ!');
   }catch(e){
-    err.textContent='❌ '+e.message; err.style.display='block';
+    const msg = e.code==='permission-denied'
+      ? '❌ ไม่มีสิทธิ์แก้ไข กรุณาติดต่อครูเพื่อรีเซ็ตรหัสผ่าน'
+      : '❌ '+e.message;
+    err.textContent=msg; err.style.display='block';
   } finally {
     btn.textContent='✅ เปลี่ยนรหัสผ่าน'; btn.disabled=false;
   }
