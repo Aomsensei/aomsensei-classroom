@@ -847,8 +847,35 @@ document.getElementById('btnSubmit').addEventListener('click', async () => {
     q20: getVal('q20'),
   };
 
-  const fields = Object.entries(answers).map(([label, value]) => ({ label, value }));
+  // ===== AUTO GRADE =====
+  const ANSWER_KEY_P4 = {
+    q1:'ค) พระพุทธศาสนา', q2:'ง) วัด',
+    q3:'ถูก', q4:'ผิด',
+    q5:'ข) หลักในการดำเนินชีวิต',
+    q6:'ก) สร้างความสามัคคีในสังคม',
+    q7:'ถูก', q8:'ผิด',
+    q9:'ยึดเหนี่ยว',
+    q10:'พระพุทธศาสนา', q11:'คริสต์ศาสนา',
+    q12:'อิสลาม', q13:'พราหมณ์-ฮินดู',
+    q14:'ข) อิหม่าม',
+    q15:'ปฏิบัติธรรม',
+    q16:'ข) วันวิสาขบูชา',
+    q17:'ถูก',
+    q18:'ข) ไหว้พระสวดมนต์ก่อนนอน',
+    q19:'ผิด',
+  };
+  const FILL_P4 = new Set(['q9','q15']);
+  let autoScore = 0;
+  const autoMax = Object.keys(ANSWER_KEY_P4).length;
+  for(const [k, correct] of Object.entries(ANSWER_KEY_P4)){
+    const ans = (answers[k]||'').trim();
+    const ok = FILL_P4.has(k)
+      ? ans !== '' && ans.toLowerCase().includes(correct.toLowerCase())
+      : ans === correct;
+    if(ok) autoScore++;
+  }
 
+  const fields = Object.entries(answers).map(([label, value]) => ({ label, value }));
   const btn = document.getElementById('btnSubmit');
   btn.disabled = true; btn.textContent = '⏳ กำลังส่ง...';
 
@@ -860,16 +887,18 @@ document.getElementById('btnSubmit').addEventListener('click', async () => {
       worksheetTitle: 'ใบงานที่ 1 — ความสำคัญของศาสนา',
       worksheetId: 'ws_social_p4_unit1',
       submittedDate: new Date().toLocaleDateString('th-TH'),
-      fields,
-      answers,
+      fields, answers,
       submittedAt: serverTimestamp(),
-      score: null,
-      maxScore: 20,
+      score: null, maxScore: 20,
+      autoScore, autoMaxScore: autoMax,
       feedback: '',
     });
+    const pct = Math.round(autoScore / autoMax * 100);
     const msg = document.getElementById('submitMsg');
     msg.className = 'submit-msg submit-ok';
-    msg.textContent = '✅ ส่งใบงานเรียบร้อยแล้ว! คุณครูจะตรวจและแจ้งคะแนนให้ภายหลัง 🎉';
+    msg.innerHTML = `✅ ส่งใบงานเรียบร้อยแล้ว!<br>
+      <b style="font-size:17px;color:${pct>=60?'#2e7d32':'#c62828'}">📊 ปรนัย+จับคู่: ${autoScore}/${autoMax} ข้อ (${pct}%)</b><br>
+      <span style="font-size:12px;color:#666">✏️ ครูจะตรวจอัตนัย (ข้อ 20) และแจ้งคะแนนรวมภายหลัง</span>`;
     btn.textContent = '✅ ส่งแล้ว';
   } catch(e) {
     const msg = document.getElementById('submitMsg');
