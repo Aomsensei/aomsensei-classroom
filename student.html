@@ -229,6 +229,7 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
     <button class="nav-tab active" onclick="switchTab('ann')" id="tab-ann"><i class="fas fa-bullhorn"></i>ประกาศ</button>
     <button class="nav-tab" onclick="switchTab('ws')" id="tab-ws"><i class="fas fa-file-alt"></i>ใบงาน</button>
     <button class="nav-tab" onclick="switchTab('kn')" id="tab-kn"><i class="fas fa-book-open"></i>ใบความรู้</button>
+    <button class="nav-tab" onclick="switchTab('game')" id="tab-game"><i class="fas fa-gamepad"></i>เกม</button>
     <button class="nav-tab" onclick="switchTab('quiz')" id="tab-quiz"><i class="fas fa-pen-to-square"></i>ข้อสอบ</button>
     <button class="nav-tab" onclick="switchTab('vid')" id="tab-vid"><i class="fas fa-play-circle"></i>วิดีโอ</button>
     <button class="nav-tab" onclick="switchTab('score')" id="tab-score"><i class="fas fa-chart-bar"></i>คะแนน</button>
@@ -249,6 +250,11 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
   <div id="content-kn" class="tab-content">
     <div class="section-title"><i class="fas fa-book-open"></i> ใบความรู้</div>
     <div id="listKn"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i></div></div>
+  </div>
+
+  <div id="content-game" class="tab-content">
+    <div class="section-title"><i class="fas fa-gamepad"></i> เกม</div>
+    <div id="listGame"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i></div></div>
   </div>
 
   <div id="content-quiz" class="tab-content">
@@ -744,7 +750,7 @@ window.switchTab = function(t){
 
 // ==================== LOAD ALL ====================
 function loadAll(){
-  loadAnn(); loadWs(); loadQuiz(); loadVid(); loadScore();
+  loadAnn(); loadWs(); loadQuiz(); loadVid(); loadScore(); loadGames();
 }
 
 // ==================== ANNOUNCEMENTS ====================
@@ -884,6 +890,68 @@ window.printWs=function(id){
   document.title=w.title||'ใบงาน';
 };
 window.closePdf=function(){ document.getElementById('pdfOverlay').style.display='none'; document.title='ห้องเรียนออนไลน์ | นักเรียน'; };
+
+// ==================== GAMES ====================
+async function loadGames(){
+  const el=document.getElementById('listGame');
+  try{
+    const q=query(collection(db,'games'),orderBy('createdAt','desc'));
+    const snap=await getDocs(q);
+    if(snap.empty){
+      el.innerHTML='<div class="empty-state"><i class="fas fa-gamepad"></i><p>ยังไม่มีเกม</p></div>';
+      return;
+    }
+    let h='';
+    snap.forEach(d=>{
+      const g=d.data();
+      if(g.roomId&&g.roomId!=='all'&&g.roomId!==student.roomId) return;
+      const thumbStyle=g.thumbnailUrl
+        ?`background:url('${esc(g.thumbnailUrl)}') center/cover no-repeat`
+        :'background:linear-gradient(135deg,#c94b00,#f39800)';
+      const typeLabel=g.type==='html'
+        ?'<span style="background:rgba(255,255,255,.22);color:#fff;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">HTML</span>'
+        :'<span style="background:rgba(255,255,255,.22);color:#fff;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">🌐 เว็บ</span>';
+      h+=`<div class="ws-card" onclick="openGame('${esc(d.id)}','${esc(g.type||'html')}','${esc(g.htmlFile||'')}','${esc(g.gameUrl||'')}','${esc(g.title||'')}')" style="cursor:pointer">
+        <div style="height:90px;border-radius:8px;margin-bottom:10px;display:flex;align-items:flex-end;padding:8px;${thumbStyle}">
+          <span style="font-size:22px;margin-right:auto">🎮</span>${typeLabel}
+        </div>
+        <div class="ws-title">${esc(g.title||'เกม')}</div>
+        ${g.subject?`<div style="font-size:11px;color:#888;margin-top:2px">📚 ${esc(g.subject)}</div>`:''}
+        ${g.description?`<div style="font-size:12px;color:#666;margin-top:6px;line-height:1.5">${esc(g.description.substring(0,70)+(g.description.length>70?'...':''))}</div>`:''}
+        <div style="margin-top:10px">
+          <button class="btn-open" style="background:#c94b00;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;width:100%">▶️ เล่นเกม</button>
+        </div>
+      </div>`;
+    });
+    el.innerHTML=h||'<div class="empty-state"><i class="fas fa-gamepad"></i><p>ไม่มีเกมสำหรับห้องเรียนนี้</p></div>';
+  }catch(e){
+    el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`;
+  }
+}
+window.openGame=function(id,type,htmlFile,gameUrl,title){
+  if(type==='html' && htmlFile){
+    const params=new URLSearchParams({
+      name:student.name||'',
+      grade:student.grade||'',
+      room:student.roomId||'',
+      subject:'',
+      gameId:id,
+      gameTitle:title
+    });
+    window.open('./'+htmlFile+'?'+params.toString(),'_blank');
+  } else if(type==='url' && gameUrl){
+    // Try iframe overlay first
+    const useIframe=document.getElementById('wsOverlay');
+    if(useIframe){
+      document.getElementById('wsOverlayTitle').textContent='🎮 '+title;
+      document.getElementById('wsIframe').src=gameUrl;
+      document.getElementById('wsOpenNewTab').href=gameUrl;
+      document.getElementById('wsOverlay').classList.add('show');
+    } else {
+      window.open(gameUrl,'_blank');
+    }
+  }
+};
 
 // ==================== QUIZZES ====================
 async function loadQuiz(){
