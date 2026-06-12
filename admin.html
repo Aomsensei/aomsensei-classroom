@@ -1636,7 +1636,7 @@ async function loadGames(){
 // ==================== GAME SUBMISSIONS ====================
 let _editGameSubId = null;
 
-async function loadGameSubmissions(){
+window.loadGameSubmissions = async function loadGameSubmissions(){
   const tb = document.getElementById('tbGameSub'); if(!tb) return;
   const gradeF  = (document.getElementById('cwGameGradeFilter')?.value  || '');
   const statusF = (document.getElementById('cwGameStatusFilter')?.value || '');
@@ -1797,7 +1797,11 @@ window.resetStudentPwd=async function(name){
 };
 
 // ==================== UTILS ====================
-window.delDoc=async function(col,id,cb){if(!confirm('ลบรายการนี้?'))return;await deleteDoc(doc(db,col,id));cb();};
+window.delDoc=async function(col,id,cb){
+  if(!confirm('ลบรายการนี้?'))return;
+  try{ await deleteDoc(doc(db,col,id)); if(typeof cb==='function') cb(); }
+  catch(e){ alert('ลบไม่ได้: '+e.message); }
+};
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 </script>
 
