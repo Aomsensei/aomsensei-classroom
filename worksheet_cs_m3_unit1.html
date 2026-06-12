@@ -923,6 +923,50 @@ document.getElementById('btnSubmit').addEventListener('click', async () => {
     q19: getTF('q19'),    q20: getVal('q20'),
   };
 
+  // ===== AUTO GRADE =====
+  // [id, correctAnswer, getterFn('radio'|'tf'|'val'), partialMatch]
+  const AG_CS = [
+    ['q1',  'ข) เว็บเบราว์เซอร์',                          'radio', false],
+    ['q2',  'ค) Java หรือ Kotlin',                          'radio', false],
+    ['q3',  'ถูก',                                          'tf',    false],
+    ['q4',  'ผิด',                                          'tf',    false],
+    ['q5a', 'Web Application',                              'val',   false],
+    ['q5b', 'Mobile Application',                           'val',   false],
+    ['q5c', 'Desktop Application',                          'val',   false],
+    ['q6',  'ก) วิเคราะห์ปัญหาและความต้องการ',             'radio', false],
+    ['q7',  'เขียนโปรแกรม',                                'val',   true],
+    ['q8a', '1', 'val', false],
+    ['q8b', '4', 'val', false],
+    ['q8c', '2', 'val', false],
+    ['q8d', '5', 'val', false],
+    ['q8e', '3', 'val', false],
+    ['q9',  'ผิด',                                          'tf',    false],
+    ['q10', 'ข) ต้นแบบเพื่อทดสอบการออกแบบก่อนพัฒนาจริง', 'radio', false],
+    ['q11', 'ข) Data Science / AI / Machine Learning',      'radio', false],
+    ['q12', 'ค) Integrated Development Environment',        'radio', false],
+    ['q13', 'ถูก',                                          'tf',    false],
+    ['q14a','Data Science / AI',                            'val',   false],
+    ['q14b','Web Frontend',                                 'val',   false],
+    ['q14c','iOS App',                                      'val',   false],
+    ['q14d','Android App',                                  'val',   false],
+    ['q15', 'Web Application',                              'val',   true],
+    ['q16', 'ข) User Experience',                           'radio', false],
+    ['q17', 'ถูก',                                          'tf',    false],
+    ['q18', 'ก) ข้อผิดพลาดหรือจุดบกพร่องในโปรแกรม',        'radio', false],
+    ['q19', 'ถูก',                                          'tf',    false],
+  ];
+  let autoScore = 0;
+  const autoMax = AG_CS.length;
+  for(const [id, correct, fn, partial] of AG_CS){
+    const actual = fn==='radio' ? getRadio(id) : fn==='tf' ? getTF(id) : getVal(id);
+    const ok = partial
+      ? actual !== '' && actual.toLowerCase().includes(correct.toLowerCase())
+      : actual === correct;
+    if(ok) autoScore++;
+  }
+  const autoPct = Math.round(autoScore/autoMax*100);
+  // =======================
+
   const fields = Object.entries(answers).map(([label,value]) => ({label,value}));
   const btn = document.getElementById('btnSubmit');
   btn.disabled = true; btn.textContent = '⏳ กำลังส่ง...';
@@ -936,11 +980,13 @@ document.getElementById('btnSubmit').addEventListener('click', async () => {
       submittedDate: new Date().toLocaleDateString('th-TH'),
       fields, answers,
       submittedAt: serverTimestamp(),
-      score: null, maxScore: 20, feedback: '',
+      score: null, maxScore: 20,
+      autoScore, autoMaxScore: autoMax,
+      feedback: '',
     });
     const msg = document.getElementById('submitMsg');
     msg.className = 'submit-msg submit-ok';
-    msg.textContent = '✅ ส่งใบงานเรียบร้อยแล้ว! คุณครูจะตรวจและแจ้งคะแนนให้ภายหลัง 🎉';
+    msg.innerHTML = `✅ ส่งใบงานเรียบร้อยแล้ว! 🎉<br>📊 ปรนัย+จับคู่: <strong>${autoScore}/${autoMax} ข้อ (${autoPct}%)</strong><br><small>อัตนัยรอครูตรวจ</small>`;
     btn.textContent = '✅ ส่งแล้ว';
   } catch(e) {
     const msg = document.getElementById('submitMsg');
