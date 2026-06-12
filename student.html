@@ -87,6 +87,18 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
 .score-badge.pass{background:#e8f5e9;color:#2e7d32}
 .score-badge.fail{background:#ffebee;color:#c62828}
 
+/* Game Icon Grid */
+.game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:16px 12px;padding:4px 0}
+@media(min-width:360px){.game-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}}
+@media(min-width:480px){.game-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:20px 16px}}
+.game-icon-item{display:flex;flex-direction:column;align-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+.game-icon-item:active .game-icon-thumb{transform:scale(.9);box-shadow:0 2px 8px rgba(201,75,0,.3)}
+.game-icon-thumb{width:88px;height:88px;border-radius:22px;background:linear-gradient(135deg,#c94b00,#f39800);display:flex;align-items:center;justify-content:center;font-size:42px;box-shadow:0 6px 20px rgba(201,75,0,.4);transition:transform .15s,box-shadow .15s;background-size:cover;background-position:center;overflow:hidden;margin-bottom:8px;flex-shrink:0;position:relative}
+@media(min-width:480px){.game-icon-thumb{width:100px;height:100px}}
+.game-icon-badge{position:absolute;bottom:5px;right:5px;background:rgba(0,0,0,.55);color:#fff;border-radius:5px;padding:1px 5px;font-size:9px;font-weight:800}
+.game-icon-name{font-size:12px;font-weight:800;color:#333;text-align:center;max-width:100px;line-height:1.3;word-break:break-word}
+.game-icon-sub{font-size:10px;color:#999;text-align:center;margin-top:2px}
+
 .video-card{background:#fff;border-radius:12px;overflow:hidden;margin-bottom:12px;box-shadow:0 2px 12px rgba(201,75,0,.1)}
 .video-card iframe{width:100%;aspect-ratio:16/9;display:block;border:none}
 .video-info{padding:10px 12px}
@@ -897,33 +909,30 @@ async function loadGames(){
   try{
     const q=query(collection(db,'games'),orderBy('createdAt','desc'));
     const snap=await getDocs(q);
-    if(snap.empty){
-      el.innerHTML='<div class="empty-state"><i class="fas fa-gamepad"></i><p>ยังไม่มีเกม</p></div>';
-      return;
-    }
-    let h='';
+    let items=[];
     snap.forEach(d=>{
       const g=d.data();
       if(g.roomId&&g.roomId!=='all'&&g.roomId!==student.roomId) return;
-      const thumbStyle=g.thumbnailUrl
-        ?`background:url('${esc(g.thumbnailUrl)}') center/cover no-repeat`
-        :'background:linear-gradient(135deg,#c94b00,#f39800)';
-      const typeLabel=g.type==='html'
-        ?'<span style="background:rgba(255,255,255,.22);color:#fff;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">HTML</span>'
-        :'<span style="background:rgba(255,255,255,.22);color:#fff;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">🌐 เว็บ</span>';
-      h+=`<div class="ws-card" onclick="openGame('${esc(d.id)}','${esc(g.type||'html')}','${esc(g.htmlFile||'')}','${esc(g.gameUrl||'')}','${esc(g.title||'')}')" style="cursor:pointer">
-        <div style="height:90px;border-radius:8px;margin-bottom:10px;display:flex;align-items:flex-end;padding:8px;${thumbStyle}">
-          <span style="font-size:22px;margin-right:auto">🎮</span>${typeLabel}
-        </div>
-        <div class="ws-title">${esc(g.title||'เกม')}</div>
-        ${g.subject?`<div style="font-size:11px;color:#888;margin-top:2px">📚 ${esc(g.subject)}</div>`:''}
-        ${g.description?`<div style="font-size:12px;color:#666;margin-top:6px;line-height:1.5">${esc(g.description.substring(0,70)+(g.description.length>70?'...':''))}</div>`:''}
-        <div style="margin-top:10px">
-          <button class="btn-open" style="background:#c94b00;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;width:100%">▶️ เล่นเกม</button>
-        </div>
-      </div>`;
+      items.push({id:d.id,...g});
     });
-    el.innerHTML=h||'<div class="empty-state"><i class="fas fa-gamepad"></i><p>ไม่มีเกมสำหรับห้องเรียนนี้</p></div>';
+    if(!items.length){
+      el.innerHTML='<div class="empty-state"><i class="fas fa-gamepad"></i><p>ยังไม่มีเกม</p></div>';
+      return;
+    }
+    const icons=items.map(g=>{
+      const hasBg=!!g.thumbnailUrl;
+      const thumbStyle=hasBg
+        ?`background-image:url('${esc(g.thumbnailUrl)}');background-size:cover;background-position:center`
+        :'';
+      const badge=g.type==='url'
+        ?`<span class="game-icon-badge">🌐</span>`:'';
+      return `<div class="game-icon-item" onclick="openGame('${esc(g.id)}','${esc(g.type||'html')}','${esc(g.htmlFile||'')}','${esc(g.gameUrl||'')}','${esc(g.title||'')}')">
+        <div class="game-icon-thumb" style="${thumbStyle}">${hasBg?'':' 🎮'}${badge}</div>
+        <div class="game-icon-name">${esc(g.title||'เกม')}</div>
+        ${g.subject?`<div class="game-icon-sub">📚 ${esc(g.subject)}</div>`:''}
+      </div>`;
+    }).join('');
+    el.innerHTML=`<div class="game-grid">${icons}</div>`;
   }catch(e){
     el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`;
   }
