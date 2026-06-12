@@ -974,16 +974,21 @@ function setEventCanvasEnabled(enabled){
   if(ec) ec.style.pointerEvents = enabled ? 'auto' : 'none';
 }
 
-window.openOverlay = function(id){
+// Declare as local module functions so they're callable within module without window. prefix
+function openOverlay(id){
   setEventCanvasEnabled(false);
   document.getElementById(id).classList.add('show');
-};
+}
 
-window.closeOverlay = function(id){
+function closeOverlay(id){
   document.getElementById(id).classList.remove('show');
   const anyOpen = document.querySelector('.overlay.show');
   if(!anyOpen) setEventCanvasEnabled(true);
-};
+}
+
+// Also expose on window so HTML onclick="closeOverlay(...)" works
+window.openOverlay  = openOverlay;
+window.closeOverlay = closeOverlay;
 
 function showMErr(id, msg){
   const el = document.getElementById(id);
