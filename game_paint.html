@@ -205,7 +205,6 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
     <!-- Import -->
     <div class="panel-section">
       <div class="panel-label">นำเข้า</div>
-      <button class="btn-act" onclick="loadAndScrollToAssets()" style="background:rgba(243,152,0,.25);color:#fbbf24;border:1px solid rgba(243,152,0,.35);margin-bottom:3px">🖼️ รูปจากครู</button>
       <button class="btn-act imp" onclick="openImgModal()">🖼️ รูปภาพ</button>
       <button class="btn-act imp" onclick="openPdfModal()">📄 PDF</button>
     </div>
@@ -228,13 +227,6 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
         <button onclick="mergeAllLayers()">🔗 รวมชั้น</button>
       </div>
     </div>
-    <!-- Teacher Assets -->
-    <div class="panel-section" id="teacherAssetsSection">
-      <div class="panel-label">📎 ครูส่งให้</div>
-      <div id="teacherAssetsList" style="display:flex;flex-direction:column;gap:6px">
-        <div style="font-size:10px;color:#4b5563;text-align:center">กด "รูปจากครู" เพื่อโหลด</div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -251,16 +243,10 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
 <div class="overlay" id="mImg">
   <div class="modal">
     <h3>🖼️ นำเข้ารูปภาพ</h3>
-    <label class="m-lbl">อัปโหลดไฟล์รูปภาพ (jpg, png, gif, webp)</label>
+    <label class="m-lbl">เลือกไฟล์รูปภาพ (jpg, png, gif, webp)</label>
     <input type="file" id="imgFile" accept="image/*" style="color:#ddd;font-size:12px;width:100%;margin-bottom:12px" onchange="loadImageFile(this)"/>
-    <div style="text-align:center;color:#4b5563;font-size:11px;margin:6px 0">— หรือใช้ URL / Google Drive —</div>
-    <label class="m-lbl">URL รูปภาพ หรือลิงก์ Google Drive</label>
-    <input type="url" class="m-inp" id="imgUrl" placeholder="https://... หรือ https://drive.google.com/file/d/.../view"/>
-    <div style="font-size:9px;color:#6b7280;margin-top:-6px;margin-bottom:6px">💡 Google Drive: ต้องแชร์เป็น "ทุกคนที่มีลิงก์" ก่อนวาง URL</div>
-    <div id="imgErr" class="m-err"></div>
     <div class="btn-row">
       <button class="btn-cancel" onclick="closeOverlay('mImg')">ยกเลิก</button>
-      <button class="btn-ok" onclick="loadImageUrl()">โหลดรูป</button>
     </div>
   </div>
 </div>
@@ -328,7 +314,7 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { FIREBASE_CONFIG } from "./js/config.js";
 
@@ -336,9 +322,6 @@ const app = initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
 const auth = getAuth(app);
 signInAnonymously(auth).catch(()=>{});
-
-// Load teacher assets as soon as Firebase is ready
-loadTeacherAssets();
 
 // PDF.js worker
 if(typeof pdfjsLib !== 'undefined'){
@@ -743,37 +726,6 @@ function floodFillOnMerged(bgCtxRef, drCtx, x, y, colorHex, alpha){
   drCtx.putImageData(drData,0,0);
 }
 
-// ========== GOOGLE DRIVE + CORS HELPERS ==========
-// Convert Google Drive share URL → direct viewable URL
-function convertGDriveUrl(url){
-  if(!url) return url;
-  if(!url.includes('drive.google.com') && !url.includes('docs.google.com')) return url;
-  let m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if(m) return 'https://lh3.googleusercontent.com/d/' + m[1];
-  m = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-  if(m) return 'https://lh3.googleusercontent.com/d/' + m[1];
-  return url;
-}
-
-// Load image with 3 fallbacks: direct+CORS → proxy+CORS → direct no-CORS (tainted)
-// onSuccess(imgEl, isTainted)
-function loadImgWithCORS(url, onSuccess, onFail){
-  const direct = convertGDriveUrl(url);
-  const proxy  = 'https://images.weserv.nl/?url=' + encodeURIComponent(direct) + '&output=jpg&il';
-  function tryLoad(src, withCORS, tainted, nextFn){
-    const img = new Image();
-    if(withCORS) img.crossOrigin = 'anonymous';
-    img.onload  = () => onSuccess(img, tainted);
-    img.onerror = nextFn;
-    img.src = src;
-  }
-  tryLoad(direct, true,  false, () =>
-    tryLoad(proxy,  true,  false, () =>
-      tryLoad(direct, false, true,  onFail || (()=>{}))
-    )
-  );
-}
-
 // ========== IMPORT IMAGE ==========
 window.openImgModal = () => openOverlay('mImg');
 
@@ -783,16 +735,6 @@ window.loadImageFile = function(input){
   reader.onload = e => applyBgImage(e.target.result);
   reader.readAsDataURL(file);
   closeOverlay('mImg');
-};
-
-window.loadImageUrl = function(){
-  const url = document.getElementById('imgUrl').value.trim();
-  if(!url){ showMErr('imgErr','กรุณาใส่ URL'); return; }
-  showMErr('imgErr','⏳ กำลังโหลด...');
-  loadImgWithCORS(url,
-    (img) => { applyBgImage(null, img); closeOverlay('mImg'); showMErr('imgErr',''); },
-    ()    => showMErr('imgErr','โหลดรูปไม่ได้ — ตรวจสอบว่าไฟล์ตั้งค่าเป็น "ทุกคนที่มีลิงก์" และ URL ถูกต้อง')
-  );
 };
 
 function applyBgImage(src, imgEl){
@@ -1015,87 +957,6 @@ document.addEventListener('keydown', e => {
   else if(e.key==='f'||e.key==='F') setTool('fill');
 });
 
-// ========== TEACHER ASSETS ==========
-async function loadTeacherAssets(){
-  const list = document.getElementById('teacherAssetsList');
-  if(!urlGameId){
-    list.innerHTML = '<div style="font-size:10px;color:#4b5563;text-align:center">ไม่มีข้อมูลเกม</div>';
-    return;
-  }
-  list.innerHTML = '<div style="font-size:10px;color:#9ca3af;text-align:center">⏳ กำลังโหลด...</div>';
-  try{
-    const snap = await getDoc(doc(db,'games',urlGameId));
-    if(!snap.exists()){
-      list.innerHTML = '<div style="font-size:10px;color:#4b5563;text-align:center">ไม่พบข้อมูลเกม</div>';
-      return;
-    }
-    const g = snap.data();
-    const assets = (g.assets||[]).filter(a =>
-      !a.grade || a.grade==='all' || a.grade===urlGrade
-    );
-    if(!assets.length){
-      list.innerHTML = '<div style="font-size:10px;color:#4b5563;text-align:center">ครูยังไม่ได้เพิ่มรูป</div>';
-      return;
-    }
-    const section = document.getElementById('teacherAssetsSection');
-    section.style.display = '';
-    list.innerHTML = assets.map(a => {
-      const safeName   = (a.name||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
-      const safeUrl    = (a.url||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
-      const thumbUrl   = convertGDriveUrl(a.url||'') || a.url || '';
-      if(a.type==='pdf'){
-        return `<button class="asset-pdf-btn" onclick="loadTeacherAssetDirect('pdf','${safeUrl}','${safeName}')">📄 ${a.name||'PDF'}</button>`;
-      } else {
-        return `<div>
-          <img class="asset-thumb" src="${thumbUrl}" alt="${a.name||''}"
-               loading="lazy"
-               onclick="loadTeacherAssetDirect('image','${safeUrl}','')"
-               title="${a.name||'รูปภาพ'}"/>
-          <div style="font-size:9px;color:#6b7280;margin-top:2px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.name||''}</div>
-        </div>`;
-      }
-    }).join('');
-  }catch(ex){
-    console.warn('loadTeacherAssets:', ex);
-    const msg = ex.message || String(ex);
-    const isPermission = msg.toLowerCase().includes('permission') || msg.includes('PERMISSION_DENIED');
-    list.innerHTML = `<div style="font-size:10px;color:#f87171;text-align:center;line-height:1.6;padding:4px">
-      ❌ ${isPermission ? 'ไม่มีสิทธิ์อ่านข้อมูล' : 'โหลดไม่ได้: '+msg}<br>
-      ${isPermission ? `<span style="color:#9ca3af">ครูต้องตั้งค่า Firestore Rules:<br>
-      <code style="color:#fbbf24;font-size:9px">match /games/{id} {<br>&nbsp;&nbsp;allow read: if true;<br>}</code></span>` : ''}
-    </div>`;
-  }
-}
-
-window.loadTeacherAssetDirect = function(type, url, name){
-  if(type==='image'){
-    loadImgWithCORS(url,
-      (img) => applyBgImage(null, img),
-      ()    => alert('โหลดรูปไม่ได้ — ตรวจสอบว่าไฟล์ใน Drive ตั้งค่าเป็น "ทุกคนที่มีลิงก์"')
-    );
-  } else {
-    // PDF via PDF.js
-    if(typeof pdfjsLib === 'undefined'){ alert('PDF.js ยังไม่พร้อม'); return; }
-    const info = document.getElementById('pdfInfo');
-    openOverlay('mPdf');
-    info.style.display = 'block';
-    info.textContent   = '⏳ กำลังโหลด PDF จากครู...';
-    pdfjsLib.getDocument({url, withCredentials:false}).promise
-      .then(pdfDoc => {
-        _pdfDoc = pdfDoc;
-        info.textContent = `✅ PDF จากครู — มี ${pdfDoc.numPages} หน้า`;
-        document.getElementById('pdfPage').max = pdfDoc.numPages;
-        document.getElementById('btnLoadPdf').disabled = false;
-        document.getElementById('pdfErr').style.display = 'none';
-      })
-      .catch(err => {
-        info.style.display = 'none';
-        const errEl = document.getElementById('pdfErr');
-        errEl.textContent = 'โหลด PDF ไม่ได้ (CORS): '+err.message;
-        errEl.style.display = 'block';
-      });
-  }
-};
 
 // ========== LAYERS ==========
 function initLayers(){
@@ -1242,13 +1103,6 @@ function renderLayersPanel(){
   setTimeout(updateLayerThumbnails, 0);
 }
 
-// ========== TEACHER ASSETS SHORTCUT ==========
-window.loadAndScrollToAssets = async function(){
-  await loadTeacherAssets();
-  const section = document.getElementById('teacherAssetsSection');
-  section.style.display = '';
-  section.scrollIntoView({behavior:'smooth', block:'nearest'});
-};
 
 </script>
 </body>
