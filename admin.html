@@ -1504,6 +1504,8 @@ window.openAddGameModal = function(){
   document.getElementById('gameDesc').value = '';
   document.getElementById('gameThumbnail').value = '';
   document.getElementById('gameRoom').value = 'all';
+  _gameAssets = [];
+  renderAssetList();
   toggleGameType('html');
   document.getElementById('gameModalTitle').textContent = '➕ เพิ่มเกม';
   document.getElementById('gameSaveErr').style.display='none';
@@ -1525,6 +1527,8 @@ window.editGame = async function(id){
     document.getElementById('gameDesc').value = g.description||'';
     document.getElementById('gameThumbnail').value = g.thumbnailUrl||'';
     document.getElementById('gameRoom').value = g.roomId||'all';
+    _gameAssets = Array.isArray(g.assets) ? JSON.parse(JSON.stringify(g.assets)) : [];
+    renderAssetList();
     toggleGameType(g.type||'html');
     document.getElementById('gameModalTitle').textContent = '✏️ แก้ไขเกม';
     document.getElementById('gameSaveErr').style.display='none';
@@ -1536,6 +1540,39 @@ window.toggleGameType = function(t){
   document.getElementById('gameHtmlRow').style.display = t==='html' ? '' : 'none';
   document.getElementById('gameUrlRow').style.display  = t==='url'  ? '' : 'none';
 };
+
+// ---- Assets management ----
+let _gameAssets = [];
+
+window.addGameAsset = function(){
+  const url   = document.getElementById('assetUrl').value.trim();
+  const grade = document.getElementById('assetGrade').value || 'all';
+  const name  = document.getElementById('assetName').value.trim();
+  if(!url){ return; }
+  const isPdf = /\.pdf($|\?)/i.test(url) || url.includes('/pdf');
+  const type  = isPdf ? 'pdf' : 'image';
+  _gameAssets.push({ id: Date.now()+'', name: name || url.split('/').pop().split('?')[0].substring(0,30), type, url, grade });
+  document.getElementById('assetUrl').value = '';
+  document.getElementById('assetName').value = '';
+  renderAssetList();
+};
+
+function renderAssetList(){
+  const el = document.getElementById('assetList'); if(!el) return;
+  if(!_gameAssets.length){
+    el.innerHTML = '<div style="color:#bbb;font-size:12px;padding:4px 0">ยังไม่มีไฟล์ — กรอก URL แล้วกด ➕</div>';
+    return;
+  }
+  el.innerHTML = _gameAssets.map((a,i) => `
+    <div style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:#fff3e0;border-radius:7px;margin-bottom:4px;font-size:12px">
+      <span style="flex-shrink:0">${a.type==='pdf'?'📄':'🖼️'}</span>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#333" title="${esc(a.url)}">${esc(a.name||a.url)}</span>
+      <span style="background:#ffd0a0;border-radius:4px;padding:1px 6px;font-size:10px;flex-shrink:0">${a.grade==='all'?'ทุกชั้น':esc(a.grade)}</span>
+      <button onclick="removeGameAsset(${i})" style="background:none;border:none;cursor:pointer;color:#c62828;font-size:15px;padding:0 2px;flex-shrink:0;line-height:1">×</button>
+    </div>`).join('');
+}
+window.removeGameAsset = function(i){ _gameAssets.splice(i,1); renderAssetList(); };
+// ---- end assets ----
 
 window.saveGame = async function(){
   const title   = document.getElementById('gameTitle').value.trim();
@@ -1553,7 +1590,7 @@ window.saveGame = async function(){
   if(type==='url'  && !gameUrl) { errEl.textContent='⚠️ กรุณากรอก URL เกม';    errEl.style.display='block'; return; }
   errEl.style.display='none';
 
-  const data = { title, type, htmlFile: type==='html'?htmlFile:'', gameUrl: type==='url'?gameUrl:'', roomId, subject, description:desc, thumbnailUrl:thumb };
+  const data = { title, type, htmlFile: type==='html'?htmlFile:'', gameUrl: type==='url'?gameUrl:'', roomId, subject, description:desc, thumbnailUrl:thumb, assets:_gameAssets };
   try{
     if(_editGameId){
       await setDoc(doc(db,'games',_editGameId), data, {merge:true});
@@ -1826,8 +1863,33 @@ function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace
     </div>
   </div>
   <label style="font-size:12px;color:#777;display:block;margin-bottom:4px">คำอธิบาย</label>
-  <textarea id="gameDesc" rows="2" placeholder="คำอธิบายเกม" style="width:100%;padding:9px 12px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;margin-bottom:10px;box-sizing:border-box"></textarea>
-  <div id="gameSaveErr" style="display:none;background:#fce4ec;color:#c62828;padding:8px 12px;border-radius:8px;font-size:13px;margin-bottom:8px;border-left:3px solid #e53935"></div>
+  <textarea id="gameDesc" rows="2" placeholder="คำอธิบายเกม" style="width:100%;padding:9px 12px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;margin-bottom:12px;box-sizing:border-box"></textarea>
+
+  <!-- Assets Section -->
+  <div style="border-top:1.5px solid #ffd0a0;padding-top:12px;margin-top:2px">
+    <div style="font-weight:800;color:#c94b00;font-size:12px;margin-bottom:8px">📎 รูปภาพ/PDF ส่งให้นักเรียน (ไม่บังคับ)</div>
+    <div id="assetList" style="min-height:24px;margin-bottom:8px"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
+      <div>
+        <label style="font-size:11px;color:#777;display:block;margin-bottom:3px">URL รูปภาพ หรือ PDF *</label>
+        <input type="url" id="assetUrl" placeholder="https://..." style="width:100%;padding:7px 10px;border:1.5px solid #ffd0a0;border-radius:7px;font-size:12px;font-family:inherit;box-sizing:border-box" onkeydown="if(event.key==='Enter')addGameAsset()"/>
+      </div>
+      <div>
+        <label style="font-size:11px;color:#777;display:block;margin-bottom:3px">ชื่อไฟล์ (ไม่บังคับ)</label>
+        <input type="text" id="assetName" placeholder="เช่น ใบระบายสี ม.1" style="width:100%;padding:7px 10px;border:1.5px solid #ffd0a0;border-radius:7px;font-size:12px;font-family:inherit;box-sizing:border-box" onkeydown="if(event.key==='Enter')addGameAsset()"/>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <select id="assetGrade" style="padding:7px 10px;border:1.5px solid #ffd0a0;border-radius:7px;font-size:12px;font-family:inherit;background:#fff;flex-shrink:0">
+        <option value="all">ทุกชั้น</option>
+        <option>ป.4</option><option>ป.5</option><option>ป.6</option>
+        <option>ม.1</option><option>ม.2</option><option>ม.3</option>
+      </select>
+      <button type="button" class="btn btn-orange btn-sm" onclick="addGameAsset()" style="flex-shrink:0">➕ เพิ่มไฟล์</button>
+    </div>
+  </div>
+
+  <div id="gameSaveErr" style="display:none;background:#fce4ec;color:#c62828;padding:8px 12px;border-radius:8px;font-size:13px;margin-top:10px;border-left:3px solid #e53935"></div>
   <div class="btn-row">
     <button class="btn btn-gray" onclick="closeModal('mGame')">ยกเลิก</button>
     <button class="btn btn-green" onclick="saveGame()">💾 บันทึก</button>
