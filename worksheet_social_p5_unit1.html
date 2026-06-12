@@ -607,6 +607,42 @@ window.submitWorksheet = async function(){
     {label:'20. หลักธรรมในชีวิต (อัตนัย)', value: getVal('q20')||'ไม่ตอบ'},
   ];
 
+  // ===== AUTO GRADE =====
+  // MCQ+TF use getRadio (returns .value = full text), fill-in+select use getVal
+  const AG_P5 = [
+    // [id, correctAnswer, useRadio, partialMatch]
+    ['q2',  'สวนลุมพินีวัน',                          true,  false],
+    ['q3',  'สุทโธทนะ',                                true,  false],
+    ['q4',  'พระนางมายาเทวี',                          true,  false],
+    ['q5',  'ต้นโพธิ์',                                true,  false],
+    ['q6',  'สถานที่เสด็จดับขันธปรินิพพาน',           true,  false],
+    ['q7',  'ถูก',                                     true,  false],
+    ['q8',  'ถูก',                                     true,  false],
+    ['q9',  'ผิด',                                     true,  false],
+    ['q10', 'ลุมพินีวัน',                              false, true],
+    ['q11', '29',                                      false, true],
+    ['q12', 'ตรัสรู้',                                 false, true],
+    ['q12b','โพธิ์',                                   false, true],
+    ['q12c','พุทธคยา',                                 false, true],
+    ['q13', 'ปัญจวัคคีย์',                             false, true],
+    ['m1',  'สถานที่ประสูติ',                          false, false],
+    ['m2',  'สถานที่ตรัสรู้',                          false, false],
+    ['m3',  'สถานที่แสดงปฐมเทศนา',                    false, false],
+    ['m4',  'สถานที่ปรินิพพาน',                        false, false],
+    ['m5',  'สถานที่บำเพ็ญทุกรกิริยา',                false, false],
+  ];
+  let autoScore = 0;
+  const autoMax = AG_P5.length;
+  for(const [id, correct, useR, partial] of AG_P5){
+    const actual = (useR ? getRadio(id) : getVal(id)).trim();
+    const ok = partial
+      ? actual !== '' && actual.toLowerCase().includes(correct.toLowerCase())
+      : actual === correct;
+    if(ok) autoScore++;
+  }
+  const autoPct = Math.round(autoScore/autoMax*100);
+  // =======================
+
   const data = {
     studentName,
     grade,
@@ -616,6 +652,9 @@ window.submitWorksheet = async function(){
     submittedDate: date,
     fields,
     submittedAt: serverTimestamp(),
+    score: null, maxScore: autoMax,
+    autoScore, autoMaxScore: autoMax,
+    feedback: '',
   };
 
   try{
@@ -624,7 +663,8 @@ window.submitWorksheet = async function(){
     msg.innerHTML = `
       <div style="font-size:22px;margin-bottom:8px">🎉</div>
       <div style="font-size:16px;font-weight:800;color:#2e7d32;margin-bottom:6px">ส่งใบงานสำเร็จแล้ว!</div>
-      <div style="font-size:13px;color:#555">ขอบคุณ ${studentName} ที่ทำใบงานอย่างตั้งใจ 🌟<br>ครูจะตรวจและแจ้งคะแนนภายหลังนะ</div>`;
+      <div style="font-size:14px;color:#1565c0;font-weight:700;margin-bottom:4px">📊 ปรนัย+จับคู่: ${autoScore}/${autoMax} ข้อ (${autoPct}%)</div>
+      <div style="font-size:13px;color:#555">ขอบคุณ ${studentName} ที่ทำใบงานอย่างตั้งใจ 🌟<br>อัตนัยรอครูตรวจนะ</div>`;
     msg.style.display='block';
     btn.textContent='✅ ส่งแล้ว';
     btn.style.background='#66bb6a';
