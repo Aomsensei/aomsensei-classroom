@@ -104,6 +104,20 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
 .btn-cancel:hover{background:rgba(255,255,255,.15)}
 .row2{display:flex;gap:8px}
 .row2 > div{flex:1}
+
+/* LAYERS */
+.layer-item{display:flex;align-items:center;gap:3px;padding:4px 4px;border-radius:6px;cursor:pointer;transition:.12s;border:1.5px solid transparent;user-select:none}
+.layer-item:hover{background:rgba(255,255,255,.07)}
+.layer-item.active{background:rgba(243,152,0,.2);border-color:rgba(243,152,0,.5)}
+.layer-thumb{border-radius:3px;border:1px solid rgba(255,255,255,.15);flex-shrink:0;background:#fff}
+.layer-name{flex:1;font-size:9px;color:#d1d5db;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.layer-btns{display:flex;gap:1px;flex-shrink:0}
+.layer-btn{font-size:10px;background:none;border:none;cursor:pointer;color:#6b7280;padding:1px 2px;line-height:1;border-radius:3px;transition:.1s}
+.layer-btn:hover{background:rgba(255,255,255,.15);color:#fff}
+.layer-btn.del:hover{color:#fca5a5}
+.layers-actions{display:flex;gap:3px;margin-top:5px}
+.layers-actions button{flex:1;padding:4px 2px;background:rgba(255,255,255,.07);color:#9ca3af;border:none;border-radius:5px;font-size:9px;cursor:pointer;font-family:inherit;transition:.1s;white-space:nowrap}
+.layers-actions button:hover{background:rgba(255,255,255,.15);color:#fff}
 </style>
 </head>
 <body>
@@ -142,6 +156,7 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
       <div class="canvas-container" id="canvasContainer" style="width:800px;height:560px">
         <canvas id="bgCanvas" width="800" height="560"></canvas>
         <canvas id="drawCanvas" width="800" height="560"></canvas>
+        <canvas id="eventCanvas" width="800" height="560" style="position:absolute;top:0;left:0;z-index:999;background:transparent;cursor:crosshair"></canvas>
       </div>
     </div>
     <!-- Zoom Bar -->
@@ -190,6 +205,7 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
     <!-- Import -->
     <div class="panel-section">
       <div class="panel-label">นำเข้า</div>
+      <button class="btn-act" onclick="loadAndScrollToAssets()" style="background:rgba(243,152,0,.25);color:#fbbf24;border:1px solid rgba(243,152,0,.35);margin-bottom:3px">🖼️ รูปจากครู</button>
       <button class="btn-act imp" onclick="openImgModal()">🖼️ รูปภาพ</button>
       <button class="btn-act imp" onclick="openPdfModal()">📄 PDF</button>
     </div>
@@ -203,11 +219,20 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
         <option value="842x595">A4 แนวนอน</option>
       </select>
     </div>
+    <!-- Layers Panel -->
+    <div class="panel-section">
+      <div class="panel-label">ชั้นงาน (Layers)</div>
+      <div id="layersList" style="display:flex;flex-direction:column;gap:2px"></div>
+      <div class="layers-actions">
+        <button onclick="addLayer()">➕ ชั้นใหม่</button>
+        <button onclick="mergeAllLayers()">🔗 รวมชั้น</button>
+      </div>
+    </div>
     <!-- Teacher Assets -->
-    <div class="panel-section" id="teacherAssetsSection" style="display:none">
+    <div class="panel-section" id="teacherAssetsSection">
       <div class="panel-label">📎 ครูส่งให้</div>
       <div id="teacherAssetsList" style="display:flex;flex-direction:column;gap:6px">
-        <div style="font-size:10px;color:#4b5563;text-align:center">กำลังโหลด...</div>
+        <div style="font-size:10px;color:#4b5563;text-align:center">กด "รูปจากครู" เพื่อโหลด</div>
       </div>
     </div>
   </div>
@@ -350,9 +375,9 @@ document.getElementById('btnSubmit').disabled = false;
 
 // ========== CANVAS SETUP ==========
 const bgCanvas   = document.getElementById('bgCanvas');
-const drawCanvas = document.getElementById('drawCanvas');
+let drawCanvas = document.getElementById('drawCanvas');
 const bgCtx      = bgCanvas.getContext('2d');
-const ctx        = drawCanvas.getContext('2d');
+let ctx        = drawCanvas.getContext('2d');
 const container  = document.getElementById('canvasContainer');
 
 let currentTool  = 'pencil';
@@ -364,6 +389,8 @@ let startX = 0, startY = 0, lastX = 0, lastY = 0;
 let undoStack = [];
 let redoStack = [];
 let snapshotBeforeStroke = null;
+let layers = [];        // [{id,name,canvas,ctx,visible}]
+let activeLayerIdx = 0;
 
 // Init background white
 bgCtx.fillStyle = '#ffffff';
@@ -456,18 +483,21 @@ document.getElementById('canvasScroll').addEventListener('wheel', e => {
 // ========== CANVAS RESIZE ==========
 window.resizeCanvas = function(val){
   const [w,h] = val.split('x').map(Number);
-  // Snapshot current
   const bgSnap = bgCtx.getImageData(0,0,bgCanvas.width,bgCanvas.height);
-  const drSnap = ctx.getImageData(0,0,drawCanvas.width,drawCanvas.height);
-  bgCanvas.width = drawCanvas.width = container.style.width.split('p')[0]*1 ? w : w;
-  bgCanvas.height = drawCanvas.height = h;
   bgCanvas.width = w; bgCanvas.height = h;
-  drawCanvas.width = w; drawCanvas.height = h;
-  container.style.width = w+'px'; container.style.height = h+'px';
   bgCtx.fillStyle = '#ffffff';
   bgCtx.fillRect(0,0,w,h);
   bgCtx.putImageData(bgSnap,0,0);
-  ctx.putImageData(drSnap,0,0);
+  // Resize all layer canvases
+  for(const l of layers){
+    const snap = l.ctx.getImageData(0,0,l.canvas.width,l.canvas.height);
+    l.canvas.width = w; l.canvas.height = h;
+    l.ctx.putImageData(snap,0,0);
+  }
+  // Resize eventCanvas
+  const ec = document.getElementById('eventCanvas');
+  if(ec){ ec.width = w; ec.height = h; }
+  container.style.width = w+'px'; container.style.height = h+'px';
   document.getElementById('canvasSizeStat').textContent = w+'×'+h;
   undoStack = []; redoStack = []; saveState();
 };
@@ -478,6 +508,7 @@ function saveState(){
   if(undoStack.length > 40) undoStack.shift();
   redoStack = [];
   document.getElementById('histStatus').textContent = 'Undo:' + (undoStack.length-1);
+  updateLayerThumbnails();
 }
 window.undo = function(){
   if(undoStack.length <= 1) return;
@@ -493,8 +524,13 @@ window.redo = function(){
   document.getElementById('histStatus').textContent = 'Undo:' + (undoStack.length-1);
 };
 window.confirmClear = function(){
-  if(!confirm('ล้างภาพทั้งหมด?')) return;
+  if(!confirm('ล้างชั้นปัจจุบัน ('+layers[activeLayerIdx].name+')?')) return;
   ctx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
+  saveState();
+};
+window.confirmClearAll = function(){
+  if(!confirm('ล้างทั้งหมด รวมพื้นหลัง?')) return;
+  layers.forEach(l => l.ctx.clearRect(0,0,l.canvas.width,l.canvas.height));
   bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
   bgCtx.fillStyle = '#ffffff';
   bgCtx.fillRect(0,0,bgCanvas.width,bgCanvas.height);
@@ -522,19 +558,6 @@ function onStart(e){
 
   if(currentTool === 'fill'){
     isDrawing = false;
-    // Merge background into temp, fill, then copy back to drawCanvas
-    const temp = document.createElement('canvas');
-    temp.width = drawCanvas.width; temp.height = drawCanvas.height;
-    const tCtx = temp.getContext('2d');
-    tCtx.drawImage(bgCanvas, 0, 0);
-    tCtx.drawImage(drawCanvas, 0, 0);
-    const imgData = tCtx.getImageData(0,0,temp.width,temp.height);
-    floodFill(imgData, x, y, currentColor, opacity);
-    // Apply fill on drawCanvas
-    const dData = ctx.getImageData(0,0,drawCanvas.width,drawCanvas.height);
-    // We fill on the merged version and copy changes back to draw layer
-    // Simpler: just fill directly on drawCanvas
-    const drawData = ctx.getImageData(0,0,drawCanvas.width,drawCanvas.height);
     floodFillOnMerged(bgCtx, ctx, x, y, currentColor, opacity);
     saveState();
     return;
@@ -659,13 +682,8 @@ function onEnd(e){
   saveState();
 }
 
-drawCanvas.addEventListener('mousedown',  onStart);
-drawCanvas.addEventListener('mousemove',  onMove);
-drawCanvas.addEventListener('mouseup',    onEnd);
-drawCanvas.addEventListener('mouseleave', onEnd);
-drawCanvas.addEventListener('touchstart', onStart, {passive:false});
-drawCanvas.addEventListener('touchmove',  onMove,  {passive:false});
-drawCanvas.addEventListener('touchend',   onEnd);
+// Event listeners are registered in initLayers() below
+initLayers();
 
 // ========== FLOOD FILL ==========
 function hexToRgba(hex, a){
@@ -676,15 +694,15 @@ function hexToRgba(hex, a){
 }
 
 function floodFillOnMerged(bgCtxRef, drCtx, x, y, colorHex, alpha){
-  // Create merged snapshot to read target color
-  const w = drawCanvas.width, h = drawCanvas.height;
+  // Create merged snapshot to read target color (bg + all visible layers)
+  const w = bgCanvas.width, h = bgCanvas.height;
   const mergedCanvas = document.createElement('canvas');
   mergedCanvas.width = w; mergedCanvas.height = h;
   const mCtx = mergedCanvas.getContext('2d');
   mCtx.fillStyle = '#ffffff';
   mCtx.fillRect(0,0,w,h);
   mCtx.drawImage(bgCanvas, 0,0);
-  mCtx.drawImage(drawCanvas, 0,0);
+  for(const l of layers){ if(l.visible) mCtx.drawImage(l.canvas, 0,0); }
 
   const imgData = mCtx.getImageData(0,0,w,h);
   const data = imgData.data;
@@ -827,14 +845,14 @@ window.doSubmit = async function(){
   const btn = document.getElementById('btnDoSubmit');
   btn.textContent='⏳ กำลังส่ง...'; btn.disabled=true;
   try{
-    // Merge bg + draw into one canvas
+    // Merge bg + all visible layers into one canvas
     const merged = document.createElement('canvas');
     merged.width = bgCanvas.width; merged.height = bgCanvas.height;
     const mCtx = merged.getContext('2d');
     mCtx.fillStyle = '#ffffff';
     mCtx.fillRect(0,0,merged.width,merged.height);
     mCtx.drawImage(bgCanvas,0,0);
-    mCtx.drawImage(drawCanvas,0,0);
+    for(const l of layers){ if(l.visible) mCtx.drawImage(l.canvas,0,0); }
 
     // Compress to JPEG base64
     const imageData = merged.toDataURL('image/jpeg', 0.82);
@@ -896,17 +914,27 @@ document.addEventListener('keydown', e => {
 
 // ========== TEACHER ASSETS ==========
 async function loadTeacherAssets(){
-  if(!urlGameId) return;
+  const list = document.getElementById('teacherAssetsList');
+  if(!urlGameId){
+    list.innerHTML = '<div style="font-size:10px;color:#4b5563;text-align:center">ไม่มีข้อมูลเกม</div>';
+    return;
+  }
+  list.innerHTML = '<div style="font-size:10px;color:#9ca3af;text-align:center">⏳ กำลังโหลด...</div>';
   try{
     const snap = await getDoc(doc(db,'games',urlGameId));
-    if(!snap.exists()) return;
+    if(!snap.exists()){
+      list.innerHTML = '<div style="font-size:10px;color:#4b5563;text-align:center">ไม่พบข้อมูลเกม</div>';
+      return;
+    }
     const g = snap.data();
     const assets = (g.assets||[]).filter(a =>
       !a.grade || a.grade==='all' || a.grade===urlGrade
     );
-    if(!assets.length) return;
+    if(!assets.length){
+      list.innerHTML = '<div style="font-size:10px;color:#4b5563;text-align:center">ครูยังไม่ได้เพิ่มรูป</div>';
+      return;
+    }
     const section = document.getElementById('teacherAssetsSection');
-    const list    = document.getElementById('teacherAssetsList');
     section.style.display = '';
     list.innerHTML = assets.map(a => {
       const safeName = (a.name||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
@@ -960,6 +988,159 @@ window.loadTeacherAssetDirect = function(type, url, name){
         errEl.style.display = 'block';
       });
   }
+};
+
+// ========== LAYERS ==========
+function initLayers(){
+  // Register the original drawCanvas as Layer 1
+  drawCanvas.style.pointerEvents = 'none';
+  drawCanvas.style.zIndex = '2';
+  layers = [{ id: 1, name: 'ชั้น 1', canvas: drawCanvas, ctx: drawCanvas.getContext('2d'), visible: true }];
+  activeLayerIdx = 0;
+
+  // eventCanvas is already in HTML; bind all pointer events to it
+  const ec = document.getElementById('eventCanvas');
+  ec.addEventListener('mousedown',  onStart);
+  ec.addEventListener('mousemove',  onMove);
+  ec.addEventListener('mouseup',    onEnd);
+  ec.addEventListener('mouseleave', onEnd);
+  ec.addEventListener('touchstart', onStart, {passive:false});
+  ec.addEventListener('touchmove',  onMove,  {passive:false});
+  ec.addEventListener('touchend',   onEnd);
+
+  renderLayersPanel();
+}
+
+window.addLayer = function(){
+  const n = layers.length + 1;
+  const canvas = document.createElement('canvas');
+  canvas.width = bgCanvas.width; canvas.height = bgCanvas.height;
+  canvas.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none';
+  const ec = document.getElementById('eventCanvas');
+  container.insertBefore(canvas, ec);
+  layers.push({ id: Date.now(), name: 'ชั้น '+n, canvas, ctx: canvas.getContext('2d'), visible: true });
+  updateLayerZIndices();
+  window.setActiveLayer(layers.length - 1);
+};
+
+window.setActiveLayer = function(idx){
+  if(idx < 0 || idx >= layers.length) return;
+  activeLayerIdx = idx;
+  drawCanvas = layers[idx].canvas;
+  ctx = layers[idx].ctx;
+  undoStack = []; redoStack = [];
+  saveState();
+  document.getElementById('histStatus').textContent = 'Undo:0';
+  renderLayersPanel();
+};
+
+window.deleteLayer = function(idx){
+  if(layers.length <= 1){ alert('ต้องมีชั้นอย่างน้อย 1 ชั้น'); return; }
+  if(!confirm('ลบ "'+layers[idx].name+'"?')) return;
+  container.removeChild(layers[idx].canvas);
+  layers.splice(idx, 1);
+  updateLayerZIndices();
+  window.setActiveLayer(Math.min(activeLayerIdx, layers.length - 1));
+};
+
+window.toggleLayerVisibility = function(idx){
+  layers[idx].visible = !layers[idx].visible;
+  layers[idx].canvas.style.opacity = layers[idx].visible ? '1' : '0';
+  renderLayersPanel();
+};
+
+window.moveLayerUp = function(idx){
+  if(idx <= 0) return;
+  [layers[idx-1], layers[idx]] = [layers[idx], layers[idx-1]];
+  if(activeLayerIdx === idx) activeLayerIdx = idx-1;
+  else if(activeLayerIdx === idx-1) activeLayerIdx = idx;
+  drawCanvas = layers[activeLayerIdx].canvas;
+  ctx = layers[activeLayerIdx].ctx;
+  updateLayerZIndices();
+  renderLayersPanel();
+};
+
+window.moveLayerDown = function(idx){
+  if(idx >= layers.length - 1) return;
+  [layers[idx], layers[idx+1]] = [layers[idx+1], layers[idx]];
+  if(activeLayerIdx === idx) activeLayerIdx = idx+1;
+  else if(activeLayerIdx === idx+1) activeLayerIdx = idx;
+  drawCanvas = layers[activeLayerIdx].canvas;
+  ctx = layers[activeLayerIdx].ctx;
+  updateLayerZIndices();
+  renderLayersPanel();
+};
+
+window.mergeAllLayers = function(){
+  if(layers.length <= 1) return;
+  if(!confirm('รวมทุกชั้นเป็นชั้นเดียว? (undo ไม่ได้)')) return;
+  const tmp = document.createElement('canvas');
+  tmp.width = bgCanvas.width; tmp.height = bgCanvas.height;
+  const tCtx = tmp.getContext('2d');
+  layers.forEach(l => { if(l.visible) tCtx.drawImage(l.canvas, 0, 0); });
+  const first = layers[0];
+  first.ctx.clearRect(0,0,tmp.width,tmp.height);
+  first.ctx.drawImage(tmp, 0, 0);
+  first.name = 'รวมแล้ว';
+  for(let i = layers.length - 1; i >= 1; i--){
+    container.removeChild(layers[i].canvas);
+    layers.splice(i, 1);
+  }
+  window.setActiveLayer(0);
+};
+
+function updateLayerZIndices(){
+  const ec = document.getElementById('eventCanvas');
+  layers.forEach((l, i) => {
+    l.canvas.style.zIndex = String(2 + i);
+    l.canvas.style.opacity = l.visible ? '1' : '0';
+  });
+  if(ec) ec.style.zIndex = String(2 + layers.length + 5);
+}
+
+function updateLayerThumbnails(){
+  layers.forEach(l => {
+    const thumb = document.getElementById('lthumb_'+l.id);
+    if(!thumb) return;
+    const tCtx = thumb.getContext('2d');
+    tCtx.clearRect(0,0,32,22);
+    tCtx.fillStyle = '#fff';
+    tCtx.fillRect(0,0,32,22);
+    tCtx.drawImage(l.canvas, 0,0,l.canvas.width,l.canvas.height, 0,0, 32,22);
+  });
+}
+
+function renderLayersPanel(){
+  const list = document.getElementById('layersList');
+  if(!list) return;
+  const html = [];
+  for(let ri = 0; ri < layers.length; ri++){
+    const i = layers.length - 1 - ri; // top layer first
+    const l = layers[i];
+    const active = i === activeLayerIdx;
+    html.push(
+      `<div class="layer-item${active?' active':''}" onclick="setActiveLayer(${i})">` +
+        `<canvas class="layer-thumb" id="lthumb_${l.id}" width="32" height="22"></canvas>` +
+        `<span class="layer-name">${l.name.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>` +
+        `<span class="layer-btns">` +
+          `<button class="layer-btn" onclick="event.stopPropagation();moveLayerUp(${i})" title="ขึ้น">↑</button>` +
+          `<button class="layer-btn" onclick="event.stopPropagation();moveLayerDown(${i})" title="ลง">↓</button>` +
+          `<button class="layer-btn" onclick="event.stopPropagation();toggleLayerVisibility(${i})" title="${l.visible?'ซ่อน':'แสดง'}">${l.visible?'👁':'🚫'}</button>` +
+          (layers.length>1 ? `<button class="layer-btn del" onclick="event.stopPropagation();deleteLayer(${i})" title="ลบ">✕</button>` : '') +
+        `</span>` +
+      `</div>`
+    );
+  }
+  list.innerHTML = html.join('');
+  setTimeout(updateLayerThumbnails, 0);
+}
+
+// ========== TEACHER ASSETS SHORTCUT ==========
+window.loadAndScrollToAssets = async function(){
+  await loadTeacherAssets();
+  const section = document.getElementById('teacherAssetsSection');
+  section.style.display = '';
+  section.scrollIntoView({behavior:'smooth', block:'nearest'});
 };
 
 </script>
