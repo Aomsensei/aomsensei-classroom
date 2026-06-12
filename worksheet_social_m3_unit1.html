@@ -634,24 +634,68 @@ window.submitWorksheet = async function(){
     {label:'21-22. เรียงลำดับกระบวนการยุติธรรม', value: Object.entries(orderMap).map(([k,val])=>`${val||'?'}. ${k}`).join(' → ')},
   ];
 
+  // ===== AUTO GRADE =====
+  // MCQ/TF questions use radio (r), fill-in+matching+ordering use v()
+  const AG_M3 = [
+    // [id, correctAnswer, useRadio, partialMatch]
+    ['q2','เป็นกฎหมายสูงสุด กฎหมายอื่นต้องไม่ขัดแย้ง', true, false],
+    ['q3','กฎหมายแพ่งเกี่ยวกับความสัมพันธ์ระหว่างเอกชน กฎหมายอาญาเกี่ยวกับความผิดต่อรัฐ', true, false],
+    ['q4','ผู้มีสัญชาติไทย อายุ 18 ปีขึ้นไป', true, false],
+    ['q5','18 ปี', true, false],
+    ['q6','เสียภาษีตามกฎหมาย', true, false],
+    ['q7','ถูก', true, false],
+    ['q8','ผิด', true, false],
+    ['q9','ถูก', true, false],
+    ['q10','ราชกิจจานุเบกษา', false, true],
+    ['q11','รัฐธรรมนูญ', false, true],
+    ['q12','แพ่ง', false, true],
+    ['q13a','สิทธิ', false, true],
+    ['q13b','หน้าที่', false, true],
+    ['m1','กฎหมายแพ่งและพาณิชย์', false, false],
+    ['m2','กฎหมายอาญา', false, false],
+    ['m3','กฎหมายจราจร', false, false],
+    ['m4','กฎหมายแรงงาน', false, false],
+    ['m5','กฎหมายรัฐธรรมนูญ', false, false],
+  ];
+  const BONUS_M3 = {ord_a:'4', ord_b:'1', ord_c:'3', ord_d:'2', ord_e:'5'};
+  let autoScore = 0;
+  const autoMax = AG_M3.length;
+  for(const [id, correct, useR, partial] of AG_M3){
+    const actual = (useR ? r(id) : v(id)).trim();
+    const ok = partial
+      ? actual !== '' && actual.toLowerCase().includes(correct.toLowerCase())
+      : actual === correct;
+    if(ok) autoScore++;
+  }
+  let bonusScore = 0;
+  for(const [k, ans] of Object.entries(BONUS_M3)){
+    if(v(k) === ans) bonusScore++;
+  }
+
   const data = {
-    studentName,
-    grade,
+    studentName, grade,
     subject: 'สังคมศึกษา',
     worksheetTitle: 'ใบงานที่ 1 — กฎหมายในชีวิตประจำวัน',
     worksheetId: 'ws_social_m3_unit1',
     submittedDate: date,
     fields,
     submittedAt: serverTimestamp(),
+    score: null, maxScore: 20,
+    autoScore, autoMaxScore: autoMax,
+    bonusScore, bonusMaxScore: bonusParts.length,
+    feedback: '',
   };
 
   try{
     await addDoc(collection(db,'worksheet_submissions'), data);
+    const pct = Math.round(autoScore / autoMax * 100);
     const msg = document.getElementById('submitMsg');
     msg.innerHTML = `
-      <div style="font-size:24px;margin-bottom:8px">🎉</div>
+      <div style="font-size:22px;margin-bottom:6px">🎉</div>
       <div style="font-size:16px;font-weight:800;color:#2e7d32;margin-bottom:6px">ส่งใบงานสำเร็จแล้ว!</div>
-      <div style="font-size:13px;color:#555">ขอบคุณ <b>${studentName}</b> ที่ทำใบงานอย่างตั้งใจ 💜<br>ครูจะตรวจและแจ้งคะแนนภายหลัง</div>`;
+      <div style="font-size:17px;font-weight:800;color:${pct>=60?'#2e7d32':'#c62828'};margin-bottom:4px">📊 ปรนัย+จับคู่: ${autoScore}/${autoMax} ข้อ (${pct}%)</div>
+      ${bonusScore>0?`<div style="font-size:13px;color:#7c4dff">⭐ โบนัสเรียงลำดับ: ${bonusScore}/5</div>`:''}
+      <div style="font-size:12px;color:#555;margin-top:4px">ขอบคุณ <b>${studentName}</b> 💜 ครูจะตรวจอัตนัยและแจ้งคะแนนรวมภายหลัง</div>`;
     msg.style.display='block';
     btn.textContent='✅ ส่งแล้ว';
     btn.style.background='#66bb6a';
