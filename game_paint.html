@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🎨 เกมสาดสีทาสี</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* TOP BAR */
+.top-bar{background:linear-gradient(135deg,#c94b00,#f39800);padding:7px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;min-height:46px}
+.top-bar h1{font-size:15px;font-weight:800;color:#fff;flex-shrink:0}
+.info-chip{background:rgba(255,255,255,.22);color:#fff;border-radius:16px;padding:3px 10px;font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0}
+.spacer{flex:1}
+.btn-submit{background:#2e7d32;color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0}
+.btn-submit:hover{background:#1b5e20}
+.btn-submit:disabled{background:#555;cursor:not-allowed}
+
+/* MAIN LAYOUT */
+.main-layout{flex:1;display:flex;overflow:hidden}
+
+/* LEFT TOOLBAR */
+.toolbar{background:#0f172a;width:50px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 0;overflow-y:auto;scrollbar-width:none}
+.toolbar::-webkit-scrollbar{display:none}
+.tool-btn{width:38px;height:38px;border:none;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:.12s;background:transparent;color:#9ca3af;flex-shrink:0}
+.tool-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.tool-btn.active{background:#c94b00;color:#fff;box-shadow:0 0 0 2px #f39800}
+.tool-sep{width:28px;height:1px;background:rgba(255,255,255,.12);margin:3px 0;flex-shrink:0}
+.tool-label{font-size:8px;color:#6b7280;text-align:center;line-height:1;margin-bottom:1px}
+
+/* CANVAS AREA */
+.canvas-area{flex:1;display:flex;overflow:hidden;position:relative}
+.canvas-scroll{flex:1;overflow:auto;display:flex;background:#374151}
+.canvas-container{position:relative;flex-shrink:0;margin:auto;box-shadow:0 4px 24px rgba(0,0,0,.5)}
+.canvas-container canvas{position:absolute;top:0;left:0;display:block}
+#bgCanvas{pointer-events:none;background:#fff}
+#drawCanvas{z-index:2;cursor:crosshair}
+
+/* RIGHT PANEL */
+.right-panel{background:#0f172a;width:152px;flex-shrink:0;padding:8px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;scrollbar-color:#333 transparent}
+.panel-section{background:rgba(255,255,255,.04);border-radius:8px;padding:8px;border:1px solid rgba(255,255,255,.06)}
+.panel-label{font-size:9px;font-weight:800;color:#9ca3af;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+
+.size-row{display:flex;align-items:center;gap:5px}
+.size-row input[type=range]{flex:1;accent-color:#f39800;height:3px}
+.size-disp{font-size:11px;color:#f39800;font-weight:800;min-width:18px;text-align:right}
+
+.colors-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-bottom:6px}
+.clr-swatch{width:22px;height:22px;border-radius:4px;cursor:pointer;border:2px solid transparent;transition:.1s;flex-shrink:0}
+.clr-swatch:hover{transform:scale(1.12)}
+.clr-swatch.active{border-color:#fff;box-shadow:0 0 0 1px #fff;transform:scale(1.1)}
+.custom-row{display:flex;align-items:center;gap:6px}
+.custom-row input[type=color]{width:32px;height:26px;border:none;border-radius:4px;cursor:pointer;padding:1px;background:transparent}
+.custom-row span{font-size:10px;color:#9ca3af}
+
+.btn-act{width:100%;padding:6px;background:rgba(255,255,255,.07);color:#d1d5db;border:none;border-radius:6px;cursor:pointer;font-size:10px;font-weight:700;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:4px;transition:.12s;margin-bottom:3px}
+.btn-act:hover{background:rgba(255,255,255,.15);color:#fff}
+.btn-act:last-child{margin-bottom:0}
+.btn-act.undo{background:rgba(243,152,0,.12);color:#fbbf24}
+.btn-act.undo:hover{background:rgba(243,152,0,.25)}
+.btn-act.redo{background:rgba(59,130,246,.12);color:#93c5fd}
+.btn-act.redo:hover{background:rgba(59,130,246,.25)}
+.btn-act.clr{background:rgba(239,68,68,.12);color:#fca5a5}
+.btn-act.clr:hover{background:rgba(239,68,68,.25)}
+.btn-act.imp{background:rgba(139,92,246,.12);color:#c4b5fd}
+.btn-act.imp:hover{background:rgba(139,92,246,.25)}
+
+/* STATUS BAR */
+.status-bar{background:#0d1117;padding:3px 10px;font-size:10px;color:#4b5563;flex-shrink:0;display:flex;gap:14px;align-items:center}
+
+/* OVERLAYS & MODALS */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;padding:16px}
+.overlay.show{display:flex}
+.modal{background:#1e293b;border-radius:14px;padding:22px;width:100%;max-width:400px;border:1px solid rgba(255,255,255,.1);box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.modal h3{color:#f39800;margin-bottom:14px;font-size:15px;font-weight:800}
+.m-lbl{font-size:11px;color:#9ca3af;display:block;margin-bottom:5px}
+.m-inp{width:100%;padding:9px 12px;border:1.5px solid rgba(255,255,255,.15);border-radius:8px;font-size:13px;font-family:inherit;background:rgba(255,255,255,.06);color:#fff;margin-bottom:10px}
+.m-inp:focus{outline:none;border-color:#f39800}
+.m-sel{width:100%;padding:9px 12px;border:1.5px solid rgba(255,255,255,.15);border-radius:8px;font-size:13px;font-family:inherit;background:#1e293b;color:#fff;margin-bottom:10px;cursor:pointer}
+.m-sel:focus{outline:none;border-color:#f39800}
+.m-sel option{background:#1e293b}
+.m-err{background:rgba(239,68,68,.15);color:#fca5a5;padding:8px 12px;border-radius:7px;font-size:12px;margin-bottom:8px;border-left:3px solid #ef4444;display:none}
+.m-ok{background:rgba(74,222,128,.15);color:#86efac;padding:8px 12px;border-radius:7px;font-size:12px;margin-bottom:8px;border-left:3px solid #4ade80;display:none}
+.btn-row{display:flex;gap:8px;margin-top:10px}
+.btn-ok{flex:1;padding:10px;background:#c94b00;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:800;font-family:inherit}
+.btn-ok:hover{background:#a33b00}
+.btn-ok:disabled{background:#555;cursor:not-allowed}
+.btn-cancel{flex:1;padding:10px;background:rgba(255,255,255,.08);color:#d1d5db;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit}
+.btn-cancel:hover{background:rgba(255,255,255,.15)}
+.row2{display:flex;gap:8px}
+.row2 > div{flex:1}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <h1>🎨 เกมสาดสีทาสี</h1>
+  <span class="info-chip" id="studentChip">🖌️ กำลังโหลด...</span>
+  <div class="spacer"></div>
+  <button class="btn-submit" onclick="showSubmitModal()" id="btnSubmit" disabled>📤 ส่งงาน</button>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main-layout">
+
+  <!-- LEFT TOOLBAR -->
+  <div class="toolbar">
+    <div class="tool-label">วาด</div>
+    <button class="tool-btn active" id="tool-pencil" onclick="setTool('pencil')" title="ดินสอ">✏️</button>
+    <button class="tool-btn" id="tool-brush" onclick="setTool('brush')" title="แปรง">🖌️</button>
+    <button class="tool-btn" id="tool-spray" onclick="setTool('spray')" title="สเปรย์">💦</button>
+    <button class="tool-btn" id="tool-eraser" onclick="setTool('eraser')" title="ยางลบ">🧹</button>
+    <div class="tool-sep"></div>
+    <div class="tool-label">รูป</div>
+    <button class="tool-btn" id="tool-fill" onclick="setTool('fill')" title="เติมสี (Paint Bucket)">🪣</button>
+    <button class="tool-btn" id="tool-line" onclick="setTool('line')" title="เส้นตรง">📏</button>
+    <button class="tool-btn" id="tool-rect" onclick="setTool('rect')" title="สี่เหลี่ยม">⬜</button>
+    <button class="tool-btn" id="tool-rectfill" onclick="setTool('rectfill')" title="สี่เหลี่ยมทึบ">⬛</button>
+    <button class="tool-btn" id="tool-circle" onclick="setTool('circle')" title="วงรี">⭕</button>
+    <button class="tool-btn" id="tool-circlefill" onclick="setTool('circlefill')" title="วงรีทึบ">🔴</button>
+  </div>
+
+  <!-- CANVAS AREA -->
+  <div class="canvas-area">
+    <div class="canvas-scroll" id="canvasScroll">
+      <div class="canvas-container" id="canvasContainer" style="width:800px;height:560px">
+        <canvas id="bgCanvas" width="800" height="560"></canvas>
+        <canvas id="drawCanvas" width="800" height="560"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <!-- Brush Size -->
+    <div class="panel-section">
+      <div class="panel-label">ขนาดแปรง</div>
+      <div class="size-row">
+        <input type="range" id="sizeSlider" min="1" max="60" value="6" oninput="updateSize(this.value)"/>
+        <span class="size-disp" id="sizeDisp">6</span>
+      </div>
+    </div>
+    <!-- Opacity -->
+    <div class="panel-section">
+      <div class="panel-label">ความโปร่งใส</div>
+      <div class="size-row">
+        <input type="range" id="opacitySlider" min="5" max="100" value="100" oninput="updateOpacity(this.value)"/>
+        <span class="size-disp" id="opacityDisp">100</span>
+      </div>
+    </div>
+    <!-- Colors -->
+    <div class="panel-section">
+      <div class="panel-label">สี</div>
+      <div class="colors-grid" id="colorsGrid"></div>
+      <div class="custom-row">
+        <input type="color" id="customColor" value="#000000" oninput="pickCustomColor(this.value)"/>
+        <span>เลือกสี</span>
+      </div>
+    </div>
+    <!-- Actions -->
+    <div class="panel-section">
+      <div class="panel-label">การกระทำ</div>
+      <button class="btn-act undo" onclick="undo()">↩️ Undo</button>
+      <button class="btn-act redo" onclick="redo()">↪️ Redo</button>
+      <button class="btn-act clr" onclick="confirmClear()">🗑️ ล้างหมด</button>
+    </div>
+    <!-- Import -->
+    <div class="panel-section">
+      <div class="panel-label">นำเข้า</div>
+      <button class="btn-act imp" onclick="openImgModal()">🖼️ รูปภาพ</button>
+      <button class="btn-act imp" onclick="openPdfModal()">📄 PDF</button>
+    </div>
+    <!-- Canvas Size -->
+    <div class="panel-section">
+      <div class="panel-label">ขนาดพื้นที่</div>
+      <select id="canvasSizeSel" class="m-sel" style="font-size:10px;padding:5px 7px;margin:0" onchange="resizeCanvas(this.value)">
+        <option value="800x560">800×560 (ปกติ)</option>
+        <option value="1024x720">1024×720 (กว้าง)</option>
+        <option value="595x842">A4 แนวตั้ง</option>
+        <option value="842x595">A4 แนวนอน</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <span id="toolStatus">✏️ ดินสอ</span>
+  <span id="coordStatus">x:0 y:0</span>
+  <span id="canvasSizeStat">800×560</span>
+  <span id="histStatus">Undo:0</span>
+</div>
+
+<!-- Modal: Import Image -->
+<div class="overlay" id="mImg">
+  <div class="modal">
+    <h3>🖼️ นำเข้ารูปภาพ</h3>
+    <label class="m-lbl">อัปโหลดไฟล์รูปภาพ (jpg, png, gif, webp)</label>
+    <input type="file" id="imgFile" accept="image/*" style="color:#ddd;font-size:12px;width:100%;margin-bottom:12px" onchange="loadImageFile(this)"/>
+    <div style="text-align:center;color:#4b5563;font-size:11px;margin:6px 0">— หรือใช้ URL —</div>
+    <label class="m-lbl">URL รูปภาพ</label>
+    <input type="url" class="m-inp" id="imgUrl" placeholder="https://example.com/image.jpg"/>
+    <div id="imgErr" class="m-err"></div>
+    <div class="btn-row">
+      <button class="btn-cancel" onclick="closeOverlay('mImg')">ยกเลิก</button>
+      <button class="btn-ok" onclick="loadImageUrl()">โหลดรูป</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Import PDF -->
+<div class="overlay" id="mPdf">
+  <div class="modal">
+    <h3>📄 นำเข้าหน้า PDF</h3>
+    <label class="m-lbl">อัปโหลดไฟล์ PDF</label>
+    <input type="file" id="pdfFile" accept=".pdf" style="color:#ddd;font-size:12px;width:100%;margin-bottom:10px" onchange="loadPdfFile(this)"/>
+    <div id="pdfInfo" class="m-ok"></div>
+    <label class="m-lbl">หน้าที่ต้องการ</label>
+    <input type="number" class="m-inp" id="pdfPage" placeholder="1" value="1" min="1"/>
+    <div id="pdfErr" class="m-err"></div>
+    <div class="btn-row">
+      <button class="btn-cancel" onclick="closeOverlay('mPdf')">ยกเลิก</button>
+      <button class="btn-ok" id="btnLoadPdf" onclick="confirmLoadPdf()" disabled>โหลดหน้านี้</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Submit -->
+<div class="overlay" id="mSubmit">
+  <div class="modal">
+    <h3>📤 ส่งงานให้ครู</h3>
+    <div id="submitErr" class="m-err"></div>
+    <label class="m-lbl">ชื่อนักเรียน *</label>
+    <input type="text" class="m-inp" id="submitName" placeholder="ชื่อ-นามสกุล"/>
+    <div class="row2">
+      <div>
+        <label class="m-lbl">ชั้น *</label>
+        <select class="m-sel" id="submitGrade">
+          <option value="">-- ชั้น --</option>
+          <option>ป.4</option><option>ป.5</option><option>ป.6</option>
+          <option>ม.1</option><option>ม.2</option><option>ม.3</option>
+        </select>
+      </div>
+      <div>
+        <label class="m-lbl">วิชา *</label>
+        <input type="text" class="m-inp" id="submitSubject" placeholder="เช่น ศิลปะ"/>
+      </div>
+    </div>
+    <div style="background:rgba(243,152,0,.1);border-radius:8px;padding:9px 11px;font-size:11px;color:#fbbf24;margin-bottom:4px">
+      💡 งานของคุณจะถูกส่งเป็นรูปภาพให้ครูตรวจ
+    </div>
+    <div class="btn-row">
+      <button class="btn-cancel" onclick="closeOverlay('mSubmit')">ยกเลิก</button>
+      <button class="btn-ok" id="btnDoSubmit" onclick="doSubmit()">✅ ส่งงาน</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Success -->
+<div class="overlay" id="mSuccess">
+  <div class="modal" style="text-align:center;padding:30px 22px">
+    <div style="font-size:52px;margin-bottom:12px">🎉</div>
+    <h3 style="color:#4ade80;font-size:20px;margin-bottom:0">ส่งงานสำเร็จ!</h3>
+    <p style="color:#9ca3af;font-size:13px;margin-top:10px;line-height:1.8">งานของคุณถูกส่งให้ครูแล้ว<br>รอครูตรวจและให้คะแนน</p>
+    <button class="btn-ok" style="margin-top:20px;max-width:200px;margin-left:auto;margin-right:auto;display:block" onclick="closeOverlay('mSuccess')">ปิด</button>
+  </div>
+</div>
+
+<!-- PDF.js from CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { FIREBASE_CONFIG } from "./js/config.js";
+
+const app = initializeApp(FIREBASE_CONFIG);
+const db = getFirestore(app);
+const auth = getAuth(app);
+signInAnonymously(auth).catch(()=>{});
+
+// PDF.js worker
+if(typeof pdfjsLib !== 'undefined'){
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+// ========== URL PARAMS ==========
+const params = new URLSearchParams(location.search);
+const urlName    = params.get('name')      || '';
+const urlGrade   = params.get('grade')     || '';
+const urlRoom    = params.get('room')      || '';
+const urlSubject = params.get('subject')   || '';
+const urlGameId  = params.get('gameId')    || '';
+const urlGameTitle = params.get('gameTitle') || 'เกมสาดสีทาสี';
+
+document.title = '🎨 ' + urlGameTitle;
+
+// Pre-fill submit form from URL params
+if(urlName)    document.getElementById('submitName').value = urlName;
+if(urlSubject) document.getElementById('submitSubject').value = urlSubject;
+if(urlGrade){
+  const sel = document.getElementById('submitGrade');
+  for(const o of sel.options){ if(o.value === urlGrade){ o.selected = true; break; } }
+}
+
+// Update chip
+const chip = document.getElementById('studentChip');
+if(urlName || urlGrade){
+  chip.textContent = (urlName || 'นักเรียน') + (urlGrade ? ' · ' + urlGrade : '');
+} else {
+  chip.textContent = '🖌️ Paint';
+}
+document.getElementById('btnSubmit').disabled = false;
+
+// ========== CANVAS SETUP ==========
+const bgCanvas   = document.getElementById('bgCanvas');
+const drawCanvas = document.getElementById('drawCanvas');
+const bgCtx      = bgCanvas.getContext('2d');
+const ctx        = drawCanvas.getContext('2d');
+const container  = document.getElementById('canvasContainer');
+
+let currentTool  = 'pencil';
+let currentColor = '#000000';
+let brushSize    = 6;
+let opacity      = 1.0;
+let isDrawing    = false;
+let startX = 0, startY = 0, lastX = 0, lastY = 0;
+let undoStack = [];
+let redoStack = [];
+let snapshotBeforeStroke = null;
+
+// Init background white
+bgCtx.fillStyle = '#ffffff';
+bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+saveState();
+
+// ========== COLORS ==========
+const presetColors = [
+  '#000000','#ffffff','#808080','#c0c0c0',
+  '#c94b00','#f39800','#ffff00','#7fff00',
+  '#00bcd4','#2196f3','#7c3aed','#e91e63',
+  '#795548','#4caf50','#009688','#f44336'
+];
+
+const colorsGrid = document.getElementById('colorsGrid');
+presetColors.forEach(c => {
+  const sw = document.createElement('div');
+  sw.className = 'clr-swatch';
+  sw.style.background = c;
+  if(c === '#ffffff') sw.style.border = '1.5px solid #555';
+  sw.title = c;
+  if(c === currentColor) sw.classList.add('active');
+  sw.onclick = () => {
+    setColor(c);
+    document.getElementById('customColor').value = c;
+  };
+  colorsGrid.appendChild(sw);
+});
+
+function setColor(c){
+  currentColor = c;
+  document.querySelectorAll('.clr-swatch').forEach(el => {
+    const bg = el.style.backgroundColor || el.style.background;
+    el.classList.toggle('active', bg === c || bg === hexToRgbStr(c));
+  });
+}
+function hexToRgbStr(hex){
+  if(!hex || hex.length < 7) return '';
+  return 'rgb('+parseInt(hex.slice(1,3),16)+', '+parseInt(hex.slice(3,5),16)+', '+parseInt(hex.slice(5,7),16)+')';
+}
+window.pickCustomColor = c => setColor(c);
+
+// ========== TOOLS ==========
+window.setTool = function(t){
+  currentTool = t;
+  document.querySelectorAll('.tool-btn[id^="tool-"]').forEach(el => el.classList.remove('active'));
+  const btn = document.getElementById('tool-' + t);
+  if(btn) btn.classList.add('active');
+  const names = {
+    pencil:'✏️ ดินสอ', brush:'🖌️ แปรง', spray:'💦 สเปรย์',
+    eraser:'🧹 ยางลบ', fill:'🪣 เติมสี',
+    line:'📏 เส้นตรง', rect:'⬜ สี่เหลี่ยม', rectfill:'⬛ สี่เหลี่ยมทึบ',
+    circle:'⭕ วงรี', circlefill:'🔴 วงรีทึบ'
+  };
+  document.getElementById('toolStatus').textContent = names[t] || t;
+};
+
+window.updateSize = v => { brushSize = parseInt(v); document.getElementById('sizeDisp').textContent = v; };
+window.updateOpacity = v => { opacity = parseInt(v)/100; document.getElementById('opacityDisp').textContent = v; };
+
+// ========== CANVAS RESIZE ==========
+window.resizeCanvas = function(val){
+  const [w,h] = val.split('x').map(Number);
+  // Snapshot current
+  const bgSnap = bgCtx.getImageData(0,0,bgCanvas.width,bgCanvas.height);
+  const drSnap = ctx.getImageData(0,0,drawCanvas.width,drawCanvas.height);
+  bgCanvas.width = drawCanvas.width = container.style.width.split('p')[0]*1 ? w : w;
+  bgCanvas.height = drawCanvas.height = h;
+  bgCanvas.width = w; bgCanvas.height = h;
+  drawCanvas.width = w; drawCanvas.height = h;
+  container.style.width = w+'px'; container.style.height = h+'px';
+  bgCtx.fillStyle = '#ffffff';
+  bgCtx.fillRect(0,0,w,h);
+  bgCtx.putImageData(bgSnap,0,0);
+  ctx.putImageData(drSnap,0,0);
+  document.getElementById('canvasSizeStat').textContent = w+'×'+h;
+  undoStack = []; redoStack = []; saveState();
+};
+
+// ========== UNDO / REDO ==========
+function saveState(){
+  undoStack.push(ctx.getImageData(0,0,drawCanvas.width,drawCanvas.height));
+  if(undoStack.length > 40) undoStack.shift();
+  redoStack = [];
+  document.getElementById('histStatus').textContent = 'Undo:' + (undoStack.length-1);
+}
+window.undo = function(){
+  if(undoStack.length <= 1) return;
+  redoStack.push(undoStack.pop());
+  ctx.putImageData(undoStack[undoStack.length-1], 0, 0);
+  document.getElementById('histStatus').textContent = 'Undo:' + (undoStack.length-1);
+};
+window.redo = function(){
+  if(!redoStack.length) return;
+  const s = redoStack.pop();
+  undoStack.push(s);
+  ctx.putImageData(s, 0, 0);
+  document.getElementById('histStatus').textContent = 'Undo:' + (undoStack.length-1);
+};
+window.confirmClear = function(){
+  if(!confirm('ล้างภาพทั้งหมด?')) return;
+  ctx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
+  bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
+  bgCtx.fillStyle = '#ffffff';
+  bgCtx.fillRect(0,0,bgCanvas.width,bgCanvas.height);
+  saveState();
+};
+
+// ========== CANVAS EVENTS ==========
+function getPos(e){
+  const rect = drawCanvas.getBoundingClientRect();
+  const sx = drawCanvas.width / rect.width;
+  const sy = drawCanvas.height / rect.height;
+  const src = e.touches ? e.touches[0] : e;
+  return {
+    x: Math.floor((src.clientX - rect.left) * sx),
+    y: Math.floor((src.clientY - rect.top)  * sy)
+  };
+}
+
+function onStart(e){
+  e.preventDefault();
+  const {x, y} = getPos(e);
+  isDrawing = true;
+  startX = lastX = x;
+  startY = lastY = y;
+
+  if(currentTool === 'fill'){
+    isDrawing = false;
+    // Merge background into temp, fill, then copy back to drawCanvas
+    const temp = document.createElement('canvas');
+    temp.width = drawCanvas.width; temp.height = drawCanvas.height;
+    const tCtx = temp.getContext('2d');
+    tCtx.drawImage(bgCanvas, 0, 0);
+    tCtx.drawImage(drawCanvas, 0, 0);
+    const imgData = tCtx.getImageData(0,0,temp.width,temp.height);
+    floodFill(imgData, x, y, currentColor, opacity);
+    // Apply fill on drawCanvas
+    const dData = ctx.getImageData(0,0,drawCanvas.width,drawCanvas.height);
+    // We fill on the merged version and copy changes back to draw layer
+    // Simpler: just fill directly on drawCanvas
+    const drawData = ctx.getImageData(0,0,drawCanvas.width,drawCanvas.height);
+    floodFillOnMerged(bgCtx, ctx, x, y, currentColor, opacity);
+    saveState();
+    return;
+  }
+
+  snapshotBeforeStroke = ctx.getImageData(0,0,drawCanvas.width,drawCanvas.height);
+
+  if(['pencil','brush','spray','eraser'].includes(currentTool)){
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    // Single dot on click
+    if(currentTool === 'eraser'){
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.globalAlpha = 1;
+    } else {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = opacity;
+    }
+  }
+}
+
+function onMove(e){
+  e.preventDefault();
+  const {x, y} = getPos(e);
+  document.getElementById('coordStatus').textContent = 'x:'+x+' y:'+y;
+  if(!isDrawing) return;
+
+  if(currentTool === 'pencil'){
+    const sz = Math.max(1, Math.ceil(brushSize * 0.4));
+    ctx.globalAlpha = opacity;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = currentColor;
+    ctx.lineWidth = sz;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+
+  } else if(currentTool === 'brush'){
+    ctx.globalAlpha = opacity;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = currentColor;
+    ctx.lineWidth = brushSize;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+
+  } else if(currentTool === 'spray'){
+    ctx.globalAlpha = opacity * 0.25;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = currentColor;
+    const density = Math.max(8, brushSize * 2);
+    for(let i=0; i<density; i++){
+      const a = Math.random() * Math.PI * 2;
+      const r = Math.random() * brushSize;
+      ctx.beginPath();
+      ctx.arc(x + Math.cos(a)*r, y + Math.sin(a)*r, 1, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+  } else if(currentTool === 'eraser'){
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = 'rgba(0,0,0,1)';
+    ctx.lineWidth = brushSize * 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+
+  } else {
+    // Shape tools: restore snapshot & preview
+    ctx.putImageData(snapshotBeforeStroke, 0, 0);
+    ctx.globalAlpha = opacity;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = currentColor;
+    ctx.fillStyle   = currentColor;
+    ctx.lineWidth   = brushSize;
+    ctx.lineCap     = 'round';
+    ctx.lineJoin    = 'round';
+
+    if(currentTool === 'line'){
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    } else if(currentTool === 'rect'){
+      ctx.strokeRect(startX, startY, x-startX, y-startY);
+    } else if(currentTool === 'rectfill'){
+      ctx.fillRect(startX, startY, x-startX, y-startY);
+    } else if(currentTool === 'circle'){
+      const rx = Math.abs(x-startX)/2, ry = Math.abs(y-startY)/2;
+      const cx2 = startX+(x-startX)/2, cy2 = startY+(y-startY)/2;
+      ctx.beginPath();
+      ctx.ellipse(cx2, cy2, Math.max(1,rx), Math.max(1,ry), 0, 0, Math.PI*2);
+      ctx.stroke();
+    } else if(currentTool === 'circlefill'){
+      const rx = Math.abs(x-startX)/2, ry = Math.abs(y-startY)/2;
+      const cx2 = startX+(x-startX)/2, cy2 = startY+(y-startY)/2;
+      ctx.beginPath();
+      ctx.ellipse(cx2, cy2, Math.max(1,rx), Math.max(1,ry), 0, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+  lastX = x; lastY = y;
+}
+
+function onEnd(e){
+  if(!isDrawing) return;
+  isDrawing = false;
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.beginPath();
+  saveState();
+}
+
+drawCanvas.addEventListener('mousedown',  onStart);
+drawCanvas.addEventListener('mousemove',  onMove);
+drawCanvas.addEventListener('mouseup',    onEnd);
+drawCanvas.addEventListener('mouseleave', onEnd);
+drawCanvas.addEventListener('touchstart', onStart, {passive:false});
+drawCanvas.addEventListener('touchmove',  onMove,  {passive:false});
+drawCanvas.addEventListener('touchend',   onEnd);
+
+// ========== FLOOD FILL ==========
+function hexToRgba(hex, a){
+  const r = parseInt(hex.slice(1,3),16)||0;
+  const g = parseInt(hex.slice(3,5),16)||0;
+  const b = parseInt(hex.slice(5,7),16)||0;
+  return [r, g, b, Math.round(a*255)];
+}
+
+function floodFillOnMerged(bgCtxRef, drCtx, x, y, colorHex, alpha){
+  // Create merged snapshot to read target color
+  const w = drawCanvas.width, h = drawCanvas.height;
+  const mergedCanvas = document.createElement('canvas');
+  mergedCanvas.width = w; mergedCanvas.height = h;
+  const mCtx = mergedCanvas.getContext('2d');
+  mCtx.fillStyle = '#ffffff';
+  mCtx.fillRect(0,0,w,h);
+  mCtx.drawImage(bgCanvas, 0,0);
+  mCtx.drawImage(drawCanvas, 0,0);
+
+  const imgData = mCtx.getImageData(0,0,w,h);
+  const data = imgData.data;
+  const idx = (Math.floor(y)*w + Math.floor(x))*4;
+  const [tr,tg,tb,ta] = [data[idx],data[idx+1],data[idx+2],data[idx+3]];
+  const [fr,fg,fb,fa] = hexToRgba(colorHex, alpha);
+  if(tr===fr && tg===fg && tb===fb && ta===fa) return;
+
+  const stack = [Math.floor(x) + Math.floor(y)*w];
+  const visited = new Uint8Array(w*h);
+
+  while(stack.length){
+    const pos = stack.pop();
+    if(visited[pos]) continue;
+    const px = pos%w, py = Math.floor(pos/w);
+    if(px<0||px>=w||py<0||py>=h) continue;
+    const i = pos*4;
+    if(data[i]!==tr||data[i+1]!==tg||data[i+2]!==tb||data[i+3]!==ta) continue;
+    visited[pos]=1;
+    // Paint on draw canvas data
+    if(px>0) stack.push(pos-1);
+    if(px<w-1) stack.push(pos+1);
+    if(py>0) stack.push(pos-w);
+    if(py<h-1) stack.push(pos+w);
+  }
+
+  // Apply fill pixels to drawCanvas
+  const drData = drCtx.getImageData(0,0,w,h);
+  for(let i=0; i<w*h; i++){
+    if(visited[i]){
+      drData.data[i*4]   = fr;
+      drData.data[i*4+1] = fg;
+      drData.data[i*4+2] = fb;
+      drData.data[i*4+3] = fa;
+    }
+  }
+  drCtx.putImageData(drData,0,0);
+}
+
+// ========== IMPORT IMAGE ==========
+window.openImgModal = () => document.getElementById('mImg').classList.add('show');
+
+window.loadImageFile = function(input){
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => applyBgImage(e.target.result);
+  reader.readAsDataURL(file);
+  closeOverlay('mImg');
+};
+
+window.loadImageUrl = function(){
+  const url = document.getElementById('imgUrl').value.trim();
+  if(!url){ showMErr('imgErr','กรุณาใส่ URL'); return; }
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => { applyBgImage(null, img); closeOverlay('mImg'); };
+  img.onerror = () => {
+    const img2 = new Image();
+    img2.onload = () => { applyBgImage(null, img2); closeOverlay('mImg'); };
+    img2.onerror = () => showMErr('imgErr','โหลดรูปไม่ได้ (CORS หรือ URL ผิด)');
+    img2.src = url;
+  };
+  img.src = url;
+};
+
+function applyBgImage(src, imgEl){
+  const img = imgEl || new Image();
+  const doApply = () => {
+    bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
+    bgCtx.fillStyle='#ffffff';
+    bgCtx.fillRect(0,0,bgCanvas.width,bgCanvas.height);
+    const scale = Math.min(bgCanvas.width/img.width, bgCanvas.height/img.height, 1);
+    const w = img.width*scale, h = img.height*scale;
+    const dx = (bgCanvas.width-w)/2, dy = (bgCanvas.height-h)/2;
+    bgCtx.drawImage(img, dx, dy, w, h);
+  };
+  if(src){ img.onload = doApply; img.src = src; }
+  else doApply();
+}
+
+// ========== IMPORT PDF ==========
+let _pdfDoc = null;
+
+window.openPdfModal = () => document.getElementById('mPdf').classList.add('show');
+
+window.loadPdfFile = async function(input){
+  const file = input.files[0]; if(!file) return;
+  if(typeof pdfjsLib === 'undefined'){
+    showMErr('pdfErr','PDF.js ยังไม่พร้อม ลองรีเฟรช'); return;
+  }
+  const info = document.getElementById('pdfInfo');
+  info.style.display='block'; info.textContent='⏳ กำลังโหลด PDF...';
+  try{
+    const buf = await file.arrayBuffer();
+    _pdfDoc = await pdfjsLib.getDocument({data:buf}).promise;
+    info.textContent = '✅ โหลดสำเร็จ — PDF มี '+_pdfDoc.numPages+' หน้า';
+    document.getElementById('pdfPage').max = _pdfDoc.numPages;
+    document.getElementById('btnLoadPdf').disabled = false;
+    document.getElementById('pdfErr').style.display='none';
+  } catch(err){
+    info.style.display='none';
+    showMErr('pdfErr','โหลด PDF ไม่ได้: '+err.message);
+  }
+};
+
+window.confirmLoadPdf = async function(){
+  if(!_pdfDoc){ showMErr('pdfErr','กรุณาอัปโหลด PDF ก่อน'); return; }
+  const pageNum = parseInt(document.getElementById('pdfPage').value)||1;
+  try{
+    const page = await _pdfDoc.getPage(pageNum);
+    const vp0 = page.getViewport({scale:1});
+    const scale = Math.min(bgCanvas.width/vp0.width, bgCanvas.height/vp0.height);
+    const viewport = page.getViewport({scale});
+    const tmp = document.createElement('canvas');
+    tmp.width = viewport.width; tmp.height = viewport.height;
+    await page.render({canvasContext:tmp.getContext('2d'), viewport}).promise;
+    applyBgImage(null, tmp);
+    closeOverlay('mPdf');
+  } catch(err){
+    showMErr('pdfErr','โหลดหน้า '+pageNum+' ไม่ได้: '+err.message);
+  }
+};
+
+// ========== SUBMIT ==========
+window.showSubmitModal = function(){
+  document.getElementById('submitErr').style.display='none';
+  document.getElementById('mSubmit').classList.add('show');
+};
+
+window.doSubmit = async function(){
+  const name    = document.getElementById('submitName').value.trim();
+  const grade   = document.getElementById('submitGrade').value;
+  const subject = document.getElementById('submitSubject').value.trim();
+  const errEl   = document.getElementById('submitErr');
+  if(!name)   { errEl.textContent='⚠️ กรุณากรอกชื่อนักเรียน'; errEl.style.display='block'; return; }
+  if(!grade)  { errEl.textContent='⚠️ กรุณาเลือกชั้น';         errEl.style.display='block'; return; }
+  if(!subject){ errEl.textContent='⚠️ กรุณากรอกวิชา';          errEl.style.display='block'; return; }
+  errEl.style.display='none';
+
+  const btn = document.getElementById('btnDoSubmit');
+  btn.textContent='⏳ กำลังส่ง...'; btn.disabled=true;
+  try{
+    // Merge bg + draw into one canvas
+    const merged = document.createElement('canvas');
+    merged.width = bgCanvas.width; merged.height = bgCanvas.height;
+    const mCtx = merged.getContext('2d');
+    mCtx.fillStyle = '#ffffff';
+    mCtx.fillRect(0,0,merged.width,merged.height);
+    mCtx.drawImage(bgCanvas,0,0);
+    mCtx.drawImage(drawCanvas,0,0);
+
+    // Compress to JPEG base64
+    const imageData = merged.toDataURL('image/jpeg', 0.82);
+
+    await addDoc(collection(db,'game_submissions'),{
+      gameId:    urlGameId,
+      gameTitle: urlGameTitle,
+      studentName: name,
+      grade,
+      subject,
+      roomId:    urlRoom,
+      imageData,
+      submittedAt: serverTimestamp(),
+      score:    null,
+      maxScore: null,
+      feedback: '',
+      gradedAt: null
+    });
+
+    closeOverlay('mSubmit');
+    document.getElementById('mSuccess').classList.add('show');
+    document.getElementById('btnSubmit').textContent = '✅ ส่งแล้ว';
+    document.getElementById('btnSubmit').style.background = '#388e3c';
+  } catch(err){
+    errEl.textContent = '❌ ส่งไม่ได้: '+err.message;
+    errEl.style.display = 'block';
+  } finally {
+    btn.textContent='✅ ส่งงาน'; btn.disabled=false;
+  }
+};
+
+// ========== UTILS ==========
+window.closeOverlay = id => document.getElementById(id).classList.remove('show');
+
+function showMErr(id, msg){
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+// Click outside modal to close
+document.querySelectorAll('.overlay').forEach(m => {
+  m.addEventListener('click', e => { if(e.target===m) m.classList.remove('show'); });
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+  if((e.ctrlKey||e.metaKey)&&e.key==='z'){ e.preventDefault(); undo(); }
+  else if((e.ctrlKey||e.metaKey)&&e.key==='y'){ e.preventDefault(); redo(); }
+  else if(e.key==='p'||e.key==='P') setTool('pencil');
+  else if(e.key==='b'||e.key==='B') setTool('brush');
+  else if(e.key==='e'||e.key==='E') setTool('eraser');
+  else if(e.key==='f'||e.key==='F') setTool('fill');
+});
+
+</script>
+</body>
+</html>
