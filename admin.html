@@ -178,6 +178,7 @@ tbody tr:hover td{background:#fff3e8}
     <button class="nav-item" onclick="showPage('worksheets',this)"><i class="fas fa-file-alt"></i> ใบงาน / ใบความรู้</button>
     <button class="nav-item" onclick="showPage('quizzes',this)"><i class="fas fa-pen-to-square"></i> ข้อสอบ</button>
     <button class="nav-item" onclick="showPage('videos',this)"><i class="fas fa-play-circle"></i> วิดีโอ</button>
+    <button class="nav-item" onclick="showPage('games',this)"><i class="fas fa-gamepad"></i> เกม</button>
     <button class="nav-item" onclick="showPage('results',this)"><i class="fas fa-chart-bar"></i> ผลสอบ</button>
     <button class="nav-item" id="navCheckWork" onclick="showPage('checkwork',this)"><i class="fas fa-tasks"></i> ตรวจงาน <span id="cwNavBadge" style="display:none;background:#e53935;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:4px">0</span></button>
     <button class="nav-item" onclick="showPage('chat',this)"><i class="fas fa-comments"></i> แชทนักเรียน</button>
@@ -272,6 +273,21 @@ tbody tr:hover td{background:#fff3e8}
       <div class="table-wrap"><table><thead><tr><th>ชื่อ</th><th>ห้อง</th><th>วิชา</th><th>URL</th><th>วันที่</th><th>การจัดการ</th></tr></thead><tbody id="tbVid"></tbody></table></div>
     </div>
 
+    <!-- GAMES -->
+    <div id="page-games" class="page">
+      <div class="section-hd">
+        <h2><i class="fas fa-gamepad"></i> เกม</h2>
+        <button class="btn btn-orange" onclick="openAddGameModal()">➕ เพิ่มเกม</button>
+      </div>
+      <div style="background:#fff8f3;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#c94b00;border-left:4px solid #f39800">
+        💡 รองรับ 2 ประเภท: <b>HTML</b> (ไฟล์ .html ในโฟลเดอร์เดียวกัน) และ <b>URL</b> (เกมจากเว็บไซต์อื่น แสดงใน iframe)
+      </div>
+      <div class="table-wrap">
+        <table><thead><tr><th>ชื่อเกม</th><th>ประเภท</th><th>ห้อง</th><th>วิชา</th><th>ไฟล์/URL</th><th>วันที่</th><th>การจัดการ</th></tr></thead>
+        <tbody id="tbGame"></tbody></table>
+      </div>
+    </div>
+
     <!-- RESULTS -->
     <div id="page-results" class="page">
       <div class="section-hd"><h2><i class="fas fa-chart-bar"></i> ผลสอบ</h2>
@@ -290,8 +306,16 @@ tbody tr:hover td{background:#fff3e8}
 
     <!-- CHECK WORK -->
     <div id="page-checkwork" class="page">
-      <div class="section-hd"><h2><i class="fas fa-tasks"></i> ตรวจงาน</h2>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <div class="section-hd"><h2><i class="fas fa-tasks"></i> ตรวจงาน</h2></div>
+      <!-- Sub-tabs -->
+      <div style="display:flex;gap:0;margin-bottom:14px;border-bottom:2px solid #ffd0a0">
+        <button id="cwTab-worksheet" class="ws-subtab active" onclick="switchCwTab('worksheet')">📄 ตรวจใบงาน</button>
+        <button id="cwTab-game" class="ws-subtab" onclick="switchCwTab('game')">🎮 ตรวจงานเกม <span id="cwGameBadge" style="display:none;background:#e53935;color:#fff;border-radius:10px;padding:0 6px;font-size:10px;margin-left:3px">0</span></button>
+      </div>
+
+      <!-- Panel: Worksheet -->
+      <div id="cwPanel-worksheet">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
           <select id="cwGradeFilter" onchange="loadCheckWork()" style="padding:7px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-family:inherit;font-size:13px">
             <option value="">ทุกชั้น</option>
             <option value="ป.4">ป.4</option><option value="ป.5">ป.5</option><option value="ป.6">ป.6</option>
@@ -307,13 +331,37 @@ tbody tr:hover td{background:#fff3e8}
           </select>
           <button class="btn btn-orange" onclick="loadCheckWork()" style="font-size:12px;padding:6px 14px">🔄 รีเฟรช</button>
         </div>
+        <div id="cwStats" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px"></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>นักเรียน</th><th>ชั้น</th><th>วิชา</th><th>ชื่อใบงาน</th><th>วันที่ส่ง</th><th>คะแนน</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+            <tbody id="tbCW"></tbody>
+          </table>
+        </div>
       </div>
-      <div id="cwStats" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px"></div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>นักเรียน</th><th>ชั้น</th><th>วิชา</th><th>ชื่อใบงาน</th><th>วันที่ส่ง</th><th>คะแนน</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
-          <tbody id="tbCW"></tbody>
-        </table>
+
+      <!-- Panel: Game submissions -->
+      <div id="cwPanel-game" style="display:none">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
+          <select id="cwGameGradeFilter" onchange="loadGameSubmissions()" style="padding:7px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-family:inherit;font-size:13px">
+            <option value="">ทุกชั้น</option>
+            <option value="ป.4">ป.4</option><option value="ป.5">ป.5</option><option value="ป.6">ป.6</option>
+            <option value="ม.1">ม.1</option><option value="ม.2">ม.2</option><option value="ม.3">ม.3</option>
+          </select>
+          <select id="cwGameStatusFilter" onchange="loadGameSubmissions()" style="padding:7px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-family:inherit;font-size:13px">
+            <option value="">ทุกสถานะ</option>
+            <option value="pending">⏳ รอตรวจ</option>
+            <option value="graded">✅ ตรวจแล้ว</option>
+          </select>
+          <button class="btn btn-orange" onclick="loadGameSubmissions()" style="font-size:12px;padding:6px 14px">🔄 รีเฟรช</button>
+        </div>
+        <div id="cwGameStats" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px"></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>นักเรียน</th><th>ชั้น</th><th>วิชา</th><th>ชื่อเกม</th><th>วันที่ส่ง</th><th>คะแนน</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+            <tbody id="tbGameSub"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -638,7 +686,7 @@ onAuthStateChanged(auth, user => {
 });
 
 // ==================== PAGES ====================
-const pageTitles = {dashboard:'🏠 Dashboard',classrooms:'🏫 ห้องเรียน',announcements:'📢 ประกาศ',worksheets:'📄 ใบงาน',quizzes:'📝 ข้อสอบ',videos:'🎬 วิดีโอ',results:'📊 ผลสอบ',checkwork:'📋 ตรวจงาน',chat:'💬 แชทนักเรียน',settings:'⚙️ ตั้งค่าเว็บไซต์',guide:'📖 คู่มือแอดมิน'};
+const pageTitles = {dashboard:'🏠 Dashboard',classrooms:'🏫 ห้องเรียน',announcements:'📢 ประกาศ',worksheets:'📄 ใบงาน',quizzes:'📝 ข้อสอบ',videos:'🎬 วิดีโอ',games:'🎮 เกม',results:'📊 ผลสอบ',checkwork:'📋 ตรวจงาน',chat:'💬 แชทนักเรียน',settings:'⚙️ ตั้งค่าเว็บไซต์',guide:'📖 คู่มือแอดมิน'};
 window.showPage = function(p, navEl){
   document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -646,7 +694,7 @@ window.showPage = function(p, navEl){
   if(navEl) navEl.classList.add('active');
   document.getElementById('pageTitle').textContent = pageTitles[p] || p;
   document.getElementById('sidebar').classList.remove('open');
-  const loaders = {dashboard:loadDashboard,classrooms:loadCls,announcements:loadAnn,worksheets:loadWs,quizzes:loadQz,videos:loadVid,results:async()=>{await loadSubjectFilter();loadResults();},checkwork:loadCheckWork,chat:initTeacherChat,settings:loadSettingsPage};
+  const loaders = {dashboard:loadDashboard,classrooms:loadCls,announcements:loadAnn,worksheets:loadWs,quizzes:loadQz,videos:loadVid,games:loadGames,results:async()=>{await loadSubjectFilter();loadResults();},checkwork:loadCheckWork,chat:initTeacherChat,settings:loadSettingsPage};
   if(loaders[p]) loaders[p]();
 };
 
@@ -728,7 +776,7 @@ let _clsMap = {}; // id → {name, code}
 function populateRoomDropdowns(){
   const opts = `<option value="all">ทุกห้องเรียน</option>` +
     Object.entries(_clsMap).map(([id,r])=>`<option value="${id}">${r.name||id} (${r.code||''})</option>`).join('');
-  ['annRoom','wsRoom','qzRoom','vidRoom'].forEach(sid=>{
+  ['annRoom','wsRoom','qzRoom','vidRoom','gameRoom'].forEach(sid=>{
     const el=document.getElementById(sid);
     if(el){const cur=el.value;el.innerHTML=opts;el.value=cur&&el.querySelector(`option[value="${cur}"]`)?cur:'all';}
   });
@@ -1434,12 +1482,220 @@ window.deleteTeacherMsg=async function(docId){
   catch(e){ alert('ลบไม่ได้: '+e.message); }
 };
 
+// ==================== GAMES ====================
+let _editGameId = null;
+
+window.switchCwTab = function(tab){
+  ['worksheet','game'].forEach(t=>{
+    document.getElementById('cwTab-'+t).classList.toggle('active', t===tab);
+    document.getElementById('cwPanel-'+t).style.display = t===tab ? '' : 'none';
+  });
+  if(tab==='game') loadGameSubmissions();
+};
+
+window.openAddGameModal = function(){
+  _editGameId = null;
+  document.getElementById('gameId').value = '';
+  document.getElementById('gameTitle').value = '';
+  document.getElementById('gameType').value = 'html';
+  document.getElementById('gameHtmlFile').value = 'game_paint.html';
+  document.getElementById('gameUrl').value = '';
+  document.getElementById('gameSubject').value = '';
+  document.getElementById('gameDesc').value = '';
+  document.getElementById('gameThumbnail').value = '';
+  document.getElementById('gameRoom').value = 'all';
+  toggleGameType('html');
+  document.getElementById('gameModalTitle').textContent = '➕ เพิ่มเกม';
+  document.getElementById('gameSaveErr').style.display='none';
+  openModal('mGame');
+};
+
+window.editGame = async function(id){
+  _editGameId = id;
+  try{
+    const snap = await getDoc(doc(db,'games',id));
+    if(!snap.exists()) return;
+    const g = snap.data();
+    document.getElementById('gameId').value = id;
+    document.getElementById('gameTitle').value = g.title||'';
+    document.getElementById('gameType').value = g.type||'html';
+    document.getElementById('gameHtmlFile').value = g.htmlFile||'';
+    document.getElementById('gameUrl').value = g.gameUrl||'';
+    document.getElementById('gameSubject').value = g.subject||'';
+    document.getElementById('gameDesc').value = g.description||'';
+    document.getElementById('gameThumbnail').value = g.thumbnailUrl||'';
+    document.getElementById('gameRoom').value = g.roomId||'all';
+    toggleGameType(g.type||'html');
+    document.getElementById('gameModalTitle').textContent = '✏️ แก้ไขเกม';
+    document.getElementById('gameSaveErr').style.display='none';
+    openModal('mGame');
+  }catch(e){ alert('โหลดข้อมูลไม่ได้: '+e.message); }
+};
+
+window.toggleGameType = function(t){
+  document.getElementById('gameHtmlRow').style.display = t==='html' ? '' : 'none';
+  document.getElementById('gameUrlRow').style.display  = t==='url'  ? '' : 'none';
+};
+
+window.saveGame = async function(){
+  const title   = document.getElementById('gameTitle').value.trim();
+  const type    = document.getElementById('gameType').value;
+  const htmlFile= document.getElementById('gameHtmlFile').value.trim();
+  const gameUrl = document.getElementById('gameUrl').value.trim();
+  const subject = document.getElementById('gameSubject').value.trim();
+  const desc    = document.getElementById('gameDesc').value.trim();
+  const thumb   = document.getElementById('gameThumbnail').value.trim();
+  const roomId  = document.getElementById('gameRoom').value || 'all';
+  const errEl   = document.getElementById('gameSaveErr');
+
+  if(!title){ errEl.textContent='⚠️ กรุณากรอกชื่อเกม'; errEl.style.display='block'; return; }
+  if(type==='html' && !htmlFile){ errEl.textContent='⚠️ กรุณากรอกชื่อไฟล์ HTML'; errEl.style.display='block'; return; }
+  if(type==='url'  && !gameUrl) { errEl.textContent='⚠️ กรุณากรอก URL เกม';    errEl.style.display='block'; return; }
+  errEl.style.display='none';
+
+  const data = { title, type, htmlFile: type==='html'?htmlFile:'', gameUrl: type==='url'?gameUrl:'', roomId, subject, description:desc, thumbnailUrl:thumb };
+  try{
+    if(_editGameId){
+      await setDoc(doc(db,'games',_editGameId), data, {merge:true});
+    } else {
+      data.createdAt = serverTimestamp();
+      await addDoc(collection(db,'games'), data);
+    }
+    closeModal('mGame');
+    loadGames();
+  }catch(e){ errEl.textContent='❌ บันทึกไม่ได้: '+e.message; errEl.style.display='block'; }
+};
+
+async function loadGames(){
+  const tb = document.getElementById('tbGame'); if(!tb) return;
+  tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#bbb">⏳ กำลังโหลด...</td></tr>';
+  try{
+    const snap = await getDocs(query(collection(db,'games'), orderBy('createdAt','desc')));
+    if(snap.empty){ tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:#bbb;padding:20px">ยังไม่มีเกม — กด ➕ เพิ่มเกม</td></tr>'; return; }
+    let rows=[];
+    snap.forEach(d=>rows.push({id:d.id,...d.data()}));
+    tb.innerHTML = rows.map(g=>{
+      const dt = g.createdAt?.toDate ? g.createdAt.toDate().toLocaleDateString('th-TH') : '-';
+      const typeBadge = g.type==='html'
+        ? '<span style="background:#1976d2;color:#fff;border-radius:6px;padding:2px 8px;font-size:11px">HTML</span>'
+        : '<span style="background:#388e3c;color:#fff;border-radius:6px;padding:2px 8px;font-size:11px">URL</span>';
+      const fileOrUrl = g.type==='html' ? esc(g.htmlFile||'-') : `<a href="${esc(g.gameUrl||'')}" target="_blank" style="color:#1976d2;font-size:11px">${esc((g.gameUrl||'').substring(0,30))}...</a>`;
+      return `<tr>
+        <td style="font-weight:700">${esc(g.title)}</td>
+        <td>${typeBadge}</td>
+        <td>${esc(g.roomId==='all'?'ทุกห้อง':(_clsMap[g.roomId]?.name||g.roomId))}</td>
+        <td>${esc(g.subject||'-')}</td>
+        <td style="font-size:12px">${fileOrUrl}</td>
+        <td style="font-size:12px">${dt}</td>
+        <td>
+          <button class="btn btn-blue btn-sm" onclick="editGame('${esc(g.id)}')">✏️ แก้</button>
+          <button class="btn btn-red btn-sm" onclick="delDoc('games','${esc(g.id)}',loadGames)">🗑️</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }catch(e){ tb.innerHTML=`<tr><td colspan="7" style="color:#c62828;padding:14px">โหลดไม่ได้: ${e.message}</td></tr>`; }
+}
+
+// ==================== GAME SUBMISSIONS ====================
+let _editGameSubId = null;
+
+async function loadGameSubmissions(){
+  const tb = document.getElementById('tbGameSub'); if(!tb) return;
+  const gradeF  = (document.getElementById('cwGameGradeFilter')?.value  || '');
+  const statusF = (document.getElementById('cwGameStatusFilter')?.value || '');
+  tb.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#bbb">⏳ กำลังโหลด...</td></tr>';
+  try{
+    const snap = await getDocs(query(collection(db,'game_submissions'), orderBy('submittedAt','desc')));
+    let rows = [];
+    snap.forEach(d => rows.push({id:d.id,...d.data()}));
+    if(gradeF)  rows = rows.filter(r=>r.grade===gradeF);
+    if(statusF==='pending') rows = rows.filter(r=>r.score===null||r.score===undefined);
+    if(statusF==='graded')  rows = rows.filter(r=>r.score!==null&&r.score!==undefined);
+
+    // Update badge
+    const pending = snap.docs.filter(d=>{ const r=d.data(); return r.score===null||r.score===undefined; }).length;
+    const badge = document.getElementById('cwGameBadge');
+    if(badge){ badge.style.display = pending>0?'':'none'; badge.textContent=pending; }
+
+    // Stats
+    const statsEl = document.getElementById('cwGameStats');
+    if(statsEl){
+      const total = rows.length;
+      const pend  = rows.filter(r=>r.score===null||r.score===undefined).length;
+      statsEl.innerHTML = `
+        <div style="background:#fff3e0;border-radius:8px;padding:8px 14px;font-size:13px"><b style="color:#c94b00">${total}</b> งานทั้งหมด</div>
+        <div style="background:#fce4ec;border-radius:8px;padding:8px 14px;font-size:13px"><b style="color:#c62828">${pend}</b> รอตรวจ</div>
+        <div style="background:#e8f5e9;border-radius:8px;padding:8px 14px;font-size:13px"><b style="color:#2e7d32">${total-pend}</b> ตรวจแล้ว</div>`;
+    }
+
+    if(!rows.length){ tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:#bbb;padding:20px">ไม่มีงานที่ตรงเงื่อนไข</td></tr>'; return; }
+    tb.innerHTML = rows.map(r=>{
+      const dt = r.submittedAt?.toDate ? r.submittedAt.toDate().toLocaleString('th-TH') : '-';
+      const scored = r.score!==null&&r.score!==undefined;
+      const badge  = scored
+        ? `<span style="background:#4caf50;color:#fff;border-radius:6px;padding:2px 8px;font-size:11px">✅ ตรวจแล้ว</span>`
+        : `<span style="background:#ff9800;color:#fff;border-radius:6px;padding:2px 8px;font-size:11px">⏳ รอตรวจ</span>`;
+      const score  = scored ? `${r.score}/${r.maxScore||'?'}` : '-';
+      return `<tr>
+        <td style="font-weight:700">${esc(r.studentName)}</td>
+        <td>${esc(r.grade)}</td>
+        <td>${esc(r.subject)}</td>
+        <td>${esc(r.gameTitle)}</td>
+        <td style="font-size:12px">${dt}</td>
+        <td>${score}</td>
+        <td>${badge}</td>
+        <td>
+          <button class="btn btn-blue btn-sm" onclick="viewGameSubmission('${esc(r.id)}')">🖼️ ดู</button>
+          <button class="btn btn-red btn-sm" onclick="delDoc('game_submissions','${esc(r.id)}',loadGameSubmissions)">🗑️</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }catch(e){ tb.innerHTML=`<tr><td colspan="8" style="color:#c62828;padding:14px">โหลดไม่ได้: ${e.message}</td></tr>`; }
+}
+
+window.viewGameSubmission = async function(id){
+  _editGameSubId = id;
+  try{
+    const snap = await getDoc(doc(db,'game_submissions',id));
+    if(!snap.exists()) return;
+    const r = snap.data();
+    const el = document.getElementById('gameSubContent');
+    el.innerHTML = `
+      <div style="margin-bottom:10px;font-size:13px">
+        <b>นักเรียน:</b> ${esc(r.studentName)} &nbsp; <b>ชั้น:</b> ${esc(r.grade)} &nbsp; <b>วิชา:</b> ${esc(r.subject)} &nbsp; <b>เกม:</b> ${esc(r.gameTitle)}
+      </div>
+      <div style="text-align:center;margin:10px 0;border:2px solid #ffd0a0;border-radius:10px;overflow:hidden;max-height:500px;overflow-y:auto">
+        <img src="${r.imageData||''}" style="max-width:100%;display:block" alt="ผลงาน"/>
+      </div>`;
+    document.getElementById('gameSubScoreInp').value = r.score ?? '';
+    document.getElementById('gameSubMaxInp').value   = r.maxScore ?? 10;
+    document.getElementById('gameSubFeedbackInp').value = r.feedback || '';
+    document.getElementById('gameSubStatus').textContent = '';
+    openModal('mGameGrade');
+  }catch(e){ alert('โหลดไม่ได้: '+e.message); }
+};
+
+window.saveGameGrade = async function(){
+  const score    = parseInt(document.getElementById('gameSubScoreInp').value);
+  const maxScore = parseInt(document.getElementById('gameSubMaxInp').value)||10;
+  const feedback = document.getElementById('gameSubFeedbackInp').value.trim();
+  const st       = document.getElementById('gameSubStatus');
+  if(isNaN(score)){ st.textContent='⚠️ กรุณากรอกคะแนน'; st.style.color='#c62828'; return; }
+  try{
+    await setDoc(doc(db,'game_submissions',_editGameSubId),{score,maxScore,feedback,gradedAt:serverTimestamp()},{merge:true});
+    st.textContent='✅ บันทึกแล้ว'; st.style.color='#2e7d32';
+    setTimeout(()=>closeModal('mGameGrade'),900);
+    loadGameSubmissions();
+  }catch(e){ st.textContent='❌ '+e.message; st.style.color='#c62828'; }
+};
+
 // ==================== EXPOSE LOAD FUNCTIONS ====================
 window.loadCls = loadCls;
 window.loadAnn = loadAnn;
 window.loadWs = loadWs;
 window.loadQz = loadQz;
 window.loadVid = loadVid;
+window.loadGames = loadGames;
 
 // ==================== STUDENT MANAGEMENT ====================
 let _currentStudentRoomId = null;
@@ -1530,6 +1786,78 @@ function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace
     </div>
   </div>
   <div class="btn-row"><button class="btn btn-gray" onclick="closeModal('mAnswers')">ปิด</button></div>
+</div></div>
+
+<!-- MODAL: เพิ่ม/แก้ไขเกม -->
+<div class="overlay" id="mGame"><div class="modal lg">
+  <h2 id="gameModalTitle">➕ เพิ่มเกม</h2>
+  <label style="font-size:12px;color:#777;display:block;margin-bottom:4px">ชื่อเกม *</label>
+  <input type="hidden" id="gameId"/>
+  <input type="text" id="gameTitle" placeholder="เช่น เกมสาดสีทาสี" style="width:100%;padding:9px 12px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:10px;box-sizing:border-box"/>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+    <div>
+      <label style="font-size:12px;color:#777;display:block;margin-bottom:4px">ประเภทเกม *</label>
+      <select id="gameType" onchange="toggleGameType(this.value)" style="width:100%;padding:9px 12px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit;background:#fff">
+        <option value="html">HTML (ไฟล์ในโฟลเดอร์)</option>
+        <option value="url">URL (เว็บไซต์อื่น)</option>
+      </select>
+    </div>
+    <div>
+      <label style="font-size:12px;color:#777;display:block;margin-bottom:4px">ห้องเรียน</label>
+      <select id="gameRoom" style="width:100%;padding:9px 12px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit;background:#fff"></select>
+    </div>
+  </div>
+  <div id="gameHtmlRow" style="margin-bottom:10px">
+    <label style="font-size:12px;color:#777;display:block;margin-bottom:4px">ชื่อไฟล์ HTML (อยู่ในโฟลเดอร์เดียวกัน) *</label>
+    <input type="text" id="gameHtmlFile" placeholder="เช่น game_paint.html" style="width:100%;padding:9px 12px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit;box-sizing:border-box"/>
+  </div>
+  <div id="gameUrlRow" style="display:none;margin-bottom:10px">
+    <label style="font-size:12px;color:#777;display:block;margin-bottom:4px">URL เกม (รองรับ iframe) *</label>
+    <input type="url" id="gameUrl" placeholder="https://example.com/game" style="width:100%;padding:9px 12px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit;box-sizing:border-box"/>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+    <div>
+      <label style="font-size:12px;color:#777;display:block;margin-bottom:4px">วิชา</label>
+      <input type="text" id="gameSubject" placeholder="เช่น ศิลปะ" style="width:100%;padding:9px 12px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit;box-sizing:border-box"/>
+    </div>
+    <div>
+      <label style="font-size:12px;color:#777;display:block;margin-bottom:4px">URL Thumbnail (ไม่บังคับ)</label>
+      <input type="url" id="gameThumbnail" placeholder="https://..." style="width:100%;padding:9px 12px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit;box-sizing:border-box"/>
+    </div>
+  </div>
+  <label style="font-size:12px;color:#777;display:block;margin-bottom:4px">คำอธิบาย</label>
+  <textarea id="gameDesc" rows="2" placeholder="คำอธิบายเกม" style="width:100%;padding:9px 12px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;margin-bottom:10px;box-sizing:border-box"></textarea>
+  <div id="gameSaveErr" style="display:none;background:#fce4ec;color:#c62828;padding:8px 12px;border-radius:8px;font-size:13px;margin-bottom:8px;border-left:3px solid #e53935"></div>
+  <div class="btn-row">
+    <button class="btn btn-gray" onclick="closeModal('mGame')">ยกเลิก</button>
+    <button class="btn btn-green" onclick="saveGame()">💾 บันทึก</button>
+  </div>
+</div></div>
+
+<!-- MODAL: ตรวจงานเกม -->
+<div class="overlay" id="mGameGrade"><div class="modal lg" style="max-height:92vh;overflow-y:auto">
+  <h2>🎮 ตรวจงานเกม</h2>
+  <div id="gameSubContent" style="font-size:13px;margin-bottom:14px"></div>
+  <div style="padding:13px 14px;background:#fff3e0;border-radius:10px;border:1.5px solid #ffd0a0">
+    <div style="font-weight:800;color:#c94b00;font-size:13px;margin-bottom:10px">📊 ให้คะแนน</div>
+    <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+      <div>
+        <label style="font-size:12px;color:#777;display:block;margin-bottom:3px">คะแนนที่ได้</label>
+        <input type="number" id="gameSubScoreInp" placeholder="0" min="0" style="width:90px;padding:8px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit"/>
+      </div>
+      <div>
+        <label style="font-size:12px;color:#777;display:block;margin-bottom:3px">คะแนนเต็ม</label>
+        <input type="number" id="gameSubMaxInp" placeholder="10" min="1" value="10" style="width:90px;padding:8px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit"/>
+      </div>
+      <div style="flex:1;min-width:160px">
+        <label style="font-size:12px;color:#777;display:block;margin-bottom:3px">ความคิดเห็น / ข้อแนะนำ</label>
+        <input type="text" id="gameSubFeedbackInp" placeholder="ความคิดเห็นของครู (ถ้ามี)" style="width:100%;padding:8px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:13px;font-family:inherit;box-sizing:border-box"/>
+      </div>
+      <button class="btn btn-green" onclick="saveGameGrade()">💾 บันทึก + ตรวจแล้ว</button>
+      <span id="gameSubStatus" style="font-size:13px"></span>
+    </div>
+  </div>
+  <div class="btn-row"><button class="btn btn-gray" onclick="closeModal('mGameGrade')">ปิด</button></div>
 </div></div>
 
 <!-- MODAL: ตรวจใบงาน -->
