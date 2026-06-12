@@ -84,7 +84,7 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
 .status-bar{background:#0d1117;padding:3px 10px;font-size:10px;color:#4b5563;flex-shrink:0;display:flex;gap:14px;align-items:center}
 
 /* OVERLAYS & MODALS */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;padding:16px}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;padding:16px}
 .overlay.show{display:flex}
 .modal{background:#1e293b;border-radius:14px;padding:22px;width:100%;max-width:400px;border:1px solid rgba(255,255,255,.1);box-shadow:0 20px 60px rgba(0,0,0,.6)}
 .modal h3{color:#f39800;margin-bottom:14px;font-size:15px;font-weight:800}
@@ -775,7 +775,7 @@ function loadImgWithCORS(url, onSuccess, onFail){
 }
 
 // ========== IMPORT IMAGE ==========
-window.openImgModal = () => document.getElementById('mImg').classList.add('show');
+window.openImgModal = () => openOverlay('mImg');
 
 window.loadImageFile = function(input){
   const file = input.files[0]; if(!file) return;
@@ -813,7 +813,7 @@ function applyBgImage(src, imgEl){
 // ========== IMPORT PDF ==========
 let _pdfDoc = null;
 
-window.openPdfModal = () => document.getElementById('mPdf').classList.add('show');
+window.openPdfModal = () => openOverlay('mPdf');
 
 window.loadPdfFile = async function(input){
   const file = input.files[0]; if(!file) return;
@@ -856,7 +856,7 @@ window.confirmLoadPdf = async function(){
 // ========== SUBMIT ==========
 window.showSubmitModal = function(){
   document.getElementById('submitErr').style.display='none';
-  document.getElementById('mSubmit').classList.add('show');
+  openOverlay('mSubmit');
 };
 
 window.doSubmit = async function(){
@@ -915,23 +915,75 @@ window.doSubmit = async function(){
     });
 
     closeOverlay('mSubmit');
-    document.getElementById('mSuccess').classList.add('show');
+    openOverlay('mSuccess');
     document.getElementById('btnSubmit').textContent = '✅ ส่งแล้ว';
     document.getElementById('btnSubmit').style.background = '#388e3c';
   } catch(err){
-    let msg = err.message || String(err);
+    const msg = err.message || String(err);
     if(msg.toLowerCase().includes('permission') || msg.includes('PERMISSION_DENIED')){
-      msg = 'ไม่มีสิทธิ์บันทึก — ครูต้องเพิ่ม Firestore Rules:\nmatch /game_submissions/{id} { allow create: if true; }';
+      const n = document.getElementById('submitName').value.trim();
+      const g = document.getElementById('submitGrade').value;
+      errEl.innerHTML = `<b>❌ ส่งไม่ได้ — Firestore Rules ยังไม่อนุญาต</b><br>
+        <span style="font-size:10px;color:#fbbf24">ครูต้องไปที่ Firebase Console → Firestore → Rules แล้วเพิ่ม:<br>
+        <code style="background:#1f2937;padding:2px 4px;border-radius:3px;display:inline-block;margin:3px 0">match /game_submissions/{id} {<br>&nbsp;&nbsp;allow create: if true;<br>}</code></span><br>
+        <button onclick="downloadWork('${n.replace(/'/g,"\\'")}','${g}')" style="margin-top:6px;padding:5px 12px;background:#f59e0b;color:#000;border:none;border-radius:6px;cursor:pointer;font-weight:bold;font-size:12px">💾 บันทึกเป็นไฟล์แทน</button>`;
+      errEl.style.display = 'block';
+    } else {
+      errEl.textContent = '❌ ส่งไม่ได้: ' + msg;
+      errEl.style.display = 'block';
     }
-    errEl.textContent = '❌ ส่งไม่ได้: ' + msg;
-    errEl.style.display = 'block';
   } finally {
     btn.textContent='✅ ส่งงาน'; btn.disabled=false;
   }
 };
 
+// Download canvas as JPEG file (fallback when Firestore rules block submit)
+window.downloadWork = function(name, grade){
+  const merged = document.createElement('canvas');
+  merged.width = bgCanvas.width; merged.height = bgCanvas.height;
+  const mCtx = merged.getContext('2d');
+  mCtx.fillStyle = '#ffffff';
+  mCtx.fillRect(0,0,merged.width,merged.height);
+  try { mCtx.drawImage(bgCanvas,0,0); } catch(e){}
+  for(const l of layers){ if(l.visible) try { mCtx.drawImage(l.canvas,0,0); } catch(e){} }
+  let dataUrl;
+  try {
+    dataUrl = merged.toDataURL('image/jpeg', 0.85);
+  } catch(e) {
+    // tainted canvas — save drawing layers only
+    const drawOnly = document.createElement('canvas');
+    drawOnly.width = bgCanvas.width; drawOnly.height = bgCanvas.height;
+    const dCtx = drawOnly.getContext('2d');
+    dCtx.fillStyle = '#ffffff';
+    dCtx.fillRect(0,0,drawOnly.width,drawOnly.height);
+    for(const l of layers){ if(l.visible) dCtx.drawImage(l.canvas,0,0); }
+    dataUrl = drawOnly.toDataURL('image/jpeg', 0.85);
+  }
+  const a = document.createElement('a');
+  a.href = dataUrl;
+  const ts = new Date().toLocaleDateString('th-TH').replace(/\//g,'-');
+  a.download = `งาน_${name||'นักเรียน'}_${grade||''}_${ts}.jpg`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+};
+
 // ========== UTILS ==========
-window.closeOverlay = id => document.getElementById(id).classList.remove('show');
+function setEventCanvasEnabled(enabled){
+  const ec = document.getElementById('eventCanvas');
+  if(ec) ec.style.pointerEvents = enabled ? 'auto' : 'none';
+}
+
+window.openOverlay = function(id){
+  setEventCanvasEnabled(false);
+  document.getElementById(id).classList.add('show');
+};
+
+window.closeOverlay = function(id){
+  document.getElementById(id).classList.remove('show');
+  const anyOpen = document.querySelector('.overlay.show');
+  if(!anyOpen) setEventCanvasEnabled(true);
+};
 
 function showMErr(id, msg){
   const el = document.getElementById(id);
@@ -941,7 +993,7 @@ function showMErr(id, msg){
 
 // Click outside modal to close
 document.querySelectorAll('.overlay').forEach(m => {
-  m.addEventListener('click', e => { if(e.target===m) m.classList.remove('show'); });
+  m.addEventListener('click', e => { if(e.target===m) closeOverlay(m.id); });
 });
 
 // Keyboard shortcuts
@@ -1020,7 +1072,7 @@ window.loadTeacherAssetDirect = function(type, url, name){
     // PDF via PDF.js
     if(typeof pdfjsLib === 'undefined'){ alert('PDF.js ยังไม่พร้อม'); return; }
     const info = document.getElementById('pdfInfo');
-    document.getElementById('mPdf').classList.add('show');
+    openOverlay('mPdf');
     info.style.display = 'block';
     info.textContent   = '⏳ กำลังโหลด PDF จากครู...';
     pdfjsLib.getDocument({url, withCredentials:false}).promise
