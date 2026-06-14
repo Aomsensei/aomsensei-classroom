@@ -256,11 +256,13 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
 
   <div id="content-ws" class="tab-content">
     <div class="section-title"><i class="fas fa-file-alt"></i> ใบงาน</div>
+    <div id="wsSubjectFilter" style="display:flex;flex-wrap:wrap;gap:6px;padding:0 0 10px 0"></div>
     <div id="listWs"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i></div></div>
   </div>
 
   <div id="content-kn" class="tab-content">
     <div class="section-title"><i class="fas fa-book-open"></i> ใบความรู้</div>
+    <div id="knSubjectFilter" style="display:flex;flex-wrap:wrap;gap:6px;padding:0 0 10px 0"></div>
     <div id="listKn"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i></div></div>
   </div>
 
@@ -276,6 +278,7 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
 
   <div id="content-vid" class="tab-content">
     <div class="section-title"><i class="fas fa-play-circle"></i> วิดีโอการเรียนรู้</div>
+    <div id="vidSubjectFilter" style="display:flex;flex-wrap:wrap;gap:6px;padding:0 0 10px 0"></div>
     <div id="listVid"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i></div></div>
   </div>
 
@@ -527,6 +530,10 @@ async function loadClassrooms(){
     const snap = await getDocs(collection(db,'classrooms'));
     const rooms = [];
     snap.forEach(d => rooms.push({id: d.id, ...d.data()}));
+    if(!rooms.length){
+      sel.innerHTML = '<option value="">⚠️ ยังไม่มีห้องเรียน ติดต่อครู</option>';
+      return;
+    }
     rooms.sort((a,b)=>{
       const na=a.name||'', nb=b.name||'';
       const ta=na.startsWith('ป')?0:1, tb=nb.startsWith('ป')?0:1;
@@ -536,8 +543,15 @@ async function loadClassrooms(){
     sel.innerHTML = '<option value="">-- เลือกชั้นเรียน --</option>' +
       rooms.map(r=>`<option value="${esc(r.id)}">${esc(r.name||r.id)}</option>`).join('');
   }catch(e){
-    sel.innerHTML = '<option value="">ไม่สามารถโหลดได้ ลองใหม่อีกครั้ง</option>';
-    console.warn('loadClassrooms:',e);
+    const code = e.code||'unknown';
+    sel.innerHTML = `<option value="">❌ โหลดไม่ได้ (${code})</option>`;
+    console.warn('loadClassrooms:', code, e.message);
+    // แสดงข้อความช่วยเหลือถ้าเป็น permission-denied
+    if(code==='permission-denied'){
+      const errEl = document.getElementById('loginErr');
+      errEl.textContent = '⚠️ Firestore Rules ไม่อนุญาตการอ่าน — ครูต้องแก้ Rules ใน Firebase Console ก่อน';
+      errEl.style.display = 'block';
+    }
   }
 }
 initPage();
@@ -555,11 +569,17 @@ window.loadStudentNames = async function(){
     const scoreSnap = await getDoc(doc(db,'score_system','hinfon_scores'));
     if(scoreSnap.exists()){
       const classes = scoreSnap.data()?.data?.classes || {};
-      // จับคู่ชื่อห้อง (ป.5 / ม.1 / ม.3/1 → ม.3 ฯลฯ)
+      // normalize: ลบช่องว่างและ / เพื่อ match ได้ยืดหยุ่นขึ้น
+      const norm = s => (s||'').replace(/[\s\/]/g,'').toLowerCase();
       const matchKey = Object.keys(classes).find(k =>
-        k === roomName || roomName.startsWith(k+'/') || roomName.startsWith(k+' ')
+        k === roomName ||        // ตรงเป๊ะ
+        k === roomId ||          // ใช้ roomId แทน roomName
+        norm(k) === norm(roomName) ||  // normalize match
+        norm(k) === norm(roomId) ||
+        roomName.startsWith(k+'/') || roomName.startsWith(k+' ') ||
+        roomId.startsWith(k+'_') || roomId.startsWith(k+'-')
       );
-      if(matchKey && classes[matchKey].students?.length){
+      if(matchKey && classes[matchKey]?.students?.length){
         const names = classes[matchKey].students.map(s =>
           [s.prefix, s.first, s.last].filter(Boolean).join(' ')
         );
@@ -568,14 +588,16 @@ window.loadStudentNames = async function(){
           names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
         return;
       }
+      console.log('score_system: ไม่พบ key ที่ตรงกับ', roomName, '/', roomId,
+        '| keys ที่มี:', Object.keys(classes).join(', '));
     }
-  }catch(e){ console.warn('loadStudentNames (scores):',e); }
+  }catch(e){ console.warn('loadStudentNames (scores):', e.code, e.message); }
 
   // === fallback: classrooms subcollection ===
   try{
     const snap = await getDocs(collection(db,'classrooms',roomId,'students'));
     if(snap.empty){
-      sel.innerHTML = '<option value="">ยังไม่มีรายชื่อ ติดต่อครู</option>';
+      sel.innerHTML = '<option value="">⚠️ ยังไม่มีรายชื่อ — ครูต้องเพิ่มนักเรียนก่อน</option>';
       return;
     }
     const names = [];
@@ -584,8 +606,14 @@ window.loadStudentNames = async function(){
     sel.innerHTML = '<option value="">-- เลือกชื่อนักเรียน --</option>' +
       names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
   }catch(e){
-    sel.innerHTML = '<option value="">โหลดไม่ได้</option>';
-    console.warn('loadStudentNames:',e);
+    const code = e.code||'unknown';
+    sel.innerHTML = `<option value="">❌ โหลดไม่ได้ (${code})</option>`;
+    console.warn('loadStudentNames (fallback):', code, e.message);
+    if(code==='permission-denied'){
+      const errEl = document.getElementById('loginErr');
+      errEl.textContent = '⚠️ ไม่มีสิทธิ์อ่านรายชื่อ — ครูต้องแก้ Firestore Rules ให้อนุญาต anonymous read';
+      errEl.style.display = 'block';
+    }
   }
 };
 
@@ -802,7 +830,7 @@ async function loadAnn(){
       </div>`;
     });
     el.innerHTML=h||'<div class="empty-state"><i class="fas fa-bullhorn"></i><p>ยังไม่มีประกาศ</p></div>';
-  }catch(e){ el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`; }
+  }catch(e){ el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้ [${e.code||'err'}]:<br>${e.message}</p>${e.code==='permission-denied'?'<p style="font-size:11px;color:#e53935;margin-top:6px">⚠️ ครูต้องแก้ Firestore Rules ให้ anonymous อ่านได้</p>':''}</div>`; }
 }
 window.openAnnFull=function(idx){
   const a=_annList[idx]; if(!a) return;
@@ -826,6 +854,7 @@ async function loadWs(){
     const q=query(collection(db,'worksheets'),orderBy('createdAt','desc'));
     const snap=await getDocs(q);
     let hWs='', hKn='';
+    const subjWs=new Set(), subjKn=new Set();
     snap.forEach(d=>{
       const w=d.data();
       if(w.roomId&&w.roomId!=='all'&&w.roomId!==student.roomId) return;
@@ -834,9 +863,11 @@ async function loadWs(){
       const isKn=w.type==='knowledge';
       const icon=isKn?'📖':'📄';
       const btnLabel=isKn?'📖 เปิดใบความรู้':'📖 เปิดใบงาน';
-      const card=`<div class="card">
+      const subj=w.subject||'';
+      if(subj){ isKn?subjKn.add(subj):subjWs.add(subj); }
+      const card=`<div class="card" data-subject="${esc(subj)}">
         <div class="card-title">${icon} ${esc(w.title||'ใบงาน')}</div>
-        <div class="card-meta">📅 ${dt}${w.subject?' · '+esc(w.subject):''}</div>
+        <div class="card-meta">📅 ${dt}${subj?' · '+esc(subj):''}</div>
         <div class="card-desc">${esc(w.description||'')}</div>
         <div class="card-actions">
           ${(w.fileUrl||w.htmlContent)?`<button class="btn btn-orange btn-sm" onclick="openWs('${d.id}')">${btnLabel}</button>`:''}
@@ -846,11 +877,45 @@ async function loadWs(){
     });
     elWs.innerHTML=hWs||'<div class="empty-state"><i class="fas fa-file-alt"></i><p>ยังไม่มีใบงาน</p></div>';
     elKn.innerHTML=hKn||'<div class="empty-state"><i class="fas fa-book-open"></i><p>ยังไม่มีใบความรู้</p></div>';
+    renderSubjectFilter('wsSubjectFilter', subjWs, 'listWs');
+    renderSubjectFilter('knSubjectFilter', subjKn, 'listKn');
   }catch(e){
-    elWs.innerHTML=`<div class="empty-state"><p>โหลดไม่ได้: ${e.message}</p></div>`;
-    elKn.innerHTML=elWs.innerHTML;
+    const msg=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้ [${e.code||'err'}]:<br>${e.message}</p></div>`;
+    elWs.innerHTML=msg; elKn.innerHTML=msg;
   }
 }
+
+function renderSubjectFilter(filterId, subjects, listId){
+  const bar=document.getElementById(filterId);
+  if(!bar) return;
+  if(subjects.size===0){ bar.innerHTML=''; return; }
+  const btnStyle=`style="padding:4px 12px;border-radius:20px;border:1px solid var(--primary);
+    background:transparent;color:var(--primary);font-family:inherit;font-size:12px;
+    cursor:pointer;font-weight:600;transition:.15s"`;
+  const btnActiveStyle=`style="padding:4px 12px;border-radius:20px;border:1px solid var(--primary);
+    background:var(--primary);color:#fff;font-family:inherit;font-size:12px;
+    cursor:pointer;font-weight:600;transition:.15s"`;
+  let html=`<button ${btnActiveStyle} data-filter="" onclick="filterWsSubject('${filterId}','${listId}',this,'')">ทั้งหมด</button>`;
+  subjects.forEach(s=>{
+    html+=`<button ${btnStyle} data-filter="${esc(s)}" onclick="filterWsSubject('${filterId}','${listId}',this,'${esc(s)}')">${esc(s)}</button>`;
+  });
+  bar.innerHTML=html;
+}
+
+window.filterWsSubject=function(filterId,listId,btn,subject){
+  // อัพเดทปุ่ม active
+  const bar=document.getElementById(filterId);
+  bar.querySelectorAll('button').forEach(b=>{
+    const active=b===btn;
+    b.style.background=active?'var(--primary)':'transparent';
+    b.style.color=active?'#fff':'var(--primary)';
+  });
+  // กรองการ์ด
+  const list=document.getElementById(listId);
+  list.querySelectorAll('.card').forEach(card=>{
+    card.style.display=(!subject||card.dataset.subject===subject)?'':'none';
+  });
+};
 // แปลง Google Drive URL เป็น preview URL ที่ embed ได้
 function _toEmbedUrl(url){
   // Google Drive: /file/d/ID/view  → /file/d/ID/preview
@@ -947,7 +1012,7 @@ async function loadGames(){
     }).join('');
     el.innerHTML=`<div class="game-grid">${icons}</div>`;
   }catch(e){
-    el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`;
+    el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้ [${e.code||'err'}]:<br>${e.message}</p></div>`;
   }
 }
 window.openGame=function(id,type,htmlFile,gameUrl,title){
@@ -1016,7 +1081,7 @@ async function loadQuiz(){
       }
     });
     el.innerHTML=h||'<div class="empty-state"><i class="fas fa-pen-to-square"></i><p>ยังไม่มีข้อสอบ</p></div>';
-  }catch(e){ el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`; }
+  }catch(e){ el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้ [${e.code||'err'}]:<br>${e.message}</p></div>`; }
 }
 window.startQuiz=function(id){
   window.location.href=`quiz.html?id=${id}&student=${encodeURIComponent(student.name)}&room=${encodeURIComponent(student.roomId)}`;
@@ -1040,19 +1105,27 @@ async function loadVid(){
     const q=query(collection(db,'videos'),orderBy('createdAt','desc'));
     const snap=await getDocs(q);
     let h='';
+    const subjVid=new Set();
     snap.forEach(d=>{
       const v=d.data();
       if(v.roomId&&v.roomId!=='all'&&v.roomId!==student.roomId) return;
+      const subj=v.subject||'';
+      if(subj) subjVid.add(subj);
       const embed=ytEmbed(v.url||'');
-      h+=`<div class="video-card">
+      h+=`<div class="video-card" data-subject="${esc(subj)}">
         ${embed
           ?`<iframe src="${embed}" allowfullscreen loading="lazy"></iframe>`
           :`<div style="background:#f5f5f5;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center"><a href="${v.url}" target="_blank" style="color:#c94b00;font-weight:700;font-size:15px;text-decoration:none">▶️ เปิดวิดีโอ</a></div>`}
-        <div class="video-info"><div class="video-title">${esc(v.title||'วิดีโอ')}</div><div class="video-desc">${esc(v.description||'')}</div></div>
+        <div class="video-info">
+          <div class="video-title">${esc(v.title||'วิดีโอ')}</div>
+          ${subj?`<div style="font-size:11px;color:#f39800;margin:2px 0">📚 ${esc(subj)}</div>`:''}
+          <div class="video-desc">${esc(v.description||'')}</div>
+        </div>
       </div>`;
     });
     el.innerHTML=h||'<div class="empty-state"><i class="fas fa-play-circle"></i><p>ยังไม่มีวิดีโอ</p></div>';
-  }catch(e){ el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`; }
+    renderSubjectFilter('vidSubjectFilter', subjVid, 'listVid');
+  }catch(e){ el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้ [${e.code||'err'}]:<br>${e.message}</p></div>`; }
 }
 function ytEmbed(url){
   const m=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
@@ -1089,7 +1162,7 @@ async function loadScore(){
     });
     h+=`</tbody></table>`;
     el.innerHTML=h;
-  }catch(e){ el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้: ${e.message}</p></div>`; }
+  }catch(e){ el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้ [${e.code||'err'}]:<br>${e.message}</p></div>`; }
 }
 
 // ==================== CHAT ====================
