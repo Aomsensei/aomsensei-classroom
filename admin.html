@@ -65,6 +65,8 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
 .ws-subtab{padding:8px 22px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:#888;border-bottom:3px solid transparent;margin-bottom:-2px}
 .ws-subtab.active{color:#c94b00;border-bottom:3px solid #f39800;background:none}
 .section-hd h2{font-size:17px;font-weight:800;color:#c94b00;display:flex;align-items:center;gap:8px}
+.admin-filter-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
+.admin-filter-bar select{padding:6px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:#333;cursor:pointer}
 
 /* TABLE */
 .table-wrap{overflow-x:auto}
@@ -238,6 +240,10 @@ tbody tr:hover td{background:#fff3e8}
     <!-- ANNOUNCEMENTS -->
     <div id="page-announcements" class="page">
       <div class="section-hd"><h2><i class="fas fa-bullhorn"></i> ประกาศ</h2><button class="btn btn-orange" onclick="openModal('mAnn');clearForm('ann')">➕ เพิ่มประกาศ</button></div>
+      <div class="admin-filter-bar">
+        <select id="annRoomFilter" onchange="loadAnn()"><option value="">ทุกห้อง</option></select>
+        <select id="annSubjFilter" onchange="loadAnn()"><option value="">ทุกวิชา</option></select>
+      </div>
       <div class="table-wrap"><table><thead><tr><th>หัวข้อ</th><th>ห้อง</th><th>วิชา</th><th>เนื้อหา</th><th>วันที่</th><th>การจัดการ</th></tr></thead><tbody id="tbAnn"></tbody></table></div>
     </div>
 
@@ -247,6 +253,10 @@ tbody tr:hover td{background:#fff3e8}
         <h2><i class="fas fa-file-alt"></i> ใบงาน / ใบความรู้</h2>
         <button class="btn btn-orange" onclick="openAddWsModal('worksheet')">➕ เพิ่มใบงาน</button>
         <button class="btn btn-orange" style="background:#7b1fa2;border-color:#7b1fa2" onclick="openAddWsModal('knowledge')">➕ เพิ่มใบความรู้</button>
+      </div>
+      <div class="admin-filter-bar">
+        <select id="wsRoomFilter" onchange="loadWs()"><option value="">ทุกห้อง</option></select>
+        <select id="wsSubjFilter" onchange="loadWs()"><option value="">ทุกวิชา</option></select>
       </div>
       <!-- Sub-tabs -->
       <div style="display:flex;gap:0;margin-bottom:12px;border-bottom:2px solid #ffd0a0">
@@ -264,12 +274,20 @@ tbody tr:hover td{background:#fff3e8}
     <!-- QUIZZES -->
     <div id="page-quizzes" class="page">
       <div class="section-hd"><h2><i class="fas fa-pen-to-square"></i> ข้อสอบ</h2><button class="btn btn-orange" onclick="openModal('mQz');clearForm('qz')">➕ สร้างข้อสอบ</button></div>
+      <div class="admin-filter-bar">
+        <select id="qzRoomFilter" onchange="loadQz()"><option value="">ทุกห้อง</option></select>
+        <select id="qzSubjFilter" onchange="loadQz()"><option value="">ทุกวิชา</option></select>
+      </div>
       <div class="table-wrap"><table><thead><tr><th>ชื่อข้อสอบ</th><th>ห้อง</th><th>วิชา</th><th>รายละเอียด</th><th>การจัดการ</th></tr></thead><tbody id="tbQz"></tbody></table></div>
     </div>
 
     <!-- VIDEOS -->
     <div id="page-videos" class="page">
       <div class="section-hd"><h2><i class="fas fa-play-circle"></i> วิดีโอ</h2><button class="btn btn-orange" onclick="openModal('mVid');clearForm('vid')">➕ เพิ่มวิดีโอ</button></div>
+      <div class="admin-filter-bar">
+        <select id="vidRoomFilter" onchange="loadVid()"><option value="">ทุกห้อง</option></select>
+        <select id="vidSubjFilter" onchange="loadVid()"><option value="">ทุกวิชา</option></select>
+      </div>
       <div class="table-wrap"><table><thead><tr><th>ชื่อ</th><th>ห้อง</th><th>วิชา</th><th>URL</th><th>วันที่</th><th>การจัดการ</th></tr></thead><tbody id="tbVid"></tbody></table></div>
     </div>
 
@@ -281,6 +299,10 @@ tbody tr:hover td{background:#fff3e8}
       </div>
       <div style="background:#fff8f3;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#c94b00;border-left:4px solid #f39800">
         💡 รองรับ 2 ประเภท: <b>HTML</b> (ไฟล์ .html ในโฟลเดอร์เดียวกัน) และ <b>URL</b> (เกมจากเว็บไซต์อื่น แสดงใน iframe)
+      </div>
+      <div class="admin-filter-bar">
+        <select id="gameRoomFilter" onchange="loadGames()"><option value="">ทุกห้อง</option></select>
+        <select id="gameSubjFilter" onchange="loadGames()"><option value="">ทุกวิชา</option></select>
       </div>
       <div class="table-wrap">
         <table><thead><tr><th>ชื่อเกม</th><th>ประเภท</th><th>ห้อง</th><th>วิชา</th><th>ไฟล์/URL</th><th>วันที่</th><th>การจัดการ</th></tr></thead>
@@ -780,6 +802,21 @@ function populateRoomDropdowns(){
     const el=document.getElementById(sid);
     if(el){const cur=el.value;el.innerHTML=opts;el.value=cur&&el.querySelector(`option[value="${cur}"]`)?cur:'all';}
   });
+  // Filter dropdowns (ทุกห้อง = "" ว่าง)
+  const filterOpts = `<option value="">ทุกห้อง</option>` +
+    Object.entries(_clsMap).map(([id,r])=>`<option value="${id}">${r.name||id}</option>`).join('');
+  ['annRoomFilter','wsRoomFilter','qzRoomFilter','vidRoomFilter','gameRoomFilter'].forEach(sid=>{
+    const el=document.getElementById(sid); if(!el) return;
+    const cur=el.value; el.innerHTML=filterOpts;
+    if(cur && el.querySelector(`option[value="${cur}"]`)) el.value=cur;
+  });
+}
+// Helper: populate subject filter select with unique values from data
+function _syncSubjFilter(selId, subjects){
+  const el=document.getElementById(selId); if(!el) return;
+  const cur=el.value;
+  el.innerHTML='<option value="">ทุกวิชา</option>'+[...subjects].sort().map(s=>`<option value="${s}">${s}</option>`).join('');
+  if(cur && el.querySelector(`option[value="${cur}"]`)) el.value=cur;
 }
 async function loadCls(){
   const tb=document.getElementById('tbCls');tb.innerHTML='';_cls={};_clsMap={};
@@ -804,12 +841,21 @@ window.saveCls=async function(){
 let _ann={};
 async function loadAnn(){
   const tb=document.getElementById('tbAnn');tb.innerHTML='';_ann={};
+  const roomF=document.getElementById('annRoomFilter')?.value||'';
+  const subjF=document.getElementById('annSubjFilter')?.value||'';
   const q=query(collection(db,'announcements'),orderBy('createdAt','desc'));
   const snap=await getDocs(q);
-  snap.forEach(d=>{const a=d.data();_ann[d.id]=a;const dt=a.createdAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
-    const rname=a.roomId==='all'||!a.roomId?'ทุกห้อง':(_clsMap[a.roomId]?.name||a.roomId);
-    tb.innerHTML+=`<tr><td><b>${a.title||'-'}</b>${a.imageUrl?`<br><img src="${a.imageUrl}" style="max-width:80px;max-height:50px;border-radius:4px;margin-top:4px;object-fit:cover" onerror="this.style.display='none'">`:''}</td><td><small>${rname}</small></td><td><small>${a.subject||'-'}</small></td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.content||''}</td><td>${dt}</td><td><button class="btn btn-gray btn-sm" onclick="editAnn('${d.id}')">✏️</button> <button class="btn btn-red btn-sm" onclick="delDoc('announcements','${d.id}',loadAnn)">🗑️</button></td></tr>`;
+  const subjSet=new Set();
+  snap.forEach(d=>{const a=d.data();_ann[d.id]=a;
+    const subj=a.subject||''; if(subj) subjSet.add(subj);
+    const rid=a.roomId||'all';
+    if(roomF&&rid!=='all'&&rid!==roomF) return;
+    if(subjF&&subj!==subjF) return;
+    const dt=a.createdAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
+    const rname=rid==='all'||!a.roomId?'ทุกห้อง':(_clsMap[rid]?.name||rid);
+    tb.innerHTML+=`<tr><td><b>${a.title||'-'}</b>${a.imageUrl?`<br><img src="${a.imageUrl}" style="max-width:80px;max-height:50px;border-radius:4px;margin-top:4px;object-fit:cover" onerror="this.style.display='none'">`:''}</td><td><small>${rname}</small></td><td><small>${subj||'-'}</small></td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.content||''}</td><td>${dt}</td><td><button class="btn btn-gray btn-sm" onclick="editAnn('${d.id}')">✏️</button> <button class="btn btn-red btn-sm" onclick="delDoc('announcements','${d.id}',loadAnn)">🗑️</button></td></tr>`;
   });
+  _syncSubjFilter('annSubjFilter', subjSet);
 }
 window.editAnn=function(id){const a=_ann[id]||{};document.getElementById('annId').value=id;document.getElementById('annTitle').value=a.title||'';document.getElementById('annContent').value=a.content||'';document.getElementById('annRoom').value=a.roomId||'all';document.getElementById('annSubject').value=a.subject||'';document.getElementById('annImageUrl').value=a.imageUrl||'';openModal('mAnn');};
 window.saveAnn=async function(){
@@ -841,14 +887,23 @@ window.openAddWsModal=function(type){
 async function loadWs(){
   const tb=document.getElementById('tbWs');tb.innerHTML='';
   const tkn=document.getElementById('tbKn');tkn.innerHTML='';_ws={};
+  const roomF=document.getElementById('wsRoomFilter')?.value||'';
+  const subjF=document.getElementById('wsSubjFilter')?.value||'';
   const q=query(collection(db,'worksheets'),orderBy('createdAt','desc'));
   const snap=await getDocs(q);
-  snap.forEach(d=>{const w=d.data();_ws[d.id]=w;const dt=w.createdAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
-    const rname=w.roomId==='all'||!w.roomId?'ทุกห้อง':(_clsMap[w.roomId]?.name||w.roomId);
-    const row=`<tr><td><b>${w.title||'-'}</b></td><td><small>${rname}</small></td><td><small>${w.subject||'-'}</small></td><td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${w.description||''}</td><td>${dt}</td><td><button class="btn btn-gray btn-sm" onclick="editWs('${d.id}')">✏️</button> <button class="btn btn-red btn-sm" onclick="delDoc('worksheets','${d.id}',loadWs)">🗑️</button></td></tr>`;
+  const subjSet=new Set();
+  snap.forEach(d=>{const w=d.data();_ws[d.id]=w;
+    const subj=w.subject||''; if(subj) subjSet.add(subj);
+    const rid=w.roomId||'all';
+    if(roomF&&rid!=='all'&&rid!==roomF) return;
+    if(subjF&&subj!==subjF) return;
+    const dt=w.createdAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
+    const rname=rid==='all'||!w.roomId?'ทุกห้อง':(_clsMap[rid]?.name||rid);
+    const row=`<tr><td><b>${w.title||'-'}</b></td><td><small>${rname}</small></td><td><small>${subj||'-'}</small></td><td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${w.description||''}</td><td>${dt}</td><td><button class="btn btn-gray btn-sm" onclick="editWs('${d.id}')">✏️</button> <button class="btn btn-red btn-sm" onclick="delDoc('worksheets','${d.id}',loadWs)">🗑️</button></td></tr>`;
     if(w.type==='knowledge') tkn.innerHTML+=row;
     else tb.innerHTML+=row;
   });
+  _syncSubjFilter('wsSubjFilter', subjSet);
 }
 window.editWs=function(id){
   const w=_ws[id]||{};
@@ -879,16 +934,25 @@ window.saveWs=async function(){
 let _qz={};
 async function loadQz(){
   const tb=document.getElementById('tbQz');tb.innerHTML='';_qz={};
+  const roomF=document.getElementById('qzRoomFilter')?.value||'';
+  const subjF=document.getElementById('qzSubjFilter')?.value||'';
   const sel=document.getElementById('resFilter');sel.innerHTML='<option value="">ทุกข้อสอบ</option>';
   const q=query(collection(db,'quizzes'),orderBy('createdAt','desc'));
   const snap=await getDocs(q);
+  const subjSet=new Set();
   snap.forEach(d=>{const qz=d.data();_qz[d.id]=qz;
+    // เติม dropdown ผลสอบ (ทุกข้อสอบ ไม่กรอง)
+    sel.innerHTML+=`<option value="${d.id}">${qz.title||d.id}</option>`;
+    const subj=qz.subject||''; if(subj) subjSet.add(subj);
+    const rid=qz.roomId||'all';
+    if(roomF&&rid!=='all'&&rid!==roomF) return;
+    if(subjF&&subj!==subjF) return;
     const typeTag = qz.quizType==='html' ? '<span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 5px;font-size:10px">HTML</span>' : '<span style="background:#2e7d32;color:#fff;border-radius:4px;padding:1px 5px;font-size:10px">ปรนัย</span>';
     const meta = qz.quizType==='html' ? `HTML` : `${qz.timeLimit||30}นาที · ${(qz.questions||[]).length}ข้อ · ผ่าน${qz.passingScore||60}%`;
-    const rname=qz.roomId==='all'||!qz.roomId?'ทุกห้อง':(_clsMap[qz.roomId]?.name||qz.roomId);
-    tb.innerHTML+=`<tr><td><b>${qz.title||'-'}</b> ${typeTag}</td><td><small>${rname}</small></td><td><small>${qz.subject||'-'}</small></td><td style="font-size:12px;color:#666">${meta}</td><td><button class="btn btn-gray btn-sm" onclick="editQz('${d.id}')">✏️</button> <button class="btn btn-red btn-sm" onclick="delDoc('quizzes','${d.id}',loadQz)">🗑️</button></td></tr>`;
-    sel.innerHTML+=`<option value="${d.id}">${qz.title||d.id}</option>`;
+    const rname=rid==='all'||!qz.roomId?'ทุกห้อง':(_clsMap[rid]?.name||rid);
+    tb.innerHTML+=`<tr><td><b>${qz.title||'-'}</b> ${typeTag}</td><td><small>${rname}</small></td><td><small>${subj||'-'}</small></td><td style="font-size:12px;color:#666">${meta}</td><td><button class="btn btn-gray btn-sm" onclick="editQz('${d.id}')">✏️</button> <button class="btn btn-red btn-sm" onclick="delDoc('quizzes','${d.id}',loadQz)">🗑️</button></td></tr>`;
   });
+  _syncSubjFilter('qzSubjFilter', subjSet);
 }
 window.editQz=function(id){
   const qz=_qz[id]||{};
@@ -944,12 +1008,21 @@ window.saveQz=async function(){
 let _vid={};
 async function loadVid(){
   const tb=document.getElementById('tbVid');tb.innerHTML='';_vid={};
+  const roomF=document.getElementById('vidRoomFilter')?.value||'';
+  const subjF=document.getElementById('vidSubjFilter')?.value||'';
   const q=query(collection(db,'videos'),orderBy('createdAt','desc'));
   const snap=await getDocs(q);
-  snap.forEach(d=>{const v=d.data();_vid[d.id]=v;const dt=v.createdAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
-    const rname=v.roomId==='all'||!v.roomId?'ทุกห้อง':(_clsMap[v.roomId]?.name||v.roomId);
-    tb.innerHTML+=`<tr><td><b>${v.title||'-'}</b></td><td><small>${rname}</small></td><td><small>${v.subject||'-'}</small></td><td><a href="${v.url||'#'}" target="_blank" style="color:#1565c0;font-size:12px">🔗 ลิงก์</a></td><td>${dt}</td><td><button class="btn btn-gray btn-sm" onclick="editVid('${d.id}')">✏️</button> <button class="btn btn-red btn-sm" onclick="delDoc('videos','${d.id}',loadVid)">🗑️</button></td></tr>`;
+  const subjSet=new Set();
+  snap.forEach(d=>{const v=d.data();_vid[d.id]=v;
+    const subj=v.subject||''; if(subj) subjSet.add(subj);
+    const rid=v.roomId||'all';
+    if(roomF&&rid!=='all'&&rid!==roomF) return;
+    if(subjF&&subj!==subjF) return;
+    const dt=v.createdAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
+    const rname=rid==='all'||!v.roomId?'ทุกห้อง':(_clsMap[rid]?.name||rid);
+    tb.innerHTML+=`<tr><td><b>${v.title||'-'}</b></td><td><small>${rname}</small></td><td><small>${subj||'-'}</small></td><td><a href="${v.url||'#'}" target="_blank" style="color:#1565c0;font-size:12px">🔗 ลิงก์</a></td><td>${dt}</td><td><button class="btn btn-gray btn-sm" onclick="editVid('${d.id}')">✏️</button> <button class="btn btn-red btn-sm" onclick="delDoc('videos','${d.id}',loadVid)">🗑️</button></td></tr>`;
   });
+  _syncSubjFilter('vidSubjFilter', subjSet);
 }
 window.editVid=function(id){const v=_vid[id]||{};document.getElementById('vidId').value=id;document.getElementById('vidTitle').value=v.title||'';document.getElementById('vidRoom').value=v.roomId||'all';document.getElementById('vidSubject').value=v.subject||'';document.getElementById('vidUrl').value=v.url||'';document.getElementById('vidDesc').value=v.description||'';openModal('mVid');};
 window.saveVid=async function(){
@@ -1606,12 +1679,16 @@ window.saveGame = async function(){
 async function loadGames(){
   const tb = document.getElementById('tbGame'); if(!tb) return;
   tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#bbb">⏳ กำลังโหลด...</td></tr>';
+  const roomF=document.getElementById('gameRoomFilter')?.value||'';
+  const subjF=document.getElementById('gameSubjFilter')?.value||'';
   try{
     const snap = await getDocs(query(collection(db,'games'), orderBy('createdAt','desc')));
     if(snap.empty){ tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:#bbb;padding:20px">ยังไม่มีเกม — กด ➕ เพิ่มเกม</td></tr>'; return; }
-    let rows=[];
-    snap.forEach(d=>rows.push({id:d.id,...d.data()}));
-    tb.innerHTML = rows.map(g=>{
+    let rows=[]; const subjSet=new Set();
+    snap.forEach(d=>{ const g={id:d.id,...d.data()}; if(g.subject) subjSet.add(g.subject); rows.push(g); });
+    if(roomF) rows=rows.filter(g=>g.roomId==='all'||!roomF||g.roomId===roomF);
+    if(subjF) rows=rows.filter(g=>(g.subject||'')===subjF);
+    tb.innerHTML = rows.length ? rows.map(g=>{
       const dt = g.createdAt?.toDate ? g.createdAt.toDate().toLocaleDateString('th-TH') : '-';
       const typeBadge = g.type==='html'
         ? '<span style="background:#1976d2;color:#fff;border-radius:6px;padding:2px 8px;font-size:11px">HTML</span>'
@@ -1629,7 +1706,8 @@ async function loadGames(){
           <button class="btn btn-red btn-sm" onclick="delDoc('games','${esc(g.id)}',loadGames)">🗑️</button>
         </td>
       </tr>`;
-    }).join('');
+    }).join('') : '<tr><td colspan="7" style="text-align:center;color:#bbb;padding:20px">ไม่มีเกมที่ตรงกับตัวกรอง</td></tr>';
+    _syncSubjFilter('gameSubjFilter', subjSet);
   }catch(e){ tb.innerHTML=`<tr><td colspan="7" style="color:#c62828;padding:14px">โหลดไม่ได้: ${e.message}</td></tr>`; }
 }
 
