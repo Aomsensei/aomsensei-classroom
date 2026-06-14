@@ -273,6 +273,7 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
 
   <div id="content-quiz" class="tab-content">
     <div class="section-title"><i class="fas fa-pen-to-square"></i> ข้อสอบออนไลน์</div>
+    <div id="quizSubjectFilter" style="display:flex;flex-wrap:wrap;gap:6px;padding:0 0 10px 0"></div>
     <div id="listQuiz"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i></div></div>
   </div>
 
@@ -912,7 +913,7 @@ window.filterWsSubject=function(filterId,listId,btn,subject){
   });
   // กรองการ์ด
   const list=document.getElementById(listId);
-  list.querySelectorAll('.card').forEach(card=>{
+  list.querySelectorAll('.card,.video-card,.quiz-card').forEach(card=>{
     card.style.display=(!subject||card.dataset.subject===subject)?'':'none';
   });
 };
@@ -1052,27 +1053,29 @@ async function loadQuiz(){
       const rs=await getDocs(rq);
       rs.forEach(d=>results[d.data().quizId]=d.data());
     }catch(e){}
-    let h=''; _quizCache={};
+    let h=''; _quizCache={}; const subjQuiz=new Set();
     snap.forEach(d=>{
       const qz=d.data();
       if(qz.roomId&&qz.roomId!=='all'&&qz.roomId!==student.roomId) return;
       _quizCache[d.id]=qz; const done=results[d.id];
       const dt=qz.createdAt?.toDate?.()?.toLocaleDateString('th-TH')||'';
+      const subj=qz.subject||'';
+      if(subj) subjQuiz.add(subj);
       const isHtml=qz.quizType==='html';
       if(isHtml){
-        h+=`<div class="quiz-card">
+        h+=`<div class="quiz-card" data-subject="${esc(subj)}">
           <div class="quiz-info">
             <div class="quiz-title">📄 ${esc(qz.title||'ข้อสอบ')} <span style="background:#1565c0;color:#fff;border-radius:4px;padding:1px 5px;font-size:10px;vertical-align:middle">HTML</span></div>
-            <div class="quiz-meta">ข้อสอบรูปแบบไฟล์${dt?' · '+dt:''}</div>
+            <div class="quiz-meta">ข้อสอบรูปแบบไฟล์${subj?' · 📚 '+esc(subj):''}${dt?' · '+dt:''}</div>
           </div>
           <button class="btn btn-blue btn-sm" onclick="openHtmlQuiz('${d.id}')">เปิดข้อสอบ</button>
         </div>`;
       } else {
         const pass=done&&done.score>=(qz.passingScore||60);
-        h+=`<div class="quiz-card">
+        h+=`<div class="quiz-card" data-subject="${esc(subj)}">
           <div class="quiz-info">
             <div class="quiz-title">📝 ${esc(qz.title||'ข้อสอบ')}</div>
-            <div class="quiz-meta">⏱️ ${qz.timeLimit||30} นาที · ${(qz.questions||[]).length} ข้อ · ผ่าน ${qz.passingScore||60}%${dt?' · '+dt:''}</div>
+            <div class="quiz-meta">⏱️ ${qz.timeLimit||30} นาที · ${(qz.questions||[]).length} ข้อ · ผ่าน ${qz.passingScore||60}%${subj?' · 📚 '+esc(subj):''}${dt?' · '+dt:''}</div>
           </div>
           ${done
             ?`<span class="score-badge ${pass?'pass':'fail'}">${done.score}%${pass?' ✓':' ✗'}</span>`
@@ -1081,6 +1084,7 @@ async function loadQuiz(){
       }
     });
     el.innerHTML=h||'<div class="empty-state"><i class="fas fa-pen-to-square"></i><p>ยังไม่มีข้อสอบ</p></div>';
+    renderSubjectFilter('quizSubjectFilter', subjQuiz, 'listQuiz');
   }catch(e){ el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้ [${e.code||'err'}]:<br>${e.message}</p></div>`; }
 }
 window.startQuiz=function(id){
