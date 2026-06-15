@@ -173,7 +173,7 @@ input.si.wide{width:32px}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { FIREBASE_CONFIG } from "./js/config.js";
 
@@ -576,12 +576,30 @@ window.doPrint=function(){
 };
 
 // ==================== INIT ====================
+let _initDone = false;
 onAuthStateChanged(auth, async user=>{
-  isTeacher=!!user;
-  if(user){await loadFromFirebase();}
-  else{loadFromLocal();}
-  currentClass=sortClasses(Object.keys(state.classes))[0]||'';
-  renderTabs();renderSubjectSelect();renderTable();
+  if(_initDone) return; // ป้องกัน callback ซ้ำ
+  if(user){
+    _initDone = true;
+    isTeacher = true;
+    await loadFromFirebase();
+    currentClass = sortClasses(Object.keys(state.classes))[0]||'';
+    renderTabs(); renderSubjectSelect(); renderTable();
+  } else {
+    // ยังไม่ได้ login → sign in แบบ anonymous เพื่อให้บันทึก Firebase ได้
+    try{
+      await signInAnonymously(auth);
+      // onAuthStateChanged จะ fire อีกครั้งพร้อม user → จัดการใน if(user) ข้างบน
+    } catch(e){
+      // Anonymous auth ปิดอยู่ → ใช้ localStorage แทน
+      _initDone = true;
+      isTeacher = false;
+      loadFromLocal();
+      currentClass = sortClasses(Object.keys(state.classes))[0]||'';
+      renderTabs(); renderSubjectSelect(); renderTable();
+      setStatus('warn','⚠️ ออฟไลน์ — เปิด Anonymous Auth ใน Firebase Console เพื่อ sync อัตโนมัติ');
+    }
+  }
 });
 </script>
 </body>
