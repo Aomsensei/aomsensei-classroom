@@ -107,6 +107,36 @@ canvas{display:block;width:100%;height:100%;}
   font-size:10px;color:#555;border-top:1px solid rgba(255,255,255,.04);flex-shrink:0;}
 .speed-row input{flex:1;}
 
+/* SUBMIT ROW */
+.submit-row{display:none;padding:6px 9px;border-top:1px solid rgba(255,255,255,.06);flex-shrink:0;}
+.submit-row.show{display:flex;justify-content:center;}
+.btn-submit{background:linear-gradient(135deg,#f39800,#e06000);color:#fff;border:none;
+  padding:7px 0;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;
+  width:100%;transition:filter .12s;box-shadow:0 2px 8px rgba(243,152,0,.35);}
+.btn-submit:hover{filter:brightness(1.12);}
+
+/* SUBMIT MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:9999;
+  align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:#1a1a2e;border:1px solid rgba(255,107,0,.4);border-radius:14px;
+  padding:22px 26px;width:320px;max-width:94vw;box-shadow:0 8px 36px rgba(0,0,0,.65);}
+.modal-box h2{font-size:15px;color:#ff9a3c;margin-bottom:14px;text-align:center;}
+.modal-field{margin-bottom:10px;}
+.modal-field label{display:block;font-size:11px;color:#888;margin-bottom:3px;}
+.modal-field input,.modal-field select{width:100%;background:#0f3460;border:1px solid rgba(255,255,255,.15);
+  color:#e0e0e0;padding:7px 10px;border-radius:7px;font-size:13px;outline:none;}
+.modal-field input:focus,.modal-field select:focus{border-color:rgba(255,107,0,.55);}
+.modal-btns{display:flex;gap:8px;margin-top:14px;}
+.modal-btn-ok{flex:1;background:#ff6b00;color:#fff;border:none;padding:8px;border-radius:7px;
+  font-size:13px;font-weight:700;cursor:pointer;transition:filter .12s;}
+.modal-btn-ok:hover:not(:disabled){filter:brightness(1.1);}
+.modal-btn-ok:disabled{opacity:.45;cursor:default;}
+.modal-btn-cancel{flex:0 0 auto;background:#2a2a3a;color:#bbb;border:none;padding:8px 14px;
+  border-radius:7px;font-size:12px;cursor:pointer;}
+.modal-btn-cancel:hover{background:#3a3a4a;color:#fff;}
+.modal-status{font-size:11px;text-align:center;color:#888;margin-top:8px;min-height:16px;}
+
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.13);border-radius:3px;}
@@ -172,9 +202,43 @@ canvas{display:block;width:100%;height:100%;}
       <input type="range" id="speedSlider" min="1" max="10" value="5" title="ความเร็ว">
       <span>🐇</span>
     </div>
+    <div class="submit-row" id="submitRow">
+      <button class="btn-submit" onclick="openSubmitModal()">📤 ส่งงานแบบฝึกหัดที่ 10</button>
+    </div>
   </div>
 
 </div><!-- end .main -->
+
+<!-- SUBMIT MODAL -->
+<div class="modal-overlay" id="submitModal">
+  <div class="modal-box">
+    <h2>📤 ส่งงานแบบฝึกหัดที่ 10</h2>
+    <div class="modal-field">
+      <label>ชื่อ – นามสกุล</label>
+      <input type="text" id="fieldName" placeholder="เช่น สมชาย ใจดี">
+    </div>
+    <div class="modal-field">
+      <label>ชั้น</label>
+      <select id="fieldClass">
+        <option>ป.4/1</option><option>ป.4/2</option><option>ป.4/3</option>
+        <option>ป.5/1</option><option>ป.5/2</option><option>ป.5/3</option>
+        <option>ป.6/1</option><option>ป.6/2</option><option>ป.6/3</option>
+        <option>ม.1/1</option><option>ม.1/2</option><option>ม.1/3</option>
+        <option>ม.2/1</option><option>ม.2/2</option><option>ม.2/3</option>
+        <option>ม.3/1</option><option>ม.3/2</option><option>ม.3/3</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>เลขที่</label>
+      <input type="number" id="fieldNum" min="1" max="60" placeholder="เลขที่ในห้อง">
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn-ok" id="btnSubmitOk" onclick="doSubmit()">✅ ส่งงาน</button>
+      <button class="modal-btn-cancel" onclick="closeSubmitModal()">ยกเลิก</button>
+    </div>
+    <div class="modal-status" id="submitStatus"></div>
+  </div>
+</div>
 
 <script>
 'use strict';
@@ -420,6 +484,35 @@ function drawScene(){
   CTX.strokeStyle='rgba(255,255,255,.12)'; CTX.lineWidth=1/zoom;
   CTX.beginPath();CTX.moveTo(CX-10,CY);CTX.lineTo(CX+10,CY);CTX.stroke();
   CTX.beginPath();CTX.moveTo(CX,CY-10);CTX.lineTo(CX,CY+10);CTX.stroke();
+
+  /* X / Y axes */
+  CTX.save();
+  CTX.setLineDash([4/zoom,3/zoom]);
+  /* X axis (แนวนอน) — สีแดง */
+  CTX.strokeStyle='rgba(255,90,90,.55)'; CTX.lineWidth=1/zoom;
+  CTX.beginPath(); CTX.moveTo(0,CY); CTX.lineTo(CW,CY); CTX.stroke();
+  /* Y axis (แนวตั้ง) — สีเขียว */
+  CTX.strokeStyle='rgba(80,210,120,.55)'; CTX.lineWidth=1/zoom;
+  CTX.beginPath(); CTX.moveTo(CX,0); CTX.lineTo(CX,CH); CTX.stroke();
+  CTX.setLineDash([]);
+  /* Axis labels */
+  const fs=9/zoom;
+  CTX.font=`bold ${fs}px Segoe UI`;
+  CTX.textBaseline='middle';
+  /* X label — ปลายขวา */
+  CTX.fillStyle='rgba(255,110,110,.8)';
+  CTX.textAlign='right';
+  CTX.fillText('X +',CW-2,CY-fs*0.8);
+  /* Y label — ปลายบน (Y บวกขึ้นในพิกัด turtle แต่ใน canvas Y ลดลง) */
+  CTX.fillStyle='rgba(80,220,130,.8)';
+  CTX.textAlign='left';
+  CTX.fillText('Y +',CX+3/zoom,fs*0.9);
+  /* origin */
+  CTX.fillStyle='rgba(255,255,255,.3)';
+  CTX.font=`${(7.5/zoom)}px Segoe UI`;
+  CTX.textAlign='left'; CTX.textBaseline='top';
+  CTX.fillText('(0,0)',CX+2/zoom,CY+1/zoom);
+  CTX.restore();
 
   /* stamps */
   for(const s of stamps){
@@ -861,6 +954,63 @@ function loadExercise(idx){
   renderPalette(ex.blocks);
   setupCanvas(); resetTurtle(); drawScene();
   renderWS();
+  /* show submit button only on exercise 10 (idx 9) */
+  document.getElementById('submitRow').classList.toggle('show', idx===9);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SUBMIT (Exercise 10)
+═══════════════════════════════════════════════════════════ */
+function openSubmitModal(){
+  document.getElementById('submitModal').classList.add('show');
+  document.getElementById('submitStatus').textContent='';
+  document.getElementById('btnSubmitOk').disabled=false;
+}
+function closeSubmitModal(){
+  document.getElementById('submitModal').classList.remove('show');
+}
+
+function _serializeBlocks(blocks, depth){
+  depth=depth||0;
+  let out=[];
+  for(const b of blocks){
+    const def=DEFS[b.type]; if(!def)continue;
+    const params=b.params?Object.entries(b.params).map(([k,v])=>k+'='+v).join(', '):'';
+    out.push('  '.repeat(depth)+'• '+def.label+(params?' ('+params+')':''));
+    if(b.body&&b.body.length) out=out.concat(_serializeBlocks(b.body,depth+1));
+  }
+  return out;
+}
+
+async function doSubmit(){
+  const name=document.getElementById('fieldName').value.trim();
+  const cls=document.getElementById('fieldClass').value;
+  const num=document.getElementById('fieldNum').value.trim();
+  if(!name||!num){
+    document.getElementById('submitStatus').textContent='⚠️ กรุณากรอกชื่อและเลขที่ให้ครบ';
+    return;
+  }
+  document.getElementById('btnSubmitOk').disabled=true;
+  document.getElementById('submitStatus').textContent='⏳ กำลังส่ง...';
+
+  const cvEl=document.getElementById('cv');
+  const imgData=cvEl.toDataURL('image/jpeg',0.82);
+  const blockList=_serializeBlocks(workspaceBlocks,0).join('\n')||'(ไม่มีบล็อค)';
+
+  if(window._doFirebaseSubmit){
+    try{
+      await window._doFirebaseSubmit({name,cls,num:parseInt(num,10),imgData,blockList});
+      document.getElementById('submitStatus').textContent='✅ ส่งงานสำเร็จ!';
+      document.getElementById('btnSubmitOk').textContent='✅ ส่งแล้ว';
+      setTimeout(closeSubmitModal,1800);
+    } catch(err){
+      document.getElementById('btnSubmitOk').disabled=false;
+      document.getElementById('submitStatus').textContent='❌ เกิดข้อผิดพลาด: '+err.message;
+    }
+  } else {
+    document.getElementById('btnSubmitOk').disabled=false;
+    document.getElementById('submitStatus').textContent='❌ Firebase ยังไม่พร้อม กรุณารอสักครู่แล้วลองใหม่';
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -870,6 +1020,31 @@ window.addEventListener('DOMContentLoaded',()=>{
   setupCanvas();
   loadExercise(0);
 });
+</script>
+
+<!-- Firebase submit (module) -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { FIREBASE_CONFIG } from "./js/config.js";
+
+const app  = initializeApp(FIREBASE_CONFIG);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+signInAnonymously(auth).catch(()=>{});
+
+window._doFirebaseSubmit = async function(data){
+  await addDoc(collection(db, 'game_submissions'), {
+    exercise   : 10,
+    name       : data.name,
+    class      : data.cls,
+    number     : data.num,
+    blocks     : data.blockList,
+    imageDataUrl: data.imgData,
+    submittedAt: serverTimestamp()
+  });
+};
 </script>
 </body>
 </html>
