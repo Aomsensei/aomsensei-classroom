@@ -52,7 +52,11 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
 .asset-pdf-btn:hover{background:rgba(239,68,68,.3)}
 
 /* RIGHT PANEL */
-.right-panel{background:#0f172a;width:152px;flex-shrink:0;padding:8px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;scrollbar-color:#333 transparent}
+.right-panel{background:#0f172a;width:168px;min-width:130px;max-width:320px;flex-shrink:0;padding:8px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;scrollbar-color:#333 transparent}
+.panel-resize-handle{width:5px;cursor:col-resize;background:rgba(255,255,255,.06);flex-shrink:0;transition:background .12s}
+.panel-resize-handle:hover{background:rgba(243,152,0,.45)}
+.layers-resize-h{height:5px;cursor:ns-resize;background:rgba(255,255,255,.08);border-radius:2px;margin-top:3px;transition:background .12s}
+.layers-resize-h:hover{background:rgba(243,152,0,.45)}
 .panel-section{background:rgba(255,255,255,.04);border-radius:8px;padding:8px;border:1px solid rgba(255,255,255,.06)}
 .panel-label{font-size:9px;font-weight:800;color:#9ca3af;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
 
@@ -106,7 +110,7 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
 .row2 > div{flex:1}
 
 /* BRUSH TIPS */
-.tip-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:2px}
+.tip-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-bottom:2px}
 .tip-btn{background:rgba(255,255,255,.07);border:1.5px solid transparent;border-radius:6px;cursor:pointer;color:#9ca3af;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5px 2px;gap:2px;transition:.12s;font-size:8px;line-height:1.1;font-family:inherit}
 .tip-btn:hover{background:rgba(255,255,255,.15);color:#fff}
 .tip-btn.active{background:rgba(243,152,0,.2);border-color:#f39800;color:#f39800}
@@ -166,6 +170,7 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
       <div class="canvas-container" id="canvasContainer" style="width:800px;height:560px">
         <canvas id="bgCanvas" width="800" height="560"></canvas>
         <canvas id="drawCanvas" width="800" height="560"></canvas>
+        <canvas id="textCanvas" width="800" height="560" style="position:absolute;top:0;left:0;z-index:990;pointer-events:none"></canvas>
         <canvas id="eventCanvas" width="800" height="560" style="position:absolute;top:0;left:0;z-index:999;background:transparent;cursor:crosshair"></canvas>
         <textarea id="textInputEl" rows="1" spellcheck="false" autocomplete="off" style="display:none"></textarea>
       </div>
@@ -179,8 +184,10 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
     </div>
   </div>
 
+  <!-- RIGHT PANEL RESIZE HANDLE -->
+  <div class="panel-resize-handle" id="panelResizeHandle"></div>
   <!-- RIGHT PANEL -->
-  <div class="right-panel">
+  <div class="right-panel" id="rightPanel">
     <!-- Brush Size -->
     <div class="panel-section">
       <div class="panel-label">ขนาดแปรง</div>
@@ -205,6 +212,18 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
           <svg viewBox="0 0 20 20" width="16" height="16"><line x1="4" y1="3" x2="4" y2="17" stroke="currentColor" stroke-width="1.8"/><line x1="8" y1="3" x2="8" y2="17" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="3" x2="12" y2="17" stroke="currentColor" stroke-width="1.8"/><line x1="16" y1="3" x2="16" y2="17" stroke="currentColor" stroke-width="1.8"/></svg>ขนแปรง</button>
         <button class="tip-btn" id="tip-watercolor" onclick="setBrushTip('watercolor')" title="สีน้ำ">
           <svg viewBox="0 0 20 20" width="16" height="16"><circle cx="10" cy="10" r="8" fill="currentColor" opacity=".2"/><circle cx="10" cy="10" r="5" fill="currentColor" opacity=".3"/><circle cx="10" cy="10" r="2.5" fill="currentColor" opacity=".6"/></svg>สีน้ำ</button>
+        <button class="tip-btn" id="tip-chalk" onclick="setBrushTip('chalk')" title="ชอล์ค">
+          <svg viewBox="0 0 20 20" width="16" height="16"><rect x="3" y="7" width="5" height="2" fill="currentColor" opacity=".5"/><rect x="8" y="5" width="4" height="2" fill="currentColor"/><rect x="6" y="9" width="6" height="2" fill="currentColor" opacity=".7"/><rect x="11" y="7" width="5" height="2" fill="currentColor" opacity=".4"/><rect x="4" y="11" width="7" height="2" fill="currentColor" opacity=".6"/></svg>ชอล์ค</button>
+        <button class="tip-btn" id="tip-oil" onclick="setBrushTip('oil')" title="สีน้ำมัน">
+          <svg viewBox="0 0 20 20" width="16" height="16"><ellipse cx="10" cy="10" rx="8" ry="5" fill="currentColor"/><ellipse cx="10" cy="10" rx="5" ry="3" fill="currentColor" opacity=".5"/></svg>น้ำมัน</button>
+        <button class="tip-btn" id="tip-charcoal" onclick="setBrushTip('charcoal')" title="ถ่าน">
+          <svg viewBox="0 0 20 20" width="16" height="16"><circle cx="10" cy="10" r="7" fill="currentColor" opacity=".1"/><circle cx="10" cy="10" r="5" fill="currentColor" opacity=".2"/><circle cx="10" cy="10" r="3" fill="currentColor" opacity=".5"/><circle cx="10" cy="10" r="1.5" fill="currentColor"/></svg>ถ่าน</button>
+        <button class="tip-btn" id="tip-dots" onclick="setBrushTip('dots')" title="จุด">
+          <svg viewBox="0 0 20 20" width="16" height="16"><circle cx="5" cy="10" r="2.5" fill="currentColor"/><circle cx="10" cy="10" r="2.5" fill="currentColor"/><circle cx="15" cy="10" r="2.5" fill="currentColor"/></svg>จุด</button>
+        <button class="tip-btn" id="tip-star" onclick="setBrushTip('star')" title="ดาว">
+          <svg viewBox="0 0 20 20" width="16" height="16"><polygon points="10,2 12.4,7.5 18.5,7.5 13.8,11.5 15.6,17.5 10,14 4.4,17.5 6.2,11.5 1.5,7.5 7.6,7.5" fill="currentColor"/></svg>ดาว</button>
+        <button class="tip-btn" id="tip-neon" onclick="setBrushTip('neon')" title="นีออน">
+          <svg viewBox="0 0 20 20" width="16" height="16"><circle cx="10" cy="10" r="8" fill="currentColor" opacity=".1"/><circle cx="10" cy="10" r="4" fill="currentColor" opacity=".4"/><circle cx="10" cy="10" r="1.5" fill="white"/></svg>นีออน</button>
       </div>
     </div>
     <!-- Text Options (shown when text tool active) -->
@@ -235,7 +254,7 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
         <button id="btnItalic" onclick="toggleTextStyle('italic')" style="flex:1;padding:5px;background:rgba(255,255,255,.07);color:#d1d5db;border:none;border-radius:6px;font-size:14px;font-style:italic;font-weight:700;cursor:pointer;font-family:Georgia,serif;transition:.12s">I</button>
         <button id="btnUnderline" onclick="toggleTextStyle('underline')" style="flex:1;padding:5px;background:rgba(255,255,255,.07);color:#d1d5db;border:none;border-radius:6px;font-size:13px;cursor:pointer;font-family:inherit;transition:.12s;text-decoration:underline">U</button>
       </div>
-      <div style="font-size:8.5px;color:#6b7280;line-height:1.5">คลิกพื้นที่แล้วพิมพ์<br>Enter = บรรทัดใหม่<br>Ctrl+Enter หรือ ESC = วาง</div>
+      <div style="font-size:8.5px;color:#6b7280;line-height:1.5">คลิก = สร้าง/เลือก<br>ดับเบิลคลิก = แก้ไข<br>ลากมุม = ย่อ/ขยาย<br>ESC = จบแก้ไข</div>
     </div>
     <!-- Opacity -->
     <div class="panel-section">
@@ -280,7 +299,8 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
     <!-- Layers Panel -->
     <div class="panel-section">
       <div class="panel-label">ชั้นงาน (Layers)</div>
-      <div id="layersList" style="display:flex;flex-direction:column;gap:2px"></div>
+      <div id="layersList" style="display:flex;flex-direction:column;gap:2px;overflow-y:auto;min-height:62px;height:120px;max-height:400px;scrollbar-width:thin;scrollbar-color:#333 transparent"></div>
+      <div class="layers-resize-h" id="layersResizeH"></div>
       <div class="layers-actions">
         <button onclick="addLayer()">➕ ชั้นใหม่</button>
         <button onclick="mergeAllLayers()">🔗 รวมชั้น</button>
@@ -434,14 +454,21 @@ let redoStack = [];
 let snapshotBeforeStroke = null;
 let layers = [];        // [{id,name,canvas,ctx,visible}]
 let activeLayerIdx = 0;
-let brushTip = 'round'; // round, flat, marker, calligraphy, bristle, watercolor
+let brushTip = 'round';
+// Text tool state (object-based)
 let textFontSize = 24;
 let textFontFamily = 'Sarabun';
 let textBold = false;
 let textItalic = false;
 let textUnderline = false;
-let _textActive = false;
-let _textX = 0, _textY = 0;
+let textObjects = [];       // {id, x, y, text, fontFamily, size, bold, italic, underline, color}
+let _nextTextId = 1;
+let _selTextId  = null;     // id of selected text object
+let _textMode   = null;     // 'move' | 'resize-nw'/'ne'/'se'/'sw' | null
+let _textDrag   = {};
+let _textEditId = null;     // id of object being edited in textarea
+let _lastTextClick = {id:null, time:0};
+const TEXT_HR = 7;          // handle hit-radius px
 
 // Init background white
 bgCtx.fillStyle = '#ffffff';
@@ -486,8 +513,8 @@ window.pickCustomColor = c => setColor(c);
 
 // ========== TOOLS ==========
 window.setTool = function(t){
-  // Commit any pending text before switching tool
-  if(_textActive){ commitTextFromInput(); }
+  if(_textEditId !== null) _finalizeTextEdit();
+  if(t !== 'text'){ _selTextId = null; _textMode = null; renderTextLayer(); }
   currentTool = t;
   document.querySelectorAll('.tool-btn[id^="tool-"]').forEach(el => el.classList.remove('active'));
   const btn = document.getElementById('tool-' + t);
@@ -505,7 +532,7 @@ window.setTool = function(t){
   if(brushPanel) brushPanel.style.display = isText ? 'none' : '';
   if(textPanel)  textPanel.style.display  = isText ? '' : 'none';
   const ec = document.getElementById('eventCanvas');
-  if(ec) ec.style.cursor = isText ? 'text' : 'crosshair';
+  if(ec) ec.style.cursor = isText ? 'default' : 'crosshair';
 };
 
 window.updateSize = v => { brushSize = parseInt(v); document.getElementById('sizeDisp').textContent = v; };
@@ -554,7 +581,9 @@ window.resizeCanvas = function(val){
     l.canvas.width = w; l.canvas.height = h;
     l.ctx.putImageData(snap,0,0);
   }
-  // Resize eventCanvas
+  // Resize textCanvas + eventCanvas
+  const tc2 = document.getElementById('textCanvas');
+  if(tc2){ tc2.width = w; tc2.height = h; }
   const ec = document.getElementById('eventCanvas');
   if(ec){ ec.width = w; ec.height = h; }
   container.style.width = w+'px'; container.style.height = h+'px';
@@ -618,15 +647,52 @@ function onStart(e){
 
   if(currentTool === 'text'){
     isDrawing = false;
-    // Commit existing text (bypass blur to avoid double-commit)
-    if(_textActive){
-      const inp2 = document.getElementById('textInputEl');
-      const t2 = inp2 ? inp2.value : '';
-      _textActive = false;
-      if(inp2){ inp2.onblur = null; inp2.style.display = 'none'; }
-      if(t2.trim()) _commitTextAt(_textX, _textY, t2);
+    // Finalize any open editor first (skip blur-callback to avoid double-commit)
+    if(_textEditId !== null) _finalizeTextEdit();
+
+    // Check resize handle on selected object
+    if(_selTextId !== null){
+      const hid = _hitTextHandle(x, y);
+      if(hid){
+        const obj = textObjects.find(o => o.id === _selTextId);
+        const b   = _textBounds(obj);
+        _textMode = 'resize-' + hid;
+        _textDrag = {sx:x, sy:y, origBounds:{...b}, origSize:obj.size, origX:obj.x, origY:obj.y};
+        return;
+      }
     }
-    showTextInput(x, y);
+
+    // Hit-test existing text objects
+    const hit = _hitText(x, y);
+    if(hit){
+      const now = Date.now();
+      if(_selTextId === hit.id && now - _lastTextClick.time < 400){
+        // Double-click → edit
+        _lastTextClick = {id:null, time:0};
+        _showTextEditor(hit);
+      } else {
+        // Single click → select + start move
+        _selTextId  = hit.id;
+        _textMode   = 'move';
+        _textDrag   = {sx:x, sy:y, origX:hit.x, origY:hit.y};
+        _lastTextClick = {id:hit.id, time:now};
+        renderTextLayer();
+      }
+      return;
+    }
+
+    // Click on empty space → deselect & create new object
+    _selTextId = null; _textMode = null;
+    const newObj = {
+      id: _nextTextId++, x, y, text:'',
+      fontFamily:textFontFamily, size:textFontSize,
+      bold:textBold, italic:textItalic, underline:textUnderline,
+      color:currentColor, opacity
+    };
+    textObjects.push(newObj);
+    _selTextId = newObj.id;
+    renderTextLayer();
+    _showTextEditor(newObj);
     return;
   }
   if(currentTool === 'fill'){
@@ -656,6 +722,55 @@ function onMove(e){
   e.preventDefault();
   const {x, y} = getPos(e);
   document.getElementById('coordStatus').textContent = 'x:'+x+' y:'+y;
+
+  // Text tool drag/resize (works without isDrawing)
+  if(currentTool === 'text' && _textMode){
+    const obj = textObjects.find(o => o.id === _selTextId);
+    if(obj){
+      if(_textMode === 'move'){
+        obj.x = _textDrag.origX + (x - _textDrag.sx);
+        obj.y = _textDrag.origY + (y - _textDrag.sy);
+        // Sync open editor textarea position
+        if(_textEditId === obj.id){
+          const inp = document.getElementById('textInputEl');
+          if(inp){ inp.style.left = obj.x+'px'; inp.style.top = obj.y+'px'; }
+        }
+      } else {
+        // resize-{nw|ne|se|sw}
+        const corner = _textMode.slice(7); // 'nw','ne','se','sw'
+        const ob = _textDrag.origBounds;
+        let newSize = _textDrag.origSize;
+        if(corner==='se'||corner==='ne'){
+          const newW = Math.max(20, x - ob.x);
+          newSize = Math.max(6, _textDrag.origSize * newW / Math.max(ob.w, 10));
+        } else {
+          const newW = Math.max(20, ob.x + ob.w - x);
+          newSize = Math.max(6, _textDrag.origSize * newW / Math.max(ob.w, 10));
+          obj.x = Math.min(_textDrag.origX + ob.w - 20, x);
+        }
+        if(corner==='nw'||corner==='ne'){
+          const newH = Math.max(16, ob.y + ob.h - y);
+          const sizeH = Math.max(6, _textDrag.origSize * newH / Math.max(ob.h, 8));
+          newSize = Math.max(newSize, sizeH);
+          obj.y = Math.min(_textDrag.origY + ob.h - 16, y);
+        }
+        obj.size = Math.max(6, Math.min(220, Math.round(newSize)));
+      }
+      renderTextLayer();
+    }
+    lastX = x; lastY = y;
+    return;
+  }
+  // Hover cursor over text objects
+  if(currentTool === 'text'){
+    const ec = document.getElementById('eventCanvas');
+    if(ec){
+      if(_selTextId !== null && _hitTextHandle(x,y)) ec.style.cursor = 'nwse-resize';
+      else if(_hitText(x,y)) ec.style.cursor = 'move';
+      else ec.style.cursor = 'crosshair';
+    }
+  }
+
   if(!isDrawing) return;
 
   if(currentTool === 'pencil' || currentTool === 'brush'){
@@ -728,6 +843,11 @@ function onMove(e){
 }
 
 function onEnd(e){
+  if(currentTool === 'text' && _textMode){
+    _textMode = null;
+    renderTextLayer();
+    return;
+  }
   if(!isDrawing) return;
   isDrawing = false;
   ctx.globalAlpha = 1;
@@ -801,6 +921,99 @@ function drawBrushPoint(c, x, y, px, py, sz){
       c.restore();
     }
     c.globalAlpha=opacity;
+
+  } else if(brushTip === 'chalk'){
+    const dx=x-px, dy=y-py, dist=Math.sqrt(dx*dx+dy*dy);
+    const steps=Math.max(1,Math.ceil(dist/3));
+    for(let s=0;s<=steps;s++){
+      const bx=px+dx*s/steps+(Math.random()-.5)*sz*.3;
+      const by=py+dy*s/steps+(Math.random()-.5)*sz*.3;
+      c.save();
+      c.globalAlpha=opacity*(0.3+Math.random()*0.5);
+      c.fillStyle=currentColor;
+      c.translate(bx,by); c.rotate(Math.random()*Math.PI);
+      c.fillRect(-sz*.4,-sz*.05,sz*.8,Math.max(1,sz*.12));
+      c.restore();
+    }
+    c.globalAlpha=opacity;
+
+  } else if(brushTip === 'oil'){
+    const dx=x-px, dy=y-py, dist=Math.sqrt(dx*dx+dy*dy), angle=Math.atan2(dy,dx);
+    const steps=Math.max(1,Math.ceil(dist/2));
+    for(let s=0;s<=steps;s++){
+      const bx=px+dx*s/steps, by=py+dy*s/steps;
+      c.save();
+      c.globalAlpha=opacity*0.88; c.fillStyle=currentColor;
+      c.beginPath(); c.ellipse(bx,by,sz*.55,sz*.38,angle,0,Math.PI*2); c.fill();
+      c.globalAlpha=opacity*0.25; c.fillStyle='#fff';
+      c.beginPath(); c.arc(bx+Math.cos(angle-1)*sz*.22, by+Math.sin(angle-1)*sz*.22, sz*.12, 0, Math.PI*2); c.fill();
+      c.restore();
+    }
+
+  } else if(brushTip === 'charcoal'){
+    const dx=x-px, dy=y-py, dist=Math.sqrt(dx*dx+dy*dy);
+    const steps=Math.max(1,Math.ceil(dist/3));
+    for(let s=0;s<=steps;s++){
+      const bx=px+dx*s/steps, by=py+dy*s/steps;
+      c.save();
+      const g=c.createRadialGradient(bx,by,0,bx,by,sz);
+      g.addColorStop(0,currentColor); g.addColorStop(1,'rgba(0,0,0,0)');
+      c.globalAlpha=opacity*0.22; c.fillStyle=g;
+      c.beginPath(); c.arc(bx,by,sz,0,Math.PI*2); c.fill();
+      for(let d=0;d<4;d++){
+        c.globalAlpha=opacity*0.07; c.fillStyle=currentColor;
+        c.beginPath(); c.arc(bx+(Math.random()-.5)*sz, by+(Math.random()-.5)*sz, Math.random()*sz*.18, 0, Math.PI*2); c.fill();
+      }
+      c.restore();
+    }
+    c.globalAlpha=opacity;
+
+  } else if(brushTip === 'dots'){
+    const dx=x-px, dy=y-py, dist=Math.sqrt(dx*dx+dy*dy);
+    const spacing=Math.max(sz*1.4, 3);
+    const steps=Math.max(1,Math.ceil(dist/spacing));
+    c.fillStyle=currentColor;
+    for(let s=0;s<=steps;s++){
+      const bx=px+dx*s/steps, by=py+dy*s/steps;
+      c.save(); c.globalAlpha=opacity;
+      c.beginPath(); c.arc(bx,by,sz*.52,0,Math.PI*2); c.fill();
+      c.restore();
+    }
+
+  } else if(brushTip === 'star'){
+    const dx=x-px, dy=y-py, dist=Math.sqrt(dx*dx+dy*dy);
+    const spacing=Math.max(sz*2.2, 5);
+    const steps=Math.max(1,Math.ceil(dist/spacing));
+    for(let s=0;s<=steps;s++){
+      const bx=px+dx*s/steps, by=py+dy*s/steps;
+      c.save(); c.globalAlpha=opacity; c.fillStyle=currentColor;
+      c.translate(bx,by); c.rotate(Math.random()*Math.PI*.4);
+      const r1=sz*.52,r2=sz*.22,pts=5;
+      c.beginPath();
+      for(let p=0;p<pts*2;p++){
+        const ang=p*Math.PI/pts-Math.PI/2, r=p%2===0?r1:r2;
+        p===0?c.moveTo(Math.cos(ang)*r,Math.sin(ang)*r):c.lineTo(Math.cos(ang)*r,Math.sin(ang)*r);
+      }
+      c.closePath(); c.fill(); c.restore();
+    }
+
+  } else if(brushTip === 'neon'){
+    const dx=x-px, dy=y-py, dist=Math.sqrt(dx*dx+dy*dy);
+    const steps=Math.max(1,Math.ceil(dist/2));
+    for(let s=0;s<=steps;s++){
+      const bx=px+dx*s/steps, by=py+dy*s/steps;
+      c.save();
+      const g=c.createRadialGradient(bx,by,0,bx,by,sz*1.6);
+      g.addColorStop(0,currentColor); g.addColorStop(1,'rgba(0,0,0,0)');
+      c.globalAlpha=opacity*0.14; c.fillStyle=g;
+      c.beginPath(); c.arc(bx,by,sz*1.6,0,Math.PI*2); c.fill();
+      c.globalAlpha=opacity*0.55; c.fillStyle=currentColor;
+      c.beginPath(); c.arc(bx,by,sz*.32,0,Math.PI*2); c.fill();
+      c.globalAlpha=opacity*0.9; c.fillStyle='#fff';
+      c.beginPath(); c.arc(bx,by,sz*.12,0,Math.PI*2); c.fill();
+      c.restore();
+    }
+    c.globalAlpha=opacity;
   }
 }
 
@@ -813,75 +1026,182 @@ window.setBrushTip = function(tip){
   ctx.beginPath();
 };
 
-// ========== TEXT TOOL ==========
-function getTextFont(){
-  return (textItalic?'italic ':'')+(textBold?'bold ':'')+textFontSize+'px "'+textFontFamily+'","Sarabun",sans-serif';
+// ========== TEXT OBJECT SYSTEM ==========
+function _objFont(o){
+  return (o.italic?'italic ':'')+(o.bold?'bold ':'')+o.size+'px "'+o.fontFamily+'","Sarabun",sans-serif';
 }
 
-function _commitTextAt(tx, ty, text){
-  if(!text || !text.trim()) return;
-  ctx.save();
-  ctx.globalAlpha = opacity;
-  ctx.globalCompositeOperation = 'source-over';
-  ctx.fillStyle = currentColor;
-  ctx.font = getTextFont();
-  ctx.textBaseline = 'top';
-  const lh = textFontSize * 1.35;
-  text.split('\n').forEach((ln, i) => {
-    ctx.fillText(ln, tx, ty + i*lh);
-    if(textUnderline){
-      const w = ctx.measureText(ln).width;
-      ctx.fillRect(tx, ty + i*lh + textFontSize + 1, w, Math.max(1, textFontSize*0.07));
+function _textBounds(obj){
+  const tc=document.getElementById('textCanvas');
+  const mc=tc?tc.getContext('2d'):document.createElement('canvas').getContext('2d');
+  mc.font=_objFont(obj);
+  const lines=(obj.text||' ').split('\n');
+  const maxW=Math.max(30,...lines.map(l=>mc.measureText(l||' ').width));
+  const lh=obj.size*1.35;
+  return {x:obj.x, y:obj.y, w:maxW, h:Math.max(obj.size*1.5, lines.length*lh)};
+}
+
+function _textHandles(obj){
+  const b=_textBounds(obj);
+  return [
+    {id:'nw',x:b.x,      y:b.y},
+    {id:'ne',x:b.x+b.w,  y:b.y},
+    {id:'se',x:b.x+b.w,  y:b.y+b.h},
+    {id:'sw',x:b.x,      y:b.y+b.h}
+  ];
+}
+
+function _hitTextHandle(x,y){
+  if(_selTextId==null) return null;
+  const obj=textObjects.find(o=>o.id===_selTextId);
+  if(!obj) return null;
+  for(const h of _textHandles(obj)){
+    if(Math.abs(x-h.x)<=TEXT_HR+3 && Math.abs(y-h.y)<=TEXT_HR+3) return h.id;
+  }
+  return null;
+}
+
+function _hitText(x,y){
+  for(let i=textObjects.length-1;i>=0;i--){
+    const b=_textBounds(textObjects[i]);
+    if(x>=b.x-4&&x<=b.x+b.w+4&&y>=b.y-4&&y<=b.y+b.h+4) return textObjects[i];
+  }
+  return null;
+}
+
+function renderTextLayer(){
+  const tc=document.getElementById('textCanvas'); if(!tc) return;
+  const tctx=tc.getContext('2d');
+  tctx.clearRect(0,0,tc.width,tc.height);
+  for(const obj of textObjects){
+    if(_textEditId===obj.id) continue; // textarea is showing it
+    tctx.save();
+    tctx.globalAlpha=obj.opacity||1;
+    tctx.fillStyle=obj.color||'#000';
+    tctx.font=_objFont(obj);
+    tctx.textBaseline='top';
+    const lh=obj.size*1.35;
+    (obj.text||'').split('\n').forEach((ln,i)=>{
+      tctx.fillText(ln,obj.x,obj.y+i*lh);
+      if(obj.underline){
+        const w=tctx.measureText(ln).width;
+        tctx.fillRect(obj.x,obj.y+i*lh+obj.size+1,w,Math.max(1,obj.size*.07));
+      }
+    });
+    tctx.restore();
+  }
+  // Selection box + handles
+  if(_selTextId!==null && currentTool==='text'){
+    const obj=textObjects.find(o=>o.id===_selTextId);
+    if(obj){
+      const b=_textBounds(obj);
+      tctx.save();
+      tctx.strokeStyle='#f39800'; tctx.lineWidth=1.5;
+      tctx.setLineDash([4,3]);
+      tctx.strokeRect(b.x-3,b.y-3,b.w+6,b.h+6);
+      tctx.setLineDash([]);
+      for(const h of _textHandles(obj)){
+        tctx.beginPath(); tctx.arc(h.x,h.y,TEXT_HR,0,Math.PI*2);
+        tctx.fillStyle='#fff'; tctx.fill();
+        tctx.strokeStyle='#f39800'; tctx.lineWidth=1.5; tctx.stroke();
+      }
+      tctx.restore();
     }
-  });
-  ctx.restore();
-  saveState();
+  }
+  // Refresh thumbnail
+  const tt=document.getElementById('lthumb_text');
+  if(tt && tc.width>0){
+    const tc2=tt.getContext('2d');
+    tc2.clearRect(0,0,32,22); tc2.fillStyle='#fff'; tc2.fillRect(0,0,32,22);
+    tc2.drawImage(tc,0,0,tc.width,tc.height,0,0,32,22);
+  }
 }
 
-function showTextInput(x, y){
-  _textX = x; _textY = y; _textActive = true;
-  const inp = document.getElementById('textInputEl');
-  inp.style.fontFamily = '"'+textFontFamily+'","Sarabun",sans-serif';
-  inp.style.fontSize   = textFontSize + 'px';
-  inp.style.fontWeight = textBold    ? 'bold'      : 'normal';
-  inp.style.fontStyle  = textItalic  ? 'italic'    : 'normal';
-  inp.style.textDecoration = textUnderline ? 'underline' : 'none';
-  inp.style.color      = currentColor;
-  inp.style.left       = x + 'px';
-  inp.style.top        = y + 'px';
-  inp.style.lineHeight = '1.35';
-  inp.style.height     = 'auto';
-  inp.value = '';
-  inp.style.display = 'block';
-  inp.oninput = () => { inp.style.height='auto'; inp.style.height=inp.scrollHeight+'px'; };
-  inp.onkeydown = e => {
-    if(e.key==='Escape'){ e.preventDefault(); _textActive=false; inp.style.display='none'; }
-    else if(e.ctrlKey && e.key==='Enter'){ e.preventDefault(); commitTextFromInput(); }
+function _showTextEditor(obj){
+  _textEditId=obj.id;
+  const inp=document.getElementById('textInputEl');
+  inp.style.fontFamily='"'+(obj.fontFamily||'Sarabun')+'","Sarabun",sans-serif';
+  inp.style.fontSize=obj.size+'px';
+  inp.style.fontWeight=obj.bold?'bold':'normal';
+  inp.style.fontStyle=obj.italic?'italic':'normal';
+  inp.style.textDecoration=obj.underline?'underline':'none';
+  inp.style.color=obj.color||'#000';
+  inp.style.left=obj.x+'px'; inp.style.top=obj.y+'px';
+  inp.style.lineHeight='1.35'; inp.style.height='auto';
+  inp.value=obj.text||'';
+  inp.style.display='block';
+  inp.oninput=()=>{ inp.style.height='auto'; inp.style.height=inp.scrollHeight+'px'; obj.text=inp.value; renderTextLayer(); };
+  inp.onkeydown=e=>{
+    if(e.key==='Escape'){ e.preventDefault(); _finalizeTextEdit(); }
+    else if(e.ctrlKey&&e.key==='Enter'){ e.preventDefault(); _finalizeTextEdit(); }
   };
-  inp.onblur = () => { if(_textActive) commitTextFromInput(); };
-  setTimeout(() => inp.focus(), 10);
+  inp.onblur=()=>{ if(_textEditId!==null) _finalizeTextEdit(); };
+  setTimeout(()=>{ inp.style.height='auto'; inp.style.height=inp.scrollHeight+'px'; inp.focus(); inp.select(); },10);
 }
 
-function commitTextFromInput(){
-  const inp = document.getElementById('textInputEl');
-  const text = inp ? inp.value : '';
-  _textActive = false;
-  if(inp){ inp.onblur = null; inp.style.display = 'none'; }
-  if(text.trim()) _commitTextAt(_textX, _textY, text);
+function _finalizeTextEdit(){
+  const prevId=_textEditId; _textEditId=null;
+  const inp=document.getElementById('textInputEl');
+  if(inp){ inp.onblur=null; const obj=textObjects.find(o=>o.id===prevId); if(obj) obj.text=inp.value; inp.style.display='none'; }
+  // Remove empty objects
+  textObjects=textObjects.filter(o=>o.text&&o.text.trim());
+  if(!textObjects.find(o=>o.id===_selTextId)) _selTextId=null;
+  renderTextLayer();
+  renderLayersPanel();
 }
 
-window.updateFontSize    = v => { textFontSize=parseInt(v); document.getElementById('fontSizeDisp').textContent=v; };
-window.updateFontFamily  = v => { textFontFamily=v; };
-window.toggleTextStyle   = function(style){
+function _rasterizeAllText(){
+  if(textObjects.length===0) return;
+  if(_textEditId!==null) _finalizeTextEdit();
+  ctx.save();
+  ctx.globalCompositeOperation='source-over';
+  for(const obj of textObjects){
+    ctx.globalAlpha=obj.opacity||1;
+    ctx.fillStyle=obj.color||'#000';
+    ctx.font=_objFont(obj);
+    ctx.textBaseline='top';
+    const lh=obj.size*1.35;
+    (obj.text||'').split('\n').forEach((ln,i)=>{
+      ctx.fillText(ln,obj.x,obj.y+i*lh);
+      if(obj.underline){const w=ctx.measureText(ln).width; ctx.fillRect(obj.x,obj.y+i*lh+obj.size+1,w,Math.max(1,obj.size*.07));}
+    });
+  }
+  ctx.restore();
+  textObjects=[]; _selTextId=null;
+  renderTextLayer(); renderLayersPanel(); saveState();
+}
+window.rasterizeAllText=_rasterizeAllText;
+
+window.updateFontSize = v => {
+  textFontSize=parseInt(v); document.getElementById('fontSizeDisp').textContent=v;
+  const obj=textObjects.find(o=>o.id===_selTextId); if(obj){ obj.size=parseInt(v); renderTextLayer(); }
+};
+window.updateFontFamily = v => {
+  textFontFamily=v;
+  const obj=textObjects.find(o=>o.id===_selTextId); if(obj){ obj.fontFamily=v; renderTextLayer(); }
+};
+window.toggleTextStyle = function(style){
   if(style==='bold'){
     textBold=!textBold;
     document.getElementById('btnBold').style.background=textBold?'rgba(243,152,0,.35)':'rgba(255,255,255,.07)';
+    const obj=textObjects.find(o=>o.id===_selTextId); if(obj){ obj.bold=textBold; renderTextLayer(); }
   } else if(style==='italic'){
     textItalic=!textItalic;
     document.getElementById('btnItalic').style.background=textItalic?'rgba(243,152,0,.35)':'rgba(255,255,255,.07)';
+    const obj=textObjects.find(o=>o.id===_selTextId); if(obj){ obj.italic=textItalic; renderTextLayer(); }
   } else if(style==='underline'){
     textUnderline=!textUnderline;
     document.getElementById('btnUnderline').style.background=textUnderline?'rgba(243,152,0,.35)':'rgba(255,255,255,.07)';
+    const obj=textObjects.find(o=>o.id===_selTextId); if(obj){ obj.underline=textUnderline; renderTextLayer(); }
+  }
+  // Sync open textarea style
+  if(_textEditId!==null){
+    const inp=document.getElementById('textInputEl');
+    if(inp){
+      inp.style.fontWeight=textBold?'bold':'normal';
+      inp.style.fontStyle=textItalic?'italic':'normal';
+      inp.style.textDecoration=textUnderline?'underline':'none';
+    }
   }
 };
 
@@ -1041,6 +1361,8 @@ window.doSubmit = async function(){
     mCtx.fillRect(0,0,merged.width,merged.height);
     mCtx.drawImage(bgCanvas,0,0);
     for(const l of layers){ if(l.visible) mCtx.drawImage(l.canvas,0,0); }
+    const tcSub = document.getElementById('textCanvas');
+    if(tcSub) try { mCtx.drawImage(tcSub,0,0); } catch(e){}
 
     // Compress to JPEG — keep under Firestore 1MB limit
     let imageData;
@@ -1107,6 +1429,8 @@ window.downloadWork = function(name, grade){
   mCtx.fillRect(0,0,merged.width,merged.height);
   try { mCtx.drawImage(bgCanvas,0,0); } catch(e){}
   for(const l of layers){ if(l.visible) try { mCtx.drawImage(l.canvas,0,0); } catch(e){} }
+  const tcDl = document.getElementById('textCanvas');
+  if(tcDl) try { mCtx.drawImage(tcDl,0,0); } catch(e){}
   let dataUrl;
   try {
     dataUrl = merged.toDataURL('image/jpeg', 0.85);
@@ -1165,16 +1489,18 @@ document.querySelectorAll('.overlay').forEach(m => {
 // Keyboard shortcuts
 document.addEventListener('keydown', e => {
   if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
-  if((e.ctrlKey||e.metaKey)&&e.key==='z'){ e.preventDefault(); undo(); }
-  else if((e.ctrlKey||e.metaKey)&&e.key==='y'){ e.preventDefault(); redo(); }
-  else if((e.ctrlKey||e.metaKey)&&(e.key==='='||e.key==='+')){ e.preventDefault(); zoomIn(); }
-  else if((e.ctrlKey||e.metaKey)&&e.key==='-'){ e.preventDefault(); zoomOut(); }
-  else if((e.ctrlKey||e.metaKey)&&e.key==='0'){ e.preventDefault(); zoomReset(); }
-  else if(e.key==='p'||e.key==='P') setTool('pencil');
-  else if(e.key==='b'||e.key==='B') setTool('brush');
-  else if(e.key==='e'||e.key==='E') setTool('eraser');
-  else if(e.key==='f'||e.key==='F') setTool('fill');
-  else if(e.key==='t'||e.key==='T') setTool('text');
+  const k = e.key.toLowerCase();
+  if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&k==='z'){ e.preventDefault(); undo(); }
+  else if((e.ctrlKey||e.metaKey)&&(k==='y'||e.shiftKey&&k==='z')){ e.preventDefault(); redo(); }
+  else if((e.ctrlKey||e.metaKey)&&(k==='='||k==='+')){ e.preventDefault(); zoomIn(); }
+  else if((e.ctrlKey||e.metaKey)&&k==='-'){ e.preventDefault(); zoomOut(); }
+  else if((e.ctrlKey||e.metaKey)&&k==='0'){ e.preventDefault(); zoomReset(); }
+  else if(k==='p') setTool('pencil');
+  else if(k==='b') setTool('brush');
+  else if(k==='e') setTool('eraser');
+  else if(k==='f') setTool('fill');
+  else if(k==='t') setTool('text');
+  else if(k==='escape'&&currentTool==='text'){ _finalizeTextEdit(); }
 });
 
 
@@ -1260,12 +1586,16 @@ window.moveLayerDown = function(idx){
 };
 
 window.mergeAllLayers = function(){
-  if(layers.length <= 1) return;
-  if(!confirm('รวมทุกชั้นเป็นชั้นเดียว? (undo ไม่ได้)')) return;
+  if(layers.length <= 1 && textObjects.length === 0) return;
+  if(!confirm('รวมทุกชั้น (รวมข้อความ) เป็นชั้นเดียว? (undo ไม่ได้)')) return;
+  if(_textEditId!==null) _finalizeTextEdit();
   const tmp = document.createElement('canvas');
   tmp.width = bgCanvas.width; tmp.height = bgCanvas.height;
   const tCtx = tmp.getContext('2d');
   layers.forEach(l => { if(l.visible) tCtx.drawImage(l.canvas, 0, 0); });
+  // Include text layer
+  const tcEl = document.getElementById('textCanvas');
+  if(tcEl) tCtx.drawImage(tcEl, 0, 0);
   const first = layers[0];
   first.ctx.clearRect(0,0,tmp.width,tmp.height);
   first.ctx.drawImage(tmp, 0, 0);
@@ -1274,16 +1604,19 @@ window.mergeAllLayers = function(){
     container.removeChild(layers[i].canvas);
     layers.splice(i, 1);
   }
+  textObjects=[]; _selTextId=null; _textEditId=null; renderTextLayer();
   window.setActiveLayer(0);
 };
 
 function updateLayerZIndices(){
   const ec = document.getElementById('eventCanvas');
+  const tc = document.getElementById('textCanvas');
   layers.forEach((l, i) => {
     l.canvas.style.zIndex = String(2 + i);
     l.canvas.style.opacity = l.visible ? '1' : '0';
   });
-  if(ec) ec.style.zIndex = String(2 + layers.length + 5);
+  if(tc) tc.style.zIndex = '990';
+  if(ec) ec.style.zIndex = '999';
 }
 
 function updateLayerThumbnails(){
@@ -1302,8 +1635,19 @@ function renderLayersPanel(){
   const list = document.getElementById('layersList');
   if(!list) return;
   const html = [];
+  // Text layer (always topmost, special)
+  const hasText = textObjects.length > 0;
+  html.push(
+    `<div class="layer-item" style="opacity:${hasText?1:.4};border-color:rgba(249,115,22,.3)">` +
+      `<canvas class="layer-thumb" id="lthumb_text" width="32" height="22"></canvas>` +
+      `<span class="layer-name" style="color:#fb923c">📝 ข้อความ</span>` +
+      `<span class="layer-btns">` +
+        `<button class="layer-btn" onclick="event.stopPropagation();rasterizeAllText()" title="รวมข้อความลงชั้น" style="color:#fb923c">⬇️</button>` +
+      `</span>` +
+    `</div>`
+  );
   for(let ri = 0; ri < layers.length; ri++){
-    const i = layers.length - 1 - ri; // top layer first
+    const i = layers.length - 1 - ri;
     const l = layers[i];
     const active = i === activeLayerIdx;
     html.push(
@@ -1321,8 +1665,46 @@ function renderLayersPanel(){
   }
   list.innerHTML = html.join('');
   setTimeout(updateLayerThumbnails, 0);
+  setTimeout(renderTextLayer, 10);
 }
 
+// ========== PANEL RESIZE ==========
+(function(){
+  const rHandle = document.getElementById('panelResizeHandle');
+  const rPanel  = document.getElementById('rightPanel');
+  let _rpDrag = null;
+  if(rHandle && rPanel){
+    rHandle.addEventListener('mousedown', e => {
+      e.preventDefault();
+      _rpDrag = {sx: e.clientX, sw: rPanel.offsetWidth};
+      window._rpDrag = true;
+    });
+    document.addEventListener('mousemove', e => {
+      if(!_rpDrag) return;
+      const newW = Math.max(130, Math.min(320, _rpDrag.sw + (_rpDrag.sx - e.clientX)));
+      rPanel.style.width = newW + 'px';
+    });
+    document.addEventListener('mouseup', () => { _rpDrag = null; window._rpDrag = false; });
+  }
+
+  const lrHandle = document.getElementById('layersResizeH');
+  const layersList = document.getElementById('layersList');
+  let _lrDrag = null;
+  if(lrHandle && layersList){
+    lrHandle.addEventListener('mousedown', e => {
+      e.preventDefault();
+      _lrDrag = {sy: e.clientY, sh: layersList.offsetHeight};
+      window._lrDrag = true;
+    });
+    document.addEventListener('mousemove', e => {
+      if(!_lrDrag) return;
+      const newH = Math.max(62, Math.min(400, _lrDrag.sh + (e.clientY - _lrDrag.sy)));
+      layersList.style.height = newH + 'px';
+      layersList.style.maxHeight = 'none';
+    });
+    document.addEventListener('mouseup', () => { _lrDrag = null; window._lrDrag = false; });
+  }
+})();
 
 </script>
 </body>
