@@ -184,6 +184,7 @@ tbody tr:hover td{background:#fff3e8}
     <button class="nav-item" onclick="showPage('results',this)"><i class="fas fa-chart-bar"></i> ผลสอบ</button>
     <button class="nav-item" id="navCheckWork" onclick="showPage('checkwork',this)"><i class="fas fa-tasks"></i> ตรวจงาน <span id="cwNavBadge" style="display:none;background:#e53935;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:4px">0</span></button>
     <button class="nav-item" onclick="showPage('chat',this)"><i class="fas fa-comments"></i> แชทนักเรียน</button>
+    <button class="nav-item" onclick="showPage('passwords',this)"><i class="fas fa-key"></i> รหัสผ่านนักเรียน</button>
     <a href="scores.html" class="nav-item"><i class="fas fa-star"></i> ระบบเก็บคะแนน</a>
     <button class="nav-item" onclick="showPage('settings',this)"><i class="fas fa-cog"></i> ตั้งค่าเว็บไซต์</button>
     <button class="nav-item" onclick="showPage('guide',this)"><i class="fas fa-book-open"></i> คู่มือแอดมิน</button>
@@ -402,6 +403,41 @@ tbody tr:hover td{background:#fff3e8}
           <input type="text" id="chatInput" placeholder="ตอบนักเรียน..." onkeydown="if(event.key==='Enter')sendTeacherChat()"/>
           <button class="chat-send" onclick="sendTeacherChat()"><i class="fas fa-paper-plane"></i></button>
         </div>
+      </div>
+    </div>
+
+    <!-- PASSWORDS -->
+    <div id="page-passwords" class="page">
+      <div class="section-hd">
+        <h2><i class="fas fa-key"></i> รหัสผ่านนักเรียน</h2>
+        <button class="btn btn-orange" onclick="loadPasswords()">🔄 รีเฟรช</button>
+      </div>
+      <div style="background:#fff8f3;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#c94b00;border-left:4px solid #f39800">
+        🔐 แสดงรหัสผ่านของนักเรียนแต่ละคน — คลิก <b>●●●</b> เพื่อดู · กดลบเพื่อรีเซ็ต (นักเรียนต้องตั้งใหม่เมื่อ Login ครั้งถัดไป)
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+        <select id="pwdRoomFilter" onchange="renderPasswordTable()"
+          style="padding:7px 12px;border:1.5px solid #ffd0a0;border-radius:8px;font-family:inherit;font-size:13px;min-width:140px">
+          <option value="">ทุกชั้น / ทุกห้อง</option>
+        </select>
+        <span id="pwdStats" style="font-size:12px;color:#999;flex:1"></span>
+        <button class="btn btn-red" style="font-size:12px;padding:5px 14px" onclick="resetAllPwdInRoom()">🗑️ ลบรหัสผ่านทั้งชั้น</button>
+      </div>
+      <div id="pwdLoading" style="text-align:center;padding:30px;color:#aaa;font-size:14px">⏳ กำลังโหลดข้อมูล...</div>
+      <div class="table-wrap" id="pwdTableWrap" style="display:none">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:40px">#</th>
+              <th>ชื่อนักเรียน</th>
+              <th>ชั้น / ห้อง</th>
+              <th style="width:110px">สถานะ</th>
+              <th style="width:160px">รหัสผ่าน</th>
+              <th style="width:130px">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="tbPwd"></tbody>
+        </table>
       </div>
     </div>
 
@@ -708,7 +744,7 @@ onAuthStateChanged(auth, user => {
 });
 
 // ==================== PAGES ====================
-const pageTitles = {dashboard:'🏠 Dashboard',classrooms:'🏫 ห้องเรียน',announcements:'📢 ประกาศ',worksheets:'📄 ใบงาน',quizzes:'📝 ข้อสอบ',videos:'🎬 วิดีโอ',games:'🎮 เกม',results:'📊 ผลสอบ',checkwork:'📋 ตรวจงาน',chat:'💬 แชทนักเรียน',settings:'⚙️ ตั้งค่าเว็บไซต์',guide:'📖 คู่มือแอดมิน'};
+const pageTitles = {dashboard:'🏠 Dashboard',classrooms:'🏫 ห้องเรียน',announcements:'📢 ประกาศ',worksheets:'📄 ใบงาน',quizzes:'📝 ข้อสอบ',videos:'🎬 วิดีโอ',games:'🎮 เกม',results:'📊 ผลสอบ',checkwork:'📋 ตรวจงาน',chat:'💬 แชทนักเรียน',passwords:'🔑 รหัสผ่านนักเรียน',settings:'⚙️ ตั้งค่าเว็บไซต์',guide:'📖 คู่มือแอดมิน'};
 window.showPage = function(p, navEl){
   document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -716,7 +752,7 @@ window.showPage = function(p, navEl){
   if(navEl) navEl.classList.add('active');
   document.getElementById('pageTitle').textContent = pageTitles[p] || p;
   document.getElementById('sidebar').classList.remove('open');
-  const loaders = {dashboard:loadDashboard,classrooms:loadCls,announcements:loadAnn,worksheets:loadWs,quizzes:loadQz,videos:loadVid,games:loadGames,results:async()=>{await loadSubjectFilter();loadResults();},checkwork:loadCheckWork,chat:initTeacherChat,settings:loadSettingsPage};
+  const loaders = {dashboard:loadDashboard,classrooms:loadCls,announcements:loadAnn,worksheets:loadWs,quizzes:loadQz,videos:loadVid,games:loadGames,results:async()=>{await loadSubjectFilter();loadResults();},checkwork:loadCheckWork,chat:initTeacherChat,passwords:loadPasswords,settings:loadSettingsPage};
   if(loaders[p]) loaders[p]();
 };
 
@@ -1872,6 +1908,169 @@ window.resetStudentPwd=async function(name){
       alert(`ℹ️ "${name}" ยังไม่เคย Login\n(ไม่มีรหัสผ่านในระบบ)`);
     }
   }catch(e){alert('รีเซ็ตไม่ได้: '+e.message);}
+};
+
+// ==================== PASSWORDS ====================
+let _pwdData = [];
+
+async function loadPasswords(){
+  const loading = document.getElementById('pwdLoading');
+  const tableWrap = document.getElementById('pwdTableWrap');
+  const tbody = document.getElementById('tbPwd');
+  if(!tbody) return;
+  loading.style.display = 'block';
+  tableWrap.style.display = 'none';
+  _pwdData = [];
+
+  try{
+    // โหลดห้องเรียนทั้งหมด
+    const roomsSnap = await getDocs(collection(db,'classrooms'));
+    const rooms = [];
+    roomsSnap.forEach(d => rooms.push({id:d.id, ...d.data()}));
+    rooms.sort((a,b) => (a.name||a.id).localeCompare(b.name||b.id,'th'));
+
+    // อัปเดต dropdown filter ชั้น
+    const filter = document.getElementById('pwdRoomFilter');
+    const prevVal = filter.value;
+    filter.innerHTML = '<option value="">ทุกชั้น / ทุกห้อง</option>';
+    rooms.forEach(r => {
+      const opt = document.createElement('option');
+      opt.value = r.id; opt.textContent = r.name || r.id;
+      filter.appendChild(opt);
+    });
+    if(prevVal) filter.value = prevVal;
+
+    // โหลดนักเรียนในแต่ละห้อง + ตรวจสอบรหัสผ่าน
+    for(const room of rooms){
+      const stuSnap = await getDocs(collection(db,'classrooms',room.id,'students'));
+      const students = [];
+      stuSnap.forEach(d => students.push({docId:d.id, ...d.data()}));
+      students.sort((a,b) => (a.name||'').localeCompare(b.name||'','th'));
+
+      for(const stu of students){
+        const name = stu.name || stu.docId;
+        const studentId = room.id + '_' + name;
+        const pwdSnap = await getDoc(doc(db,'students',studentId));
+        const hasPwd = pwdSnap.exists();
+        const pwd = hasPwd ? (pwdSnap.data().password || '') : '';
+        _pwdData.push({
+          studentId, name,
+          roomId: room.id,
+          roomName: room.name || room.id,
+          hasPassword: hasPwd,
+          password: pwd
+        });
+      }
+    }
+    renderPasswordTable();
+  } catch(e){
+    document.getElementById('tbPwd').innerHTML =
+      `<tr><td colspan="6" style="text-align:center;color:#e53935;padding:20px">❌ โหลดไม่ได้: ${esc(e.message)}</td></tr>`;
+    tableWrap.style.display = 'block';
+  } finally {
+    loading.style.display = 'none';
+  }
+}
+
+window.renderPasswordTable = function(){
+  const tbody = document.getElementById('tbPwd');
+  const tableWrap = document.getElementById('pwdTableWrap');
+  if(!tbody) return;
+
+  const roomFilter = document.getElementById('pwdRoomFilter').value;
+  const rows = _pwdData.filter(r => !roomFilter || r.roomId === roomFilter);
+
+  // Stats
+  const total = rows.length;
+  const hasPwdCount = rows.filter(r => r.hasPassword).length;
+  document.getElementById('pwdStats').textContent =
+    total > 0
+      ? `พบ ${total} คน · ตั้งรหัสแล้ว ${hasPwdCount} คน · ยังไม่ตั้ง ${total - hasPwdCount} คน`
+      : 'ไม่พบข้อมูลนักเรียน';
+
+  if(!rows.length){
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#ccc;padding:30px">ไม่พบข้อมูล</td></tr>`;
+    tableWrap.style.display = 'block';
+    return;
+  }
+
+  tbody.innerHTML = rows.map((r, i) => {
+    const statusBadge = r.hasPassword
+      ? `<span style="background:#e8f5e9;color:#2e7d32;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap">✅ ตั้งแล้ว</span>`
+      : `<span style="background:#fce4ec;color:#c62828;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap">⚠️ ยังไม่ตั้ง</span>`;
+    const pwdCell = r.hasPassword
+      ? `<span id="pwd_${i}" class="pwd-mask" onclick="window.togglePwd(this,'${r.password.replace(/'/g,"\\'")}')" title="คลิกเพื่อดูรหัสผ่าน"
+           style="font-family:monospace;font-size:13px;cursor:pointer;user-select:none;filter:blur(4px);transition:filter .2s;display:inline-block">
+           ${r.password || '(ว่าง)'}
+         </span>`
+      : `<span style="color:#ccc;font-size:12px">—</span>`;
+    const actionCell = r.hasPassword
+      ? `<button class="btn btn-red btn-sm" onclick="window.deletePwd(${i})">🗑️ ลบรหัสผ่าน</button>`
+      : `<span style="color:#ccc;font-size:12px">—</span>`;
+
+    return `<tr>
+      <td style="text-align:center;color:#aaa;font-size:12px">${i + 1}</td>
+      <td><b>${esc(r.name)}</b></td>
+      <td><span style="background:#fff3e0;color:#c94b00;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700">${esc(r.roomName)}</span></td>
+      <td>${statusBadge}</td>
+      <td>${pwdCell}</td>
+      <td>${actionCell}</td>
+    </tr>`;
+  }).join('');
+
+  tableWrap.style.display = 'block';
+};
+
+window.togglePwd = function(el, pwd){
+  const isHidden = el.style.filter !== 'none' && el.style.filter !== '';
+  if(isHidden){
+    el.textContent = pwd || '(ว่าง)';
+    el.style.filter = 'none';
+    el.title = 'คลิกเพื่อซ่อน';
+  } else {
+    el.textContent = pwd || '(ว่าง)';
+    el.style.filter = 'blur(4px)';
+    el.title = 'คลิกเพื่อดูรหัสผ่าน';
+  }
+};
+
+window.deletePwd = async function(idx){
+  const r = _pwdData.find((_, i) => {
+    // find by visible index in current filter
+    const roomFilter = document.getElementById('pwdRoomFilter').value;
+    const rows = _pwdData.filter(x => !roomFilter || x.roomId === roomFilter);
+    return rows[idx] === _;
+  });
+  // simpler approach: find from rendered rows
+  const roomFilter = document.getElementById('pwdRoomFilter').value;
+  const rows = _pwdData.filter(x => !roomFilter || x.roomId === roomFilter);
+  const row = rows[idx];
+  if(!row) return;
+
+  if(!confirm(`ลบรหัสผ่านของ "${row.name}"?\nนักเรียนจะต้องตั้งรหัสผ่านใหม่เมื่อ Login ครั้งถัดไป`)) return;
+  try{
+    await deleteDoc(doc(db, 'students', row.studentId));
+    row.hasPassword = false;
+    row.password = '';
+    // sync back to _pwdData
+    const master = _pwdData.find(x => x.studentId === row.studentId);
+    if(master){ master.hasPassword = false; master.password = ''; }
+    renderPasswordTable();
+  } catch(e){ alert('ลบไม่ได้: ' + e.message); }
+};
+
+window.resetAllPwdInRoom = async function(){
+  const roomFilter = document.getElementById('pwdRoomFilter').value;
+  const rows = _pwdData.filter(r => (!roomFilter || r.roomId === roomFilter) && r.hasPassword);
+  if(!rows.length){ alert('ไม่มีรหัสผ่านในชั้นนี้ที่จะลบ'); return; }
+  const roomLabel = roomFilter ? (rows[0]?.roomName || roomFilter) : 'ทุกชั้น';
+  if(!confirm(`ลบรหัสผ่านนักเรียนทั้งหมด ${rows.length} คน ใน${roomLabel}?\nพวกเขาจะต้องตั้งรหัสผ่านใหม่เมื่อ Login ครั้งถัดไป`)) return;
+  try{
+    await Promise.all(rows.map(r => deleteDoc(doc(db, 'students', r.studentId))));
+    rows.forEach(r => { r.hasPassword = false; r.password = ''; });
+    renderPasswordTable();
+    alert(`✅ ลบรหัสผ่านทั้งหมด ${rows.length} คนสำเร็จ`);
+  } catch(e){ alert('เกิดข้อผิดพลาด: ' + e.message); }
 };
 
 // ==================== UTILS ====================
