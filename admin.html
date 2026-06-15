@@ -1940,15 +1940,38 @@ async function loadPasswords(){
     });
     if(prevVal) filter.value = prevVal;
 
+    // โหลด score_system เพื่อดึงรายชื่อนักเรียน
+    const scoreSnap = await getDoc(doc(db,'score_system','hinfon_scores'));
+    const scoreClasses = scoreSnap.exists() ? (scoreSnap.data()?.data?.classes || {}) : {};
+    const norm = s => (s||'').replace(/[\s\/]/g,'').toLowerCase();
+
     // โหลดนักเรียนในแต่ละห้อง + ตรวจสอบรหัสผ่าน
     for(const room of rooms){
-      const stuSnap = await getDocs(collection(db,'classrooms',room.id,'students'));
-      const students = [];
-      stuSnap.forEach(d => students.push({docId:d.id, ...d.data()}));
-      students.sort((a,b) => (a.name||'').localeCompare(b.name||'','th'));
+      const roomName = room.name || room.id;
 
-      for(const stu of students){
-        const name = stu.name || stu.docId;
+      // ลอง match กับ score_system ก่อน
+      const matchKey = Object.keys(scoreClasses).find(k =>
+        k === roomName || k === room.id ||
+        norm(k) === norm(roomName) || norm(k) === norm(room.id) ||
+        roomName.startsWith(k+'/') || roomName.startsWith(k+' ') ||
+        room.id.startsWith(k+'_') || room.id.startsWith(k+'-')
+      );
+
+      let names = [];
+      if(matchKey && scoreClasses[matchKey]?.students?.length){
+        // ได้นักเรียนจาก score_system
+        names = scoreClasses[matchKey].students.map(s =>
+          [s.prefix, s.first, s.last].filter(Boolean).join(' ')
+        );
+      } else {
+        // fallback: classrooms subcollection
+        const stuSnap = await getDocs(collection(db,'classrooms',room.id,'students'));
+        stuSnap.forEach(d => names.push(d.data().name || d.id));
+      }
+
+      names.sort((a,b) => (a||'').localeCompare(b||'','th'));
+
+      for(const name of names){
         const studentId = room.id + '_' + name;
         const pwdSnap = await getDoc(doc(db,'students',studentId));
         const hasPwd = pwdSnap.exists();
@@ -1956,7 +1979,7 @@ async function loadPasswords(){
         _pwdData.push({
           studentId, name,
           roomId: room.id,
-          roomName: room.name || room.id,
+          roomName,
           hasPassword: hasPwd,
           password: pwd
         });
