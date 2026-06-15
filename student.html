@@ -565,6 +565,11 @@ window.loadStudentNames = async function(){
   sel.innerHTML = '<option value="">⏳ กำลังโหลด...</option>';
   if(!roomId){ sel.innerHTML = '<option value="">-- เลือกชื่อนักเรียน --</option>'; return; }
 
+  // ตรวจสอบ auth — ถ้ายังไม่ได้ login ให้ signInAnonymously ก่อน
+  if(!auth.currentUser){
+    try{ await signInAnonymously(auth); }catch(_){}
+  }
+
   // === ดึงรายชื่อจากระบบเก็บคะแนน (score_system) ก่อน ===
   try{
     const scoreSnap = await getDoc(doc(db,'score_system','hinfon_scores'));
