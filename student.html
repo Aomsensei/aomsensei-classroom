@@ -285,6 +285,9 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
 
   <div id="content-score" class="tab-content">
     <div class="section-title"><i class="fas fa-chart-bar"></i> ผลคะแนนของฉัน</div>
+    <div style="font-size:13px;font-weight:700;color:#f39800;margin:2px 0 6px 2px">📋 คะแนนเก็บ</div>
+    <div id="listCollectScore"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i></div></div>
+    <div style="font-size:13px;font-weight:700;color:#f39800;margin:16px 0 6px 2px">📝 ผลการสอบ</div>
     <div id="listScore"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i></div></div>
   </div>
 
@@ -808,7 +811,7 @@ window.switchTab = function(t){
 
 // ==================== LOAD ALL ====================
 function loadAll(){
-  loadAnn(); loadWs(); loadQuiz(); loadVid(); loadScore(); loadGames();
+  loadAnn(); loadWs(); loadQuiz(); loadVid(); loadScore(); loadCollectScore(); loadGames();
 }
 
 // ==================== ANNOUNCEMENTS ====================
@@ -1171,6 +1174,106 @@ async function loadScore(){
     h+=`</tbody></table>`;
     el.innerHTML=h;
   }catch(e){ el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดไม่ได้ [${e.code||'err'}]:<br>${e.message}</p></div>`; }
+}
+
+// ==================== COLLECT SCORES ====================
+async function loadCollectScore(){
+  const el=document.getElementById('listCollectScore');
+  if(!el||!student) return;
+  try{
+    const snap=await getDoc(doc(db,'score_system','hinfon_scores'));
+    if(!snap.exists()){
+      el.innerHTML='<div class="empty-state"><i class="fas fa-chart-bar"></i><p>ยังไม่มีข้อมูลคะแนนเก็บ</p></div>';
+      return;
+    }
+    const data=snap.data()?.data||{};
+    const classes=data.classes||{};
+    const subjects=data.subjects||[];
+    const allScores=data.scores||{};
+
+    // หา class key ที่ตรงกับห้องของนักเรียน
+    const norm=s=>(s||'').replace(/[\s\/]/g,'').toLowerCase();
+    const roomName=student.roomName||'';
+    const roomId=student.roomId||'';
+    const matchKey=Object.keys(classes).find(k=>
+      k===roomName||k===roomId||
+      norm(k)===norm(roomName)||norm(k)===norm(roomId)||
+      roomName.startsWith(k+'/')||roomName.startsWith(k+' ')||
+      roomId.startsWith(k+'_')||roomId.startsWith(k+'-')
+    );
+
+    if(!matchKey){
+      el.innerHTML='<div class="empty-state"><i class="fas fa-chart-bar"></i><p>ไม่พบข้อมูลคะแนนเก็บสำหรับชั้นนี้</p></div>';
+      return;
+    }
+
+    // หาข้อมูลนักเรียนในชั้น
+    const classStudents=classes[matchKey]?.students||[];
+    const stuName=student.name||'';
+    const stuEntry=classStudents.find(s=>{
+      const full=[s.prefix,s.first,s.last].filter(Boolean).join(' ');
+      return full===stuName||
+        (s.first+' '+s.last)===stuName||
+        s.first===stuName;
+    });
+
+    if(!stuEntry){
+      el.innerHTML='<div class="empty-state"><i class="fas fa-user-slash"></i><p>ไม่พบชื่อนักเรียนในระบบคะแนนเก็บ</p></div>';
+      return;
+    }
+
+    const stuId=stuEntry.id;
+    const classScores=allScores[matchKey]||{};
+
+    // สร้างตาราง
+    let h=`<div style="overflow-x:auto"><table class="score-table">
+      <thead><tr>
+        <th>วิชา</th>
+        <th style="text-align:center">คะแนนเก็บสะสม</th>
+        <th style="text-align:center">กลางภาค 1</th>
+        <th style="text-align:center">ปลายภาค 1</th>
+        <th style="text-align:center">กลางภาค 2</th>
+        <th style="text-align:center">ปลายภาค 2</th>
+      </tr></thead><tbody>`;
+
+    let hasAnyScore=false;
+    subjects.forEach(subj=>{
+      const subjData=(classScores[subj]||{})[stuId]||{};
+      const collect=(subjData.collect||[]);
+      const filled=collect.filter(v=>v!==''&&v!==null&&v!==undefined);
+      const total=filled.reduce((s,v)=>s+(+v||0),0);
+      const mid1=subjData.mid1??'';
+      const final1=subjData.final1??'';
+      const mid2=subjData.mid2??'';
+      const final2=subjData.final2??'';
+      const hasScore=filled.length>0||mid1!==''||final1!==''||mid2!==''||final2!=='';
+      if(hasScore) hasAnyScore=true;
+
+      const collectCell=filled.length>0
+        ?`<b style="color:#c94b00">${total}</b><span style="color:#aaa;font-size:11px"> (${filled.length}/20 ครั้ง)</span>`
+        :`<span style="color:#ccc">—</span>`;
+      const fmt=v=>v!==''?`<b>${v}</b>`:`<span style="color:#ccc">—</span>`;
+
+      h+=`<tr>
+        <td><b>${esc(subj)}</b></td>
+        <td style="text-align:center">${collectCell}</td>
+        <td style="text-align:center">${fmt(mid1)}</td>
+        <td style="text-align:center">${fmt(final1)}</td>
+        <td style="text-align:center">${fmt(mid2)}</td>
+        <td style="text-align:center">${fmt(final2)}</td>
+      </tr>`;
+    });
+
+    h+=`</tbody></table></div>`;
+
+    if(!hasAnyScore){
+      el.innerHTML='<div class="empty-state"><i class="fas fa-chart-bar"></i><p>ยังไม่มีการบันทึกคะแนนเก็บ</p></div>';
+    } else {
+      el.innerHTML=h;
+    }
+  }catch(e){
+    el.innerHTML=`<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>โหลดคะแนนเก็บไม่ได้<br><small>${esc(e.message)}</small></p></div>`;
+  }
 }
 
 // ==================== CHAT ====================
