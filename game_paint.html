@@ -105,6 +105,13 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
 .row2{display:flex;gap:8px}
 .row2 > div{flex:1}
 
+/* BRUSH TIPS */
+.tip-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:2px}
+.tip-btn{background:rgba(255,255,255,.07);border:1.5px solid transparent;border-radius:6px;cursor:pointer;color:#9ca3af;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5px 2px;gap:2px;transition:.12s;font-size:8px;line-height:1.1;font-family:inherit}
+.tip-btn:hover{background:rgba(255,255,255,.15);color:#fff}
+.tip-btn.active{background:rgba(243,152,0,.2);border-color:#f39800;color:#f39800}
+/* TEXT INPUT OVERLAY */
+#textInputEl{position:absolute;background:rgba(255,255,255,.04);border:1.5px dashed rgba(249,115,22,.8);outline:none;resize:none;padding:2px 5px;min-width:50px;min-height:1.4em;z-index:1000;overflow:hidden;border-radius:2px;white-space:pre-wrap}
 /* LAYERS */
 .layer-item{display:flex;align-items:center;gap:3px;padding:4px 4px;border-radius:6px;cursor:pointer;transition:.12s;border:1.5px solid transparent;user-select:none}
 .layer-item:hover{background:rgba(255,255,255,.07)}
@@ -148,6 +155,9 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
     <button class="tool-btn" id="tool-rectfill" onclick="setTool('rectfill')" title="สี่เหลี่ยมทึบ">⬛</button>
     <button class="tool-btn" id="tool-circle" onclick="setTool('circle')" title="วงรี">⭕</button>
     <button class="tool-btn" id="tool-circlefill" onclick="setTool('circlefill')" title="วงรีทึบ">🔴</button>
+    <div class="tool-sep"></div>
+    <div class="tool-label">ข้อความ</div>
+    <button class="tool-btn" id="tool-text" onclick="setTool('text')" title="ข้อความ (T)" style="font-weight:900;font-size:15px;font-family:Georgia,serif">T</button>
   </div>
 
   <!-- CANVAS AREA -->
@@ -157,6 +167,7 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
         <canvas id="bgCanvas" width="800" height="560"></canvas>
         <canvas id="drawCanvas" width="800" height="560"></canvas>
         <canvas id="eventCanvas" width="800" height="560" style="position:absolute;top:0;left:0;z-index:999;background:transparent;cursor:crosshair"></canvas>
+        <textarea id="textInputEl" rows="1" spellcheck="false" autocomplete="off" style="display:none"></textarea>
       </div>
     </div>
     <!-- Zoom Bar -->
@@ -177,6 +188,54 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#fff;height:100vh
         <input type="range" id="sizeSlider" min="1" max="60" value="6" oninput="updateSize(this.value)"/>
         <span class="size-disp" id="sizeDisp">6</span>
       </div>
+    </div>
+    <!-- Brush Tips -->
+    <div class="panel-section" id="brushTipsPanel">
+      <div class="panel-label">หัวแปรง</div>
+      <div class="tip-grid">
+        <button class="tip-btn active" id="tip-round" onclick="setBrushTip('round')" title="กลม">
+          <svg viewBox="0 0 20 20" width="16" height="16"><circle cx="10" cy="10" r="6" fill="currentColor"/></svg>กลม</button>
+        <button class="tip-btn" id="tip-flat" onclick="setBrushTip('flat')" title="แบน/ชิเซล">
+          <svg viewBox="0 0 20 20" width="16" height="16"><rect x="2" y="6" width="16" height="8" rx="1" fill="currentColor"/></svg>แบน</button>
+        <button class="tip-btn" id="tip-marker" onclick="setBrushTip('marker')" title="มาร์คเกอร์">
+          <svg viewBox="0 0 20 20" width="16" height="16"><rect x="4" y="4" width="12" height="12" fill="currentColor"/></svg>มาร์คเกอร์</button>
+        <button class="tip-btn" id="tip-calligraphy" onclick="setBrushTip('calligraphy')" title="ปากกาอักษรา">
+          <svg viewBox="0 0 20 20" width="16" height="16"><ellipse cx="10" cy="10" rx="8" ry="3.5" transform="rotate(-45 10 10)" fill="currentColor"/></svg>อักษรา</button>
+        <button class="tip-btn" id="tip-bristle" onclick="setBrushTip('bristle')" title="ขนแปรง">
+          <svg viewBox="0 0 20 20" width="16" height="16"><line x1="4" y1="3" x2="4" y2="17" stroke="currentColor" stroke-width="1.8"/><line x1="8" y1="3" x2="8" y2="17" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="3" x2="12" y2="17" stroke="currentColor" stroke-width="1.8"/><line x1="16" y1="3" x2="16" y2="17" stroke="currentColor" stroke-width="1.8"/></svg>ขนแปรง</button>
+        <button class="tip-btn" id="tip-watercolor" onclick="setBrushTip('watercolor')" title="สีน้ำ">
+          <svg viewBox="0 0 20 20" width="16" height="16"><circle cx="10" cy="10" r="8" fill="currentColor" opacity=".2"/><circle cx="10" cy="10" r="5" fill="currentColor" opacity=".3"/><circle cx="10" cy="10" r="2.5" fill="currentColor" opacity=".6"/></svg>สีน้ำ</button>
+      </div>
+    </div>
+    <!-- Text Options (shown when text tool active) -->
+    <div class="panel-section" id="textPanel" style="display:none">
+      <div class="panel-label">ตัวอักษร</div>
+      <select id="fontFamilySel" onchange="updateFontFamily(this.value)" style="width:100%;padding:5px 7px;border:1.5px solid rgba(255,255,255,.15);border-radius:7px;font-size:10px;font-family:inherit;background:#1e293b;color:#fff;margin-bottom:6px;cursor:pointer">
+        <option value="Sarabun">Sarabun</option>
+        <option value="TH Sarabun New">TH Sarabun New</option>
+        <option value="Angsana New">Angsana New</option>
+        <option value="AngsanaUPC">AngsanaUPC</option>
+        <option value="Cordia New">Cordia New</option>
+        <option value="CordiaUPC">CordiaUPC</option>
+        <option value="Tahoma">Tahoma</option>
+        <option value="Arial">Arial</option>
+        <option value="Georgia">Georgia</option>
+        <option value="Times New Roman">Times New Roman</option>
+        <option value="Courier New">Courier New</option>
+        <option value="Impact">Impact</option>
+        <option value="Comic Sans MS">Comic Sans MS</option>
+      </select>
+      <div class="size-row" style="margin-bottom:5px">
+        <span style="font-size:9px;color:#9ca3af;min-width:18px;flex-shrink:0">px</span>
+        <input type="range" id="fontSizeSlider" min="8" max="144" value="24" oninput="updateFontSize(this.value)"/>
+        <span class="size-disp" id="fontSizeDisp">24</span>
+      </div>
+      <div style="display:flex;gap:4px;margin-bottom:5px">
+        <button id="btnBold" onclick="toggleTextStyle('bold')" style="flex:1;padding:5px;background:rgba(255,255,255,.07);color:#d1d5db;border:none;border-radius:6px;font-size:14px;font-weight:900;cursor:pointer;font-family:Georgia,serif;transition:.12s">B</button>
+        <button id="btnItalic" onclick="toggleTextStyle('italic')" style="flex:1;padding:5px;background:rgba(255,255,255,.07);color:#d1d5db;border:none;border-radius:6px;font-size:14px;font-style:italic;font-weight:700;cursor:pointer;font-family:Georgia,serif;transition:.12s">I</button>
+        <button id="btnUnderline" onclick="toggleTextStyle('underline')" style="flex:1;padding:5px;background:rgba(255,255,255,.07);color:#d1d5db;border:none;border-radius:6px;font-size:13px;cursor:pointer;font-family:inherit;transition:.12s;text-decoration:underline">U</button>
+      </div>
+      <div style="font-size:8.5px;color:#6b7280;line-height:1.5">คลิกพื้นที่แล้วพิมพ์<br>Enter = บรรทัดใหม่<br>Ctrl+Enter หรือ ESC = วาง</div>
     </div>
     <!-- Opacity -->
     <div class="panel-section">
@@ -375,6 +434,14 @@ let redoStack = [];
 let snapshotBeforeStroke = null;
 let layers = [];        // [{id,name,canvas,ctx,visible}]
 let activeLayerIdx = 0;
+let brushTip = 'round'; // round, flat, marker, calligraphy, bristle, watercolor
+let textFontSize = 24;
+let textFontFamily = 'Sarabun';
+let textBold = false;
+let textItalic = false;
+let textUnderline = false;
+let _textActive = false;
+let _textX = 0, _textY = 0;
 
 // Init background white
 bgCtx.fillStyle = '#ffffff';
@@ -419,6 +486,8 @@ window.pickCustomColor = c => setColor(c);
 
 // ========== TOOLS ==========
 window.setTool = function(t){
+  // Commit any pending text before switching tool
+  if(_textActive){ commitTextFromInput(); }
   currentTool = t;
   document.querySelectorAll('.tool-btn[id^="tool-"]').forEach(el => el.classList.remove('active'));
   const btn = document.getElementById('tool-' + t);
@@ -427,9 +496,16 @@ window.setTool = function(t){
     pencil:'✏️ ดินสอ', brush:'🖌️ แปรง', spray:'💦 สเปรย์',
     eraser:'🧹 ยางลบ', fill:'🪣 เติมสี',
     line:'📏 เส้นตรง', rect:'⬜ สี่เหลี่ยม', rectfill:'⬛ สี่เหลี่ยมทึบ',
-    circle:'⭕ วงรี', circlefill:'🔴 วงรีทึบ'
+    circle:'⭕ วงรี', circlefill:'🔴 วงรีทึบ', text:'🔤 ข้อความ'
   };
   document.getElementById('toolStatus').textContent = names[t] || t;
+  const isText = t === 'text';
+  const brushPanel = document.getElementById('brushTipsPanel');
+  const textPanel  = document.getElementById('textPanel');
+  if(brushPanel) brushPanel.style.display = isText ? 'none' : '';
+  if(textPanel)  textPanel.style.display  = isText ? '' : 'none';
+  const ec = document.getElementById('eventCanvas');
+  if(ec) ec.style.cursor = isText ? 'text' : 'crosshair';
 };
 
 window.updateSize = v => { brushSize = parseInt(v); document.getElementById('sizeDisp').textContent = v; };
@@ -540,6 +616,19 @@ function onStart(e){
   startX = lastX = x;
   startY = lastY = y;
 
+  if(currentTool === 'text'){
+    isDrawing = false;
+    // Commit existing text (bypass blur to avoid double-commit)
+    if(_textActive){
+      const inp2 = document.getElementById('textInputEl');
+      const t2 = inp2 ? inp2.value : '';
+      _textActive = false;
+      if(inp2){ inp2.onblur = null; inp2.style.display = 'none'; }
+      if(t2.trim()) _commitTextAt(_textX, _textY, t2);
+    }
+    showTextInput(x, y);
+    return;
+  }
   if(currentTool === 'fill'){
     isDrawing = false;
     floodFillOnMerged(bgCtx, ctx, x, y, currentColor, opacity);
@@ -569,30 +658,11 @@ function onMove(e){
   document.getElementById('coordStatus').textContent = 'x:'+x+' y:'+y;
   if(!isDrawing) return;
 
-  if(currentTool === 'pencil'){
-    const sz = Math.max(1, Math.ceil(brushSize * 0.4));
+  if(currentTool === 'pencil' || currentTool === 'brush'){
+    const sz = currentTool === 'pencil' ? Math.max(1, Math.ceil(brushSize * 0.4)) : brushSize;
     ctx.globalAlpha = opacity;
     ctx.globalCompositeOperation = 'source-over';
-    ctx.strokeStyle = currentColor;
-    ctx.lineWidth = sz;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.lineTo(x, y);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-
-  } else if(currentTool === 'brush'){
-    ctx.globalAlpha = opacity;
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.strokeStyle = currentColor;
-    ctx.lineWidth = brushSize;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.lineTo(x, y);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(x, y);
+    drawBrushPoint(ctx, x, y, lastX, lastY, sz);
 
   } else if(currentTool === 'spray'){
     ctx.globalAlpha = opacity * 0.25;
@@ -665,6 +735,155 @@ function onEnd(e){
   ctx.beginPath();
   saveState();
 }
+
+// ========== BRUSH TIPS ==========
+function drawBrushPoint(c, x, y, px, py, sz){
+  if(brushTip === 'round'){
+    c.strokeStyle = currentColor; c.lineWidth = sz; c.lineCap = 'round'; c.lineJoin = 'round';
+    c.lineTo(x, y); c.stroke(); c.beginPath(); c.moveTo(x, y);
+
+  } else if(brushTip === 'flat'){
+    const dx=x-px, dy=y-py, angle=Math.atan2(dy,dx);
+    const dist=Math.sqrt(dx*dx+dy*dy), steps=Math.max(1,Math.ceil(dist/2));
+    c.fillStyle=currentColor;
+    for(let s=0;s<=steps;s++){
+      const bx=px+dx*s/steps, by=py+dy*s/steps;
+      c.save(); c.translate(bx,by); c.rotate(angle+Math.PI/2);
+      c.fillRect(-sz/2, -Math.max(sz*0.22,1.5), sz, Math.max(sz*0.45,3));
+      c.restore();
+    }
+
+  } else if(brushTip === 'marker'){
+    c.strokeStyle=currentColor; c.lineWidth=sz; c.lineCap='square'; c.lineJoin='miter';
+    c.globalAlpha=Math.min(opacity,0.88);
+    c.lineTo(x,y); c.stroke(); c.beginPath(); c.moveTo(x,y);
+    c.globalAlpha=opacity;
+
+  } else if(brushTip === 'calligraphy'){
+    const dx=x-px, dy=y-py, dist=Math.sqrt(dx*dx+dy*dy);
+    const steps=Math.max(1,Math.ceil(dist/2));
+    c.fillStyle=currentColor;
+    for(let s=0;s<=steps;s++){
+      const bx=px+dx*s/steps, by=py+dy*s/steps;
+      c.beginPath();
+      c.ellipse(bx, by, sz*0.68, Math.max(sz*0.16,1), -Math.PI/4, 0, Math.PI*2);
+      c.fill();
+    }
+
+  } else if(brushTip === 'bristle'){
+    const nb=Math.max(3,Math.floor(sz/3.5)), spread=sz*0.85;
+    const dx=x-px, dy=y-py, len=Math.sqrt(dx*dx+dy*dy)||1;
+    const nx=-dy/len, ny=dx/len;
+    for(let b=0;b<nb;b++){
+      const off=(b/(Math.max(nb-1,1))-0.5)*spread;
+      c.save(); c.beginPath();
+      c.globalAlpha=opacity*(0.4+Math.random()*0.6);
+      c.strokeStyle=currentColor; c.lineWidth=Math.max(0.4,sz*0.07); c.lineCap='round';
+      c.moveTo(px+nx*off, py+ny*off); c.lineTo(x+nx*off, y+ny*off); c.stroke();
+      c.restore();
+    }
+    c.globalAlpha=opacity;
+
+  } else if(brushTip === 'watercolor'){
+    const dx=x-px, dy=y-py, dist=Math.sqrt(dx*dx+dy*dy);
+    const steps=Math.max(1,Math.ceil(dist/5));
+    for(let s=0;s<=steps;s++){
+      const bx=px+dx*s/steps, by=py+dy*s/steps;
+      c.save();
+      const g=c.createRadialGradient(bx,by,0,bx,by,sz*1.4);
+      g.addColorStop(0,currentColor); g.addColorStop(1,'rgba(0,0,0,0)');
+      c.globalAlpha=opacity*0.07; c.fillStyle=g;
+      c.beginPath(); c.arc(bx,by,sz*1.4,0,Math.PI*2); c.fill();
+      c.globalAlpha=opacity*0.13; c.fillStyle=currentColor;
+      c.beginPath();
+      c.arc(bx+(Math.random()-.5)*sz*.45, by+(Math.random()-.5)*sz*.45, sz*.38, 0, Math.PI*2);
+      c.fill();
+      c.restore();
+    }
+    c.globalAlpha=opacity;
+  }
+}
+
+window.setBrushTip = function(tip){
+  brushTip = tip;
+  document.querySelectorAll('.tip-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('tip-'+tip);
+  if(btn) btn.classList.add('active');
+  // Restart path so tip change takes effect immediately
+  ctx.beginPath();
+};
+
+// ========== TEXT TOOL ==========
+function getTextFont(){
+  return (textItalic?'italic ':'')+(textBold?'bold ':'')+textFontSize+'px "'+textFontFamily+'","Sarabun",sans-serif';
+}
+
+function _commitTextAt(tx, ty, text){
+  if(!text || !text.trim()) return;
+  ctx.save();
+  ctx.globalAlpha = opacity;
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.fillStyle = currentColor;
+  ctx.font = getTextFont();
+  ctx.textBaseline = 'top';
+  const lh = textFontSize * 1.35;
+  text.split('\n').forEach((ln, i) => {
+    ctx.fillText(ln, tx, ty + i*lh);
+    if(textUnderline){
+      const w = ctx.measureText(ln).width;
+      ctx.fillRect(tx, ty + i*lh + textFontSize + 1, w, Math.max(1, textFontSize*0.07));
+    }
+  });
+  ctx.restore();
+  saveState();
+}
+
+function showTextInput(x, y){
+  _textX = x; _textY = y; _textActive = true;
+  const inp = document.getElementById('textInputEl');
+  inp.style.fontFamily = '"'+textFontFamily+'","Sarabun",sans-serif';
+  inp.style.fontSize   = textFontSize + 'px';
+  inp.style.fontWeight = textBold    ? 'bold'      : 'normal';
+  inp.style.fontStyle  = textItalic  ? 'italic'    : 'normal';
+  inp.style.textDecoration = textUnderline ? 'underline' : 'none';
+  inp.style.color      = currentColor;
+  inp.style.left       = x + 'px';
+  inp.style.top        = y + 'px';
+  inp.style.lineHeight = '1.35';
+  inp.style.height     = 'auto';
+  inp.value = '';
+  inp.style.display = 'block';
+  inp.oninput = () => { inp.style.height='auto'; inp.style.height=inp.scrollHeight+'px'; };
+  inp.onkeydown = e => {
+    if(e.key==='Escape'){ e.preventDefault(); _textActive=false; inp.style.display='none'; }
+    else if(e.ctrlKey && e.key==='Enter'){ e.preventDefault(); commitTextFromInput(); }
+  };
+  inp.onblur = () => { if(_textActive) commitTextFromInput(); };
+  setTimeout(() => inp.focus(), 10);
+}
+
+function commitTextFromInput(){
+  const inp = document.getElementById('textInputEl');
+  const text = inp ? inp.value : '';
+  _textActive = false;
+  if(inp){ inp.onblur = null; inp.style.display = 'none'; }
+  if(text.trim()) _commitTextAt(_textX, _textY, text);
+}
+
+window.updateFontSize    = v => { textFontSize=parseInt(v); document.getElementById('fontSizeDisp').textContent=v; };
+window.updateFontFamily  = v => { textFontFamily=v; };
+window.toggleTextStyle   = function(style){
+  if(style==='bold'){
+    textBold=!textBold;
+    document.getElementById('btnBold').style.background=textBold?'rgba(243,152,0,.35)':'rgba(255,255,255,.07)';
+  } else if(style==='italic'){
+    textItalic=!textItalic;
+    document.getElementById('btnItalic').style.background=textItalic?'rgba(243,152,0,.35)':'rgba(255,255,255,.07)';
+  } else if(style==='underline'){
+    textUnderline=!textUnderline;
+    document.getElementById('btnUnderline').style.background=textUnderline?'rgba(243,152,0,.35)':'rgba(255,255,255,.07)';
+  }
+};
 
 // Event listeners are registered in initLayers() below
 initLayers();
@@ -955,6 +1174,7 @@ document.addEventListener('keydown', e => {
   else if(e.key==='b'||e.key==='B') setTool('brush');
   else if(e.key==='e'||e.key==='E') setTool('eraser');
   else if(e.key==='f'||e.key==='F') setTool('fill');
+  else if(e.key==='t'||e.key==='T') setTool('text');
 });
 
 
