@@ -706,6 +706,8 @@ window.confirmSetPwd = async function(){
   err.style.display='none';
   const btn = document.querySelector('#modalSetPwd .btn-ok');
   btn.textContent='⏳ กำลังบันทึก...'; btn.disabled=true;
+  // ensure anonymous auth ก่อนเขียน Firestore
+  if(!auth.currentUser){ try{ await signInAnonymously(auth); }catch(_){} }
   try{
     await setDoc(_pendingLoginData.studentRef,{
       name: _pendingLoginData.name,
@@ -717,7 +719,7 @@ window.confirmSetPwd = async function(){
     completeLogin(_pendingLoginData.room, _pendingLoginData.name);
     _pendingLoginData=null;
   }catch(e){
-    err.textContent='❌ บันทึกไม่ได้: '+e.message; err.style.display='block';
+    err.textContent='❌ บันทึกไม่ได้: '+(e.code||e.message); err.style.display='block';
   } finally {
     btn.textContent='✅ บันทึกรหัสผ่าน'; btn.disabled=false;
   }
@@ -748,6 +750,8 @@ window.doChangePwd = async function(){
   err.style.display='none';
   const btn = document.querySelector('#modalChangePwd .btn-ok');
   btn.textContent='⏳ กำลังเปลี่ยน...'; btn.disabled=true;
+  // ensure anonymous auth ก่อนเขียน Firestore
+  if(!auth.currentUser){ try{ await signInAnonymously(auth); }catch(_){} }
   try{
     const studentId  = student.roomId+'_'+student.name;
     const studentRef = doc(db,'students',studentId);
@@ -755,13 +759,11 @@ window.doChangePwd = async function(){
     if(!snap.exists()||snap.data().password!==oldP){
       err.textContent='❌ รหัสผ่านเดิมไม่ถูกต้อง'; err.style.display='block'; return;
     }
-    // ลอง updateDoc ก่อน ถ้าไม่ได้ (Firestore rule อนุญาตแค่ create) ให้ delete+recreate
     const saved = snap.data();
     try{
       await updateDoc(studentRef, {password: p1});
     }catch(updateErr){
       if(updateErr.code==='permission-denied'){
-        // delete แล้ว recreate เพื่อหลีกเลี่ยง update rule
         await deleteDoc(studentRef);
         await setDoc(studentRef, {...saved, password: p1});
       } else { throw updateErr; }
@@ -769,10 +771,7 @@ window.doChangePwd = async function(){
     closeChangePwd();
     alert('✅ เปลี่ยนรหัสผ่านสำเร็จ!');
   }catch(e){
-    const msg = e.code==='permission-denied'
-      ? '❌ ไม่มีสิทธิ์แก้ไข กรุณาติดต่อครูเพื่อรีเซ็ตรหัสผ่าน'
-      : '❌ '+e.message;
-    err.textContent=msg; err.style.display='block';
+    err.textContent='❌ '+(e.code||e.message); err.style.display='block';
   } finally {
     btn.textContent='✅ เปลี่ยนรหัสผ่าน'; btn.disabled=false;
   }
