@@ -286,6 +286,14 @@ function loadFromLocal(){
 }
 
 async function syncToFirebase(){
+  // เขียน Firebase ได้เฉพาะ admin (email-login) เท่านั้น
+  if(!isTeacher){
+    localStorage.setItem(STORE_KEY,JSON.stringify(state));
+    setStatus('ok','💾 บันทึกเฉพาะเครื่อง · เปิดจาก Admin เพื่อ sync Firebase');
+    const badge=document.getElementById('autoSyncBadge');
+    if(badge) badge.textContent='⚠️ บันทึกเฉพาะเครื่อง';
+    return;
+  }
   try{
     await setDoc(doc(db,'score_system',FB_DOC),{data:state,updatedAt:serverTimestamp()});
     localStorage.setItem(STORE_KEY,JSON.stringify(state));
@@ -581,15 +589,20 @@ onAuthStateChanged(auth, async user=>{
   if(_initDone) return; // ป้องกัน callback ซ้ำ
   if(user){
     _initDone = true;
-    isTeacher = true;
+    // isTeacher = true เฉพาะผู้ที่ login ด้วย email (admin) เท่านั้น
+    // anonymous user (ไม่มี email) อ่านได้แต่เขียนไม่ได้
+    isTeacher = !!(user.email);
     await loadFromFirebase();
     currentClass = sortClasses(Object.keys(state.classes))[0]||'';
     renderTabs(); renderSubjectSelect(); renderTable();
+    if(!isTeacher){
+      setStatus('warn','⚠️ โหลดได้ · บันทึกเฉพาะเครื่อง — เปิดจาก Admin เพื่อ sync Firebase');
+    }
   } else {
-    // ยังไม่ได้ login → sign in แบบ anonymous เพื่อให้บันทึก Firebase ได้
+    // ยังไม่ได้ login → sign in anonymous เพื่อ อ่าน Firebase ได้
     try{
       await signInAnonymously(auth);
-      // onAuthStateChanged จะ fire อีกครั้งพร้อม user → จัดการใน if(user) ข้างบน
+      // onAuthStateChanged จะ fire อีกครั้งพร้อม anonymous user → isTeacher = false
     } catch(e){
       // Anonymous auth ปิดอยู่ → ใช้ localStorage แทน
       _initDone = true;
@@ -597,7 +610,7 @@ onAuthStateChanged(auth, async user=>{
       loadFromLocal();
       currentClass = sortClasses(Object.keys(state.classes))[0]||'';
       renderTabs(); renderSubjectSelect(); renderTable();
-      setStatus('warn','⚠️ ออฟไลน์ — เปิด Anonymous Auth ใน Firebase Console เพื่อ sync อัตโนมัติ');
+      setStatus('warn','⚠️ ออฟไลน์ — เปิดจาก Admin เพื่อ sync Firebase');
     }
   }
 });
