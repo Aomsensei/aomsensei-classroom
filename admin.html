@@ -813,7 +813,7 @@ window.clearForm = function(t){
   if(t==='ann'){document.getElementById('annId').value='';document.getElementById('annTitle').value='';document.getElementById('annContent').value='';document.getElementById('annImageUrl').value='';}
   if(t==='ws'){document.getElementById('wsId').value='';document.getElementById('wsType').value='worksheet';['wsTitle','wsSubject','wsDesc','wsUrl','wsHtml'].forEach(id=>document.getElementById(id).value='');document.getElementById('mWsTitle').textContent='📄 ใบงาน';document.getElementById('mWsTitleLabel').textContent='ชื่อใบงาน';}
   if(t==='qz'){document.getElementById('qzId').value='';document.getElementById('qzTitle').value='';document.getElementById('qzType').value='questions';toggleQzType('questions');document.getElementById('qzTime').value=30;document.getElementById('qzPass').value=60;document.getElementById('qzHtmlUrl').value='';qzQuestions=[];renderQ();}
-  if(t==='vid'){document.getElementById('vidId').value='';['vidTitle','vidUrl','vidDesc'].forEach(id=>document.getElementById(id).value='');}
+  if(t==='vid'){document.getElementById('vidId').value='';['vidTitle','vidUrl','vidDesc','vidSubject'].forEach(id=>document.getElementById(id).value='');const vr=document.getElementById('vidRoom');if(vr)vr.value='all';}
 };
 document.querySelectorAll('.overlay').forEach(m => m.addEventListener('click', e => {if(e.target===m)m.classList.remove('show');}));
 
@@ -1064,10 +1064,18 @@ window.editVid=function(id){const v=_vid[id]||{};document.getElementById('vidId'
 window.saveVid=async function(){
   const id=document.getElementById('vidId').value;
   const data={title:document.getElementById('vidTitle').value.trim(),roomId:document.getElementById('vidRoom').value,subject:document.getElementById('vidSubject').value.trim(),url:document.getElementById('vidUrl').value.trim(),description:document.getElementById('vidDesc').value.trim()};
-  if(!data.title)return;
-  if(id)await setDoc(doc(db,'videos',id),data,{merge:true});
-  else await addDoc(collection(db,'videos'),{...data,createdAt:serverTimestamp()});
-  closeModal('mVid');loadVid();
+  if(!data.title){alert('กรุณากรอกชื่อวิดีโอ');return;}
+  const btn=document.querySelector('#mVid .btn-orange');
+  if(btn){btn.disabled=true;btn.textContent='กำลังบันทึก...';}
+  try{
+    if(id)await setDoc(doc(db,'videos',id),data,{merge:true});
+    else await addDoc(collection(db,'videos'),{...data,createdAt:serverTimestamp()});
+    closeModal('mVid');loadVid();
+  }catch(e){
+    alert('บันทึกไม่สำเร็จ: '+e.message);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='บันทึก';}
+  }
 };
 
 // ==================== RESULTS ====================
