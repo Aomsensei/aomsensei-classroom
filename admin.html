@@ -959,11 +959,19 @@ window.editWs=function(id){
 window.saveWs=async function(){
   const id=document.getElementById('wsId').value;
   const data={type:document.getElementById('wsType').value||'worksheet',title:document.getElementById('wsTitle').value.trim(),roomId:document.getElementById('wsRoom').value,subject:document.getElementById('wsSubject').value.trim(),description:document.getElementById('wsDesc').value.trim(),fileUrl:document.getElementById('wsUrl').value.trim(),htmlContent:document.getElementById('wsHtml').value.trim()};
-  if(!data.title)return;
-  if(id)await setDoc(doc(db,'worksheets',id),data,{merge:true});
-  else await addDoc(collection(db,'worksheets'),{...data,createdAt:serverTimestamp()});
-  closeModal('mWs');loadWs();
-  switchWsTab(data.type);
+  if(!data.title){alert('กรุณาใส่ชื่อใบงาน');return;}
+  const btn=document.querySelector('#mWs .btn-orange');
+  if(btn){btn.disabled=true;btn.textContent='กำลังบันทึก...';}
+  try{
+    if(id)await setDoc(doc(db,'worksheets',id),data,{merge:true});
+    else await addDoc(collection(db,'worksheets'),{...data,createdAt:serverTimestamp()});
+    closeModal('mWs');loadWs();
+    switchWsTab(data.type);
+  }catch(e){
+    alert('บันทึกไม่สำเร็จ: '+e.message);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='บันทึก';}
+  }
 };
 
 // ==================== QUIZZES ====================
@@ -1035,9 +1043,17 @@ window.saveQz=async function(){
     data={title,quizType:'questions',timeLimit:parseInt(document.getElementById('qzTime').value)||30,passingScore:parseInt(document.getElementById('qzPass').value)||60,questions:qzQuestions,roomId,subject};
     if(!qzQuestions.length){alert('กรุณาเพิ่มอย่างน้อย 1 คำถาม');return;}
   }
-  if(id)await setDoc(doc(db,'quizzes',id),data,{merge:true});
-  else await addDoc(collection(db,'quizzes'),{...data,createdAt:serverTimestamp()});
-  closeModal('mQz');loadQz();
+  const btn=document.querySelector('#mQz .btn-orange');
+  if(btn){btn.disabled=true;btn.textContent='กำลังบันทึก...';}
+  try{
+    if(id)await setDoc(doc(db,'quizzes',id),data,{merge:true});
+    else await addDoc(collection(db,'quizzes'),{...data,createdAt:serverTimestamp()});
+    closeModal('mQz');loadQz();
+  }catch(e){
+    alert('บันทึกไม่สำเร็จ: '+e.message);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='บันทึก';}
+  }
 };
 
 // ==================== VIDEOS ====================
