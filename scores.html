@@ -584,36 +584,32 @@ window.doPrint=function(){
 };
 
 // ==================== INIT ====================
-let _initDone = false;
-onAuthStateChanged(auth, async user=>{
-  if(_initDone) return; // ป้องกัน callback ซ้ำ
-  if(user){
-    _initDone = true;
-    // isTeacher = true เฉพาะผู้ที่ login ด้วย email (admin) เท่านั้น
-    // anonymous user (ไม่มี email) อ่านได้แต่เขียนไม่ได้
-    isTeacher = !!(user.email);
+// ใช้ authStateReady() แทน onAuthStateChanged
+// แก้ปัญหา: onAuthStateChanged ยิง null ก่อน → signInAnonymously ก่อน → email session ถูก block
+(async()=>{
+  try{ await auth.authStateReady(); }catch(e){}
+  const user = auth.currentUser;
+  if(user && user.email){
+    // admin login ด้วย email — sync Firebase ได้
+    isTeacher = true;
     await loadFromFirebase();
     currentClass = sortClasses(Object.keys(state.classes))[0]||'';
     renderTabs(); renderSubjectSelect(); renderTable();
-    if(!isTeacher){
-      setStatus('warn','⚠️ โหลดได้ · บันทึกเฉพาะเครื่อง — เปิดจาก Admin เพื่อ sync Firebase');
-    }
+    setStatus('sync','☁️ เชื่อมต่อ Firebase · '+user.email);
   } else {
-    // ยังไม่ได้ login → sign in anonymous เพื่อ อ่าน Firebase ได้
+    // ไม่มี email session — ลอง anonymous เพื่ออ่าน Firebase (score_system read=public)
+    isTeacher = false;
     try{
-      await signInAnonymously(auth);
-      // onAuthStateChanged จะ fire อีกครั้งพร้อม anonymous user → isTeacher = false
-    } catch(e){
-      // Anonymous auth ปิดอยู่ → ใช้ localStorage แทน
-      _initDone = true;
-      isTeacher = false;
+      if(!user) await signInAnonymously(auth);
+      await loadFromFirebase();
+    }catch(e){
       loadFromLocal();
-      currentClass = sortClasses(Object.keys(state.classes))[0]||'';
-      renderTabs(); renderSubjectSelect(); renderTable();
-      setStatus('warn','⚠️ ออฟไลน์ — เปิดจาก Admin เพื่อ sync Firebase');
     }
+    currentClass = sortClasses(Object.keys(state.classes))[0]||'';
+    renderTabs(); renderSubjectSelect(); renderTable();
+    setStatus('warn','⚠️ โหลดได้ · บันทึกเฉพาะเครื่อง — เปิดจาก Admin เพื่อ sync Firebase');
   }
-});
+})();
 </script>
 </body>
 </html>
