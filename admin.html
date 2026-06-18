@@ -1368,11 +1368,14 @@ async function loadCheckWork(){
       const statusBadge = isGraded
         ? '<span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:800">✅ ตรวจแล้ว</span>'
         : '<span style="background:#fff3e0;color:#f39800;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:800">⏳ รอตรวจ</span>';
+      const displayName = Array.isArray(r.members)
+        ? r.members.map(m=>typeof m==='object'?`${m.name||''} (${m.no||'-'})`:m).join(', ')
+        : (r.studentName||'-');
       return `<tr>
-        <td><b>${esc(r.studentName||'-')}</b></td>
-        <td>${esc(r.grade||'-')}</td>
+        <td><b>${esc(displayName)}</b></td>
+        <td>${esc(r.grade||r.classroom||'-')}</td>
         <td>${esc(r.subject||'-')}</td>
-        <td>${esc(r.worksheetTitle||'-')}</td>
+        <td>${esc(r.worksheet||r.worksheetTitle||'-')}</td>
         <td style="font-size:11.5px;color:#666">${dt}</td>
         <td>${scoreDisp}</td>
         <td>${statusBadge}</td>
@@ -1384,60 +1387,177 @@ async function loadCheckWork(){
 }
 
 let _cwGradingId = null;
+let _cwIsRubric  = false;
+
+// rubric config per worksheet name
+const RUBRICS = {
+  'พลิกวิกฤตไซเบอร์': [
+    { key:'scoreAnalysis',  label:'🔬 วิเคราะห์สถานการณ์ปัญหา',        max:5  },
+    { key:'scoreRules',     label:'⚔️ 4 กฎเหล็ก (ความคิดสร้างสรรค์)',  max:10 },
+    { key:'scorePresent',   label:'🎤 การนำเสนอ',                        max:5  },
+    { key:'scoreCooper',    label:'🤝 ความร่วมมือในกลุ่ม',              max:5  },
+    { key:'scoreSummary',   label:'🚀 สรุปและประยุกต์ใช้',              max:5  },
+  ],
+};
+
 window.viewWorkSubmission = function(docId){
   _cwGradingId = docId;
   const r = _cwDocs[docId]; if(!r) return;
   const isGraded = !!r.gradedAt;
-  const answers = r.answers||{};
-  const fields = r.fields||[]; // array of {label, value}
+  const wsName   = r.worksheet||r.worksheetTitle||'';
+  const rubric   = RUBRICS[wsName] || null;
+  _cwIsRubric    = !!rubric;
+
+  /* ===== HEADER ===== */
+  const members = Array.isArray(r.members)
+    ? r.members.map(m => typeof m==='object' ? `เลขที่ ${m.no||'-'} ${m.name||'-'}` : m).join(' · ')
+    : (r.studentName||'-');
+  const dt = r.submittedAt?.toDate
+    ? r.submittedAt.toDate().toLocaleDateString('th-TH',{day:'2-digit',month:'short',year:'2-digit',hour:'2-digit',minute:'2-digit'})
+    : '-';
 
   let html = `<div style="margin-bottom:14px;padding:12px;background:#fff3e0;border-radius:10px;border:1.5px solid #ffd0a0">
-    <div style="font-size:13px;font-weight:800;color:#c94b00;margin-bottom:6px">📄 ข้อมูลใบงาน</div>
+    <div style="font-size:13px;font-weight:800;color:#c94b00;margin-bottom:6px">📄 ${esc(wsName||'ใบงาน')}</div>
     <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:13px">
-      <span>👤 <b>${esc(r.studentName||'-')}</b></span>
-      <span>🏫 ชั้น <b>${esc(r.grade||'-')}</b></span>
+      <span>👥 <b>${esc(members)}</b></span>
+      <span>🏫 <b>${esc(r.grade||r.classroom||'-')}</b></span>
       <span>📚 <b>${esc(r.subject||'-')}</b></span>
-      <span>📋 <b>${esc(r.worksheetTitle||'-')}</b></span>
+      <span>🕐 ${dt}</span>
     </div>
   </div>`;
 
-  // Display submitted content
-  if(fields.length>0){
-    html += '<div style="font-weight:800;color:#555;font-size:13px;margin-bottom:8px">📝 คำตอบของนักเรียน</div>';
-    html += fields.map(f=>`<div style="margin-bottom:10px;padding:10px;background:#fafafa;border-radius:8px;border:1px solid #eee">
-      <div style="font-size:12px;color:#888;margin-bottom:4px">${esc(f.label||'')}</div>
-      <div style="font-size:13px;white-space:pre-wrap">${esc(f.value||'(ไม่มีคำตอบ)')}</div>
-    </div>`).join('');
-  } else if(Object.keys(answers).length>0){
-    html += '<div style="font-weight:800;color:#555;font-size:13px;margin-bottom:8px">📝 คำตอบของนักเรียน</div>';
-    html += Object.entries(answers).map(([k,v])=>`<div style="margin-bottom:8px;padding:8px 12px;background:#fafafa;border-radius:8px;border:1px solid #eee">
-      <span style="font-size:12px;color:#888;margin-right:8px">${esc(k)}</span><span style="font-size:13px">${esc(String(v))}</span>
-    </div>`).join('');
+  /* ===== CYBER CRISIS WORKSHEET FIELDS ===== */
+  if(wsName==='พลิกวิกฤตไซเบอร์'){
+    const ansBlock = (label, val, color='#f5f5f5', border='#e0e0e0') =>
+      `<div style="margin-bottom:10px;padding:12px;background:${color};border-radius:10px;border:1.5px solid ${border}">
+        <div style="font-size:11.5px;font-weight:800;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px">${label}</div>
+        <div style="font-size:13.5px;line-height:1.7;white-space:pre-wrap">${esc(val||'(ไม่ได้ตอบ)')}</div>
+       </div>`;
+
+    html += `<div style="font-weight:800;color:#b71c1c;font-size:13px;margin:12px 0 8px">🔴 ส่วนที่ 2 — วิเคราะห์สถานการณ์ปัญหา</div>`;
+    html += ansBlock('จุดพลาดที่ 1', r.mistake1, '#fff5f5','#ffcdd2');
+    html += ansBlock('จุดพลาดที่ 2', r.mistake2, '#fff5f5','#ffcdd2');
+    html += ansBlock('จุดพลาดที่ 3', r.mistake3, '#fff5f5','#ffcdd2');
+
+    html += `<div style="font-weight:800;color:#e65100;font-size:13px;margin:14px 0 8px">⚔️ ส่วนที่ 2 (ต่อ) — 4 กฎเหล็กไซเบอร์</div>`;
+    html += ansBlock('กฎเหล็กที่ 1', r.rule1, '#fff8e1','#ffe082');
+    html += ansBlock('กฎเหล็กที่ 2', r.rule2, '#fff8e1','#ffe082');
+    html += ansBlock('กฎเหล็กที่ 3', r.rule3, '#fff8e1','#ffe082');
+    html += ansBlock('กฎเหล็กที่ 4', r.rule4, '#fff8e1','#ffe082');
+
+    html += `<div style="font-weight:800;color:#006064;font-size:13px;margin:14px 0 8px">🌟 ส่วนที่ 3 — Reflection</div>`;
+    html += ansBlock('สิ่งที่เรียนรู้ / ความสำเร็จ', r.learned, '#e0f7fa','#80deea');
+    html += ansBlock('นำไปใช้ในชีวิตประจำวัน', r.apply,   '#e0f7fa','#80deea');
+
   } else {
-    html += '<div style="color:#bbb;font-size:13px;margin-bottom:12px">ไม่มีข้อมูลคำตอบ</div>';
+    /* generic display */
+    const fields  = r.fields||[];
+    const answers = r.answers||{};
+    if(fields.length>0){
+      html += '<div style="font-weight:800;color:#555;font-size:13px;margin-bottom:8px">📝 คำตอบของนักเรียน</div>';
+      html += fields.map(f=>`<div style="margin-bottom:10px;padding:10px;background:#fafafa;border-radius:8px;border:1px solid #eee">
+        <div style="font-size:12px;color:#888;margin-bottom:4px">${esc(f.label||'')}</div>
+        <div style="font-size:13px;white-space:pre-wrap">${esc(f.value||'(ไม่มีคำตอบ)')}</div></div>`).join('');
+    } else if(Object.keys(answers).length>0){
+      html += '<div style="font-weight:800;color:#555;font-size:13px;margin-bottom:8px">📝 คำตอบของนักเรียน</div>';
+      html += Object.entries(answers).map(([k,v])=>`<div style="margin-bottom:8px;padding:8px 12px;background:#fafafa;border-radius:8px;border:1px solid #eee">
+        <span style="font-size:12px;color:#888;margin-right:8px">${esc(k)}</span><span style="font-size:13px">${esc(String(v))}</span></div>`).join('');
+    } else {
+      html += '<div style="color:#bbb;font-size:13px;margin-bottom:12px">ไม่มีข้อมูลคำตอบ</div>';
+    }
   }
 
-  if(r.feedback){ html+=`<div style="margin-top:10px;padding:10px;background:#e8f5e9;border-radius:8px;font-size:13px"><b>💬 ความคิดเห็นครู:</b> ${esc(r.feedback)}</div>`; }
+  if(r.feedback && isGraded){
+    html += `<div style="margin-top:10px;padding:10px;background:#e8f5e9;border-radius:8px;font-size:13px"><b>💬 ความคิดเห็นครู:</b> ${esc(r.feedback)}</div>`;
+  }
 
   document.getElementById('cwWorkContent').innerHTML = html;
-  document.getElementById('cwGradeScoreInp').value = r.score!==undefined?r.score:'';
-  document.getElementById('cwGradeMaxInp').value = r.maxScore!==undefined?r.maxScore:'10';
-  document.getElementById('cwFeedbackInp').value = r.feedback||'';
+
+  /* ===== GRADING PANEL ===== */
+  const gradingEl = document.getElementById('cwGradingPanel');
+  if(_cwIsRubric && rubric){
+    // build rubric inputs
+    const totalMax = rubric.reduce((s,c)=>s+c.max,0);
+    let gHtml = `<div style="font-weight:800;color:#c94b00;font-size:13px;margin-bottom:12px">📊 ให้คะแนนตามเกณฑ์ (รวม ${totalMax} คะแนน)</div>`;
+    rubric.forEach(c=>{
+      const saved = r.rubricScores?.[c.key]!==undefined ? r.rubricScores[c.key] : '';
+      gHtml += `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div style="flex:1;font-size:13px;font-weight:600">${c.label}</div>
+        <div style="display:flex;align-items:center;gap:5px;white-space:nowrap">
+          <input type="number" id="rub_${c.key}" min="0" max="${c.max}" value="${saved}"
+            oninput="updateRubricTotal()"
+            style="width:64px;padding:6px 8px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit;text-align:center">
+          <span style="font-size:12.5px;color:#999">/ ${c.max}</span>
+        </div>
+      </div>`;
+    });
+    gHtml += `<div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding:10px 14px;background:#fff3e0;border-radius:10px;border:1.5px solid #ffd0a0">
+      <span style="font-size:14px;font-weight:800;color:#c94b00">รวมคะแนน</span>
+      <span id="rubricTotal" style="font-size:22px;font-weight:900;color:#c94b00">0 / ${totalMax}</span>
+    </div>`;
+    gHtml += `<div style="margin-top:10px">
+      <label style="font-size:12px;color:#777;display:block;margin-bottom:4px">💬 ความคิดเห็น / ข้อแนะนำ</label>
+      <input type="text" id="cwFeedbackInp" placeholder="ความคิดเห็นของครู (ถ้ามี)" value="${esc(r.feedback||'')}" style="width:100%;padding:8px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:13px;font-family:inherit;box-sizing:border-box">
+    </div>`;
+    gradingEl.innerHTML = gHtml;
+    setTimeout(updateRubricTotal, 50);
+  } else {
+    // simple score panel
+    gradingEl.innerHTML = `
+      <div style="font-weight:800;color:#c94b00;font-size:13px;margin-bottom:10px">📊 ให้คะแนน</div>
+      <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+        <div><label style="font-size:12px;color:#777;display:block;margin-bottom:3px">คะแนนที่ได้</label>
+          <input type="number" id="cwGradeScoreInp" placeholder="0" min="0" value="${r.score!==undefined?r.score:''}" style="width:90px;padding:8px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit"/></div>
+        <div><label style="font-size:12px;color:#777;display:block;margin-bottom:3px">คะแนนเต็ม</label>
+          <input type="number" id="cwGradeMaxInp" placeholder="10" min="1" value="${r.maxScore!==undefined?r.maxScore:'10'}" style="width:90px;padding:8px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit"/></div>
+        <div style="flex:1;min-width:160px"><label style="font-size:12px;color:#777;display:block;margin-bottom:3px">ความคิดเห็น / ข้อแนะนำ</label>
+          <input type="text" id="cwFeedbackInp" placeholder="ความคิดเห็นของครู (ถ้ามี)" value="${esc(r.feedback||'')}" style="width:100%;padding:8px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:13px;font-family:inherit;box-sizing:border-box"/></div>
+      </div>`;
+  }
+
   document.getElementById('cwGradeStatus').textContent = isGraded ? '✅ ตรวจแล้ว' : '';
   document.getElementById('cwGradeStatus').style.color = '#2e7d32';
   openModal('mCheckWork');
 };
 
+window.updateRubricTotal = function(){
+  const rubric = RUBRICS[_cwDocs[_cwGradingId]?.worksheet] || [];
+  const totalMax = rubric.reduce((s,c)=>s+c.max,0);
+  const total = rubric.reduce((s,c)=>{
+    const v = parseInt(document.getElementById('rub_'+c.key)?.value)||0;
+    return s + Math.min(v, c.max);
+  },0);
+  const el = document.getElementById('rubricTotal');
+  if(el) el.textContent = `${total} / ${totalMax}`;
+};
+
 window.saveWorkGrade = async function(){
   if(!_cwGradingId) return;
-  const score = parseInt(document.getElementById('cwGradeScoreInp').value)||0;
-  const maxScore = parseInt(document.getElementById('cwGradeMaxInp').value)||10;
-  const feedback = document.getElementById('cwFeedbackInp').value.trim();
+  const r = _cwDocs[_cwGradingId]||{};
+  const wsName = r.worksheet||r.worksheetTitle||'';
+  const rubric = RUBRICS[wsName] || null;
+  const feedback = (document.getElementById('cwFeedbackInp')?.value||'').trim();
   const st = document.getElementById('cwGradeStatus');
   st.textContent = 'กำลังบันทึก...'; st.style.color = '#888';
   try{
-    await setDoc(doc(db,'worksheet_submissions',_cwGradingId),{score,maxScore,feedback,gradedAt:serverTimestamp(),gradedBy:'admin'},{merge:true});
-    _cwDocs[_cwGradingId] = {...(_cwDocs[_cwGradingId]||{}),score,maxScore,feedback,gradedAt:new Date()};
+    let payload;
+    if(_cwIsRubric && rubric){
+      const rubricScores = {};
+      let total = 0;
+      rubric.forEach(c=>{
+        const v = Math.min(parseInt(document.getElementById('rub_'+c.key)?.value)||0, c.max);
+        rubricScores[c.key] = v;
+        total += v;
+      });
+      const maxScore = rubric.reduce((s,c)=>s+c.max,0);
+      payload = { rubricScores, score:total, maxScore, feedback, gradedAt:serverTimestamp(), gradedBy:'admin' };
+    } else {
+      const score    = parseInt(document.getElementById('cwGradeScoreInp')?.value)||0;
+      const maxScore = parseInt(document.getElementById('cwGradeMaxInp')?.value)||10;
+      payload = { score, maxScore, feedback, gradedAt:serverTimestamp(), gradedBy:'admin' };
+    }
+    await setDoc(doc(db,'worksheet_submissions',_cwGradingId), payload, {merge:true});
+    _cwDocs[_cwGradingId] = {...(r), ...payload, gradedAt:new Date()};
     st.textContent = '✅ บันทึกแล้ว'; st.style.color = '#2e7d32';
     loadCheckWork();
   }catch(e){ st.textContent = '❌ '+e.message; st.style.color = '#c62828'; }
@@ -2288,23 +2408,11 @@ function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace
 <div class="overlay" id="mCheckWork"><div class="modal lg" style="max-height:90vh;overflow-y:auto">
   <h2>📋 ตรวจใบงาน</h2>
   <div id="cwWorkContent" style="font-size:13px;margin-bottom:14px"></div>
-  <div style="padding:13px 14px;background:#fff3e0;border-radius:10px;border:1.5px solid #ffd0a0">
-    <div style="font-weight:800;color:#c94b00;font-size:13px;margin-bottom:10px">📊 ให้คะแนน</div>
-    <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
-      <div>
-        <label style="font-size:12px;color:#777;display:block;margin-bottom:3px">คะแนนที่ได้</label>
-        <input type="number" id="cwGradeScoreInp" placeholder="0" min="0" style="width:90px;padding:8px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit"/>
-      </div>
-      <div>
-        <label style="font-size:12px;color:#777;display:block;margin-bottom:3px">คะแนนเต็ม</label>
-        <input type="number" id="cwGradeMaxInp" placeholder="10" min="1" value="10" style="width:90px;padding:8px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit"/>
-      </div>
-      <div style="flex:1;min-width:160px">
-        <label style="font-size:12px;color:#777;display:block;margin-bottom:3px">ความคิดเห็น / ข้อแนะนำ</label>
-        <input type="text" id="cwFeedbackInp" placeholder="ความคิดเห็นของครู (ถ้ามี)" style="width:100%;padding:8px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:13px;font-family:inherit;box-sizing:border-box"/>
-      </div>
+  <div style="padding:14px 16px;background:#fff3e0;border-radius:12px;border:1.5px solid #ffd0a0;margin-bottom:12px">
+    <div id="cwGradingPanel"></div>
+    <div style="margin-top:12px;display:flex;align-items:center;gap:12px">
       <button class="btn btn-green" onclick="saveWorkGrade()">💾 บันทึก + ตรวจแล้ว</button>
-      <span id="cwGradeStatus" style="font-size:13px"></span>
+      <span id="cwGradeStatus" style="font-size:13px;font-weight:700"></span>
     </div>
   </div>
   <div class="btn-row"><button class="btn btn-gray" onclick="closeModal('mCheckWork')">ปิด</button></div>
