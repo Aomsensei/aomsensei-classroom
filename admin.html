@@ -719,12 +719,13 @@ tbody tr:hover td{background:#fff3e8}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, inMemoryPersistence, setPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, collection, getDocs, addDoc, setDoc, getDoc, doc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { FIREBASE_CONFIG } from "./js/config.js";
 
 const app = initializeApp(FIREBASE_CONFIG);
 const auth = getAuth(app);
+setPersistence(auth, inMemoryPersistence); // ไม่จำ session — ต้อง login ใหม่ทุกครั้งที่เปิดหน้า
 const db = getFirestore(app);
 let chartInst = null, chatUnsub = null, currentRoom = null, qzQuestions = [];
 
