@@ -20,7 +20,12 @@
     }
     body{
       font-family:var(--font);
-      background:linear-gradient(160deg,#fff8e1 0%,#ffe0b2 50%,#fff3e0 100%);
+      background-color:#c5e0a3;
+      background-image:
+        radial-gradient(ellipse at 82% 5%,rgba(255,236,60,.45) 0%,transparent 28%),
+        linear-gradient(180deg,
+          #87ceeb 0%,#b3e5fc 18%,#c8e6c9 32%,
+          #dcedc8 44%,#fff9c4 56%,#fff3e0 72%,#ffe0b2 100%);
       min-height:100vh;color:#333;overflow-x:hidden;
     }
 
@@ -65,7 +70,8 @@
     .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important;box-shadow:none!important}
 
     input[type=text]{width:100%;padding:11px 14px;border:2px solid #ffd0a0;
-      border-radius:9px;font-family:var(--font);font-size:15px;outline:none;background:#fff}
+      border-radius:9px;font-family:var(--font);font-size:15px;outline:none;background:#fff;
+      unicode-bidi:plaintext;-webkit-text-size-adjust:none;text-size-adjust:none}
     input[type=text]:focus{border-color:var(--orange)}
 
     /* ══════════════════════════════════
@@ -137,6 +143,16 @@
     .chat-msg{margin-bottom:7px;font-size:13.5px;line-height:1.45}
     .chat-name{font-weight:700;color:var(--orange-d)}
     .chat-sys{color:#888;font-style:italic;font-size:12.5px}
+    /* ── CHAT REPLY ── */
+    .reply-bar{background:#fff8e1;border-left:3px solid var(--orange);padding:7px 10px;
+      border-radius:7px;margin-bottom:7px;display:flex;align-items:center;gap:8px}
+    .reply-bar-name{font-weight:700;color:var(--orange-d);font-size:11.5px}
+    .reply-bar-text{font-size:12px;color:#888;white-space:nowrap;overflow:hidden;
+      text-overflow:ellipsis;flex:1;min-width:0}
+    .msg-reply-tag{background:rgba(243,152,0,.1);border-left:2px solid var(--orange);
+      padding:2px 7px;border-radius:4px;font-size:11px;color:#999;
+      margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+      display:block;max-width:100%}
 
     /* ══════════════════════════════════
        ANNOUNCE BANNERS
@@ -381,6 +397,13 @@
 
   <div class="card" style="padding:12px">
     <div id="chatBox"></div>
+    <div id="replyBar" class="reply-bar hidden">
+      <div style="min-width:0;flex:1">
+        <div class="reply-bar-name">↩️ ตอบกลับ</div>
+        <div id="replyPreview" class="reply-bar-text"></div>
+      </div>
+      <button onclick="G.cancelReply()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#aaa;flex-shrink:0;padding:0">✕</button>
+    </div>
     <div class="flex-gap">
       <input type="text" id="chatInput" placeholder="พิมพ์ข้อความ..." style="flex:1" maxlength="80">
       <button class="btn btn-orange" style="width:auto;padding:11px 16px" onclick="G.sendChat()">ส่ง</button>
@@ -444,7 +467,7 @@
     <div id="goRoleList"></div>
   </div>
 
-  <button class="btn btn-orange" onclick="G.backToHome()">🏠 กลับหน้าหลัก</button>
+  <button id="goHomeBtn" class="btn btn-orange" onclick="G.backToHome()">🏠 กลับหน้าหลัก</button>
 </div>
 
 <!-- ══ LOADING OVERLAY ══ -->
@@ -527,6 +550,7 @@ let myId   = localStorage.getItem('tkId') || (() => {
 })();
 let myName='', myRole='', roomCode='', isHost=false;
 let listeners={}, hostTimer=null;
+let replyTo=null; // {name,text} ข้อความที่กำลังตอบกลับ
 
 // ──────────────────────────────────────────
 // ยูทิลิตี้: หน้าจอ / loading
@@ -624,11 +648,19 @@ function enterLobby(){
   show('sc-lobby');
   document.getElementById('lobbyCode').textContent = roomCode;
 
-  // ฟังรายชื่อผู้เล่น
+  // ฟังรายชื่อผู้เล่น + ตรวจจับการถูกเตะ
   const pRef = ref(db,`tk_rooms/${roomCode}/players`);
   listeners.players = (()=>{
     const unsub = onValue(pRef, snap=>{
       const p = snap.val()||{};
+      // ถูกเตะออก
+      if(!p[myId]){
+        killListeners();
+        roomCode=''; isHost=false;
+        alert('❌ คุณถูกเตะออกจากห้อง');
+        show('sc-home');
+        return;
+      }
       renderLobby(p);
     });
     return ()=>off(pRef,'value',unsub);
@@ -650,7 +682,11 @@ function renderLobby(players){
   document.getElementById('lobbyList').innerHTML = Object.entries(players).map(([id,p])=>`
     <div class="player-row">
       ${id===myId?'⭐':'🧑'} ${p.name}
-      ${id===myId?'<span class="badge b-orange" style="margin-left:auto">คุณ</span>':''}
+      ${id===myId
+        ?'<span class="badge b-orange" style="margin-left:auto">คุณ</span>'
+        :isHost
+          ?`<button onclick="G.kickPlayer('${id}')" style="margin-left:auto;background:none;border:1.5px solid #ffcdd2;border-radius:6px;color:#e53935;font-size:11px;padding:2px 9px;cursor:pointer;font-weight:700">เตะ</button>`
+          :''}
     </div>
   `).join('');
 
@@ -663,6 +699,11 @@ function renderLobby(players){
   } else {
     vis('startWrap',false); vis('waitMsg',true);
   }
+}
+
+async function kickPlayer(targetId){
+  if(!isHost || !roomCode) return;
+  await remove(ref(db,`tk_rooms/${roomCode}/players/${targetId}`));
 }
 
 async function leaveRoom(){
@@ -713,6 +754,8 @@ function makeRoles(n){
 async function enterRoleReveal(){
   killListeners();
   show('sc-role');
+  // ยกเลิก onDisconnect — พับหน้าจอ/สลับแอปได้โดยไม่ถูกเตะ
+  try{ onDisconnect(ref(db,`tk_rooms/${roomCode}/players/${myId}`)).cancel(); }catch(e){}
   const snap = await get(ref(db,`tk_rooms/${roomCode}/players/${myId}/role`));
   myRole = snap.val()||'villager';
 
@@ -790,8 +833,18 @@ async function enterNight(roomData){
   const players= snap.val()||{};
   const alive  = Object.entries(players).filter(([,p])=>p.isAlive);
 
-  // แสดง UI ตาม role
-  if(myRole==='killer'){
+  const imAlive=players[myId]?.isAlive===true;
+
+  // แสดง UI ตาม role — ผู้เล่นที่ตายแล้วไม่สามารถใช้ความสามารถได้
+  if(!imAlive){
+    const vEl=document.getElementById('uiVillager');
+    vEl.innerHTML=`<div class="card tc" style="background:#eceff1;border:2px solid #cfd8dc;padding:28px">
+      <div style="font-size:48px">👻</div>
+      <h3 style="color:#607d8b;margin-top:10px">คุณเสียชีวิตแล้ว</h3>
+      <div class="tm mt8">ดูเกมต่อได้ แต่ใช้ความสามารถไม่ได้</div>
+    </div>`;
+    vis('uiVillager',true);
+  } else if(myRole==='killer'){
     renderKillerUI(alive);
   } else if(myRole==='chief'){
     const lpSnap=await get(ref(db,`tk_rooms/${roomCode}/protectedLast`));
@@ -976,10 +1029,19 @@ async function enterMorning(roomData){
   if(isHost){
     const win=checkWin(players);
     if(win){ await doGameOver(players,win); return; }
-    vis('mornHostBtn',true); vis('mornWait',false);
-  } else {
-    vis('mornHostBtn',false); vis('mornWait',true);
+    // Auto-advance to chat after 5s
+    setTimeout(async()=>{ if(roomCode) await goToChat(); }, 5000);
   }
+  // แสดง countdown ให้ทุกคน
+  vis('mornHostBtn',false); vis('mornWait',true);
+  let mT=5;
+  const mWait=document.getElementById('mornWait');
+  mWait.textContent=`⏳ ไปสืบสวนอัตโนมัติใน ${mT} วินาที...`;
+  const miv=setInterval(()=>{
+    mT--;
+    if(mWait) mWait.textContent=`⏳ ไปสืบสวนอัตโนมัติใน ${mT>0?mT:0} วินาที...`;
+    if(mT<=0) clearInterval(miv);
+  },1000);
 
   // ฟัง phase เปลี่ยน
   const phRef=ref(db,`tk_rooms/${roomCode}/phase`);
@@ -1014,10 +1076,10 @@ async function goToChat(){
   // ล้างแชทเก่า (ทุกต้นรอบ)
   await set(ref(db,`tk_rooms/${roomCode}/messages`), null);
   await update(ref(db,`tk_rooms/${roomCode}`),{
-    phase:'chat', timer:60, votes:null, killerVotes:null,
+    phase:'chat', timer:30, votes:null, killerVotes:null,
     chiefProtect:null, auntCheck:null, auntResult:null,
   });
-  startHostTimer('chat',60);
+  startHostTimer('chat',30);
 }
 
 // ──────────────────────────────────────────
@@ -1050,10 +1112,18 @@ async function enterChat(){
     const unsub=onValue(msgRef,snap=>{
       const msgs=snap.val()||{};
       const chatEl=document.getElementById('chatBox');
-      chatEl.innerHTML=Object.values(msgs)
-        .sort((a,b)=>(a.ts||0)-(b.ts||0))
-        .map(m=>`<div class="chat-msg"><span class="chat-name">${escHtml(m.name)}:</span> ${escHtml(m.text)}</div>`)
-        .join('')||'<div class="chat-sys">ยังไม่มีข้อความ...</div>';
+      window._cm={}; // message map สำหรับ reply
+      const sorted=Object.values(msgs).sort((a,b)=>(a.ts||0)-(b.ts||0));
+      sorted.forEach((m,i)=>{ window._cm['c'+i]={name:m.name,text:m.text}; });
+      chatEl.innerHTML=sorted.map((m,i)=>{
+        const rTag=m.replyTo
+          ?`<span class="msg-reply-tag">↩️ <b>${escHtml(m.replyTo.name)}</b>: ${escHtml((m.replyTo.text||'').slice(0,36))}${(m.replyTo.text||'').length>36?'…':''}</span>`
+          :'';
+        const rBtn=alive
+          ?`<button onclick="G.startReply(window._cm['c${i}'])" style="float:right;background:none;border:none;font-size:12px;color:#ccc;cursor:pointer;padding:0 3px;line-height:1.6" title="ตอบกลับ">↩</button>`
+          :'';
+        return `<div class="chat-msg">${rBtn}${rTag}<span class="chat-name">${escHtml(m.name)}:</span> ${escHtml(m.text)}</div>`;
+      }).join('')||'<div class="chat-sys">ยังไม่มีข้อความ...</div>';
       chatEl.scrollTop=chatEl.scrollHeight;
     });
     return ()=>off(msgRef,'value',unsub);
@@ -1070,9 +1140,27 @@ async function sendChat(){
   if(!text) return;
   const mySnap=await get(ref(db,`tk_rooms/${roomCode}/players/${myId}/isAlive`));
   if(!mySnap.val()) return;
-  await push(ref(db,`tk_rooms/${roomCode}/messages`),{name:myName, text, ts:Date.now()});
+  const msgData={name:myName, text, ts:Date.now()};
+  if(replyTo) msgData.replyTo={name:replyTo.name, text:replyTo.text};
+  await push(ref(db,`tk_rooms/${roomCode}/messages`), msgData);
   inp.value='';
+  cancelReply();
 }
+
+function startReply(msg){
+  if(!msg) return;
+  replyTo={name:msg.name, text:msg.text};
+  document.getElementById('replyPreview').textContent=`${msg.name}: ${(msg.text||'').slice(0,40)}${(msg.text||'').length>40?'…':''}`;
+  document.getElementById('replyBar').classList.remove('hidden');
+  document.getElementById('chatInput').focus();
+}
+
+function cancelReply(){
+  replyTo=null;
+  const bar=document.getElementById('replyBar');
+  if(bar) bar.classList.add('hidden');
+}
+
 document.getElementById('chatInput').addEventListener('keypress',e=>{ if(e.key==='Enter') G.sendChat(); });
 
 // ──────────────────────────────────────────
@@ -1102,7 +1190,13 @@ async function enterVote(){
       </button>
     `).join('')||'<div class="tm">ไม่มีผู้เล่น</div>';
 
-  if(!myAlive) document.getElementById('voteStatus').textContent='💀 คุณเสียชีวิตแล้ว ไม่สามารถโหวตได้';
+  const aliveN=Object.values(players).filter(p=>p.isAlive).length;
+  const needV=Math.floor(aliveN/2)+1;
+  if(!myAlive){
+    document.getElementById('voteStatus').textContent='💀 คุณเสียชีวิตแล้ว ไม่สามารถโหวตได้';
+  } else {
+    document.getElementById('voteStatus').textContent=`ต้องการ ${needV} เสียงขึ้นไปถึงจะจับได้ · โหวตแล้ว 0/${aliveN} คน`;
+  }
 
   // ฟัง timer + เสียงโหวต + phase
   const rRef=ref(db,`tk_rooms/${roomCode}`);
@@ -1113,7 +1207,8 @@ async function enterVote(){
       updateTimerUI('voteTimer', room.timer||0);
       const votes=room.votes||{};
       const total=Object.values(room.players||{}).filter(p=>p.isAlive).length;
-      document.getElementById('voteStatus').textContent=`โหวตแล้ว ${Object.keys(votes).length}/${total} คน`;
+      const needV2=Math.floor(total/2)+1;
+      document.getElementById('voteStatus').textContent=`ต้องการ ${needV2} เสียง · โหวตแล้ว ${Object.keys(votes).length}/${total} คน`;
       if(room.phase==='arrested' && !wentArrested){ wentArrested=true; enterArrested(room); }
       if(room.phase==='gameover'){
         get(ref(db,`tk_rooms/${roomCode}`)).then(s=>{
@@ -1142,14 +1237,16 @@ async function processVote(){
   const players=room.players||{};
   const votes  =room.votes||{};
 
-  // นับเสียง
+  // นับเสียง (ต้องมากกว่าครึ่งของผู้เล่นที่เหลือ)
+  const aliveCount=Object.values(players).filter(p=>p.isAlive).length;
+  const halfPlus=Math.floor(aliveCount/2)+1;
   const cnt={};
   Object.values(votes).forEach(id=>{ cnt[id]=(cnt[id]||0)+1; });
   let arrested=null;
   if(Object.keys(cnt).length>0){
     const maxV=Math.max(...Object.values(cnt));
     const tops=Object.entries(cnt).filter(([,v])=>v===maxV).map(([id])=>id);
-    if(tops.length===1) arrested=tops[0]; // เสียงเท่ากัน → ไม่มีใครถูกจับ
+    if(tops.length===1 && maxV>=halfPlus) arrested=tops[0]; // เสียงเดียวและมากกว่าครึ่ง
   }
 
   const law=LAWS[Math.floor(Math.random()*LAWS.length)];
@@ -1182,17 +1279,19 @@ async function enterArrested(roomData){
   const arId   =room.arrestedId;
   const law    =room.currentLaw||LAWS[0];
 
-  // แสดง Role ผู้ถูกจับ
+  // แสดงผู้ถูกจับ (ไม่เปิดเผยบทบาท — จะเปิดเมื่อเกมจบ)
   const cardEl=document.getElementById('arrestedCard');
   if(arId && players[arId]){
     const p=players[arId];
-    const info=ROLES[p.role]||ROLES.villager;
     cardEl.innerHTML=`
-      <div class="role-card ${info.cls}">
-        <div style="font-size:13px;opacity:.75;margin-bottom:6px">ถูกจับ: ${p.name}</div>
-        <span class="role-emoji">${info.emoji}</span>
-        <div class="role-name">${info.name}</div>
-        <div class="role-desc">${info.desc}</div>
+      <div class="card tc" style="padding:22px 18px">
+        <div style="font-size:64px">🚔</div>
+        <div style="font-size:12px;color:#888;margin-top:8px">ถูกจับกุมโดยชาวบ้าน</div>
+        <h2 style="margin-top:6px">${escHtml(p.name)}</h2>
+        <div style="margin-top:12px;background:#f5f5f5;border-radius:8px;padding:10px;font-size:13px;color:#aaa">
+          🔒 บทบาทเป็นความลับ<br>
+          <span style="font-size:11px">จะเปิดเผยเมื่อเกมจบ</span>
+        </div>
       </div>`;
   } else {
     cardEl.innerHTML=`<div class="card tc">
@@ -1210,8 +1309,17 @@ async function enterArrested(roomData){
       <div class="law-desc">${law.d}</div>
     </div>`;
 
-  if(isHost){ vis('arrestHostBtn',true); vis('arrestWait',false); }
-  else       { vis('arrestHostBtn',false); vis('arrestWait',true); }
+  // Auto-advance to next round after 5s
+  vis('arrestHostBtn',false); vis('arrestWait',true);
+  let aT=5;
+  const aWait=document.getElementById('arrestWait');
+  aWait.textContent=`⏳ รอบต่อไปอัตโนมัติใน ${aT} วินาที...`;
+  const aiv=setInterval(()=>{
+    aT--;
+    if(aWait) aWait.textContent=`⏳ รอบต่อไปอัตโนมัติใน ${aT>0?aT:0} วินาที...`;
+    if(aT<=0) clearInterval(aiv);
+  },1000);
+  if(isHost) setTimeout(async()=>{ if(roomCode) await nextRound(); }, 5000);
 
   // ฟัง phase เปลี่ยน
   const phRef=ref(db,`tk_rooms/${roomCode}/phase`);
@@ -1274,6 +1382,16 @@ function enterGameOver(players, winner){
       </div>
     </div>`;
 
+  // Auto-return home countdown
+  let goT=20;
+  const goBtn=document.getElementById('goHomeBtn');
+  if(goBtn) goBtn.textContent=`🏠 กลับหน้าหลัก (${goT})`;
+  const goiv=setInterval(()=>{
+    goT--;
+    if(goBtn) goBtn.textContent=`🏠 กลับหน้าหลัก (${goT>0?goT:0})`;
+    if(goT<=0){ clearInterval(goiv); G.backToHome(); }
+  },1000);
+
   // เปิดเผย Role ทุกคน
   document.getElementById('goRoleList').innerHTML=Object.entries(players).map(([id,p])=>{
     const info=ROLES[p.role]||ROLES.villager;
@@ -1304,9 +1422,11 @@ function updateTimerUI(elId, t){
 // ──────────────────────────────────────────
 window.G={
   createRoom, joinRoom, leaveRoom, startGame,
+  kickPlayer,
   showRole, confirmRole,
   killerVote, chiefProtect, auntCheck,
   castVote, sendChat, goToChat,
+  startReply, cancelReply,
   nextRound, backToHome,
 };
 
