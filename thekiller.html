@@ -542,6 +542,33 @@ function killListeners(){
 }
 
 // ──────────────────────────────────────────
+// Helper: Firebase + timeout 8 วินาที
+// ──────────────────────────────────────────
+function withTO(promise, ms=8000){
+  return Promise.race([
+    promise,
+    new Promise((_,rej)=>setTimeout(()=>rej(new Error('TIMEOUT')),ms))
+  ]);
+}
+function showDbError(e){
+  setLoad(false);
+  if(e.message==='TIMEOUT'){
+    alert(
+      '⏱️ การเชื่อมต่อค้าง (timeout)\n\n'+
+      'ต้องทำก่อนใช้งาน:\n'+
+      '1. เปิด Firebase Console\n'+
+      '2. Realtime Database → Create database\n'+
+      '3. ตั้ง Rules เป็น:\n'+
+      '   {"rules":{".read":true,".write":true}}\n\n'+
+      'หรือ databaseURL อาจผิด Region\n'+
+      'ลองเปลี่ยนเป็น:\nhttps://aomsensei-classroom-default-rtdb.firebaseio.com'
+    );
+  } else {
+    alert('Firebase Error: '+e.message);
+  }
+}
+
+// ──────────────────────────────────────────
 // SCREEN 1: หน้าแรก — สร้าง/เข้าร่วมห้อง
 // ──────────────────────────────────────────
 async function createRoom(){
@@ -549,21 +576,20 @@ async function createRoom(){
   if(!myName){ alert('กรุณาใส่ชื่อผู้เล่น'); return; }
   localStorage.setItem('tkName', myName);
   setLoad(true,'กำลังสร้างห้อง...');
-
   roomCode = Math.random().toString(36).slice(2,6).toUpperCase();
   isHost   = true;
-
-  await set(ref(db,`tk_rooms/${roomCode}`),{
-    host:roomCode, hostId:myId, phase:'lobby', round:0, timer:0,
-    createdAt: Date.now(),
-  });
-  await set(ref(db,`tk_rooms/${roomCode}/players/${myId}`),{
-    name:myName, role:'', isAlive:true, isReady:false, joinedAt:Date.now()
-  });
-  onDisconnect(ref(db,`tk_rooms/${roomCode}/players/${myId}`)).remove();
-
-  setLoad(false);
-  enterLobby();
+  try{
+    await withTO(set(ref(db,`tk_rooms/${roomCode}`),{
+      host:roomCode, hostId:myId, phase:'lobby', round:0, timer:0,
+      createdAt: Date.now(),
+    }));
+    await withTO(set(ref(db,`tk_rooms/${roomCode}/players/${myId}`),{
+      name:myName, role:'', isAlive:true, isReady:false, joinedAt:Date.now()
+    }));
+    onDisconnect(ref(db,`tk_rooms/${roomCode}/players/${myId}`)).remove();
+    setLoad(false);
+    enterLobby();
+  }catch(e){ showDbError(e); roomCode=''; isHost=false; }
 }
 
 async function joinRoom(){
@@ -571,28 +597,24 @@ async function joinRoom(){
   const code = document.getElementById('joinCode').value.trim().toUpperCase();
   if(!myName){ alert('กรุณาใส่ชื่อผู้เล่น'); return; }
   if(code.length!==4){ alert('รหัสห้องต้องเป็น 4 ตัวอักษร'); return; }
-
   setLoad(true,'กำลังเข้าร่วม...');
-  const snap = await get(ref(db,`tk_rooms/${code}`));
-  if(!snap.exists()){ setLoad(false); alert('ไม่พบห้องนี้'); return; }
-
-  const room = snap.val();
-  if(room.phase!=='lobby'){ setLoad(false); alert('เกมนี้เริ่มไปแล้ว'); return; }
-
-  const cnt = Object.keys(room.players||{}).length;
-  if(cnt>=10){ setLoad(false); alert('ห้องเต็มแล้ว (10/10)'); return; }
-
-  roomCode = code;
-  isHost   = (room.hostId === myId);
-  localStorage.setItem('tkName', myName);
-
-  await set(ref(db,`tk_rooms/${roomCode}/players/${myId}`),{
-    name:myName, role:'', isAlive:true, isReady:false, joinedAt:Date.now()
-  });
-  onDisconnect(ref(db,`tk_rooms/${roomCode}/players/${myId}`)).remove();
-
-  setLoad(false);
-  enterLobby();
+  try{
+    const snap = await withTO(get(ref(db,`tk_rooms/${code}`)));
+    if(!snap.exists()){ setLoad(false); alert('ไม่พบห้องนี้'); return; }
+    const room = snap.val();
+    if(room.phase!=='lobby'){ setLoad(false); alert('เกมนี้เริ่มไปแล้ว'); return; }
+    const cnt = Object.keys(room.players||{}).length;
+    if(cnt>=10){ setLoad(false); alert('ห้องเต็มแล้ว (10/10)'); return; }
+    roomCode = code;
+    isHost   = (room.hostId === myId);
+    localStorage.setItem('tkName', myName);
+    await withTO(set(ref(db,`tk_rooms/${roomCode}/players/${myId}`),{
+      name:myName, role:'', isAlive:true, isReady:false, joinedAt:Date.now()
+    }));
+    onDisconnect(ref(db,`tk_rooms/${roomCode}/players/${myId}`)).remove();
+    setLoad(false);
+    enterLobby();
+  }catch(e){ showDbError(e); roomCode=''; isHost=false; }
 }
 
 // ──────────────────────────────────────────
