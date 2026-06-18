@@ -155,6 +155,19 @@
       display:block;max-width:100%}
 
     /* ══════════════════════════════════
+       VOICE CHAT
+    ══════════════════════════════════ */
+    .voice-panel{background:var(--green-l);border:1.5px solid #a5d6a7;border-radius:var(--r);padding:12px}
+    .voice-peer{display:inline-block;margin:3px 4px 3px 0;padding:3px 10px;
+      background:#fff;border-radius:20px;border:1.5px solid #c8e6c9;
+      font-size:12px;font-weight:600;transition:border-color .3s}
+    .voice-peer.active{border-color:var(--green);background:var(--green-l)}
+    .mute-btn{background:var(--green);color:#fff;border:none;border-radius:8px;
+      padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;
+      font-family:var(--font);transition:background .2s}
+    .mute-btn.muted{background:#e53935}
+
+    /* ══════════════════════════════════
        ANNOUNCE BANNERS
     ══════════════════════════════════ */
     .banner{padding:16px;border-radius:12px;text-align:center;font-size:18px;font-weight:800;line-height:1.4}
@@ -393,6 +406,16 @@
   <div class="timer-wrap">
     <div class="timer-ring" id="chatTimer">60</div>
     <div class="tm tc" style="margin-top:6px">วินาทีเหลือ</div>
+  </div>
+
+  <!-- Voice Chat Panel — แสดงเฉพาะช่วงสืบสวน -->
+  <div id="voicePanel" class="voice-panel hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="font-weight:700;font-size:13px;color:var(--green)">🎙️ แชทเสียง</div>
+      <button id="muteBtn" class="mute-btn" onclick="G.toggleMute()">🎙️ เปิดอยู่</button>
+    </div>
+    <div id="voiceStatus" style="font-size:12px;color:#888;margin-bottom:6px">กำลังเชื่อมต่อ...</div>
+    <div id="voicePeers"></div>
   </div>
 
   <div class="card" style="padding:12px">
@@ -709,6 +732,7 @@ async function kickPlayer(targetId){
 async function leaveRoom(){
   if(!confirm('ออกจากห้องใช่ไหม?')) return;
   killListeners();
+  stopVoiceChat();
   if(roomCode) await remove(ref(db,`tk_rooms/${roomCode}/players/${myId}`));
   roomCode=''; isHost=false;
   show('sc-home');
@@ -741,8 +765,8 @@ async function startGame(){
 
 function makeRoles(n){
   const r=[];
-  r.push(n<6 ? 'killer' : 'killer'); // ฆาตกรคนที่ 1
-  if(n>=6) r.push('killer');         // ฆาตกรคนที่ 2 (≥6 คน)
+  r.push('killer');           // ฆาตกรคนที่ 1 (ทุกเกม)
+  if(n>5) r.push('killer');  // ฆาตกรคนที่ 2 (มากกว่า 5 คน)
   r.push('chief'); r.push('aunt');
   while(r.length<n) r.push('villager');
   return r.sort(()=>Math.random()-.5);
@@ -823,6 +847,7 @@ async function confirmRole(){
 // ──────────────────────────────────────────
 async function enterNight(roomData){
   killListeners();
+  stopVoiceChat(); // ออกจาก chat/vote — ปิด voice ถ้ายังเปิดอยู่
   show('sc-night');
   document.getElementById('nightRound').textContent = roomData?.round||1;
 
@@ -852,6 +877,8 @@ async function enterNight(roomData){
   } else if(myRole==='aunt'){
     renderAuntUI(alive);
   } else {
+    // คืนค่า UI หลับ (กรณีรอบใหม่หลังรีเซ็ต — เพื่อป้องกัน innerHTML ค้างจากรอบก่อน)
+    document.getElementById('uiVillager').innerHTML=`<div class="card tc" style="background:var(--green-l);border:2px solid #a5d6a7;padding:28px"><div style="font-size:48px">😴</div><h3 style="color:var(--green);margin-top:10px">คุณกำลังหลับอยู่...</h3><div class="tm mt8">รอให้รอบกลางคืนผ่านไป</div></div>`;
     vis('uiVillager',true);
   }
 
@@ -1047,8 +1074,10 @@ async function enterMorning(roomData){
   const phRef=ref(db,`tk_rooms/${roomCode}/phase`);
   listeners.morning=(()=>{
     const unsub=onValue(phRef,snap=>{
-      if(snap.val()==='chat') enterChat();
-      if(snap.val()==='gameover'){
+      const ph=snap.val();
+      if(ph==='chat') enterChat();
+      if(ph==='role_reveal') enterRoleReveal();
+      if(ph==='gameover'){
         get(ref(db,`tk_rooms/${roomCode}`)).then(s=>{
           const d=s.val(); enterGameOver(d.players||{}, d.winner);
         });
@@ -1087,12 +1116,22 @@ async function goToChat(){
 // ──────────────────────────────────────────
 async function enterChat(){
   killListeners();
+  stopVoiceChat(); // ล้าง voice connections เก่า
   show('sc-chat');
 
-  const mySnap=await get(ref(db,`tk_rooms/${roomCode}/players/${myId}/isAlive`));
-  const alive=mySnap.val()===true;
+  const snap    = await get(ref(db,`tk_rooms/${roomCode}/players`));
+  const players = snap.val()||{};
+  const alive   = players[myId]?.isAlive===true;
   document.getElementById('chatInput').disabled=!alive;
   if(!alive) document.getElementById('chatInput').placeholder='💀 คุณเสียชีวิตแล้ว ไม่สามารถแชทได้';
+
+  // เริ่ม voice chat สำหรับผู้เล่นที่ยังมีชีวิต
+  if(alive){
+    const alivePlayers=Object.entries(players)
+      .filter(([,p])=>p.isAlive)
+      .map(([id,p])=>({id,name:p.name}));
+    startVoiceChat(alivePlayers);
+  }
 
   // ฟัง timer + phase
   const rRef=ref(db,`tk_rooms/${roomCode}`);
@@ -1129,7 +1168,7 @@ async function enterChat(){
     return ()=>off(msgRef,'value',unsub);
   })();
 
-  if(isHost) startHostTimer('chat',60);
+  // หมายเหตุ: goToChat() เริ่ม timer 30s ไว้แล้ว; ไม่ restart ที่นี่อีกครั้ง
 }
 
 function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -1173,6 +1212,7 @@ async function startVotePhase(){
 
 async function enterVote(){
   killListeners();
+  stopVoiceChat(); // ออกจาก chat phase — ปิด voice
   show('sc-vote');
 
   const snap   =await get(ref(db,`tk_rooms/${roomCode}/players`));
@@ -1309,9 +1349,9 @@ async function enterArrested(roomData){
       <div class="law-desc">${law.d}</div>
     </div>`;
 
-  // Auto-advance to next round after 5s
+  // Auto-advance to next round after 10s
   vis('arrestHostBtn',false); vis('arrestWait',true);
-  let aT=5;
+  let aT=10;
   const aWait=document.getElementById('arrestWait');
   aWait.textContent=`⏳ รอบต่อไปอัตโนมัติใน ${aT} วินาที...`;
   const aiv=setInterval(()=>{
@@ -1319,16 +1359,18 @@ async function enterArrested(roomData){
     if(aWait) aWait.textContent=`⏳ รอบต่อไปอัตโนมัติใน ${aT>0?aT:0} วินาที...`;
     if(aT<=0) clearInterval(aiv);
   },1000);
-  if(isHost) setTimeout(async()=>{ if(roomCode) await nextRound(); }, 5000);
+  if(isHost) setTimeout(async()=>{ if(roomCode) await nextRound(); }, 10000);
 
   // ฟัง phase เปลี่ยน
   const phRef=ref(db,`tk_rooms/${roomCode}/phase`);
   listeners.arrested=(()=>{
     const unsub=onValue(phRef,snap=>{
-      if(snap.val()==='night'){
+      const ph=snap.val();
+      if(ph==='role_reveal') enterRoleReveal(); // รอบใหม่ — แจกบทบาทใหม่
+      if(ph==='night'){
         get(ref(db,`tk_rooms/${roomCode}`)).then(s=>enterNight(s.val()));
       }
-      if(snap.val()==='gameover'){
+      if(ph==='gameover'){
         get(ref(db,`tk_rooms/${roomCode}`)).then(s=>{
           const d=s.val(); enterGameOver(d.players||{}, d.winner);
         });
@@ -1342,27 +1384,37 @@ async function nextRound(){
   const snap   =await get(ref(db,`tk_rooms/${roomCode}`));
   const room   =snap.val()||{};
   const players=room.players||{};
-  const win    =checkWin(players);
+  // ตรวจชนะก่อนรีเซ็ต (กัน edge case)
+  const win=checkWin(players);
   if(win){ await doGameOver(players,win); return; }
 
+  const ids=Object.keys(players);
   const newRound=(room.round||1)+1;
-  const u={};
-  Object.keys(players).forEach(id=>{ u[`tk_rooms/${roomCode}/players/${id}/isReady`]=false; });
-  u[`tk_rooms/${roomCode}/phase`]='night';
-  u[`tk_rooms/${roomCode}/round`]=newRound;
-  u[`tk_rooms/${roomCode}/timer`]=10;
-  u[`tk_rooms/${roomCode}/killerVotes`]=null;
-  u[`tk_rooms/${roomCode}/nightTarget`]=null;
-  u[`tk_rooms/${roomCode}/votes`]=null;
-  u[`tk_rooms/${roomCode}/arrestedId`]=null;
-  u[`tk_rooms/${roomCode}/chiefProtect`]=null;
-  u[`tk_rooms/${roomCode}/auntCheck`]=null;
-  u[`tk_rooms/${roomCode}/auntResult`]=null;
-  await update(ref(db),u);
 
-  const rSnap=await get(ref(db,`tk_rooms/${roomCode}`));
-  enterNight(rSnap.val());
-  startHostTimer('night',10);
+  // แจกบทบาทใหม่ทุกรอบ — รีเซ็ตสถานะทั้งหมด เก็บแค่ชื่อ
+  const roles=makeRoles(ids.length);
+  const shuffled=[...ids].sort(()=>Math.random()-.5);
+  const u={};
+  shuffled.forEach((id,i)=>{
+    u[`tk_rooms/${roomCode}/players/${id}/role`]    = roles[i];
+    u[`tk_rooms/${roomCode}/players/${id}/isAlive`] = true;
+    u[`tk_rooms/${roomCode}/players/${id}/isReady`] = false;
+  });
+  u[`tk_rooms/${roomCode}/phase`]        = 'role_reveal';
+  u[`tk_rooms/${roomCode}/round`]        = newRound;
+  u[`tk_rooms/${roomCode}/timer`]        = 0;
+  u[`tk_rooms/${roomCode}/killerVotes`]  = null;
+  u[`tk_rooms/${roomCode}/nightTarget`]  = null;
+  u[`tk_rooms/${roomCode}/protectedLast`]= null;
+  u[`tk_rooms/${roomCode}/votes`]        = null;
+  u[`tk_rooms/${roomCode}/arrestedId`]   = null;
+  u[`tk_rooms/${roomCode}/chiefProtect`] = null;
+  u[`tk_rooms/${roomCode}/auntCheck`]    = null;
+  u[`tk_rooms/${roomCode}/auntResult`]   = null;
+  u[`tk_rooms/${roomCode}/messages`]     = null;
+  u[`tk_rooms/${roomCode}/webrtc`]       = null;
+  await update(ref(db),u);
+  // enterRoleReveal จะถูกเรียกโดย listener เมื่อ phase = 'role_reveal'
 }
 
 // ──────────────────────────────────────────
@@ -1404,6 +1456,7 @@ function enterGameOver(players, winner){
 
 function backToHome(){
   killListeners();
+  stopVoiceChat();
   roomCode=''; isHost=false; myRole='';
   show('sc-home');
 }
@@ -1418,6 +1471,139 @@ function updateTimerUI(elId, t){
 }
 
 // ──────────────────────────────────────────
+// VOICE CHAT — WebRTC + Firebase signaling
+// ──────────────────────────────────────────
+let voiceConns  = {};   // { peerId: RTCPeerConnection }
+let voiceAudios = {};   // { peerId: HTMLAudioElement }
+let localStream = null;
+let voiceMuted  = false;
+const ICE_SERVERS = [{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}];
+
+async function startVoiceChat(alivePlayers){
+  // alivePlayers = [{id, name}] รวมตัวเอง
+  const panelEl  = document.getElementById('voicePanel');
+  const statusEl = document.getElementById('voiceStatus');
+  const peersEl  = document.getElementById('voicePeers');
+
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+  } catch(e) {
+    if(panelEl){ panelEl.classList.remove('hidden'); }
+    if(statusEl) statusEl.textContent='❌ ไม่สามารถเข้าถึงไมค์ได้ ('+e.name+')';
+    return;
+  }
+  voiceMuted = false;
+  if(panelEl) panelEl.classList.remove('hidden');
+  const muteBtn = document.getElementById('muteBtn');
+  if(muteBtn){ muteBtn.textContent='🎙️ เปิดอยู่'; muteBtn.classList.remove('muted'); }
+
+  const peers = alivePlayers.filter(p=>p.id!==myId);
+  if(!peers.length){ if(statusEl) statusEl.textContent='✅ ไม่มีผู้เล่นคนอื่นในรอบนี้'; return; }
+
+  if(peersEl) peersEl.innerHTML=peers.map(p=>
+    `<span class="voice-peer" id="vp_${p.id}">🔇 ${p.name}</span>`).join('');
+  if(statusEl) statusEl.textContent=`✅ ไมค์พร้อม · กำลังเชื่อมต่อ ${peers.length} คน...`;
+
+  for(const peer of peers){
+    const pc = new RTCPeerConnection({iceServers:ICE_SERVERS});
+    voiceConns[peer.id] = pc;
+
+    // เพิ่ม local audio
+    localStream.getTracks().forEach(t=>pc.addTrack(t,localStream));
+
+    // รับ remote audio
+    pc.ontrack = (e)=>{
+      if(!voiceAudios[peer.id]){
+        const audio = new Audio();
+        audio.autoplay = true;
+        document.body.appendChild(audio);
+        voiceAudios[peer.id] = audio;
+      }
+      voiceAudios[peer.id].srcObject = e.streams[0];
+      const vpEl = document.getElementById(`vp_${peer.id}`);
+      if(vpEl){ vpEl.textContent=`🔊 ${peer.name}`; vpEl.classList.add('active'); }
+    };
+
+    // ICE candidate
+    pc.onicecandidate = (e)=>{
+      if(!e.candidate||!roomCode) return;
+      push(ref(db,`tk_rooms/${roomCode}/webrtc/${myId}/${peer.id}/ice`), e.candidate.toJSON());
+    };
+
+    // Initiator: ผู้ที่มี myId น้อยกว่าเป็นคนส่ง offer
+    if(myId < peer.id){
+      try{
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        await set(ref(db,`tk_rooms/${roomCode}/webrtc/${myId}/${peer.id}/offer`),
+          {type:offer.type, sdp:offer.sdp});
+      }catch(e){ console.warn('voice offer error',e); }
+    }
+
+    // Answerer: ฟัง offer จาก peer แล้วตอบกลับ
+    if(myId > peer.id){
+      const ofRef = ref(db,`tk_rooms/${roomCode}/webrtc/${peer.id}/${myId}/offer`);
+      listeners[`vof_${peer.id}`]=(()=>{
+        const unsub=onValue(ofRef, async snap=>{
+          if(!snap.val()||pc.signalingState!=='stable') return;
+          try{
+            await pc.setRemoteDescription(snap.val());
+            const ans = await pc.createAnswer();
+            await pc.setLocalDescription(ans);
+            await set(ref(db,`tk_rooms/${roomCode}/webrtc/${peer.id}/${myId}/answer`),
+              {type:ans.type, sdp:ans.sdp});
+          }catch(e){ console.warn('voice answer error',e); }
+        });
+        return ()=>off(ofRef,'value',unsub);
+      })();
+    }
+
+    // Initiator: ฟัง answer
+    if(myId < peer.id){
+      const anRef = ref(db,`tk_rooms/${roomCode}/webrtc/${myId}/${peer.id}/answer`);
+      listeners[`van_${peer.id}`]=(()=>{
+        const unsub=onValue(anRef, async snap=>{
+          if(!snap.val()||pc.signalingState!=='have-local-offer') return;
+          try{ await pc.setRemoteDescription(snap.val()); }catch(e){ console.warn('voice setRemote ans',e); }
+        });
+        return ()=>off(anRef,'value',unsub);
+      })();
+    }
+
+    // ICE จาก peer
+    const iceRef = ref(db,`tk_rooms/${roomCode}/webrtc/${peer.id}/${myId}/ice`);
+    const knownIce = new Set();
+    listeners[`vic_${peer.id}`]=(()=>{
+      const unsub=onValue(iceRef, snap=>{
+        const ices=snap.val(); if(!ices) return;
+        Object.entries(ices).forEach(([k,ice])=>{
+          if(knownIce.has(k)) return; knownIce.add(k);
+          pc.addIceCandidate(ice).catch(()=>{});
+        });
+      });
+      return ()=>off(iceRef,'value',unsub);
+    })();
+  }
+}
+
+function stopVoiceChat(){
+  Object.values(voiceConns).forEach(pc=>{ try{pc.close();}catch(e){} });
+  voiceConns = {};
+  Object.values(voiceAudios).forEach(a=>{ a.pause(); a.srcObject=null; try{if(a.parentNode) a.parentNode.removeChild(a);}catch(e){} });
+  voiceAudios = {};
+  if(localStream){ localStream.getTracks().forEach(t=>t.stop()); localStream=null; }
+  if(roomCode) remove(ref(db,`tk_rooms/${roomCode}/webrtc/${myId}`)).catch(()=>{});
+  const p=document.getElementById('voicePanel'); if(p) p.classList.add('hidden');
+}
+
+function toggleMute(){
+  voiceMuted=!voiceMuted;
+  if(localStream) localStream.getAudioTracks().forEach(t=>{ t.enabled=!voiceMuted; });
+  const btn=document.getElementById('muteBtn');
+  if(btn){ btn.textContent=voiceMuted?'🔇 ปิดอยู่':'🎙️ เปิดอยู่'; btn.classList.toggle('muted',voiceMuted); }
+}
+
+// ──────────────────────────────────────────
 // Export ฟังก์ชันเป็น Global (onclick ใช้ได้)
 // ──────────────────────────────────────────
 window.G={
@@ -1427,6 +1613,7 @@ window.G={
   killerVote, chiefProtect, auntCheck,
   castVote, sendChat, goToChat,
   startReply, cancelReply,
+  toggleMute,
   nextRound, backToHome,
 };
 
