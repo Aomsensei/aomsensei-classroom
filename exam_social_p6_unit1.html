@@ -634,9 +634,26 @@
     q16:'ค', q17:'ก', q18:'ข', q19:'ง', q20:'ค'
   };
 
-  function submitAnswers() {
+  
+// ==================== ANTI-CHEAT ====================
+var _examSubmitted = false;
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'hidden' && !_examSubmitted) {
+    _examSubmitted = true;
+    var ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(198,40,40,.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:Sarabun,sans-serif;text-align:center;padding:20px';
+    ov.innerHTML = '<div style="font-size:60px;margin-bottom:14px">⚠️</div><div style="font-size:28px;font-weight:800;margin-bottom:8px">ตรวจพบการสลับหน้าจอ!</div><div style="font-size:17px;opacity:.9">ระบบส่งคำตอบอัตโนมัติแล้ว</div>';
+    document.body.appendChild(ov);
+    submitAnswers(true, 'สลับแท็บ/ซ่อนหน้าต่าง');
+  }
+});
+
+  function submitAnswers(isCheat, cheatReason) {
     var name = document.getElementById('studentNameSel').value;
-    if (!name) { alert('⚠️ กรุณาเลือกชื่อนักเรียนก่อน'); return; }
+    if (!name && !isCheat) { alert('⚠️ กรุณาเลือกชื่อนักเรียนก่อน'); return; }
+    if (!name) name = '(ไม่ระบุชื่อ)';
+    isCheat = isCheat || false;
+    cheatReason = cheatReason || null;
     var answers = {};
     for (var i = 1; i <= 20; i++) {
       var sel = document.querySelector('input[name="q'+i+'"]:checked');
@@ -669,6 +686,7 @@
       unit: 'หน่วยที่ 1', answers: answers, totalOutOf: 20
     };
     if (hasKey) { data.mcScore = mcScore; data.mcDetails = mcDetails; }
+        if (isCheat) { data.cheated = true; data.cheatReason = cheatReason || "unknown"; }
     (function doSubmit() {
       if (typeof window._submitAnswers === 'function') {
         window._submitAnswers(data).then(function() {
