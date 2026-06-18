@@ -357,22 +357,37 @@ body{
   <div class="group-card">
     <div class="gc-title">👥 สมาชิกกลุ่ม</div>
     <div id="loadingStudents" class="loading-txt">⏳ กำลังโหลดรายชื่อนักเรียน...</div>
-    <div class="member-grid" id="memberGrid" style="display:none">
-      <div class="member-row">
-        <label class="m-lbl">สมาชิกคนที่ 1</label>
-        <select id="member1" class="m-sel">
-          <option value="">— เลือกชื่อนักเรียน —</option>
-        </select>
+    <div id="memberGrid" style="display:none">
+      <!-- สมาชิกคนที่ 1 -->
+      <div style="margin-bottom:14px">
+        <div class="m-lbl" style="margin-bottom:6px">👤 สมาชิกคนที่ 1</div>
+        <div style="display:grid;grid-template-columns:1fr 90px;gap:8px">
+          <select id="member1Name" class="m-sel">
+            <option value="">— เลือกชื่อนักเรียน —</option>
+          </select>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span style="font-size:11px;color:rgba(255,255,255,.45);font-weight:700">เลขที่</span>
+            <input id="member1No" class="m-inp" type="number" min="1" max="50" placeholder="...">
+          </div>
+        </div>
       </div>
-      <div class="member-row">
-        <label class="m-lbl">สมาชิกคนที่ 2</label>
-        <select id="member2" class="m-sel">
-          <option value="">— เลือกชื่อนักเรียน —</option>
-        </select>
+      <!-- สมาชิกคนที่ 2 -->
+      <div style="margin-bottom:14px">
+        <div class="m-lbl" style="margin-bottom:6px">👤 สมาชิกคนที่ 2</div>
+        <div style="display:grid;grid-template-columns:1fr 90px;gap:8px">
+          <select id="member2Name" class="m-sel">
+            <option value="">— เลือกชื่อนักเรียน —</option>
+          </select>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span style="font-size:11px;color:rgba(255,255,255,.45);font-weight:700">เลขที่</span>
+            <input id="member2No" class="m-inp" type="number" min="1" max="50" placeholder="...">
+          </div>
+        </div>
       </div>
-      <div class="member-row" style="grid-column:1/-1">
-        <label class="m-lbl">ชั้น</label>
-        <div class="m-static">📚 ชั้นมัธยมศึกษาปีที่ 3</div>
+      <!-- ชั้น -->
+      <div>
+        <div class="m-lbl" style="margin-bottom:6px">🏫 ชั้น</div>
+        <div class="m-static">ชั้นมัธยมศึกษาปีที่ 3</div>
         <input type="hidden" id="classroom" value="ม.3">
       </div>
     </div>
@@ -632,52 +647,59 @@ const app = initializeApp(FIREBASE_CONFIG);
 const db  = getFirestore(app);
 
 // ===== LOAD STUDENTS FROM FIREBASE =====
-async function loadStudents(){
-  const loadEl  = document.getElementById('loadingStudents');
-  const gridEl  = document.getElementById('memberGrid');
+(async function loadStudents(){
+  const loadEl = document.getElementById('loadingStudents');
+  const gridEl = document.getElementById('memberGrid');
   try{
     const snap = await getDoc(doc(db,'score_system','hinfon_scores'));
     let students = [];
     if(snap.exists()){
       const data = snap.data().data || {};
-      students = (data.classes?.['ม.3']?.students) || [];
+      const key  = Object.keys(data.classes||{}).find(k=>k==='ม.3'||k.startsWith('ม.3'));
+      students   = key ? (data.classes[key].students||[]) : [];
     }
-    // Fallback: hard-coded list if Firebase empty
+    // Fallback
     if(!students.length){
       students = [
-        {id:'m3_1',prefix:'เด็กชาย',first:'อัครเดช',last:'ชัยสามารถ'},
-        {id:'m3_2',prefix:'เด็กชาย',first:'ณรงค์ชัย',last:'เสาโกมุท'},
-        {id:'m3_3',prefix:'เด็กชาย',first:'พงษ์พิพัฒน์',last:'ปิ่นตำนัก'},
-        {id:'m3_4',prefix:'เด็กชาย',first:'พุฒินันท์',last:'พบโชค'},
-        {id:'m3_5',prefix:'เด็กชาย',first:'รัตนเทพ',last:'มะเรืองศูนย์'},
-        {id:'m3_6',prefix:'เด็กชาย',first:'นพนันท์',last:'ขำเส็ง'},
-        {id:'m3_7',prefix:'เด็กหญิง',first:'กัญญาภรณ์',last:'วิชัยรัมย์'},
-        {id:'m3_8',prefix:'เด็กหญิง',first:'อมลวรรณ',last:'ทุมพันธ์'},
-        {id:'m3_9',prefix:'เด็กหญิง',first:'จิราวรรณ',last:'กองพา'},
-        {id:'m3_10',prefix:'เด็กชาย',first:'ธนกร',last:'หอมหวล'},
+        {prefix:'เด็กชาย',first:'อัครเดช',last:'ชัยสามารถ'},
+        {prefix:'เด็กชาย',first:'ณรงค์ชัย',last:'เสาโกมุท'},
+        {prefix:'เด็กชาย',first:'พงษ์พิพัฒน์',last:'ปิ่นตำนัก'},
+        {prefix:'เด็กชาย',first:'พุฒินันท์',last:'พบโชค'},
+        {prefix:'เด็กชาย',first:'รัตนเทพ',last:'มะเรืองศูนย์'},
+        {prefix:'เด็กชาย',first:'นพนันท์',last:'ขำเส็ง'},
+        {prefix:'เด็กหญิง',first:'กัญญาภรณ์',last:'วิชัยรัมย์'},
+        {prefix:'เด็กหญิง',first:'อมลวรรณ',last:'ทุมพันธ์'},
+        {prefix:'เด็กหญิง',first:'จิราวรรณ',last:'กองพา'},
+        {prefix:'เด็กชาย',first:'ธนกร',last:'หอมหวล'},
       ];
     }
-    // Populate both selects
-    ['member1','member2'].forEach(selId=>{
+    // Populate selects (name only, no number prefix)
+    ['member1Name','member2Name'].forEach(selId=>{
       const sel = document.getElementById(selId);
-      students.forEach((s,i)=>{
-        const opt = document.createElement('option');
-        opt.value = `เลขที่ ${i+1} — ${s.prefix}${s.first} ${s.last}`;
-        opt.textContent = `เลขที่ ${i+1}  ${s.prefix}${s.first} ${s.last}`;
+      sel.innerHTML = '<option value="">— เลือกชื่อนักเรียน —</option>';
+      students.forEach(s=>{
+        const full = [s.prefix, s.first, s.last].filter(Boolean).join(' ');
+        const opt  = document.createElement('option');
+        opt.value  = full;
+        opt.textContent = full;
         sel.appendChild(opt);
       });
       sel.addEventListener('change', checkMembers);
+    });
+    // เลขที่ input events
+    ['member1No','member2No'].forEach(id=>{
+      document.getElementById(id)?.addEventListener('input', checkMembers);
     });
     loadEl.style.display = 'none';
     gridEl.style.display = '';
   }catch(e){
     loadEl.textContent = '⚠️ โหลดรายชื่อไม่ได้ กรุณาลองใหม่';
   }
-}
-loadStudents();
+})();
 
 function checkMembers(){
-  const ok = ['member1','member2'].every(i=>(document.getElementById(i)?.value||'').trim().length>0);
+  const ok = ['member1Name','member2Name'].every(i=>(document.getElementById(i)?.value||'').trim().length>0)
+          && ['member1No','member2No'].every(i=>(document.getElementById(i)?.value||'').trim().length>0);
   mark('groupinfo', ok);
 }
 
@@ -734,9 +756,12 @@ setupTextarea('ref2','ref2','ref2',15);
 
 // ===== SUBMIT =====
 document.getElementById('btnSubmit').addEventListener('click', async()=>{
-  const m1n = document.getElementById('member1').value.trim();
-  const m2n = document.getElementById('member2').value.trim();
-  if(!m1n || !m2n){ alert('กรุณาเลือกชื่อสมาชิกอย่างน้อย 2 คนก่อนส่ง 📝'); return; }
+  const m1n  = document.getElementById('member1Name').value.trim();
+  const m2n  = document.getElementById('member2Name').value.trim();
+  const m1no = document.getElementById('member1No').value.trim();
+  const m2no = document.getElementById('member2No').value.trim();
+  if(!m1n || !m2n){ alert('กรุณาเลือกชื่อสมาชิกให้ครบก่อนส่ง 📝'); return; }
+  if(!m1no || !m2no){ alert('กรุณากรอกเลขที่ให้ครบก่อนส่ง 📝'); return; }
 
   const getVal = id => (document.getElementById(id)||{}).value?.trim()||'';
 
@@ -747,7 +772,10 @@ document.getElementById('btnSubmit').addEventListener('click', async()=>{
     unit      : 4,
     plan      : 3,
     classroom : 'ม.3',
-    members   : [m1n, m2n].filter(Boolean),
+    members   : [
+      { name: m1n, no: m1no },
+      { name: m2n, no: m2no },
+    ],
     // Part 2: analysis
     mistake1  : getVal('m1'),
     mistake2  : getVal('m2'),
