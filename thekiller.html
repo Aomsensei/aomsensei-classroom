@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🔪 ตามล่าฆาตกร · บ้านห้วยหินฝน</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ══════════════════════════════════
+       RESET & ROOT
+    ══════════════════════════════════ */
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    :root{
+      --orange:#f39800;--orange-d:#e07800;--orange-l:#fff3e0;--orange-ll:#fffbf0;
+      --red:#c62828;--red-l:#ffebee;--green:#2e7d32;--green-l:#e8f5e9;
+      --blue:#1565c0;--blue-l:#e3f2fd;--purple:#6a1b9a;--purple-l:#f3e5f5;
+      --dark:#1a1a2e;--gray:#757575;--gray-l:#f5f5f5;
+      --shadow:0 4px 20px rgba(0,0,0,0.13);--r:14px;
+      --font:'Sarabun',sans-serif;
+    }
+    body{
+      font-family:var(--font);
+      background:linear-gradient(160deg,#fff8e1 0%,#ffe0b2 50%,#fff3e0 100%);
+      min-height:100vh;color:#333;overflow-x:hidden;
+    }
+
+    /* ══════════════════════════════════
+       VILLAGE HEADER — แสดงชื่อหมู่บ้านตลอด
+    ══════════════════════════════════ */
+    .village-hd{
+      background:linear-gradient(135deg,#f39800,#e65100);
+      color:#fff;text-align:center;padding:10px 16px;
+      font-size:13px;font-weight:700;letter-spacing:.8px;
+      position:sticky;top:0;z-index:300;
+      box-shadow:0 2px 10px rgba(0,0,0,.25);
+    }
+
+    /* ══════════════════════════════════
+       SCREENS
+    ══════════════════════════════════ */
+    .screen{display:none;min-height:calc(100vh - 41px);padding:14px;
+      max-width:480px;margin:0 auto;flex-direction:column;gap:14px}
+    .screen.active{display:flex}
+
+    /* ══════════════════════════════════
+       CARDS & BUTTONS
+    ══════════════════════════════════ */
+    .card{background:rgba(255,255,255,.97);border-radius:var(--r);
+      padding:18px;box-shadow:var(--shadow)}
+    .card-warn{background:#fff8e1;border:1.5px solid #ffe082}
+    h1{font-size:26px;font-weight:800;line-height:1.25}
+    h2{font-size:20px;font-weight:700}
+    h3{font-size:16px;font-weight:700}
+
+    .btn{display:block;width:100%;padding:13px;border:none;border-radius:11px;
+      font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;
+      transition:transform .15s,box-shadow .15s;text-align:center}
+    .btn:active{transform:scale(.97)}
+    .btn-orange{background:linear-gradient(135deg,#f39800,#e07800);color:#fff}
+    .btn-orange:hover{box-shadow:0 4px 14px rgba(243,152,0,.4)}
+    .btn-red{background:linear-gradient(135deg,#e53935,#c62828);color:#fff}
+    .btn-green{background:linear-gradient(135deg,#43a047,#2e7d32);color:#fff}
+    .btn-outline{background:#fff;border:2px solid var(--orange);color:var(--orange-d)}
+    .btn-dark{background:linear-gradient(135deg,#37474f,#263238);color:#fff}
+    .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+
+    input[type=text]{width:100%;padding:11px 14px;border:2px solid #ffd0a0;
+      border-radius:9px;font-family:var(--font);font-size:15px;outline:none;background:#fff}
+    input[type=text]:focus{border-color:var(--orange)}
+
+    /* ══════════════════════════════════
+       BADGES
+    ══════════════════════════════════ */
+    .badge{display:inline-block;padding:3px 10px;border-radius:20px;
+      font-size:11.5px;font-weight:700}
+    .b-orange{background:var(--orange-l);color:var(--orange-d)}
+    .b-red{background:var(--red-l);color:var(--red)}
+    .b-green{background:var(--green-l);color:var(--green)}
+    .b-gray{background:var(--gray-l);color:var(--gray)}
+    .b-dark{background:#37474f;color:#fff}
+    .b-purple{background:var(--purple-l);color:var(--purple)}
+
+    /* ══════════════════════════════════
+       TIMER
+    ══════════════════════════════════ */
+    .timer-wrap{text-align:center;padding:10px 0}
+    .timer-ring{width:78px;height:78px;border-radius:50%;border:5px solid var(--orange);
+      display:flex;align-items:center;justify-content:center;font-size:28px;
+      font-weight:800;margin:0 auto;color:var(--orange-d);background:var(--orange-l);
+      transition:all .4s}
+    .timer-ring.warn{border-color:#ff6f00;color:#ff6f00;background:#fff8e1;animation:tpulse .6s infinite}
+    .timer-ring.urgent{border-color:var(--red);color:var(--red);background:var(--red-l);animation:tpulse .35s infinite}
+    @keyframes tpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+
+    /* ══════════════════════════════════
+       ROLE CARDS
+    ══════════════════════════════════ */
+    .role-card{text-align:center;padding:28px 18px;border-radius:var(--r)}
+    .role-emoji{font-size:72px;margin-bottom:10px;display:block;
+      filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
+    .role-name{font-size:24px;font-weight:800;margin-bottom:6px}
+    .role-desc{font-size:14px;opacity:.88;line-height:1.5}
+    .rc-killer{background:linear-gradient(135deg,#1a1a2e,#4a0e0e);color:#fff}
+    .rc-chief{background:linear-gradient(135deg,#0d47a1,#1976d2);color:#fff}
+    .rc-aunt{background:linear-gradient(135deg,#4a148c,#7b1fa2);color:#fff}
+    .rc-villager{background:linear-gradient(135deg,#1b5e20,#388e3c);color:#fff}
+    .rc-dead{background:linear-gradient(135deg,#37474f,#607d8b);color:#fff}
+
+    /* ══════════════════════════════════
+       PLAYER LIST ITEMS
+    ══════════════════════════════════ */
+    .player-row{display:flex;align-items:center;gap:9px;padding:9px 12px;
+      background:#fff8f0;border-radius:9px;margin-bottom:7px;
+      border:1.5px solid #ffd0a0;font-size:14px;font-weight:600}
+    .player-row.dead{opacity:.45;text-decoration:line-through;
+      background:var(--gray-l);border-color:#ddd}
+
+    /* ══════════════════════════════════
+       NIGHT ACTION BUTTONS
+    ══════════════════════════════════ */
+    .action-btn{display:flex;align-items:center;gap:10px;padding:11px 14px;
+      background:#fff;border:2px solid #ffd0a0;border-radius:9px;margin-bottom:7px;
+      cursor:pointer;width:100%;font-family:var(--font);font-size:14px;
+      font-weight:600;transition:all .15s;text-align:left}
+    .action-btn:hover{border-color:var(--orange);background:var(--orange-l)}
+    .action-btn.selected-killer{border-color:var(--red);background:var(--red-l);color:var(--red)}
+    .action-btn.selected-chief{border-color:var(--blue);background:var(--blue-l);color:var(--blue)}
+    .action-btn.selected-aunt{border-color:var(--purple);background:var(--purple-l);color:var(--purple)}
+    .action-btn:disabled{opacity:.4;cursor:not-allowed}
+
+    /* ══════════════════════════════════
+       CHAT
+    ══════════════════════════════════ */
+    #chatBox{height:190px;overflow-y:auto;background:#f9f9f9;
+      border-radius:9px;padding:10px;border:1.5px solid #ffe0b2;margin-bottom:8px;
+      scroll-behavior:smooth}
+    .chat-msg{margin-bottom:7px;font-size:13.5px;line-height:1.45}
+    .chat-name{font-weight:700;color:var(--orange-d)}
+    .chat-sys{color:#888;font-style:italic;font-size:12.5px}
+
+    /* ══════════════════════════════════
+       ANNOUNCE BANNERS
+    ══════════════════════════════════ */
+    .banner{padding:16px;border-radius:12px;text-align:center;font-size:18px;font-weight:800;line-height:1.4}
+    .banner-death{background:var(--red-l);color:var(--red);border:2px solid #ef9a9a}
+    .banner-safe{background:var(--green-l);color:var(--green);border:2px solid #a5d6a7}
+    .banner-neutral{background:var(--gray-l);color:#555;border:2px solid #ddd}
+
+    /* ══════════════════════════════════
+       AUNT RESULT
+    ══════════════════════════════════ */
+    .aunt-result{padding:16px;border-radius:11px;text-align:center;
+      font-size:16px;font-weight:700;margin-top:4px}
+    .aunt-guilty{background:var(--red-l);color:var(--red);border:2px solid #ef9a9a}
+    .aunt-safe{background:var(--green-l);color:var(--green);border:2px solid #a5d6a7}
+
+    /* ══════════════════════════════════
+       LAW CARD
+    ══════════════════════════════════ */
+    .law-card{background:linear-gradient(135deg,#263238,#37474f);color:#fff;
+      border-radius:12px;padding:18px;text-align:center}
+    .law-sec{font-size:22px;font-weight:800;margin-bottom:5px}
+    .law-title{font-size:15px;font-weight:700;margin-bottom:8px;opacity:.95}
+    .law-desc{font-size:13px;opacity:.82;line-height:1.6}
+
+    /* ══════════════════════════════════
+       GAME OVER
+    ══════════════════════════════════ */
+    .go-card{text-align:center;padding:30px 18px;border-radius:var(--r)}
+    .go-killers{background:linear-gradient(135deg,#1a1a2e,#b71c1c);color:#fff}
+    .go-villagers{background:linear-gradient(135deg,#1b5e20,#2e7b32);color:#fff}
+
+    /* ══════════════════════════════════
+       OVERLAY (loading)
+    ══════════════════════════════════ */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;
+      display:flex;align-items:center;justify-content:center;padding:20px}
+    .ov-card{background:#fff;border-radius:var(--r);padding:26px;
+      max-width:340px;width:100%;text-align:center}
+
+    /* ══════════════════════════════════
+       ROOM CODE
+    ══════════════════════════════════ */
+    .room-code{font-size:38px;font-weight:800;color:var(--orange-d);
+      letter-spacing:8px;text-align:center;padding:12px;
+      background:var(--orange-l);border-radius:10px}
+
+    /* utils */
+    .tc{text-align:center}.tm{color:var(--gray);font-size:13px}
+    .mt8{margin-top:8px}.mt14{margin-top:14px}
+    .flex-gap{display:flex;gap:8px}
+    .hidden{display:none!important}
+    .night-hint{background:rgba(255,255,255,.1);border-radius:8px;padding:10px;
+      font-size:12.5px;margin-top:10px;opacity:.88;line-height:1.6}
+    .phase-hd{padding:20px 18px;border-radius:var(--r);text-align:center;color:#fff}
+  </style>
+</head>
+<body>
+
+<!-- ══ หัวเว็บ แสดงชื่อหมู่บ้านตลอดเวลา ══ -->
+<div class="village-hd">🏘️ บ้านห้วยหินฝน &nbsp;·&nbsp; ตามล่าฆาตกร</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 1: หน้าแรก
+══════════════════════════════════════ -->
+<div id="sc-home" class="screen active">
+  <div class="tc" style="padding:18px 0 6px">
+    <div style="font-size:72px;margin-bottom:6px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.2))">🔪</div>
+    <h1>ตามล่าฆาตกร</h1>
+    <div style="font-size:15px;color:#888;margin-top:4px">บ้านห้วยหินฝน</div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:10px">👤 ชื่อผู้เล่น</h3>
+    <input type="text" id="playerName" placeholder="ใส่ชื่อของคุณ (ไม่เกิน 12 ตัว)" maxlength="12">
+  </div>
+
+  <button class="btn btn-orange" onclick="G.createRoom()">🏠 สร้างห้องใหม่</button>
+
+  <div class="card flex-gap" style="align-items:center">
+    <input type="text" id="joinCode" placeholder="รหัสห้อง 4 ตัว" maxlength="4"
+      style="text-transform:uppercase;flex:1;font-size:18px;font-weight:700;letter-spacing:4px">
+    <button class="btn btn-outline" style="width:auto;padding:12px 18px;white-space:nowrap"
+      onclick="G.joinRoom()">เข้าร่วม</button>
+  </div>
+
+  <div class="card card-warn">
+    <h3 style="margin-bottom:8px">📋 วิธีเล่น</h3>
+    <div style="font-size:13px;color:#555;line-height:1.8">
+      🔴 <b>ฆาตกร</b> — สังหารชาวบ้านทุกคืน ไม่ให้ใครรู้ตัว<br>
+      👮 <b>ผู้ใหญ่บ้าน</b> — คุ้มครองชาวบ้าน 1 คนต่อคืน<br>
+      🔍 <b>ป้าข้างบ้าน</b> — ตรวจสอบตัวตนผู้เล่น 1 คนต่อคืน<br>
+      🌾 <b>ชาวบ้าน</b> — ช่วยกันสืบและโหวตจับฆาตกร<br>
+      <br>ต้องการ <b>4–10 คน</b> แต่ละคนใช้โทรศัพท์ตัวเอง
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 2: ห้องรอ (Lobby)
+══════════════════════════════════════ -->
+<div id="sc-lobby" class="screen">
+  <div class="card tc">
+    <div class="tm" style="margin-bottom:4px">รหัสห้อง — แชร์ให้เพื่อน</div>
+    <div class="room-code" id="lobbyCode">----</div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px">
+      <h3>ผู้เล่นในห้อง</h3>
+      <span id="playerCount" class="badge b-orange">0/10</span>
+    </div>
+    <div id="lobbyList"></div>
+  </div>
+
+  <div id="startWrap" class="hidden">
+    <button class="btn btn-orange" id="startBtn" onclick="G.startGame()">🎮 เริ่มเกม!</button>
+    <div class="tm tc mt8" id="startHint">ต้องการผู้เล่นอย่างน้อย 4 คน</div>
+  </div>
+  <div id="waitMsg" class="card tc" style="background:#f9f9f9;color:#888">⏳ รอ Host เริ่มเกม...</div>
+
+  <button class="btn btn-outline" style="margin-top:auto" onclick="G.leaveRoom()">ออกจากห้อง</button>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 3: เปิดเผยบทบาท
+══════════════════════════════════════ -->
+<div id="sc-role" class="screen">
+  <div class="card tc">
+    <div style="font-size:14px;color:#888;margin-bottom:6px">บทบาทลับของคุณในเกมนี้...</div>
+    <h2>กดปุ่มเพื่อเปิดดู</h2>
+  </div>
+
+  <div id="roleCardWrap" class="hidden"></div>
+
+  <button class="btn btn-orange" id="showRoleBtn" onclick="G.showRole()">🔓 เปิดดูบทบาท</button>
+
+  <div id="confirmWrap" class="hidden">
+    <button class="btn btn-outline" onclick="G.confirmRole()">✅ รับทราบแล้ว — ซ่อนบทบาท</button>
+  </div>
+
+  <div id="waitRoleWrap" class="hidden">
+    <div class="card tc" style="background:#f9f9f9">
+      <div style="font-size:32px">🔒</div>
+      <div style="font-weight:700;color:#888;margin-top:6px">ซ่อนบทบาทแล้ว</div>
+      <div id="readyCount" class="tm mt8"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 4: กลางคืน
+══════════════════════════════════════ -->
+<div id="sc-night" class="screen">
+  <div class="phase-hd" style="background:linear-gradient(135deg,#1a1a2e,#2d1b69)">
+    <div style="font-size:36px">🌙</div>
+    <h2 style="color:#fff;margin-top:4px">กลางคืน</h2>
+    <div style="color:rgba(255,255,255,.75);font-size:13px;margin-top:2px">รอบที่ <span id="nightRound">1</span></div>
+  </div>
+
+  <div class="timer-wrap">
+    <div class="timer-ring" id="nightTimer">10</div>
+    <div class="tm tc" style="margin-top:6px">วินาที</div>
+  </div>
+
+  <!-- ฆาตกร -->
+  <div id="uiKiller" class="hidden">
+    <div class="card" style="background:var(--red-l);border:2px solid #ef9a9a">
+      <div style="font-size:12.5px;color:var(--red);font-weight:700;margin-bottom:10px">🔪 เลือกเหยื่อที่จะสังหาร</div>
+      <div id="killerList"></div>
+      <div id="killerHint" class="tm mt8"></div>
+    </div>
+  </div>
+
+  <!-- ผู้ใหญ่บ้าน -->
+  <div id="uiChief" class="hidden">
+    <div class="card" style="background:var(--blue-l);border:2px solid #90caf9">
+      <div style="font-size:12.5px;color:var(--blue);font-weight:700;margin-bottom:10px">🛡️ เลือกคนที่จะคุ้มครองคืนนี้</div>
+      <div id="chiefList"></div>
+      <div id="chiefHint" class="tm mt8"></div>
+    </div>
+  </div>
+
+  <!-- ป้าข้างบ้าน -->
+  <div id="uiAunt" class="hidden">
+    <div class="card" style="background:var(--purple-l);border:2px solid #ce93d8">
+      <div style="font-size:12.5px;color:var(--purple);font-weight:700;margin-bottom:10px">🔍 เลือกผู้เล่นที่จะตรวจสอบตัวตน</div>
+      <div id="auntList"></div>
+      <div id="auntHint" class="tm mt8"></div>
+    </div>
+  </div>
+
+  <!-- ชาวบ้าน -->
+  <div id="uiVillager" class="hidden">
+    <div class="card tc" style="background:var(--green-l);border:2px solid #a5d6a7;padding:28px">
+      <div style="font-size:48px">😴</div>
+      <h3 style="color:var(--green);margin-top:10px">คุณกำลังหลับอยู่...</h3>
+      <div class="tm mt8">รอให้รอบกลางคืนผ่านไป</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 5: รุ่งเช้า
+══════════════════════════════════════ -->
+<div id="sc-morning" class="screen">
+  <div class="phase-hd" style="background:linear-gradient(135deg,#f57f17,#ff8f00)">
+    <div style="font-size:36px">☀️</div>
+    <h2 style="color:#fff;margin-top:4px">รุ่งเช้า</h2>
+    <div style="color:rgba(255,255,255,.8);font-size:13px;margin-top:2px">รอบที่ <span id="morningRound">1</span></div>
+  </div>
+
+  <div id="morningBanner"></div>
+  <div id="auntPrivate" class="hidden"></div>
+
+  <div class="card">
+    <h3 style="margin-bottom:10px">ผู้เล่นที่เหลือ</h3>
+    <div id="morningList"></div>
+  </div>
+
+  <div id="mornHostBtn" class="hidden">
+    <button class="btn btn-orange" onclick="G.goToChat()">💬 เริ่มการสืบสวน →</button>
+  </div>
+  <div id="mornWait" class="card tc hidden" style="background:#f9f9f9;color:#888">⏳ รอ Host...</div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 6: สืบสวน (แชท)
+══════════════════════════════════════ -->
+<div id="sc-chat" class="screen">
+  <div class="phase-hd" style="background:linear-gradient(135deg,#01579b,#0288d1)">
+    <div style="font-size:28px">💬</div>
+    <h2 style="color:#fff;margin-top:2px">ช่วงสืบสวน</h2>
+    <div style="color:rgba(255,255,255,.8);font-size:13px;margin-top:2px">พูดคุยหาเบาะแสก่อนโหวต</div>
+  </div>
+
+  <div class="timer-wrap">
+    <div class="timer-ring" id="chatTimer">60</div>
+    <div class="tm tc" style="margin-top:6px">วินาทีเหลือ</div>
+  </div>
+
+  <div class="card" style="padding:12px">
+    <div id="chatBox"></div>
+    <div class="flex-gap">
+      <input type="text" id="chatInput" placeholder="พิมพ์ข้อความ..." style="flex:1" maxlength="80">
+      <button class="btn btn-orange" style="width:auto;padding:11px 16px" onclick="G.sendChat()">ส่ง</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 7: โหวต
+══════════════════════════════════════ -->
+<div id="sc-vote" class="screen">
+  <div class="phase-hd" style="background:linear-gradient(135deg,#880e4f,#c2185b)">
+    <div style="font-size:28px">🗳️</div>
+    <h2 style="color:#fff;margin-top:2px">โหวตจับผู้ต้องสงสัย</h2>
+    <div style="color:rgba(255,255,255,.8);font-size:13px;margin-top:2px">ใครคือฆาตกรในหมู่บ้าน?</div>
+  </div>
+
+  <div class="timer-wrap">
+    <div class="timer-ring" id="voteTimer">20</div>
+    <div class="tm tc" style="margin-top:6px">วินาทีเหลือ</div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:11px">เลือกผู้ต้องสงสัย</h3>
+    <div id="voteList"></div>
+  </div>
+
+  <div id="voteStatus" class="card tc" style="background:#f9f9f9;color:#888"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 8: จับเข้าคุก
+══════════════════════════════════════ -->
+<div id="sc-arrested" class="screen">
+  <div class="phase-hd" style="background:linear-gradient(135deg,#263238,#37474f)">
+    <div style="font-size:36px">🚔</div>
+    <h2 style="color:#fff;margin-top:4px">จับได้แล้ว!</h2>
+  </div>
+
+  <div id="arrestedCard"></div>
+
+  <div class="card">
+    <div class="tm tc" style="margin-bottom:10px">⚖️ กฎหมายอาญาที่เกี่ยวข้อง</div>
+    <div id="lawCard"></div>
+  </div>
+
+  <div id="arrestHostBtn" class="hidden">
+    <button class="btn btn-orange" onclick="G.nextRound()">➡️ รอบต่อไป</button>
+  </div>
+  <div id="arrestWait" class="card tc hidden" style="background:#f9f9f9;color:#888">⏳ รอ Host เริ่มรอบต่อไป...</div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 9: จบเกม
+══════════════════════════════════════ -->
+<div id="sc-gameover" class="screen">
+  <div id="goCard"></div>
+
+  <div class="card">
+    <h3 style="margin-bottom:11px">🎭 เปิดเผยบทบาททุกคน</h3>
+    <div id="goRoleList"></div>
+  </div>
+
+  <button class="btn btn-orange" onclick="G.backToHome()">🏠 กลับหน้าหลัก</button>
+</div>
+
+<!-- ══ LOADING OVERLAY ══ -->
+<div id="loadOv" class="overlay hidden">
+  <div class="ov-card">
+    <div style="font-size:42px;margin-bottom:10px">⏳</div>
+    <div id="loadMsg" style="font-size:15px;font-weight:700">กำลังโหลด...</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     JAVASCRIPT — Firebase Realtime Database + Game Logic
+══════════════════════════════════════════════════════════ -->
+<script type="module">
+// ──────────────────────────────────────────
+// Firebase Setup
+// ──────────────────────────────────────────
+import { initializeApp }          from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, set, get, push, update, remove,
+         onValue, off, serverTimestamp, onDisconnect }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+/* ⚠️ ใช้ Firebase config ของเว็บไซต์
+   REALTIME DATABASE ต้องเปิดใช้งานใน Firebase Console ก่อน
+   Database URL อาจต้องแก้ให้ตรงกับ Region ที่เลือก:
+   - Asia : https://aomsensei-classroom-default-rtdb.asia-southeast1.firebasedatabase.app
+   - US   : https://aomsensei-classroom-default-rtdb.firebaseio.com              */
+const FB_CFG = {
+  apiKey:            "AIzaSyAYFY_9VqMFsVX22EW2aPVq7NawWQV-n_g",
+  authDomain:        "aomsensei-classroom.firebaseapp.com",
+  databaseURL:       "https://aomsensei-classroom-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:         "aomsensei-classroom",
+  storageBucket:     "aomsensei-classroom.firebasestorage.app",
+  messagingSenderId: "152996049271",
+  appId:             "1:152996049271:web:a9a2927490e1e908d9f172",
+};
+const fbApp = initializeApp(FB_CFG, 'thekiller');
+const db    = getDatabase(fbApp);
+
+// ──────────────────────────────────────────
+// กฎหมายอาญา 17 มาตรา
+// ──────────────────────────────────────────
+const LAWS = [
+  {s:'มาตรา 288', t:'ฆ่าผู้อื่น',             d:'ผู้ใดฆ่าผู้อื่น ต้องระวางโทษประหารชีวิต จำคุกตลอดชีวิต หรือจำคุก 15–20 ปี'},
+  {s:'มาตรา 289', t:'ฆ่าโดยไตร่ตรองไว้ก่อน', d:'วางแผนสังหารล่วงหน้า ต้องระวางโทษประหารชีวิตเพียงสถานเดียว'},
+  {s:'มาตรา 290', t:'ทำร้ายจนถึงแก่ความตาย', d:'ทำร้ายโดยไม่เจตนาให้ตาย แต่ตายในที่สุด จำคุก 3–15 ปี'},
+  {s:'มาตรา 295', t:'ทำร้ายร่างกาย',          d:'ทำให้ผู้อื่นได้รับอันตรายแก่กายหรือจิตใจ จำคุกไม่เกิน 2 ปี หรือปรับไม่เกิน 4,000 บาท'},
+  {s:'มาตรา 296', t:'ทำร้ายร่างกายสาหัส',     d:'ทำให้เสียโฉม ทุพพลภาพ หรือป่วยเรื้อรัง จำคุก 6 เดือน – 10 ปี'},
+  {s:'มาตรา 309', t:'ข่มขู่บังคับ',           d:'ข่มขู่ให้กระทำการหรือจำยอม จำคุกไม่เกิน 3 ปี หรือปรับไม่เกิน 6,000 บาท'},
+  {s:'มาตรา 326', t:'หมิ่นประมาท',            d:'ใส่ความผู้อื่นต่อบุคคลที่สาม จำคุกไม่เกิน 1 ปี หรือปรับไม่เกิน 20,000 บาท'},
+  {s:'มาตรา 334', t:'ลักทรัพย์',              d:'ลักทรัพย์ผู้อื่น จำคุกไม่เกิน 3 ปี หรือปรับไม่เกิน 6,000 บาท'},
+  {s:'มาตรา 335', t:'ลักทรัพย์ฉกรรจ์',        d:'ลักทรัพย์โดยมีเหตุฉกรรจ์ เช่น ปีนเข้าบ้าน จำคุก 1–5 ปี'},
+  {s:'มาตรา 339', t:'ชิงทรัพย์',              d:'ลักทรัพย์โดยใช้กำลังหรือขู่เข็ญทันที จำคุก 5–10 ปี'},
+  {s:'มาตรา 341', t:'ฉ้อโกง',                d:'หลอกลวงผู้อื่นให้เสียทรัพย์ จำคุกไม่เกิน 3 ปี หรือปรับไม่เกิน 6,000 บาท'},
+  {s:'มาตรา 362', t:'บุกรุก',                d:'เข้าไปในอสังหาริมทรัพย์ผู้อื่นโดยไม่มีสิทธิ จำคุกไม่เกิน 1 ปี'},
+  {s:'มาตรา 365', t:'บุกรุกฉกรรจ์',          d:'บุกรุกโดยใช้กำลังหรือหมู่คณะ จำคุก 1–5 ปี หรือปรับไม่เกิน 10,000 บาท'},
+  {s:'มาตรา 368', t:'ขัดคำสั่งเจ้าพนักงาน', d:'ไม่ปฏิบัติตามคำสั่งเจ้าพนักงาน จำคุกไม่เกิน 10 วัน หรือปรับไม่เกิน 500 บาท'},
+  {s:'มาตรา 371', t:'พาอาวุธในที่สาธารณะ',  d:'พาอาวุธไปในเมืองหรือทางสาธารณะโดยไม่มีเหตุอันควร ปรับไม่เกิน 1,000 บาท'},
+  {s:'มาตรา 374', t:'ละเว้นช่วยผู้อื่น',    d:'เห็นผู้ตกอันตรายไม่ช่วยทั้งที่ช่วยได้ จำคุกไม่เกิน 1 เดือน หรือปรับไม่เกิน 1,000 บาท'},
+  {s:'มาตรา 376', t:'โกงน้ำหนัก',           d:'ใช้เครื่องชั่งที่ไม่ถูกต้อง จำคุกไม่เกิน 3 เดือน หรือปรับไม่เกิน 500 บาท'},
+];
+
+// ──────────────────────────────────────────
+// ข้อมูลบทบาท
+// ──────────────────────────────────────────
+const ROLES = {
+  killer:   {emoji:'🔪', name:'ฆาตกร',      desc:'ชายหน้าตาน่าสงสัย ยิ้มหลอก ๆ',            cls:'rc-killer'},
+  chief:    {emoji:'👨‍⚖️', name:'ผู้ใหญ่บ้าน', desc:'ท้องพลุ้ย ถือไม้เท้า คุ้มครองชาวบ้าน',     cls:'rc-chief'},
+  aunt:     {emoji:'👵', name:'ป้าข้างบ้าน', desc:'แว่นหนา หูผึ่ง แอบมองรั้ว รู้ทุกอย่าง',   cls:'rc-aunt'},
+  villager: {emoji:'🧑‍🌾', name:'ชาวบ้าน',    desc:'ใจดี ถือจอบ งง ๆ ไม่รู้อะไรเลย',         cls:'rc-villager'},
+};
+
+// ──────────────────────────────────────────
+// State ของเกม
+// ──────────────────────────────────────────
+let myId   = localStorage.getItem('tkId') || (() => {
+  const id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+  localStorage.setItem('tkId', id);
+  return id;
+})();
+let myName='', myRole='', roomCode='', isHost=false;
+let listeners={}, hostTimer=null;
+
+// ──────────────────────────────────────────
+// ยูทิลิตี้: หน้าจอ / loading
+// ──────────────────────────────────────────
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function vis(id,v){ const el=document.getElementById(id); if(el) el.classList.toggle('hidden',!v); }
+function setLoad(show,msg='กำลังโหลด...'){ document.getElementById('loadMsg').textContent=msg; document.getElementById('loadOv').classList.toggle('hidden',!show); }
+
+function killListeners(){
+  Object.values(listeners).forEach(fn=>{ try{fn&&fn();}catch(e){} });
+  listeners={};
+  if(hostTimer){ clearInterval(hostTimer); hostTimer=null; }
+}
+
+// ──────────────────────────────────────────
+// SCREEN 1: หน้าแรก — สร้าง/เข้าร่วมห้อง
+// ──────────────────────────────────────────
+async function createRoom(){
+  myName = document.getElementById('playerName').value.trim();
+  if(!myName){ alert('กรุณาใส่ชื่อผู้เล่น'); return; }
+  localStorage.setItem('tkName', myName);
+  setLoad(true,'กำลังสร้างห้อง...');
+
+  roomCode = Math.random().toString(36).slice(2,6).toUpperCase();
+  isHost   = true;
+
+  await set(ref(db,`tk_rooms/${roomCode}`),{
+    host:roomCode, hostId:myId, phase:'lobby', round:0, timer:0,
+    createdAt: Date.now(),
+  });
+  await set(ref(db,`tk_rooms/${roomCode}/players/${myId}`),{
+    name:myName, role:'', isAlive:true, isReady:false, joinedAt:Date.now()
+  });
+  onDisconnect(ref(db,`tk_rooms/${roomCode}/players/${myId}`)).remove();
+
+  setLoad(false);
+  enterLobby();
+}
+
+async function joinRoom(){
+  myName = document.getElementById('playerName').value.trim();
+  const code = document.getElementById('joinCode').value.trim().toUpperCase();
+  if(!myName){ alert('กรุณาใส่ชื่อผู้เล่น'); return; }
+  if(code.length!==4){ alert('รหัสห้องต้องเป็น 4 ตัวอักษร'); return; }
+
+  setLoad(true,'กำลังเข้าร่วม...');
+  const snap = await get(ref(db,`tk_rooms/${code}`));
+  if(!snap.exists()){ setLoad(false); alert('ไม่พบห้องนี้'); return; }
+
+  const room = snap.val();
+  if(room.phase!=='lobby'){ setLoad(false); alert('เกมนี้เริ่มไปแล้ว'); return; }
+
+  const cnt = Object.keys(room.players||{}).length;
+  if(cnt>=10){ setLoad(false); alert('ห้องเต็มแล้ว (10/10)'); return; }
+
+  roomCode = code;
+  isHost   = (room.hostId === myId);
+  localStorage.setItem('tkName', myName);
+
+  await set(ref(db,`tk_rooms/${roomCode}/players/${myId}`),{
+    name:myName, role:'', isAlive:true, isReady:false, joinedAt:Date.now()
+  });
+  onDisconnect(ref(db,`tk_rooms/${roomCode}/players/${myId}`)).remove();
+
+  setLoad(false);
+  enterLobby();
+}
+
+// ──────────────────────────────────────────
+// SCREEN 2: Lobby
+// ──────────────────────────────────────────
+function enterLobby(){
+  show('sc-lobby');
+  document.getElementById('lobbyCode').textContent = roomCode;
+
+  // ฟังรายชื่อผู้เล่น
+  const pRef = ref(db,`tk_rooms/${roomCode}/players`);
+  listeners.players = (()=>{
+    const unsub = onValue(pRef, snap=>{
+      const p = snap.val()||{};
+      renderLobby(p);
+    });
+    return ()=>off(pRef,'value',unsub);
+  })();
+
+  // ฟัง phase เพื่อรู้ว่าเกมเริ่มแล้ว
+  const phRef = ref(db,`tk_rooms/${roomCode}/phase`);
+  listeners.phase = (()=>{
+    const unsub = onValue(phRef, snap=>{
+      if(snap.val()==='role_reveal') enterRoleReveal();
+    });
+    return ()=>off(phRef,'value',unsub);
+  })();
+}
+
+function renderLobby(players){
+  const cnt = Object.keys(players).length;
+  document.getElementById('playerCount').textContent = `${cnt}/10`;
+  document.getElementById('lobbyList').innerHTML = Object.entries(players).map(([id,p])=>`
+    <div class="player-row">
+      ${id===myId?'⭐':'🧑'} ${p.name}
+      ${id===myId?'<span class="badge b-orange" style="margin-left:auto">คุณ</span>':''}
+    </div>
+  `).join('');
+
+  if(isHost){
+    vis('startWrap',true); vis('waitMsg',false);
+    const btn = document.getElementById('startBtn');
+    btn.disabled = cnt<4;
+    document.getElementById('startHint').textContent =
+      cnt<4 ? `รอผู้เล่นอีก ${4-cnt} คน` : `พร้อมเริ่ม! (${cnt} คน)`;
+  } else {
+    vis('startWrap',false); vis('waitMsg',true);
+  }
+}
+
+async function leaveRoom(){
+  if(!confirm('ออกจากห้องใช่ไหม?')) return;
+  killListeners();
+  if(roomCode) await remove(ref(db,`tk_rooms/${roomCode}/players/${myId}`));
+  roomCode=''; isHost=false;
+  show('sc-home');
+}
+
+// ──────────────────────────────────────────
+// เริ่มเกม — Host เท่านั้น
+// ──────────────────────────────────────────
+async function startGame(){
+  const snap = await get(ref(db,`tk_rooms/${roomCode}/players`));
+  const pls  = snap.val()||{};
+  const ids  = Object.keys(pls);
+  if(ids.length<4){ alert('ต้องมีผู้เล่นอย่างน้อย 4 คน'); return; }
+
+  // แจกบทบาท
+  const roles = makeRoles(ids.length);
+  const shuffled = [...ids].sort(()=>Math.random()-.5);
+  const upd = {};
+  shuffled.forEach((id,i)=>{
+    upd[`tk_rooms/${roomCode}/players/${id}/role`]    = roles[i];
+    upd[`tk_rooms/${roomCode}/players/${id}/isAlive`] = true;
+    upd[`tk_rooms/${roomCode}/players/${id}/isReady`] = false;
+  });
+  upd[`tk_rooms/${roomCode}/phase`] = 'role_reveal';
+  upd[`tk_rooms/${roomCode}/round`] = 1;
+  upd[`tk_rooms/${roomCode}/nightTarget`]  = null;
+  upd[`tk_rooms/${roomCode}/protectedLast`]= null;
+  await update(ref(db), upd);
+}
+
+function makeRoles(n){
+  const r=[];
+  r.push(n<6 ? 'killer' : 'killer'); // ฆาตกรคนที่ 1
+  if(n>=6) r.push('killer');         // ฆาตกรคนที่ 2 (≥6 คน)
+  r.push('chief'); r.push('aunt');
+  while(r.length<n) r.push('villager');
+  return r.sort(()=>Math.random()-.5);
+}
+
+// ──────────────────────────────────────────
+// SCREEN 3: เปิดเผยบทบาท
+// ──────────────────────────────────────────
+async function enterRoleReveal(){
+  killListeners();
+  show('sc-role');
+  const snap = await get(ref(db,`tk_rooms/${roomCode}/players/${myId}/role`));
+  myRole = snap.val()||'villager';
+
+  // รีเซ็ต UI
+  vis('roleCardWrap',false); vis('confirmWrap',false); vis('waitRoleWrap',false);
+  vis('showRoleBtn',true);
+}
+
+function showRole(){
+  const info = ROLES[myRole]||ROLES.villager;
+  document.getElementById('roleCardWrap').innerHTML=`
+    <div class="role-card ${info.cls}">
+      <span class="role-emoji">${info.emoji}</span>
+      <div class="role-name">${info.name}</div>
+      <div class="role-desc">${info.desc}</div>
+      ${myRole==='killer'?'<div class="night-hint">⚠️ จำบทบาทให้ดี อย่าให้ใครเห็น!</div>':''}
+      ${myRole==='aunt'?'<div class="night-hint">🔍 คืนนี้คุณจะรู้ความจริงที่คนอื่นไม่รู้</div>':''}
+    </div>`;
+  vis('roleCardWrap',true); vis('showRoleBtn',false); vis('confirmWrap',true);
+}
+
+async function confirmRole(){
+  await update(ref(db,`tk_rooms/${roomCode}/players/${myId}`),{isReady:true});
+  vis('confirmWrap',false); vis('waitRoleWrap',true);
+
+  // ฟัง ready count + phase night
+  const rRef = ref(db,`tk_rooms/${roomCode}`);
+  let started=false;
+  listeners.roleWait=(()=>{
+    const unsub=onValue(rRef,snap=>{
+      const room=snap.val(); if(!room) return;
+      const pls=room.players||{};
+      const readyN=Object.values(pls).filter(p=>p.isReady).length;
+      const total=Object.keys(pls).length;
+      document.getElementById('readyCount').textContent=`รับทราบแล้ว ${readyN}/${total} คน`;
+      if(room.phase==='night' && !started){ started=true; enterNight(room); }
+    });
+    return ()=>off(rRef,'value',unsub);
+  })();
+
+  // Host: ตรวจทุก 1.5 วินาที → ถ้าทุกคนพร้อม → night
+  if(isHost){
+    let chk=setInterval(async()=>{
+      const s=await get(ref(db,`tk_rooms/${roomCode}/players`));
+      const pls=s.val()||{};
+      if(Object.values(pls).every(p=>p.isReady)){
+        clearInterval(chk);
+        const u={};
+        Object.keys(pls).forEach(id=>u[`tk_rooms/${roomCode}/players/${id}/isReady`]=false);
+        u[`tk_rooms/${roomCode}/phase`]='night';
+        u[`tk_rooms/${roomCode}/timer`]=10;
+        u[`tk_rooms/${roomCode}/killerVotes`]=null;
+        u[`tk_rooms/${roomCode}/chiefProtect`]=null;
+        u[`tk_rooms/${roomCode}/auntCheck`]=null;
+        await update(ref(db),u);
+        startHostTimer('night',10);
+      }
+    },1500);
+    listeners.readyChk=()=>clearInterval(chk);
+  }
+}
+
+// ──────────────────────────────────────────
+// SCREEN 4: กลางคืน
+// ──────────────────────────────────────────
+async function enterNight(roomData){
+  killListeners();
+  show('sc-night');
+  document.getElementById('nightRound').textContent = roomData?.round||1;
+
+  // ซ่อน UI ทั้งหมด
+  ['uiKiller','uiChief','uiAunt','uiVillager'].forEach(id=>vis(id,false));
+
+  const snap   = await get(ref(db,`tk_rooms/${roomCode}/players`));
+  const players= snap.val()||{};
+  const alive  = Object.entries(players).filter(([,p])=>p.isAlive);
+
+  // แสดง UI ตาม role
+  if(myRole==='killer'){
+    renderKillerUI(alive);
+  } else if(myRole==='chief'){
+    const lpSnap=await get(ref(db,`tk_rooms/${roomCode}/protectedLast`));
+    renderChiefUI(alive, lpSnap.val());
+  } else if(myRole==='aunt'){
+    renderAuntUI(alive);
+  } else {
+    vis('uiVillager',true);
+  }
+
+  // ฟัง timer + phase เปลี่ยน
+  const rRef=ref(db,`tk_rooms/${roomCode}`);
+  let wentMorning=false;
+  listeners.night=(()=>{
+    const unsub=onValue(rRef,snap=>{
+      const room=snap.val(); if(!room) return;
+      updateTimerUI('nightTimer', room.timer||0);
+      if(room.phase==='morning' && !wentMorning){ wentMorning=true; enterMorning(room); }
+    });
+    return ()=>off(rRef,'value',unsub);
+  })();
+
+  if(isHost) startHostTimer('night',10);
+}
+
+function renderKillerUI(alive){
+  vis('uiKiller',true);
+  // ป้าเหยื่อเฉพาะคนที่ไม่ใช่ฆาตกร
+  const targets=alive.filter(([id,p])=>p.role!=='killer');
+  document.getElementById('killerList').innerHTML=targets.map(([id,p])=>`
+    <button class="action-btn" id="k_${id}" onclick="G.killerVote('${id}')">
+      🎯 ${p.name}
+    </button>
+  `).join('')||'<div class="tm">ไม่มีเป้าหมาย</div>';
+  // แสดงชื่อฆาตกรร่วม
+  const partners=alive.filter(([id,p])=>p.role==='killer'&&id!==myId).map(([,p])=>p.name);
+  if(partners.length) document.getElementById('killerHint').textContent=`🔪 ฆาตกรร่วม: ${partners.join(', ')}`;
+}
+
+async function killerVote(targetId){
+  document.querySelectorAll('[id^="k_"]').forEach(b=>b.classList.remove('selected-killer'));
+  const btn=document.getElementById(`k_${targetId}`);
+  if(btn) btn.classList.add('selected-killer');
+  document.getElementById('killerHint').textContent='✅ เลือกแล้ว รอผลรวม...';
+  await set(ref(db,`tk_rooms/${roomCode}/killerVotes/${myId}`), targetId);
+}
+
+function renderChiefUI(alive, lastProtected){
+  vis('uiChief',true);
+  const targets=alive.filter(([id])=>id!==lastProtected);
+  document.getElementById('chiefList').innerHTML=targets.map(([id,p])=>`
+    <button class="action-btn" id="c_${id}" onclick="G.chiefProtect('${id}')">
+      🛡️ ${p.name}${id===myId?' (ตัวเอง)':''}
+    </button>
+  `).join('')||'<div class="tm">ไม่มีตัวเลือก</div>';
+}
+
+async function chiefProtect(targetId){
+  document.querySelectorAll('[id^="c_"]').forEach(b=>b.classList.remove('selected-chief'));
+  const btn=document.getElementById(`c_${targetId}`);
+  if(btn) btn.classList.add('selected-chief');
+  document.getElementById('chiefHint').textContent='✅ คุ้มครองแล้ว';
+  await set(ref(db,`tk_rooms/${roomCode}/chiefProtect`), targetId);
+}
+
+function renderAuntUI(alive){
+  vis('uiAunt',true);
+  const targets=alive.filter(([id])=>id!==myId);
+  document.getElementById('auntList').innerHTML=targets.map(([id,p])=>`
+    <button class="action-btn" id="a_${id}" onclick="G.auntCheck('${id}')">
+      🔍 ${p.name}
+    </button>
+  `).join('')||'<div class="tm">ไม่มีตัวเลือก</div>';
+}
+
+async function auntCheck(targetId){
+  document.querySelectorAll('[id^="a_"]').forEach(b=>b.classList.remove('selected-aunt'));
+  const btn=document.getElementById(`a_${targetId}`);
+  if(btn) btn.classList.add('selected-aunt');
+  document.getElementById('auntHint').textContent='✅ ส่งการตรวจแล้ว';
+  await set(ref(db,`tk_rooms/${roomCode}/auntCheck`),{targetId, by:myId});
+}
+
+// ──────────────────────────────────────────
+// HOST: Timer + ประมวลผลกลางคืน
+// ──────────────────────────────────────────
+function startHostTimer(phase, secs){
+  if(!isHost) return;
+  if(hostTimer){ clearInterval(hostTimer); hostTimer=null; }
+  let t=secs;
+  hostTimer=setInterval(async()=>{
+    t--;
+    await set(ref(db,`tk_rooms/${roomCode}/timer`), t<0?0:t);
+    if(t<=0){
+      clearInterval(hostTimer); hostTimer=null;
+      if(phase==='night')  await processNight();
+      else if(phase==='chat') await startVotePhase();
+      else if(phase==='vote') await processVote();
+    }
+  },1000);
+}
+
+async function processNight(){
+  const snap   = await get(ref(db,`tk_rooms/${roomCode}`));
+  const room   = snap.val()||{};
+  const players= room.players||{};
+  const kVotes = room.killerVotes||{};
+  const protect= room.chiefProtect||null;
+  const auntCk = room.auntCheck||null;
+
+  // ── ประมวลผลการโหวตฆาตกร ──
+  let victim=null;
+  const vArr=Object.values(kVotes);
+  if(vArr.length>0){
+    const cnt={};
+    vArr.forEach(id=>{ cnt[id]=(cnt[id]||0)+1; });
+    const maxV=Math.max(...Object.values(cnt));
+    const tops=Object.entries(cnt).filter(([,v])=>v===maxV).map(([id])=>id);
+    victim=tops[Math.floor(Math.random()*tops.length)];
+    if(protect && victim===protect) victim=null; // ผู้ใหญ่คุ้มครองสำเร็จ
+  }
+
+  // ── ผลป้าตรวจ ──
+  let auntResult=null;
+  if(auntCk){
+    const tRole=players[auntCk.targetId]?.role||'';
+    auntResult={targetId:auntCk.targetId, isKiller:tRole==='killer', by:auntCk.by};
+  }
+
+  const u={
+    [`tk_rooms/${roomCode}/phase`]:'morning',
+    [`tk_rooms/${roomCode}/nightTarget`]:victim,
+    [`tk_rooms/${roomCode}/protectedLast`]:protect,
+    [`tk_rooms/${roomCode}/auntResult`]:auntResult,
+    [`tk_rooms/${roomCode}/timer`]:0,
+  };
+  if(victim) u[`tk_rooms/${roomCode}/players/${victim}/isAlive`]=false;
+  await update(ref(db),u);
+}
+
+// ──────────────────────────────────────────
+// SCREEN 5: รุ่งเช้า
+// ──────────────────────────────────────────
+async function enterMorning(roomData){
+  killListeners();
+  show('sc-morning');
+  document.getElementById('morningRound').textContent = roomData?.round||1;
+
+  const snap   = await get(ref(db,`tk_rooms/${roomCode}`));
+  const room   = snap.val()||{};
+  const players= room.players||{};
+  const victim = room.nightTarget;
+  const auntR  = room.auntResult;
+
+  // ประกาศผล
+  const banEl=document.getElementById('morningBanner');
+  if(victim && players[victim]){
+    banEl.innerHTML=`<div class="banner banner-death">💀 ${players[victim].name} ถูกสังหารคืนนี้!</div>`;
+  } else {
+    banEl.innerHTML=`<div class="banner banner-safe">✨ คืนนี้ไม่มีใครเสียชีวิต!</div>`;
+  }
+
+  // ป้าดูผลลับเฉพาะตัวเอง
+  const aptEl=document.getElementById('auntPrivate');
+  if(myRole==='aunt' && auntR && auntR.by===myId){
+    const tn=players[auntR.targetId]?.name||'???';
+    aptEl.innerHTML=`<div class="aunt-result ${auntR.isKiller?'aunt-guilty':'aunt-safe'}">
+      👵 ผลตรวจลับ: <b>${tn}</b> ${auntR.isKiller?'✅ ใช่ฆาตกร!':'❌ ไม่ใช่ฆาตกร'}
+    </div>`;
+    vis('auntPrivate',true);
+  } else { vis('auntPrivate',false); }
+
+  // รายชื่อ
+  document.getElementById('morningList').innerHTML=Object.entries(players).map(([id,p])=>`
+    <div class="player-row ${!p.isAlive?'dead':''}">
+      ${p.isAlive?'🟢':'💀'} ${p.name}
+      ${id===myId?'<span class="badge b-orange" style="margin-left:auto">คุณ</span>':''}
+    </div>
+  `).join('');
+
+  // ตรวจเงื่อนไขชนะ
+  if(isHost){
+    const win=checkWin(players);
+    if(win){ await doGameOver(players,win); return; }
+    vis('mornHostBtn',true); vis('mornWait',false);
+  } else {
+    vis('mornHostBtn',false); vis('mornWait',true);
+  }
+
+  // ฟัง phase เปลี่ยน
+  const phRef=ref(db,`tk_rooms/${roomCode}/phase`);
+  listeners.morning=(()=>{
+    const unsub=onValue(phRef,snap=>{
+      if(snap.val()==='chat') enterChat();
+      if(snap.val()==='gameover'){
+        get(ref(db,`tk_rooms/${roomCode}`)).then(s=>{
+          const d=s.val(); enterGameOver(d.players||{}, d.winner);
+        });
+      }
+    });
+    return ()=>off(phRef,'value',unsub);
+  })();
+}
+
+function checkWin(players){
+  const alive=Object.values(players).filter(p=>p.isAlive);
+  const kN=alive.filter(p=>p.role==='killer').length;
+  const vN=alive.filter(p=>p.role!=='killer').length;
+  if(kN===0) return 'villagers';
+  if(kN>=vN) return 'killers';
+  return null;
+}
+
+async function doGameOver(players, winner){
+  await update(ref(db,`tk_rooms/${roomCode}`),{phase:'gameover', winner});
+  enterGameOver(players, winner);
+}
+
+async function goToChat(){
+  // ล้างแชทเก่า (ทุกต้นรอบ)
+  await set(ref(db,`tk_rooms/${roomCode}/messages`), null);
+  await update(ref(db,`tk_rooms/${roomCode}`),{
+    phase:'chat', timer:60, votes:null, killerVotes:null,
+    chiefProtect:null, auntCheck:null, auntResult:null,
+  });
+  startHostTimer('chat',60);
+}
+
+// ──────────────────────────────────────────
+// SCREEN 6: สืบสวน (แชท)
+// ──────────────────────────────────────────
+async function enterChat(){
+  killListeners();
+  show('sc-chat');
+
+  const mySnap=await get(ref(db,`tk_rooms/${roomCode}/players/${myId}/isAlive`));
+  const alive=mySnap.val()===true;
+  document.getElementById('chatInput').disabled=!alive;
+  if(!alive) document.getElementById('chatInput').placeholder='💀 คุณเสียชีวิตแล้ว ไม่สามารถแชทได้';
+
+  // ฟัง timer + phase
+  const rRef=ref(db,`tk_rooms/${roomCode}`);
+  let wentVote=false;
+  listeners.chat=(()=>{
+    const unsub=onValue(rRef,snap=>{
+      const room=snap.val(); if(!room) return;
+      updateTimerUI('chatTimer', room.timer||0);
+      if(room.phase==='vote' && !wentVote){ wentVote=true; enterVote(); }
+    });
+    return ()=>off(rRef,'value',unsub);
+  })();
+
+  // ฟังแชท
+  const msgRef=ref(db,`tk_rooms/${roomCode}/messages`);
+  listeners.msgs=(()=>{
+    const unsub=onValue(msgRef,snap=>{
+      const msgs=snap.val()||{};
+      const chatEl=document.getElementById('chatBox');
+      chatEl.innerHTML=Object.values(msgs)
+        .sort((a,b)=>(a.ts||0)-(b.ts||0))
+        .map(m=>`<div class="chat-msg"><span class="chat-name">${escHtml(m.name)}:</span> ${escHtml(m.text)}</div>`)
+        .join('')||'<div class="chat-sys">ยังไม่มีข้อความ...</div>';
+      chatEl.scrollTop=chatEl.scrollHeight;
+    });
+    return ()=>off(msgRef,'value',unsub);
+  })();
+
+  if(isHost) startHostTimer('chat',60);
+}
+
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function sendChat(){
+  const inp=document.getElementById('chatInput');
+  const text=inp.value.trim();
+  if(!text) return;
+  const mySnap=await get(ref(db,`tk_rooms/${roomCode}/players/${myId}/isAlive`));
+  if(!mySnap.val()) return;
+  await push(ref(db,`tk_rooms/${roomCode}/messages`),{name:myName, text, ts:Date.now()});
+  inp.value='';
+}
+document.getElementById('chatInput').addEventListener('keypress',e=>{ if(e.key==='Enter') G.sendChat(); });
+
+// ──────────────────────────────────────────
+// SCREEN 7: โหวต
+// ──────────────────────────────────────────
+async function startVotePhase(){
+  await update(ref(db,`tk_rooms/${roomCode}`),{phase:'vote', timer:20, votes:null});
+  startHostTimer('vote',20);
+}
+
+async function enterVote(){
+  killListeners();
+  show('sc-vote');
+
+  const snap   =await get(ref(db,`tk_rooms/${roomCode}/players`));
+  const players=snap.val()||{};
+  const myAlive=players[myId]?.isAlive===true;
+
+  // แสดงปุ่มโหวต (ไม่รวมตัวเอง)
+  const alive=Object.entries(players).filter(([,p])=>p.isAlive&&true);
+  document.getElementById('voteList').innerHTML=alive
+    .filter(([id])=>id!==myId)
+    .map(([id,p])=>`
+      <button class="action-btn${!myAlive?' disabled':''}" id="v_${id}"
+        onclick="${myAlive?`G.castVote('${id}')`:''}">
+        🧑 ${p.name}
+      </button>
+    `).join('')||'<div class="tm">ไม่มีผู้เล่น</div>';
+
+  if(!myAlive) document.getElementById('voteStatus').textContent='💀 คุณเสียชีวิตแล้ว ไม่สามารถโหวตได้';
+
+  // ฟัง timer + เสียงโหวต + phase
+  const rRef=ref(db,`tk_rooms/${roomCode}`);
+  let wentArrested=false;
+  listeners.vote=(()=>{
+    const unsub=onValue(rRef,snap=>{
+      const room=snap.val(); if(!room) return;
+      updateTimerUI('voteTimer', room.timer||0);
+      const votes=room.votes||{};
+      const total=Object.values(room.players||{}).filter(p=>p.isAlive).length;
+      document.getElementById('voteStatus').textContent=`โหวตแล้ว ${Object.keys(votes).length}/${total} คน`;
+      if(room.phase==='arrested' && !wentArrested){ wentArrested=true; enterArrested(room); }
+      if(room.phase==='gameover'){
+        get(ref(db,`tk_rooms/${roomCode}`)).then(s=>{
+          const d=s.val(); enterGameOver(d.players||{}, d.winner);
+        });
+      }
+    });
+    return ()=>off(rRef,'value',unsub);
+  })();
+
+  if(isHost) startHostTimer('vote',20);
+}
+
+async function castVote(targetId){
+  const s=await get(ref(db,`tk_rooms/${roomCode}/players/${myId}/isAlive`));
+  if(!s.val()) return;
+  document.querySelectorAll('[id^="v_"]').forEach(b=>b.classList.remove('selected-killer'));
+  const btn=document.getElementById(`v_${targetId}`);
+  if(btn) btn.classList.add('selected-killer');
+  await set(ref(db,`tk_rooms/${roomCode}/votes/${myId}`), targetId);
+}
+
+async function processVote(){
+  const snap   =await get(ref(db,`tk_rooms/${roomCode}`));
+  const room   =snap.val()||{};
+  const players=room.players||{};
+  const votes  =room.votes||{};
+
+  // นับเสียง
+  const cnt={};
+  Object.values(votes).forEach(id=>{ cnt[id]=(cnt[id]||0)+1; });
+  let arrested=null;
+  if(Object.keys(cnt).length>0){
+    const maxV=Math.max(...Object.values(cnt));
+    const tops=Object.entries(cnt).filter(([,v])=>v===maxV).map(([id])=>id);
+    if(tops.length===1) arrested=tops[0]; // เสียงเท่ากัน → ไม่มีใครถูกจับ
+  }
+
+  const law=LAWS[Math.floor(Math.random()*LAWS.length)];
+  const u={
+    [`tk_rooms/${roomCode}/phase`]:'arrested',
+    [`tk_rooms/${roomCode}/arrestedId`]:arrested,
+    [`tk_rooms/${roomCode}/currentLaw`]:law,
+    [`tk_rooms/${roomCode}/timer`]:0,
+  };
+  if(arrested) u[`tk_rooms/${roomCode}/players/${arrested}/isAlive`]=false;
+  await update(ref(db),u);
+
+  // ตรวจชนะ
+  const newPSnap=await get(ref(db,`tk_rooms/${roomCode}/players`));
+  const newP=newPSnap.val()||{};
+  const win=checkWin(newP);
+  if(win) await update(ref(db,`tk_rooms/${roomCode}`),{phase:'gameover', winner:win});
+}
+
+// ──────────────────────────────────────────
+// SCREEN 8: จับเข้าคุก
+// ──────────────────────────────────────────
+async function enterArrested(roomData){
+  killListeners();
+  show('sc-arrested');
+
+  const snap   =await get(ref(db,`tk_rooms/${roomCode}`));
+  const room   =snap.val()||{};
+  const players=room.players||{};
+  const arId   =room.arrestedId;
+  const law    =room.currentLaw||LAWS[0];
+
+  // แสดง Role ผู้ถูกจับ
+  const cardEl=document.getElementById('arrestedCard');
+  if(arId && players[arId]){
+    const p=players[arId];
+    const info=ROLES[p.role]||ROLES.villager;
+    cardEl.innerHTML=`
+      <div class="role-card ${info.cls}">
+        <div style="font-size:13px;opacity:.75;margin-bottom:6px">ถูกจับ: ${p.name}</div>
+        <span class="role-emoji">${info.emoji}</span>
+        <div class="role-name">${info.name}</div>
+        <div class="role-desc">${info.desc}</div>
+      </div>`;
+  } else {
+    cardEl.innerHTML=`<div class="card tc">
+      <div style="font-size:48px">🤝</div>
+      <h3 style="margin-top:10px">เสียงเท่ากัน!</h3>
+      <div class="tm mt8">ไม่มีใครถูกจับในรอบนี้</div>
+    </div>`;
+  }
+
+  // กฎหมาย
+  document.getElementById('lawCard').innerHTML=`
+    <div class="law-card">
+      <div class="law-sec">${law.s}</div>
+      <div class="law-title">${law.t}</div>
+      <div class="law-desc">${law.d}</div>
+    </div>`;
+
+  if(isHost){ vis('arrestHostBtn',true); vis('arrestWait',false); }
+  else       { vis('arrestHostBtn',false); vis('arrestWait',true); }
+
+  // ฟัง phase เปลี่ยน
+  const phRef=ref(db,`tk_rooms/${roomCode}/phase`);
+  listeners.arrested=(()=>{
+    const unsub=onValue(phRef,snap=>{
+      if(snap.val()==='night'){
+        get(ref(db,`tk_rooms/${roomCode}`)).then(s=>enterNight(s.val()));
+      }
+      if(snap.val()==='gameover'){
+        get(ref(db,`tk_rooms/${roomCode}`)).then(s=>{
+          const d=s.val(); enterGameOver(d.players||{}, d.winner);
+        });
+      }
+    });
+    return ()=>off(phRef,'value',unsub);
+  })();
+}
+
+async function nextRound(){
+  const snap   =await get(ref(db,`tk_rooms/${roomCode}`));
+  const room   =snap.val()||{};
+  const players=room.players||{};
+  const win    =checkWin(players);
+  if(win){ await doGameOver(players,win); return; }
+
+  const newRound=(room.round||1)+1;
+  const u={};
+  Object.keys(players).forEach(id=>{ u[`tk_rooms/${roomCode}/players/${id}/isReady`]=false; });
+  u[`tk_rooms/${roomCode}/phase`]='night';
+  u[`tk_rooms/${roomCode}/round`]=newRound;
+  u[`tk_rooms/${roomCode}/timer`]=10;
+  u[`tk_rooms/${roomCode}/killerVotes`]=null;
+  u[`tk_rooms/${roomCode}/nightTarget`]=null;
+  u[`tk_rooms/${roomCode}/votes`]=null;
+  u[`tk_rooms/${roomCode}/arrestedId`]=null;
+  u[`tk_rooms/${roomCode}/chiefProtect`]=null;
+  u[`tk_rooms/${roomCode}/auntCheck`]=null;
+  u[`tk_rooms/${roomCode}/auntResult`]=null;
+  await update(ref(db),u);
+
+  const rSnap=await get(ref(db,`tk_rooms/${roomCode}`));
+  enterNight(rSnap.val());
+  startHostTimer('night',10);
+}
+
+// ──────────────────────────────────────────
+// SCREEN 9: จบเกม
+// ──────────────────────────────────────────
+function enterGameOver(players, winner){
+  killListeners();
+  show('sc-gameover');
+
+  const killerWin=winner==='killers';
+  document.getElementById('goCard').innerHTML=`
+    <div class="go-card ${killerWin?'go-killers':'go-villagers'}">
+      <div style="font-size:72px;margin-bottom:10px">${killerWin?'🔪':'🏆'}</div>
+      <h1 style="color:#fff">${killerWin?'ฆาตกรชนะ!':'ชาวบ้านชนะ!'}</h1>
+      <div style="color:rgba(255,255,255,.85);font-size:15px;margin-top:6px">
+        ${killerWin?'ฆาตกรครองบ้านห้วยหินฝนสำเร็จ!':'ชาวบ้านกำจัดฆาตกรหมดแล้ว!'}
+      </div>
+    </div>`;
+
+  // เปิดเผย Role ทุกคน
+  document.getElementById('goRoleList').innerHTML=Object.entries(players).map(([id,p])=>{
+    const info=ROLES[p.role]||ROLES.villager;
+    return `<div class="player-row" style="justify-content:space-between">
+      <span>${info.emoji} ${p.name}${id===myId?' <span class="badge b-orange">คุณ</span>':''}</span>
+      <span class="badge ${p.role==='killer'?'b-red':'b-green'}">${info.name}</span>
+    </div>`;
+  }).join('');
+}
+
+function backToHome(){
+  killListeners();
+  roomCode=''; isHost=false; myRole='';
+  show('sc-home');
+}
+
+// ──────────────────────────────────────────
+// ยูทิลิตี้: Update Timer UI
+// ──────────────────────────────────────────
+function updateTimerUI(elId, t){
+  const el=document.getElementById(elId); if(!el) return;
+  el.textContent=t;
+  el.className='timer-ring' + (t<=5?' urgent':t<=10?' warn':'');
+}
+
+// ──────────────────────────────────────────
+// Export ฟังก์ชันเป็น Global (onclick ใช้ได้)
+// ──────────────────────────────────────────
+window.G={
+  createRoom, joinRoom, leaveRoom, startGame,
+  showRole, confirmRole,
+  killerVote, chiefProtect, auntCheck,
+  castVote, sendChat, goToChat,
+  nextRound, backToHome,
+};
+
+// โหลดชื่อเก่า
+const savedName=localStorage.getItem('tkName');
+if(savedName) document.getElementById('playerName').value=savedName;
+document.getElementById('playerName').addEventListener('change',function(){
+  localStorage.setItem('tkName',this.value.trim());
+});
+
+// ล้าง input รหัสห้องให้เป็น uppercase อัตโนมัติ
+document.getElementById('joinCode').addEventListener('input',function(){
+  this.value=this.value.toUpperCase();
+});
+</script>
+</body>
+</html>
