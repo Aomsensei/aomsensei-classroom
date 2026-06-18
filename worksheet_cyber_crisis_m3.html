@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ใบภารกิจ: พลิกวิกฤตไซเบอร์ — วิทยาการคำนวณ ม.3</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Sarabun',sans-serif;
+  background:linear-gradient(150deg,#0a0e1a 0%,#0d1b2e 40%,#0a1628 100%);
+  min-height:100vh;padding-bottom:80px;
+}
+
+/* ===== HEADER ===== */
+.ws-header{
+  background:linear-gradient(135deg,#020c1b 0%,#0a1628 30%,#0d2137 60%,#061020 100%);
+  color:#fff;text-align:center;padding:0 0 28px;
+  position:relative;overflow:hidden;
+  border-bottom:3px solid rgba(0,255,200,.2);
+}
+.hdr-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(0,255,200,.04) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(0,255,200,.04) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+.hdr-glow{position:absolute;border-radius:50%;pointer-events:none}
+.header-scene{
+  display:flex;flex-direction:column;align-items:center;
+  padding:28px 20px 16px;position:relative;z-index:2;
+}
+.shield-wrap{
+  width:100px;height:100px;margin-bottom:14px;
+  filter:drop-shadow(0 0 18px rgba(0,255,200,.5));
+  animation:shield-pulse 2.5s ease-in-out infinite;
+}
+@keyframes shield-pulse{0%,100%{filter:drop-shadow(0 0 18px rgba(0,255,200,.5))}50%{filter:drop-shadow(0 0 30px rgba(0,255,200,.8))}}
+.hdr-badge{
+  display:inline-block;background:rgba(0,255,200,.1);
+  border:1.5px solid rgba(0,255,200,.35);border-radius:20px;
+  padding:4px 18px;font-size:12px;font-weight:700;letter-spacing:1px;
+  margin-bottom:10px;color:#00ffc8;
+}
+.header-text h1{
+  font-size:clamp(22px,5.5vw,38px);font-weight:900;
+  text-shadow:0 0 30px rgba(0,255,200,.4);line-height:1.2;margin-bottom:6px;
+}
+.header-text .subtitle{font-size:14px;opacity:.75;color:#a0c4d8;margin-bottom:4px}
+.header-text .subject{font-size:13px;color:#00ffc8;opacity:.8;font-weight:700}
+
+/* scan line effect */
+@keyframes scan{0%{transform:translateY(-100%)}100%{transform:translateY(100vh)}}
+.scan-line{
+  position:absolute;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(0,255,200,.15),transparent);
+  animation:scan 4s linear infinite;z-index:1;pointer-events:none;
+}
+
+/* ===== PROGRESS BAR ===== */
+.progress-wrap{
+  background:linear-gradient(90deg,#020c1b,#061020);
+  border-bottom:2px solid rgba(0,255,200,.2);
+  padding:10px 20px;position:sticky;top:0;z-index:200;
+  box-shadow:0 2px 20px rgba(0,255,200,.1);
+}
+.prog-row{display:flex;justify-content:space-between;margin-bottom:5px}
+.prog-lbl{font-size:13px;font-weight:700;color:#00ffc8}
+.prog-pct{font-size:13px;font-weight:800;color:#69f0ae}
+.prog-bg{background:rgba(255,255,255,.08);border-radius:10px;height:8px;overflow:hidden}
+.prog-fill{
+  height:100%;border-radius:10px;width:0%;
+  background:linear-gradient(90deg,#00ffc8,#00bcd4,#69f0ae);
+  transition:width .4s ease;box-shadow:0 0 10px rgba(0,255,200,.4);
+}
+
+/* ===== CONTAINER ===== */
+.wrap{max-width:720px;margin:0 auto;padding:0 14px}
+
+/* ===== GROUP CARD ===== */
+.group-card{
+  background:rgba(255,255,255,.04);
+  backdrop-filter:blur(10px);
+  border-radius:20px;padding:20px;margin:20px 0;
+  box-shadow:0 4px 24px rgba(0,0,0,.3);
+  border:1.5px solid rgba(0,255,200,.15);
+}
+.gc-title{
+  text-align:center;font-size:17px;font-weight:900;
+  color:#00ffc8;margin-bottom:16px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.member-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:440px){.member-grid{grid-template-columns:1fr}}
+.member-row{display:flex;flex-direction:column;gap:5px}
+.m-lbl{font-size:12.5px;font-weight:700;color:#a0c4d8}
+.m-inp{
+  width:100%;padding:10px 14px;
+  background:rgba(255,255,255,.06);
+  border:1.5px solid rgba(0,255,200,.2);
+  border-radius:12px;font-family:'Sarabun',sans-serif;font-size:15px;
+  color:#e0f7f4;transition:.2s;
+}
+.m-inp:focus{outline:none;border-color:#00ffc8;background:rgba(0,255,200,.05)}
+.m-inp::placeholder{color:rgba(255,255,255,.3)}
+.m-sel{
+  width:100%;padding:10px 14px;
+  background:rgba(255,255,255,.06);
+  border:1.5px solid rgba(0,255,200,.2);
+  border-radius:12px;font-family:'Sarabun',sans-serif;font-size:15px;
+  color:#e0f7f4;transition:.2s;cursor:pointer;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2300ffc8' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;
+  padding-right:36px;
+}
+.m-sel:focus{outline:none;border-color:#00ffc8;background-color:rgba(0,255,200,.05)}
+.m-sel option{background:#0a1628;color:#e0f7f4}
+.m-static{
+  width:100%;padding:10px 14px;
+  background:rgba(0,255,200,.05);
+  border:1.5px solid rgba(0,255,200,.3);
+  border-radius:12px;font-family:'Sarabun',sans-serif;font-size:15px;
+  color:#00ffc8;font-weight:700;
+}
+.loading-txt{font-size:13px;color:rgba(255,255,255,.4);margin-top:5px;text-align:center}
+
+/* ===== SECTION CARD ===== */
+.ws-section{
+  background:rgba(255,255,255,.04);
+  backdrop-filter:blur(10px);
+  border-radius:24px;padding:24px 20px;margin:16px 0;
+  box-shadow:0 4px 20px rgba(0,0,0,.25);
+  position:relative;overflow:hidden;
+  border:1.5px solid rgba(255,255,255,.07);
+}
+.ws-section::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:5px;border-radius:24px 24px 0 0;
+}
+.s-cyber::before   {background:linear-gradient(90deg,#004d40,#00ffc8,#004d40)}
+.s-red::before     {background:linear-gradient(90deg,#4a0000,#ff5252,#4a0000)}
+.s-gold::before    {background:linear-gradient(90deg,#3e2100,#ffd54f,#3e2100)}
+.s-teal::before    {background:linear-gradient(90deg,#003344,#00bcd4,#003344)}
+.s-purple::before  {background:linear-gradient(90deg,#1a0033,#ce93d8,#1a0033)}
+.s-green::before   {background:linear-gradient(90deg,#002600,#69f0ae,#002600)}
+
+.sec-hd{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.sec-ic{
+  width:52px;height:52px;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;flex-shrink:0;box-shadow:0 4px 15px rgba(0,0,0,.3);
+}
+.s-cyber  .sec-ic{background:linear-gradient(135deg,#004d40,#00796b)}
+.s-red    .sec-ic{background:linear-gradient(135deg,#7f0000,#d32f2f)}
+.s-gold   .sec-ic{background:linear-gradient(135deg,#4e2a00,#f57f17)}
+.s-teal   .sec-ic{background:linear-gradient(135deg,#002233,#0097a7)}
+.s-purple .sec-ic{background:linear-gradient(135deg,#2d0060,#7b1fa2)}
+.s-green  .sec-ic{background:linear-gradient(135deg,#003300,#2e7d32)}
+
+.sec-title{font-size:19px;font-weight:900;color:#e0f7f4}
+.sec-num{font-size:13px;font-weight:700;letter-spacing:.5px;margin-bottom:2px}
+.s-cyber  .sec-num{color:#00ffc8}
+.s-red    .sec-num{color:#ff7070}
+.s-gold   .sec-num{color:#ffd54f}
+.s-teal   .sec-num{color:#4dd0e1}
+.s-purple .sec-num{color:#ce93d8}
+.s-green  .sec-num{color:#69f0ae}
+
+/* ===== INFO BOX ===== */
+.info-box{
+  border-radius:14px;padding:14px 16px;margin-bottom:16px;
+  border-left:4px solid;
+}
+.ib-cyber {background:rgba(0,255,200,.06);border-left-color:#00ffc8;color:#c8f7f0}
+.ib-red   {background:rgba(255,82,82,.07);border-left-color:#ff5252;color:#ffcdd2}
+.ib-gold  {background:rgba(255,213,79,.07);border-left-color:#ffd54f;color:#fff9c4}
+.ib-teal  {background:rgba(0,188,212,.07);border-left-color:#00bcd4;color:#b2ebf2}
+.info-box h4{font-size:14.5px;font-weight:800;margin-bottom:8px}
+.info-box p, .info-box li{font-size:14px;line-height:1.8;opacity:.9}
+.info-box ul{padding-left:18px}
+
+/* ===== ROLEPLAY BANNER ===== */
+.role-banner{
+  background:linear-gradient(135deg,rgba(0,77,64,.6),rgba(0,121,107,.5));
+  border:2px solid rgba(0,255,200,.3);
+  border-radius:18px;padding:18px;margin-bottom:16px;
+  text-align:center;
+}
+.role-emoji{font-size:48px;display:block;margin-bottom:8px;filter:drop-shadow(0 0 10px rgba(0,255,200,.5))}
+.role-title{font-size:18px;font-weight:900;color:#00ffc8;margin-bottom:6px}
+.role-desc{font-size:14px;color:#b2dfdb;line-height:1.7}
+
+/* ===== MISSION BOX ===== */
+.mission-box{
+  background:rgba(255,213,79,.06);border:1.5px solid rgba(255,213,79,.25);
+  border-radius:14px;padding:14px 16px;margin-bottom:6px;
+}
+.mission-title{font-size:13.5px;font-weight:800;color:#ffd54f;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.mission-txt{font-size:14px;color:#fff9c4;line-height:1.75}
+
+/* ===== MISTAKE CARD ===== */
+.mistake-card{
+  border-radius:16px;padding:16px 18px;margin-bottom:14px;
+  border:1.5px solid;transition:.3s;
+}
+.mk1{background:rgba(183,28,28,.08);border-color:rgba(255,82,82,.2)}
+.mk2{background:rgba(183,28,28,.06);border-color:rgba(255,82,82,.15)}
+.mk3{background:rgba(183,28,28,.05);border-color:rgba(255,82,82,.12)}
+.mistake-card.filled{border-color:rgba(255,82,82,.5)}
+.mk-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.mk-badge{
+  background:linear-gradient(135deg,#7f0000,#d32f2f);
+  color:#fff;border-radius:12px;padding:5px 14px;
+  font-size:13px;font-weight:800;white-space:nowrap;
+}
+.mk-label{font-size:15px;font-weight:700;color:#ffcdd2}
+.open-inp{
+  width:100%;padding:12px 14px;
+  background:rgba(255,255,255,.05);
+  border:1.5px solid rgba(255,255,255,.12);
+  border-radius:12px;font-family:'Sarabun',sans-serif;font-size:15px;
+  color:#e0f7f4;resize:vertical;min-height:90px;transition:.2s;
+}
+.open-inp:focus{outline:none;border-color:#00ffc8;background:rgba(0,255,200,.04)}
+.open-inp::placeholder{color:rgba(255,255,255,.25)}
+
+/* ===== IRON RULES ===== */
+.rule-card{
+  background:rgba(255,255,255,.04);border:1.5px solid rgba(255,213,79,.2);
+  border-radius:16px;padding:14px 16px;margin-bottom:12px;
+  transition:.3s;
+}
+.rule-card.filled{border-color:rgba(255,213,79,.5)}
+.rule-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.rule-badge{
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:900;color:#fff;flex-shrink:0;
+}
+.rb1{background:linear-gradient(135deg,#e65100,#f57f17)}
+.rb2{background:linear-gradient(135deg,#ad1457,#e91e63)}
+.rb3{background:linear-gradient(135deg,#283593,#3f51b5)}
+.rb4{background:linear-gradient(135deg,#1b5e20,#388e3c)}
+.rule-label{font-size:14.5px;font-weight:800;color:#fff9c4}
+
+/* ===== REFLECT CARD ===== */
+.reflect-card{
+  background:rgba(0,188,212,.05);border:1.5px solid rgba(0,188,212,.2);
+  border-radius:16px;padding:16px 18px;margin-bottom:14px;transition:.3s;
+}
+.reflect-card.filled{border-color:rgba(0,188,212,.5)}
+.reflect-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.reflect-icon{font-size:28px}
+.reflect-label{font-size:15px;font-weight:800;color:#b2ebf2}
+.reflect-sub{font-size:12.5px;color:#80deea;margin-top:2px}
+
+/* ===== RUBRIC ===== */
+.rubric-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+.rubric-table th{
+  background:linear-gradient(135deg,rgba(0,255,200,.12),rgba(0,188,212,.1));
+  color:#00ffc8;padding:10px 12px;text-align:left;font-weight:800;
+  border:1px solid rgba(0,255,200,.15);
+}
+.rubric-table td{
+  padding:10px 12px;border:1px solid rgba(255,255,255,.08);
+  color:#c8f7f0;vertical-align:top;
+}
+.rubric-table tr:nth-child(even) td{background:rgba(255,255,255,.03)}
+.rubric-table .score-col{text-align:center;font-weight:800;color:#ffd54f;font-size:16px}
+.rubric-total{
+  background:rgba(0,255,200,.08);border-top:2px solid rgba(0,255,200,.3);
+  font-weight:900;color:#00ffc8;
+}
+
+/* ===== SUBMIT ===== */
+.submit-area{text-align:center;padding:28px 0 0}
+.btn-submit{
+  background:linear-gradient(135deg,#004d40,#00796b,#00897b);
+  color:#fff;border:2px solid rgba(0,255,200,.4);
+  padding:16px 50px;border-radius:50px;
+  font-family:'Sarabun',sans-serif;font-size:18px;font-weight:800;
+  cursor:pointer;letter-spacing:.3px;
+  box-shadow:0 6px 25px rgba(0,77,64,.5),0 0 25px rgba(0,255,200,.2);
+  transition:.3s;
+}
+.btn-submit:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 30px rgba(0,77,64,.6),0 0 35px rgba(0,255,200,.35);
+  background:linear-gradient(135deg,#00695c,#00897b,#00acc1);
+}
+.btn-submit:disabled{background:#37474f;border-color:transparent;box-shadow:none;cursor:not-allowed;transform:none}
+.submit-msg{
+  margin-top:14px;font-size:15px;font-weight:700;
+  padding:12px 20px;border-radius:12px;display:none;
+}
+.submit-ok {background:rgba(0,200,130,.15);border:1px solid rgba(0,200,130,.3);color:#69f0ae;display:block}
+.submit-err{background:rgba(229,57,53,.12);border:1px solid rgba(229,57,53,.25);color:#ff8a80;display:block}
+
+/* ===== UTILS ===== */
+.divider{height:1px;background:linear-gradient(90deg,transparent,rgba(0,255,200,.15),transparent);margin:16px 0}
+.chip{display:inline-block;padding:3px 12px;border-radius:20px;font-size:12.5px;font-weight:700}
+.chip-cyber{background:rgba(0,255,200,.12);color:#00ffc8;border:1px solid rgba(0,255,200,.25)}
+.chip-red{background:rgba(255,82,82,.12);color:#ff7070;border:1px solid rgba(255,82,82,.2)}
+.q-counter{font-size:12px;color:rgba(255,255,255,.4);margin-top:5px;text-align:right}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="ws-header">
+  <div class="hdr-grid"></div>
+  <div class="scan-line"></div>
+  <div class="hdr-glow" style="width:300px;height:300px;top:-100px;left:-60px;background:radial-gradient(rgba(0,255,200,.05),transparent 70%)"></div>
+  <div class="hdr-glow" style="width:200px;height:200px;bottom:-50px;right:50px;background:radial-gradient(rgba(0,188,212,.07),transparent 70%)"></div>
+
+  <div class="header-scene">
+    <!-- Shield SVG -->
+    <svg class="shield-wrap" viewBox="0 0 100 110" xmlns="http://www.w3.org/2000/svg">
+      <path d="M50 5 L88 22 L88 60 Q88 85 50 105 Q12 85 12 60 L12 22 Z"
+        fill="none" stroke="rgba(0,255,200,.6)" stroke-width="3"/>
+      <path d="M50 12 L82 27 L82 60 Q82 81 50 98 Q18 81 18 60 L18 27 Z"
+        fill="rgba(0,77,64,.6)" stroke="rgba(0,255,200,.35)" stroke-width="1.5"/>
+      <!-- Lock icon inside -->
+      <rect x="38" y="52" width="24" height="18" rx="3" fill="rgba(0,255,200,.7)"/>
+      <path d="M42 52 L42 46 Q42 38 50 38 Q58 38 58 46 L58 52"
+        fill="none" stroke="rgba(0,255,200,.7)" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="50" cy="62" r="3" fill="#061020"/>
+      <!-- Glow dots -->
+      <circle cx="22" cy="32" r="2" fill="#00ffc8" opacity=".4"/>
+      <circle cx="78" cy="32" r="2" fill="#00ffc8" opacity=".4"/>
+      <circle cx="18" cy="68" r="1.5" fill="#00ffc8" opacity=".3"/>
+      <circle cx="82" cy="68" r="1.5" fill="#00ffc8" opacity=".3"/>
+    </svg>
+
+    <div class="header-text">
+      <div class="hdr-badge">🏫 โรงเรียนหินฝนวิทยาคม &nbsp;·&nbsp; วิทยาการคำนวณ ม.3</div>
+      <h1>🛡️ พลิกวิกฤตไซเบอร์</h1>
+      <div class="subtitle">Cyber Crisis Response Mission</div>
+      <div class="subject">หน่วยที่ 4 &nbsp;|&nbsp; แผนที่ 3 &nbsp;|&nbsp; ปีการศึกษา 2568</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PROGRESS ===== -->
+<div class="progress-wrap">
+  <div class="prog-row">
+    <span class="prog-lbl" id="progressText">กรอกข้อมูล 0/6 รายการ</span>
+    <span class="prog-pct" id="progressPct">0%</span>
+  </div>
+  <div class="prog-bg"><div class="prog-fill" id="progressFill"></div></div>
+</div>
+
+<div class="wrap">
+
+  <!-- ===== GROUP INFO ===== -->
+  <div class="group-card">
+    <div class="gc-title">👥 สมาชิกกลุ่ม</div>
+    <div id="loadingStudents" class="loading-txt">⏳ กำลังโหลดรายชื่อนักเรียน...</div>
+    <div class="member-grid" id="memberGrid" style="display:none">
+      <div class="member-row">
+        <label class="m-lbl">สมาชิกคนที่ 1</label>
+        <select id="member1" class="m-sel">
+          <option value="">— เลือกชื่อนักเรียน —</option>
+        </select>
+      </div>
+      <div class="member-row">
+        <label class="m-lbl">สมาชิกคนที่ 2</label>
+        <select id="member2" class="m-sel">
+          <option value="">— เลือกชื่อนักเรียน —</option>
+        </select>
+      </div>
+      <div class="member-row" style="grid-column:1/-1">
+        <label class="m-lbl">ชั้น</label>
+        <div class="m-static">📚 ชั้นมัธยมศึกษาปีที่ 3</div>
+        <input type="hidden" id="classroom" value="ม.3">
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 1: ROLEPLAY ===== -->
+  <div class="ws-section s-cyber">
+    <div class="sec-hd">
+      <div class="sec-ic">🔍</div>
+      <div>
+        <div class="sec-num">ส่วนที่ 1</div>
+        <div class="sec-title">บทบาทสมมติ (Roleplay)</div>
+      </div>
+    </div>
+
+    <div class="role-banner">
+      <span class="role-emoji">🕵️</span>
+      <div class="role-title">สวมบทบาทเป็น "ทีมผู้เชี่ยวชาญความปลอดภัยทางไซเบอร์"</div>
+      <div class="role-desc">Cybersecurity Expert Team</div>
+    </div>
+
+    <div class="mission-box">
+      <div class="mission-title">🎯 ภารกิจของทีม</div>
+      <div class="mission-txt">
+        ทีมของนักเรียนได้รับมอบหมายให้เป็น <b style="color:#ffd54f">"ผู้เชี่ยวชาญด้านความปลอดภัยทางไซเบอร์"</b>
+        ที่ถูกเรียกตัวมาแก้ไขปัญหาการถูกมิจฉาชีพหลอกลวงจากการทำธุรกรรมอิเล็กทรอนิกส์ในโรงเรียนหินฝนวิทยาคม<br><br>
+        ทีมต้องวิเคราะห์ปัญหา แล้วสร้าง <b style="color:#00ffc8">"4 กฎเหล็ก"</b> ป้องกันให้ทุกคนในโรงเรียนนำไปใช้ได้จริง!
+      </div>
+    </div>
+
+    <div class="info-box ib-cyber">
+      <h4>📺 คำแนะนำก่อนเริ่ม</h4>
+      <ul>
+        <li>ดูสถานการณ์จำลองที่ครูนำเสนอบนหน้าจอให้ครบก่อน</li>
+        <li>ช่วยกันคิดวิเคราะห์ภายในกลุ่ม</li>
+        <li>ตอบทุกส่วนให้ครบถ้วน แล้วเตรียมตัวแทนพูดนำเสนอ</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 2: วิเคราะห์สถานการณ์ ===== -->
+  <div class="ws-section s-red">
+    <div class="sec-hd">
+      <div class="sec-ic">🔬</div>
+      <div>
+        <div class="sec-num">ส่วนที่ 2</div>
+        <div class="sec-title">วิเคราะห์สถานการณ์ปัญหา</div>
+      </div>
+    </div>
+
+    <div class="info-box ib-red">
+      <h4>📺 ดูสถานการณ์บนหน้าจอแล้วตอบคำถาม</h4>
+      <p>จากเหตุการณ์ที่ครูนำเสนอ อะไรคือ <b>"จุดพลาด"</b> ที่ทำให้เกิดความเสียหาย?<br>
+      <span style="opacity:.75;font-size:13px">เขียนอธิบายให้ละเอียด อย่างน้อย 2-3 ประโยคต่อข้อ</span></p>
+    </div>
+
+    <!-- จุดพลาดที่ 1 -->
+    <div class="mistake-card mk1" id="card-m1">
+      <div class="mk-hd">
+        <span class="mk-badge">🔴 จุดพลาดที่ 1</span>
+        <span class="mk-label">ข้อผิดพลาดแรกที่ตรวจพบ</span>
+      </div>
+      <textarea id="m1" class="open-inp" rows="4"
+        placeholder="เขียนอธิบายว่าเกิดอะไรขึ้น ทำไมจึงถือว่าเป็นจุดพลาด และส่งผลเสียอย่างไร..."></textarea>
+      <div class="q-counter" id="cnt-m1">0 ตัวอักษร</div>
+    </div>
+
+    <!-- จุดพลาดที่ 2 -->
+    <div class="mistake-card mk2" id="card-m2">
+      <div class="mk-hd">
+        <span class="mk-badge">🔴 จุดพลาดที่ 2</span>
+        <span class="mk-label">ข้อผิดพลาดที่สองที่ตรวจพบ</span>
+      </div>
+      <textarea id="m2" class="open-inp" rows="4"
+        placeholder="เขียนอธิบายว่าเกิดอะไรขึ้น ทำไมจึงถือว่าเป็นจุดพลาด และส่งผลเสียอย่างไร..."></textarea>
+      <div class="q-counter" id="cnt-m2">0 ตัวอักษร</div>
+    </div>
+
+    <!-- จุดพลาดที่ 3 -->
+    <div class="mistake-card mk3" id="card-m3">
+      <div class="mk-hd">
+        <span class="mk-badge">🔴 จุดพลาดที่ 3</span>
+        <span class="mk-label">ข้อผิดพลาดที่สามที่ตรวจพบ</span>
+      </div>
+      <textarea id="m3" class="open-inp" rows="4"
+        placeholder="เขียนอธิบายว่าเกิดอะไรขึ้น ทำไมจึงถือว่าเป็นจุดพลาด และส่งผลเสียอย่างไร..."></textarea>
+      <div class="q-counter" id="cnt-m3">0 ตัวอักษร</div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 2.5: 4 กฎเหล็ก ===== -->
+  <div class="ws-section s-gold">
+    <div class="sec-hd">
+      <div class="sec-ic">⚔️</div>
+      <div>
+        <div class="sec-num">ส่วนที่ 2 (ต่อ)</div>
+        <div class="sec-title">สร้างคู่มือ — 4 กฎเหล็กไซเบอร์</div>
+      </div>
+    </div>
+
+    <div class="info-box ib-gold">
+      <h4>🛡️ ภารกิจ: สร้างกฎเหล็กป้องกันไซเบอร์</h4>
+      <p>จากการวิเคราะห์จุดพลาด ให้กลุ่มช่วยกันคิด <b>4 กฎเหล็ก</b> ที่ทุกคนในโรงเรียนควรปฏิบัติเพื่อป้องกันการตกเป็นเหยื่อมิจฉาชีพออนไลน์ กฎต้องปฏิบัติได้จริง ชัดเจน จำง่าย</p>
+    </div>
+
+    <!-- กฎเหล็กที่ 1–4 -->
+    <div class="rule-card" id="card-r1">
+      <div class="rule-hd">
+        <div class="rule-badge rb1">1</div>
+        <div class="rule-label">กฎเหล็กที่ 1 — ชื่อกฎ / หัวข้อ + อธิบายวิธีปฏิบัติ</div>
+      </div>
+      <textarea id="r1" class="open-inp" rows="3"
+        placeholder="เช่น  ❌ ห้ามกดลิงก์แปลกหน้า — ถ้าได้รับลิงก์จากคนแปลกหน้าหรือข้อความน่าสงสัย ห้ามกดโดยเด็ดขาด ให้โทรยืนยันก่อนเสมอ..."></textarea>
+      <div class="q-counter" id="cnt-r1">0 ตัวอักษร</div>
+    </div>
+
+    <div class="rule-card" id="card-r2">
+      <div class="rule-hd">
+        <div class="rule-badge rb2">2</div>
+        <div class="rule-label">กฎเหล็กที่ 2 — ชื่อกฎ / หัวข้อ + อธิบายวิธีปฏิบัติ</div>
+      </div>
+      <textarea id="r2" class="open-inp" rows="3"
+        placeholder="เขียนกฎและอธิบายวิธีปฏิบัติ..."></textarea>
+      <div class="q-counter" id="cnt-r2">0 ตัวอักษร</div>
+    </div>
+
+    <div class="rule-card" id="card-r3">
+      <div class="rule-hd">
+        <div class="rule-badge rb3">3</div>
+        <div class="rule-label">กฎเหล็กที่ 3 — ชื่อกฎ / หัวข้อ + อธิบายวิธีปฏิบัติ</div>
+      </div>
+      <textarea id="r3" class="open-inp" rows="3"
+        placeholder="เขียนกฎและอธิบายวิธีปฏิบัติ..."></textarea>
+      <div class="q-counter" id="cnt-r3">0 ตัวอักษร</div>
+    </div>
+
+    <div class="rule-card" id="card-r4">
+      <div class="rule-hd">
+        <div class="rule-badge rb4">4</div>
+        <div class="rule-label">กฎเหล็กที่ 4 — ชื่อกฎ / หัวข้อ + อธิบายวิธีปฏิบัติ</div>
+      </div>
+      <textarea id="r4" class="open-inp" rows="3"
+        placeholder="เขียนกฎและอธิบายวิธีปฏิบัติ..."></textarea>
+      <div class="q-counter" id="cnt-r4">0 ตัวอักษร</div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 3: Reflection ===== -->
+  <div class="ws-section s-teal">
+    <div class="sec-hd">
+      <div class="sec-ic">🌟</div>
+      <div>
+        <div class="sec-num">ส่วนที่ 3</div>
+        <div class="sec-title">ความสำเร็จและการประยุกต์ใช้</div>
+      </div>
+    </div>
+
+    <div class="info-box ib-teal">
+      <h4>📣 เตรียมตัวแทนพูดนำเสนอ</h4>
+      <p>ตอบทั้ง 2 ข้อ แล้วเลือกตัวแทนกลุ่มพูดนำเสนอให้เพื่อน ๆ ฟัง</p>
+    </div>
+
+    <!-- สิ่งที่เรียนรู้ -->
+    <div class="reflect-card" id="card-ref1">
+      <div class="reflect-hd">
+        <span class="reflect-icon">💡</span>
+        <div>
+          <div class="reflect-label">กลุ่มของเราเรียนรู้อะไร?</div>
+          <div class="reflect-sub">สิ่งที่ประสบความสำเร็จ / สิ่งที่ค้นพบในคาบนี้</div>
+        </div>
+      </div>
+      <textarea id="ref1" class="open-inp" rows="4"
+        placeholder="เขียนสิ่งที่กลุ่มได้เรียนรู้ ความรู้ใหม่ที่ได้รับ หรือสิ่งที่ทำให้คาบนี้ประสบความสำเร็จ..."></textarea>
+      <div class="q-counter" id="cnt-ref1">0 ตัวอักษร</div>
+    </div>
+
+    <!-- นำไปใช้ -->
+    <div class="reflect-card" id="card-ref2">
+      <div class="reflect-hd">
+        <span class="reflect-icon">🚀</span>
+        <div>
+          <div class="reflect-label">เราจะนำไปใช้อย่างไร?</div>
+          <div class="reflect-sub">นำไปใช้กับชีวิตประจำวัน / แนะนำคนในครอบครัว</div>
+        </div>
+      </div>
+      <textarea id="ref2" class="open-inp" rows="4"
+        placeholder="เขียนว่าจะนำความรู้ที่ได้ไปใช้ในชีวิตจริงอย่างไร เช่น เตือนครอบครัว เพื่อน หรือปรับเปลี่ยนพฤติกรรมตัวเอง..."></textarea>
+      <div class="q-counter" id="cnt-ref2">0 ตัวอักษร</div>
+    </div>
+  </div>
+
+  <!-- ===== RUBRIC (read-only) ===== -->
+  <div class="ws-section s-purple">
+    <div class="sec-hd">
+      <div class="sec-ic">📊</div>
+      <div>
+        <div class="sec-num">เกณฑ์การประเมินผล</div>
+        <div class="sec-title">คะแนนเต็ม 30 คะแนน</div>
+      </div>
+    </div>
+
+    <table class="rubric-table">
+      <thead>
+        <tr>
+          <th>เกณฑ์การประเมิน</th>
+          <th style="text-align:center;white-space:nowrap">คะแนนเต็ม</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>🔬 วิเคราะห์สถานการณ์ปัญหาได้ครบถ้วน ตรงประเด็น</td>
+          <td class="score-col">5</td>
+        </tr>
+        <tr>
+          <td>⚔️ 4 กฎเหล็กมีความคิดสร้างสรรค์และปฏิบัติได้จริง</td>
+          <td class="score-col">10</td>
+        </tr>
+        <tr>
+          <td>🎤 การนำเสนอชัดเจน น่าสนใจ ตัวแทนพูดได้ครบ</td>
+          <td class="score-col">5</td>
+        </tr>
+        <tr>
+          <td>🤝 ความร่วมมือในกลุ่ม มีส่วนร่วมทุกคน</td>
+          <td class="score-col">5</td>
+        </tr>
+        <tr>
+          <td>🚀 สรุปและการประยุกต์ใช้ได้จริงในชีวิตประจำวัน</td>
+          <td class="score-col">5</td>
+        </tr>
+        <tr class="rubric-total">
+          <td><b>รวมทั้งหมด</b></td>
+          <td class="score-col">30</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top:12px;font-size:12.5px;color:rgba(255,255,255,.4);text-align:center">
+      🌐 เว็บไซต์ห้องเรียนครูโอม &nbsp;·&nbsp; วิทยาการคำนวณ ม.3 &nbsp;·&nbsp; แผนที่ 3 &nbsp;·&nbsp; ปีการศึกษา 2568
+    </div>
+  </div>
+
+  <!-- ===== SUBMIT ===== -->
+  <div class="submit-area">
+    <button class="btn-submit" id="btnSubmit">🛡️ ส่งใบภารกิจ</button>
+    <div class="submit-msg" id="submitMsg"></div>
+  </div>
+
+</div><!-- end wrap -->
+
+<script type="module">
+import { initializeApp }  from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getFirestore, collection, addDoc, doc, getDoc, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { FIREBASE_CONFIG } from './js/config.js';
+
+const app = initializeApp(FIREBASE_CONFIG);
+const db  = getFirestore(app);
+
+// ===== LOAD STUDENTS FROM FIREBASE =====
+async function loadStudents(){
+  const loadEl  = document.getElementById('loadingStudents');
+  const gridEl  = document.getElementById('memberGrid');
+  try{
+    const snap = await getDoc(doc(db,'score_system','hinfon_scores'));
+    let students = [];
+    if(snap.exists()){
+      const data = snap.data().data || {};
+      students = (data.classes?.['ม.3']?.students) || [];
+    }
+    // Fallback: hard-coded list if Firebase empty
+    if(!students.length){
+      students = [
+        {id:'m3_1',prefix:'เด็กชาย',first:'อัครเดช',last:'ชัยสามารถ'},
+        {id:'m3_2',prefix:'เด็กชาย',first:'ณรงค์ชัย',last:'เสาโกมุท'},
+        {id:'m3_3',prefix:'เด็กชาย',first:'พงษ์พิพัฒน์',last:'ปิ่นตำนัก'},
+        {id:'m3_4',prefix:'เด็กชาย',first:'พุฒินันท์',last:'พบโชค'},
+        {id:'m3_5',prefix:'เด็กชาย',first:'รัตนเทพ',last:'มะเรืองศูนย์'},
+        {id:'m3_6',prefix:'เด็กชาย',first:'นพนันท์',last:'ขำเส็ง'},
+        {id:'m3_7',prefix:'เด็กหญิง',first:'กัญญาภรณ์',last:'วิชัยรัมย์'},
+        {id:'m3_8',prefix:'เด็กหญิง',first:'อมลวรรณ',last:'ทุมพันธ์'},
+        {id:'m3_9',prefix:'เด็กหญิง',first:'จิราวรรณ',last:'กองพา'},
+        {id:'m3_10',prefix:'เด็กชาย',first:'ธนกร',last:'หอมหวล'},
+      ];
+    }
+    // Populate both selects
+    ['member1','member2'].forEach(selId=>{
+      const sel = document.getElementById(selId);
+      students.forEach((s,i)=>{
+        const opt = document.createElement('option');
+        opt.value = `เลขที่ ${i+1} — ${s.prefix}${s.first} ${s.last}`;
+        opt.textContent = `เลขที่ ${i+1}  ${s.prefix}${s.first} ${s.last}`;
+        sel.appendChild(opt);
+      });
+      sel.addEventListener('change', checkMembers);
+    });
+    loadEl.style.display = 'none';
+    gridEl.style.display = '';
+  }catch(e){
+    loadEl.textContent = '⚠️ โหลดรายชื่อไม่ได้ กรุณาลองใหม่';
+  }
+}
+loadStudents();
+
+function checkMembers(){
+  const ok = ['member1','member2'].every(i=>(document.getElementById(i)?.value||'').trim().length>0);
+  mark('groupinfo', ok);
+}
+
+// ===== PROGRESS =====
+const TOTAL = 6;
+const _done = {};
+function mark(id, ok){
+  _done[id] = ok;
+  const n   = Object.values(_done).filter(Boolean).length;
+  const pct = Math.round(n / TOTAL * 100);
+  document.getElementById('progressFill').style.width  = pct + '%';
+  document.getElementById('progressPct').textContent   = pct + '%';
+  document.getElementById('progressText').textContent  = `กรอกข้อมูล ${n}/${TOTAL} รายการ`;
+}
+
+// ===== CHAR COUNTER + TEXTAREA HANDLERS =====
+function setupTextarea(id, cardId, markId, minLen=10){
+  const el   = document.getElementById(id);
+  const cnt  = document.getElementById('cnt-'+id);
+  const card = document.getElementById('card-'+cardId);
+  if(!el) return;
+  el.addEventListener('input', function(){
+    const len = this.value.trim().length;
+    if(cnt) cnt.textContent = len + ' ตัวอักษร';
+    const ok = len >= minLen;
+    if(card) card.classList.toggle('filled', ok);
+    mark(markId, ok);
+  });
+}
+
+// Mistake analysis
+setupTextarea('m1','m1','m1',20);
+setupTextarea('m2','m2','m2',20);
+setupTextarea('m3','m3','m3',20);
+
+// Iron rules — count all 4 together as 1 progress item
+['r1','r2','r3','r4'].forEach(id=>{
+  const el  = document.getElementById(id);
+  const cnt = document.getElementById('cnt-'+id);
+  const card= document.getElementById('card-'+id);
+  if(!el) return;
+  el.addEventListener('input', function(){
+    const len = this.value.trim().length;
+    if(cnt) cnt.textContent = len + ' ตัวอักษร';
+    if(card) card.classList.toggle('filled', len>=10);
+    const allFilled = ['r1','r2','r3','r4'].every(i=>(document.getElementById(i)?.value.trim().length||0)>=10);
+    mark('rules', allFilled);
+  });
+});
+
+// Reflection
+setupTextarea('ref1','ref1','ref1',15);
+setupTextarea('ref2','ref2','ref2',15);
+
+// ===== SUBMIT =====
+document.getElementById('btnSubmit').addEventListener('click', async()=>{
+  const m1n = document.getElementById('member1').value.trim();
+  const m2n = document.getElementById('member2').value.trim();
+  if(!m1n || !m2n){ alert('กรุณาเลือกชื่อสมาชิกอย่างน้อย 2 คนก่อนส่ง 📝'); return; }
+
+  const getVal = id => (document.getElementById(id)||{}).value?.trim()||'';
+
+  const payload = {
+    worksheet : 'พลิกวิกฤตไซเบอร์',
+    subject   : 'วิทยาการคำนวณ',
+    grade     : 'ม.3',
+    unit      : 4,
+    plan      : 3,
+    classroom : 'ม.3',
+    members   : [m1n, m2n].filter(Boolean),
+    // Part 2: analysis
+    mistake1  : getVal('m1'),
+    mistake2  : getVal('m2'),
+    mistake3  : getVal('m3'),
+    // Part 2 (continued): iron rules
+    rule1     : getVal('r1'),
+    rule2     : getVal('r2'),
+    rule3     : getVal('r3'),
+    rule4     : getVal('r4'),
+    // Part 3: reflection
+    learned   : getVal('ref1'),
+    apply     : getVal('ref2'),
+    submittedAt: serverTimestamp(),
+  };
+
+  const btn = document.getElementById('btnSubmit');
+  const msg = document.getElementById('submitMsg');
+  btn.disabled = true;
+  btn.textContent = '⏳ กำลังส่ง...';
+  msg.className = 'submit-msg';
+  msg.style.display = 'none';
+
+  try{
+    await addDoc(collection(db,'worksheet_submissions'), payload);
+    msg.textContent = '✅ ส่งใบภารกิจเรียบร้อยแล้ว! ขอบคุณทีม "ผู้เชี่ยวชาญไซเบอร์" 🛡️';
+    msg.className = 'submit-msg submit-ok';
+    msg.style.display = 'block';
+    btn.textContent = '✅ ส่งแล้ว!';
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('progressPct').textContent  = '100%';
+    document.getElementById('progressText').textContent = '✅ ส่งใบภารกิจเรียบร้อย';
+  }catch(e){
+    msg.textContent = '❌ เกิดข้อผิดพลาด: ' + e.message;
+    msg.className = 'submit-msg submit-err';
+    msg.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = '🛡️ ส่งใบภารกิจ';
+  }
+});
+</script>
+</body>
+</html>
