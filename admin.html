@@ -725,7 +725,6 @@ import { FIREBASE_CONFIG } from "./js/config.js";
 
 const app = initializeApp(FIREBASE_CONFIG);
 const auth = getAuth(app);
-setPersistence(auth, inMemoryPersistence); // ไม่จำ session — ต้อง login ใหม่ทุกครั้งที่เปิดหน้า
 const db = getFirestore(app);
 let chartInst = null, chatUnsub = null, currentRoom = null, qzQuestions = [];
 
@@ -743,12 +742,17 @@ window.doLogin = async function(){
 };
 window.doLogout = () => signOut(auth);
 
-onAuthStateChanged(auth, user => {
-  document.getElementById('loginScreen').style.display = user ? 'none' : 'flex';
-  document.getElementById('mainArea').style.display = user ? 'flex' : 'none';
-  document.getElementById('mainArea').style.flexDirection = 'column';
-  if(user){ document.getElementById('teacherEmail').textContent = user.email || 'ครู'; loadSettings(); loadCls(); loadDashboard(); }
-});
+// บังคับ login ใหม่ทุกครั้ง: await setPersistence → signOut session เดิม → ค่อยฟัง auth
+(async () => {
+  try { await setPersistence(auth, inMemoryPersistence); } catch(e) {}
+  try { await signOut(auth); } catch(e) {}
+  onAuthStateChanged(auth, user => {
+    document.getElementById('loginScreen').style.display = user ? 'none' : 'flex';
+    document.getElementById('mainArea').style.display = user ? 'flex' : 'none';
+    document.getElementById('mainArea').style.flexDirection = 'column';
+    if(user){ document.getElementById('teacherEmail').textContent = user.email || 'ครู'; loadSettings(); loadCls(); loadDashboard(); }
+  });
+})();
 
 // ==================== PAGES ====================
 const pageTitles = {dashboard:'🏠 Dashboard',classrooms:'🏫 ห้องเรียน',announcements:'📢 ประกาศ',worksheets:'📄 ใบงาน',quizzes:'📝 ข้อสอบ',videos:'🎬 วิดีโอ',games:'🎮 เกม',results:'📊 ผลสอบ',checkwork:'📋 ตรวจงาน',chat:'💬 แชทนักเรียน',passwords:'🔑 รหัสผ่านนักเรียน',settings:'⚙️ ตั้งค่าเว็บไซต์',guide:'📖 คู่มือแอดมิน'};
