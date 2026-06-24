@@ -89,6 +89,8 @@ input.si.wide{width:32px}
     <span id="autoSyncBadge" style="background:rgba(255,255,255,.2);color:#fff;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700">☁️ auto-sync</span>
     <button class="btn btn-blue" onclick="openPrintModal()">🖨️ พิมพ์รายงาน</button>
     <button class="btn btn-orange" onclick="openAddClassModal()">➕ ชั้นเรียน</button>
+    <button id="btnTeacherLogin" class="btn btn-green" onclick="openLoginModal()" style="font-size:12px">🔐 ล็อกอินครู</button>
+    <button id="btnTeacherLogout" class="btn btn-gray" onclick="doScoresLogout()" style="display:none;font-size:12px">🚪 ออก</button>
     <a href="admin.html" class="btn btn-gray">🔙 Admin</a>
   </div>
 </div>
@@ -171,9 +173,28 @@ input.si.wide{width:32px}
   </div>
 </div>
 
+<!-- TEACHER LOGIN MODAL -->
+<div class="modal-overlay" id="loginModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center">
+  <div class="modal" style="max-width:340px;text-align:center">
+    <h2 style="color:#c94b00;margin-bottom:4px">🔐 ล็อกอินครู</h2>
+    <p style="font-size:13px;color:#888;margin-bottom:16px">เพื่อ sync คะแนนขึ้น Firebase</p>
+    <input type="email" id="scLoginEmail" placeholder="อีเมล์ครู"
+      style="width:100%;padding:10px 12px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit;box-sizing:border-box;margin-bottom:8px"
+      onkeydown="if(event.key==='Enter')doScoresLogin()">
+    <input type="password" id="scLoginPwd" placeholder="รหัสผ่าน"
+      style="width:100%;padding:10px 12px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:14px;font-family:inherit;box-sizing:border-box;margin-bottom:8px"
+      onkeydown="if(event.key==='Enter')doScoresLogin()">
+    <div id="scLoginErr" style="background:#ffebee;color:#c62828;padding:8px 12px;border-radius:8px;font-size:13px;margin-bottom:8px;display:none"></div>
+    <div style="display:flex;gap:8px">
+      <button onclick="closeLoginModal()" style="flex:1;padding:10px;background:#eee;border:none;border-radius:8px;font-family:inherit;font-size:14px;cursor:pointer">ยกเลิก</button>
+      <button onclick="doScoresLogin()" style="flex:2;padding:10px;background:linear-gradient(90deg,#e65c00,#f39800);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">🔐 เข้าสู่ระบบ</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { FIREBASE_CONFIG } from "./js/config.js";
 
@@ -583,32 +604,90 @@ window.doPrint=function(){
   setTimeout(()=>{window.print();area.style.display='none';},200);
 };
 
+// ==================== LOGIN MODAL ====================
+window.openLoginModal = function(){
+  document.getElementById('loginModal').style.display='flex';
+  document.getElementById('scLoginEmail').value='';
+  document.getElementById('scLoginPwd').value='';
+  document.getElementById('scLoginErr').style.display='none';
+  setTimeout(()=>document.getElementById('scLoginEmail').focus(),100);
+};
+window.closeLoginModal = function(){
+  document.getElementById('loginModal').style.display='none';
+};
+window.doScoresLogin = async function(){
+  const email = document.getElementById('scLoginEmail').value.trim();
+  const pwd   = document.getElementById('scLoginPwd').value;
+  const errEl = document.getElementById('scLoginErr');
+  errEl.style.display='none';
+  try{
+    await signInWithEmailAndPassword(auth, email, pwd);
+    closeLoginModal();
+    // onAuthStateChanged will handle the rest
+  }catch(e){
+    const msgs={'auth/invalid-credential':'อีเมล์หรือรหัสผ่านไม่ถูกต้อง','auth/wrong-password':'รหัสผ่านไม่ถูกต้อง','auth/user-not-found':'ไม่พบบัญชีนี้','auth/too-many-requests':'ล็อกอินผิดบ่อยเกินไป'};
+    errEl.textContent = msgs[e.code]||e.message;
+    errEl.style.display='block';
+  }
+};
+window.doScoresLogout = async function(){
+  if(!confirm('ออกจากระบบ? คะแนนจะถูกบันทึกเฉพาะเครื่องจนกว่าจะ login ใหม่')) return;
+  await signOut(auth);
+};
+
+function updateAuthUI(user){
+  const btnLogin  = document.getElementById('btnTeacherLogin');
+  const btnLogout = document.getElementById('btnTeacherLogout');
+  const badge     = document.getElementById('autoSyncBadge');
+  if(user && user.email){
+    if(btnLogin)  btnLogin.style.display='none';
+    if(btnLogout){ btnLogout.style.display=''; btnLogout.textContent='🚪 '+user.email.split('@')[0]; }
+    if(badge) badge.textContent='☁️ auto-sync ON';
+  } else {
+    if(btnLogin)  btnLogin.style.display='';
+    if(btnLogout) btnLogout.style.display='none';
+    if(badge) badge.textContent='⚠️ บันทึกเฉพาะเครื่อง';
+  }
+}
+
 // ==================== INIT ====================
-// ใช้ authStateReady() แทน onAuthStateChanged
-// แก้ปัญหา: onAuthStateChanged ยิง null ก่อน → signInAnonymously ก่อน → email session ถูก block
 (async()=>{
-  try{ await auth.authStateReady(); }catch(e){}
+  // โหลดข้อมูลก่อน (อ่าน Firebase ได้ทุกคน)
+  try{
+    await auth.authStateReady();
+  }catch(e){}
+
   const user = auth.currentUser;
   if(user && user.email){
-    // admin login ด้วย email — sync Firebase ได้
     isTeacher = true;
     await loadFromFirebase();
-    currentClass = sortClasses(Object.keys(state.classes))[0]||'';
-    renderTabs(); renderSubjectSelect(); renderTable();
     setStatus('sync','☁️ เชื่อมต่อ Firebase · '+user.email);
   } else {
-    // ไม่มี email session — ลอง anonymous เพื่ออ่าน Firebase (score_system read=public)
     isTeacher = false;
-    try{
-      if(!user) await signInAnonymously(auth);
-      await loadFromFirebase();
-    }catch(e){
-      loadFromLocal();
-    }
-    currentClass = sortClasses(Object.keys(state.classes))[0]||'';
-    renderTabs(); renderSubjectSelect(); renderTable();
-    setStatus('warn','⚠️ โหลดได้ · บันทึกเฉพาะเครื่อง — เปิดจาก Admin เพื่อ sync Firebase');
+    // โหลด Firebase (read public) โดยไม่ต้อง auth
+    try{ await loadFromFirebase(); }catch(e){ loadFromLocal(); }
+    setStatus('warn','⚠️ โหลดได้ · กด 🔐 ล็อกอินครู เพื่อ sync Firebase');
   }
+
+  currentClass = sortClasses(Object.keys(state.classes))[0]||'';
+  renderTabs(); renderSubjectSelect(); renderTable();
+  updateAuthUI(user);
+
+  // ฟัง auth state change — เมื่อ login/logout
+  onAuthStateChanged(auth, async(u)=>{
+    updateAuthUI(u);
+    if(u && u.email && !isTeacher){
+      // เพิ่งล็อกอิน → reload จาก Firebase แล้ว sync
+      isTeacher = true;
+      await loadFromFirebase();
+      currentClass = sortClasses(Object.keys(state.classes))[0]||'';
+      renderTabs(); renderSubjectSelect(); renderTable();
+      setStatus('sync','☁️ เชื่อมต่อ Firebase · '+u.email);
+    } else if(!u || !u.email){
+      isTeacher = false;
+      setStatus('warn','⚠️ บันทึกเฉพาะเครื่อง — กด 🔐 ล็อกอินครู เพื่อ sync Firebase');
+    }
+  });
 })();
 </script>
 </body>
