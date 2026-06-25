@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>แบบทดสอบ สังคมศึกษา ป.6 หลักธรรมนำความสุข</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --primary:#7c6fcd;--primary2:#9b8fe0;--accent:#b8aef0;
+      --light:#f5f3ff;--light2:#ede9fb;--border:#d8d2f6;
+      --text:#2d2255;--muted:#8478b8;--white:#ffffff;
+    }
+    body{font-family:'Sarabun',sans-serif;background:linear-gradient(135deg,#f5f3ff 0%,#ede9fb 45%,#fce4ec 100%);min-height:100vh;padding:20px;color:var(--text)}
+    .page-wrapper{max-width:860px;margin:0 auto}
+
+    .exam-header{background:linear-gradient(135deg,#9575cd 0%,#7986cb 50%,#80cbc4 100%);border-radius:18px;padding:32px 36px 24px;color:#fff;text-align:center;margin-bottom:24px;box-shadow:0 8px 32px rgba(120,100,200,.25);position:relative;overflow:hidden}
+    .exam-header::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.12)}
+    .exam-header::after{content:'';position:absolute;bottom:-50px;left:-30px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.08)}
+    .subject-badge{display:inline-block;background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.45);border-radius:20px;padding:4px 16px;font-size:13px;font-weight:500;letter-spacing:.5px;margin-bottom:10px}
+    .exam-header h1{font-size:24px;font-weight:700;margin-bottom:6px;text-shadow:0 2px 6px rgba(0,0,0,.15)}
+    .exam-header h2{font-size:16px;font-weight:500;opacity:.95;margin-bottom:16px}
+    .exam-meta{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:12px}
+    .meta-item{display:flex;align-items:center;gap:6px;font-size:14px;background:rgba(255,255,255,.20);border-radius:10px;padding:5px 14px}
+
+    .info-bar{background:var(--white);border-radius:12px;padding:16px 24px;display:flex;gap:14px;align-items:flex-start;margin-bottom:20px;box-shadow:0 2px 12px rgba(120,100,200,.10);border-left:5px solid #b8aef0}
+    .info-icon{font-size:22px;flex-shrink:0;margin-top:2px}
+    .info-bar p{font-size:14.5px;line-height:1.8;color:#4a3d7a}
+    .info-bar strong{color:var(--primary)}
+
+    .student-form{background:var(--white);border-radius:14px;padding:20px 28px;margin-bottom:24px;box-shadow:0 2px 12px rgba(120,100,200,.08);display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .student-form .full-width{grid-column:1/-1}
+    .form-field label{display:block;font-size:13.5px;font-weight:600;color:var(--primary);margin-bottom:6px}
+    .form-field .line{border:none;border-bottom:2px solid var(--border);background:transparent;width:100%;padding:4px 2px;font-size:15px;font-family:'Sarabun',sans-serif;color:var(--text);outline:none;transition:border-color .2s}
+    .form-field .line:focus{border-bottom-color:var(--primary)}
+    .form-field select.line{appearance:none;-webkit-appearance:none;cursor:pointer}
+    .score-box{display:flex;justify-content:flex-end;align-items:center}
+    .score-inner{border:2.5px solid var(--primary);border-radius:12px;padding:10px 24px;text-align:center;min-width:120px;background:var(--light)}
+    .score-inner .label{font-size:13px;color:var(--primary);font-weight:600}
+    .score-inner .value{font-size:26px;font-weight:700;color:var(--primary);line-height:1.3}
+    .score-inner .total{font-size:13px;color:var(--muted)}
+
+    .section-title{background:linear-gradient(90deg,#9575cd,#7986cb);color:#fff;border-radius:10px;padding:10px 20px;font-size:15.5px;font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:8px;box-shadow:0 3px 12px rgba(120,100,200,.20)}
+
+    .questions-container{display:flex;flex-direction:column;gap:16px}
+    .question-card{background:var(--white);border-radius:14px;padding:20px 24px;box-shadow:0 2px 10px rgba(120,100,200,.07);border:1.5px solid #ede9fb;transition:border-color .2s,box-shadow .2s}
+    .question-card:hover{border-color:#b8aef0;box-shadow:0 4px 18px rgba(120,100,200,.14)}
+    .question-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
+    .q-number{flex-shrink:0;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#9575cd,#7986cb);color:#fff;font-weight:700;font-size:14.5px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(120,100,200,.30)}
+    .q-text{font-size:16px;font-weight:600;line-height:1.6;color:#2d2255;flex:1;padding-top:4px}
+    .choices{display:flex;flex-direction:column;gap:8px;padding-left:48px}
+    .choice-label{display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:9px 14px;border-radius:9px;border:1.5px solid #e8e4fa;background:#faf9ff;transition:all .18s;font-size:15px;line-height:1.5}
+    .choice-label:hover{border-color:#b8aef0;background:var(--light2)}
+    .choice-label input[type="radio"]{display:none}
+    .choice-label input[type="radio"]:checked + .choice-letter{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .choice-label:has(input:checked){border-color:var(--primary);background:var(--light)}
+    .choice-letter{flex-shrink:0;width:26px;height:26px;border-radius:50%;border:2px solid #b8aef0;background:#fff;color:var(--primary);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .18s;margin-top:1px}
+    .choice-text{flex:1}
+
+    .answer-section{margin-top:32px}
+    .answer-toggle{background:linear-gradient(90deg,#7c6fcd,#9b8fe0);color:#fff;border:none;border-radius:10px;padding:11px 24px;font-size:15px;font-weight:600;font-family:'Sarabun',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(120,100,200,.25);transition:transform .15s,box-shadow .15s;margin-bottom:16px;margin-right:8px}
+    .answer-toggle:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(120,100,200,.35)}
+    .answer-key-grid{display:none;grid-template-columns:repeat(5,1fr);gap:10px}
+    .answer-key-grid.show{display:grid}
+    .ans-cell{background:var(--white);border-radius:10px;padding:10px 8px;text-align:center;box-shadow:0 2px 8px rgba(120,100,200,.08);border:1.5px solid #e8e4fa}
+    .ans-cell .ans-q{font-size:12px;color:var(--muted);margin-bottom:4px}
+    .ans-cell .ans-a{font-size:18px;font-weight:700;color:var(--primary)}
+
+    .submit-area{background:var(--white);border-radius:14px;padding:24px 28px;margin-top:24px;box-shadow:0 2px 12px rgba(120,100,200,.09);text-align:center}
+    .btn-submit{background:linear-gradient(90deg,#7c6fcd,#9575cd);color:#fff;border:none;border-radius:12px;padding:14px 40px;font-size:17px;font-weight:700;font-family:'Sarabun',sans-serif;cursor:pointer;box-shadow:0 6px 20px rgba(120,100,200,.30);transition:transform .15s,box-shadow .15s}
+    .btn-submit:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(120,100,200,.40)}
+    .btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    #submitMsg{display:none;margin-top:18px;padding:18px 22px;border-radius:12px;background:#f1f8e9;border:1.5px solid #a5d6a7;text-align:left}
+
+    .pw-modal-overlay{display:none;position:fixed;inset:0;background:rgba(45,34,85,.55);z-index:2000;align-items:center;justify-content:center}
+    .pw-modal-overlay.show{display:flex}
+    .pw-box{background:#fff;border-radius:18px;padding:32px 36px;max-width:380px;width:92%;box-shadow:0 12px 48px rgba(120,100,200,.25);text-align:center}
+    .pw-icon{font-size:40px;margin-bottom:12px}
+    .pw-title{font-size:19px;font-weight:700;color:var(--primary);margin-bottom:6px}
+    .pw-sub{font-size:13.5px;color:var(--muted);margin-bottom:20px}
+    .pw-input{width:100%;padding:12px 16px;font-size:22px;letter-spacing:8px;border:2px solid var(--border);border-radius:10px;font-family:'Sarabun',sans-serif;color:var(--text);text-align:center;outline:none;transition:border-color .2s;margin-bottom:8px}
+    .pw-input:focus{border-color:var(--primary)}
+    .pw-error{font-size:13px;color:#c62828;min-height:20px;margin-bottom:12px;font-weight:600}
+    .pw-actions{display:flex;gap:10px;justify-content:center}
+    .pw-btn-cancel{background:#f0eeff;color:#7c6fcd;border:none;border-radius:9px;padding:10px 22px;font-size:14px;font-weight:600;font-family:'Sarabun',sans-serif;cursor:pointer}
+    .pw-btn-ok{background:linear-gradient(90deg,#7c6fcd,#9b8fe0);color:#fff;border:none;border-radius:9px;padding:10px 26px;font-size:14px;font-weight:600;font-family:'Sarabun',sans-serif;cursor:pointer}
+
+    .exam-footer{text-align:center;margin-top:28px;padding:18px;background:var(--white);border-radius:12px;box-shadow:0 2px 10px rgba(120,100,200,.07);font-size:13.5px;color:var(--muted)}
+    .exam-footer strong{color:var(--primary)}
+
+    @media(max-width:600px){
+      .student-form{grid-template-columns:1fr}
+      .student-form .full-width{grid-column:1}
+      .answer-key-grid{grid-template-columns:repeat(4,1fr)}
+      .choices{padding-left:0}
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- HEADER -->
+  <div class="exam-header">
+    <div class="subject-badge">📚 กลุ่มสาระการเรียนรู้สังคมศึกษา ศาสนา และวัฒนธรรม</div>
+    <h1>แบบทดสอบวิชาสังคมศึกษา ชั้นประถมศึกษาปีที่ 6</h1>
+    <h2>🙏 หลักธรรมนำความสุข</h2>
+    <div class="exam-meta">
+      <div class="meta-item"><span>✏️</span> ปรนัย 20 ข้อ</div>
+      <div class="meta-item"><span>⭐</span> 10 คะแนน</div>
+      <div class="meta-item"><span>⏱️</span> เวลา 30 นาที</div>
+    </div>
+  </div>
+
+  <!-- INFO -->
+  <div class="info-bar">
+    <div class="info-icon">📌</div>
+    <p>
+      <strong>คำสั่ง:</strong>
+      เลือกคำตอบที่ถูกต้องที่สุด <strong>1 ข้อ</strong> จากตัวเลือก ก ข ค ง
+      (ข้อละ <strong>0.5 คะแนน</strong> รวม <strong>10 คะแนน</strong>)
+    </p>
+  </div>
+
+  <!-- STUDENT FORM -->
+  <div class="student-form">
+    <div class="form-field full-width">
+      <label>ชื่อ–นามสกุล</label>
+      <select id="studentNameSel" class="line" style="font-size:15px;padding:4px 2px">
+        <option value="">⏳ กำลังโหลดรายชื่อ...</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label>เลขที่</label>
+      <input class="line" id="studentNo" type="number" min="1" max="50" placeholder="........."/>
+    </div>
+    <div class="form-field">
+      <label>ชั้น</label>
+      <input class="line" type="text" value="ป.6" readonly style="color:#777"/>
+    </div>
+    <div class="form-field">
+      <label>วันที่สอบ</label>
+      <input class="line" id="testDate" type="text" placeholder="วัน/เดือน/ปี"/>
+    </div>
+    <div class="score-box">
+      <div class="score-inner">
+        <div class="label">คะแนนที่ได้</div>
+        <div class="value" id="scoreDisplay">&nbsp;&nbsp;&nbsp;</div>
+        <div class="total">จาก 10 คะแนน</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUESTIONS -->
+  <div class="section-title"><span>📝</span> ปรนัย — เลือกตอบข้อที่ถูกต้องที่สุด (ข้อละ 0.5 คะแนน)</div>
+
+  <div class="questions-container">
+
+    <!-- Q1 (ข) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">1</div>
+        <div class="q-text">"หลักธรรมนำความสุข" หมายถึงอะไร</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q1" value="ก"><span class="choice-letter">ก</span><span class="choice-text">การท่องจำบทสวดมนต์ให้ได้มาก ๆ</span></label>
+        <label class="choice-label"><input type="radio" name="q1" value="ข"><span class="choice-letter">ข</span><span class="choice-text">การนำคำสอนทางพระพุทธศาสนามาประพฤติปฏิบัติเพื่อให้เกิดความสุข</span></label>
+        <label class="choice-label"><input type="radio" name="q1" value="ค"><span class="choice-letter">ค</span><span class="choice-text">การทำบุญด้วยการใส่บาตรทุกวัน</span></label>
+        <label class="choice-label"><input type="radio" name="q1" value="ง"><span class="choice-letter">ง</span><span class="choice-text">การปฏิบัติธรรมในวัดเป็นประจำ</span></label>
+      </div>
+    </div>
+
+    <!-- Q2 (ก) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">2</div>
+        <div class="q-text">ข้อใด ไม่ใช่ ประโยชน์ของการมีหลักธรรม</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q2" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ทำให้ร่ำรวยและมีทรัพย์สินมาก</span></label>
+        <label class="choice-label"><input type="radio" name="q2" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ช่วยให้มีจิตใจสงบและอ่อนโยน</span></label>
+        <label class="choice-label"><input type="radio" name="q2" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ช่วยให้ครอบครัวอยู่ร่วมกันอย่างร่มเย็น</span></label>
+        <label class="choice-label"><input type="radio" name="q2" value="ง"><span class="choice-letter">ง</span><span class="choice-text">เป็นพื้นฐานของการเป็นพลเมืองที่มีคุณภาพ</span></label>
+      </div>
+    </div>
+
+    <!-- Q3 (ค) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">3</div>
+        <div class="q-text">"ทาน" ในทางพระพุทธศาสนาหมายถึงข้อใด</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q3" value="ก"><span class="choice-letter">ก</span><span class="choice-text">การมีสติรู้ตัวอยู่เสมอ</span></label>
+        <label class="choice-label"><input type="radio" name="q3" value="ข"><span class="choice-letter">ข</span><span class="choice-text">การรักษาศีลห้า</span></label>
+        <label class="choice-label"><input type="radio" name="q3" value="ค"><span class="choice-letter">ค</span><span class="choice-text">การให้และการแบ่งปัน</span></label>
+        <label class="choice-label"><input type="radio" name="q3" value="ง"><span class="choice-letter">ง</span><span class="choice-text">การสวดมนต์ทุกเช้า</span></label>
+      </div>
+    </div>
+
+    <!-- Q4 (ง) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">4</div>
+        <div class="q-text">หลักธรรม "กตัญญู" หมายถึงข้อใด</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q4" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ความปรารถนาให้ผู้อื่นมีความสุข</span></label>
+        <label class="choice-label"><input type="radio" name="q4" value="ข"><span class="choice-letter">ข</span><span class="choice-text">การตั้งใจมั่นในสิ่งที่ทำ</span></label>
+        <label class="choice-label"><input type="radio" name="q4" value="ค"><span class="choice-letter">ค</span><span class="choice-text">การไม่เบียดเบียนผู้อื่น</span></label>
+        <label class="choice-label"><input type="radio" name="q4" value="ง"><span class="choice-letter">ง</span><span class="choice-text">การรู้คุณและตอบแทนผู้มีพระคุณ</span></label>
+      </div>
+    </div>
+
+    <!-- Q5 (ข) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">5</div>
+        <div class="q-text">"เมตตา" แตกต่างจาก "กรุณา" อย่างไร</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q5" value="ก"><span class="choice-letter">ก</span><span class="choice-text">เมตตาคือการให้ทาน กรุณาคือการรักษาศีล</span></label>
+        <label class="choice-label"><input type="radio" name="q5" value="ข"><span class="choice-letter">ข</span><span class="choice-text">เมตตาคือปรารถนาให้ผู้อื่นมีสุข กรุณาคืออยากให้ผู้อื่นพ้นทุกข์</span></label>
+        <label class="choice-label"><input type="radio" name="q5" value="ค"><span class="choice-letter">ค</span><span class="choice-text">เมตตาใช้ในบ้าน กรุณาใช้ในโรงเรียนเท่านั้น</span></label>
+        <label class="choice-label"><input type="radio" name="q5" value="ง"><span class="choice-letter">ง</span><span class="choice-text">เมตตาและกรุณาหมายความเดียวกัน</span></label>
+      </div>
+    </div>
+
+    <!-- Q6 (ก) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">6</div>
+        <div class="q-text">พฤติกรรมใดสอดคล้องกับหลักธรรมเรื่อง "ทาน" มากที่สุด</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q6" value="ก"><span class="choice-letter">ก</span><span class="choice-text">แบ่งอุปกรณ์การเรียนให้เพื่อนที่ลืมมา</span></label>
+        <label class="choice-label"><input type="radio" name="q6" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ตั้งใจฟังครูในชั้นเรียน</span></label>
+        <label class="choice-label"><input type="radio" name="q6" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ไม่นินทาว่าร้ายผู้อื่น</span></label>
+        <label class="choice-label"><input type="radio" name="q6" value="ง"><span class="choice-letter">ง</span><span class="choice-text">หายใจเข้า-ออกช้า ๆ ก่อนเริ่มเรียน</span></label>
+      </div>
+    </div>
+
+    <!-- Q7 (ค) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">7</div>
+        <div class="q-text">ข้อใดเป็นตัวอย่างการปฏิบัติตามหลักธรรม "ศีล" ในโรงเรียน</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q7" value="ก"><span class="choice-letter">ก</span><span class="choice-text">แบ่งขนมให้เพื่อน</span></label>
+        <label class="choice-label"><input type="radio" name="q7" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ช่วยเหลือผู้สูงอายุข้ามถนน</span></label>
+        <label class="choice-label"><input type="radio" name="q7" value="ค"><span class="choice-letter">ค</span><span class="choice-text">พูดความจริง ไม่โกหกครูเมื่อทำผิด</span></label>
+        <label class="choice-label"><input type="radio" name="q7" value="ง"><span class="choice-letter">ง</span><span class="choice-text">นั่งสมาธิก่อนนอนทุกคืน</span></label>
+      </div>
+    </div>
+
+    <!-- Q8 (ง) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">8</div>
+        <div class="q-text">การรักษาศีลช่วยให้ชีวิตดีขึ้นอย่างไร</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q8" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ทำให้เรียนเก่งขึ้นทันที</span></label>
+        <label class="choice-label"><input type="radio" name="q8" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ทำให้ร่ำรวยและประสบความสำเร็จ</span></label>
+        <label class="choice-label"><input type="radio" name="q8" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ทำให้เป็นที่รักของเพื่อนทุกคน</span></label>
+        <label class="choice-label"><input type="radio" name="q8" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ทำให้คนอื่นไว้วางใจ จิตใจผ่องใส และลดความขัดแย้ง</span></label>
+      </div>
+    </div>
+
+    <!-- Q9 (ข) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">9</div>
+        <div class="q-text">"สติ" ในทางพระพุทธศาสนาหมายถึงข้อใด</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q9" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ความตั้งใจมั่นในสิ่งที่ทำ</span></label>
+        <label class="choice-label"><input type="radio" name="q9" value="ข"><span class="choice-letter">ข</span><span class="choice-text">การรู้ตัวอยู่เสมอว่ากำลังคิด พูด หรือทำอะไร</span></label>
+        <label class="choice-label"><input type="radio" name="q9" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ความปรารถนาดีต่อผู้อื่น</span></label>
+        <label class="choice-label"><input type="radio" name="q9" value="ง"><span class="choice-letter">ง</span><span class="choice-text">การรู้คุณผู้มีพระคุณ</span></label>
+      </div>
+    </div>
+
+    <!-- Q10 (ก) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">10</div>
+        <div class="q-text">วิธีฝึกสติสมาธิที่เหมาะสมสำหรับนักเรียนคือข้อใด</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q10" value="ก"><span class="choice-letter">ก</span><span class="choice-text">นั่งนิ่ง หายใจเข้า-ออกช้า ๆ ก่อนเริ่มเรียน</span></label>
+        <label class="choice-label"><input type="radio" name="q10" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ทำงานหลายอย่างพร้อมกันเพื่อฝึกสมาธิ</span></label>
+        <label class="choice-label"><input type="radio" name="q10" value="ค"><span class="choice-letter">ค</span><span class="choice-text">เล่นเกมคอมพิวเตอร์นาน ๆ</span></label>
+        <label class="choice-label"><input type="radio" name="q10" value="ง"><span class="choice-letter">ง</span><span class="choice-text">นอนพักผ่อนให้มากที่สุด</span></label>
+      </div>
+    </div>
+
+    <!-- Q11 (ค) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">11</div>
+        <div class="q-text">ผลดีของการมีสติสมาธิในการเรียนคือข้อใด</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q11" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ทำให้ชนะเพื่อนในการสอบเสมอ</span></label>
+        <label class="choice-label"><input type="radio" name="q11" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ทำให้ครูชมเชยทุกวัน</span></label>
+        <label class="choice-label"><input type="radio" name="q11" value="ค"><span class="choice-letter">ค</span><span class="choice-text">เรียนรู้ได้ดีขึ้น ไม่หุนหันพลันแล่น และแก้ปัญหาได้อย่างมีเหตุผล</span></label>
+        <label class="choice-label"><input type="radio" name="q11" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ทำให้จำหนังสือได้ทั้งเล่มภายในวันเดียว</span></label>
+      </div>
+    </div>
+
+    <!-- Q12 (ข) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">12</div>
+        <div class="q-text">นักเรียนพบของตกอยู่กับพื้นห้องเรียน ควรปฏิบัติอย่างไรตามหลักธรรม "ศีล"</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q12" value="ก"><span class="choice-letter">ก</span><span class="choice-text">เก็บไว้ใช้เองเพราะไม่รู้ว่าเป็นของใคร</span></label>
+        <label class="choice-label"><input type="radio" name="q12" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ส่งคืนครูหรือประกาศหาเจ้าของ</span></label>
+        <label class="choice-label"><input type="radio" name="q12" value="ค"><span class="choice-letter">ค</span><span class="choice-text">เอาไปทิ้งในถังขยะ</span></label>
+        <label class="choice-label"><input type="radio" name="q12" value="ง"><span class="choice-letter">ง</span><span class="choice-text">แกล้งทำเป็นไม่เห็น</span></label>
+      </div>
+    </div>
+
+    <!-- Q13 (ง) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">13</div>
+        <div class="q-text">เมื่อนักเรียนรู้สึกโกรธเพื่อน ควรปฏิบัติตามหลักธรรมใด</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q13" value="ก"><span class="choice-letter">ก</span><span class="choice-text">แก้แค้นทันทีเพื่อให้เพื่อนเข็ดหลาบ</span></label>
+        <label class="choice-label"><input type="radio" name="q13" value="ข"><span class="choice-letter">ข</span><span class="choice-text">บอกเพื่อนคนอื่น ๆ ให้ช่วยต่อว่า</span></label>
+        <label class="choice-label"><input type="radio" name="q13" value="ค"><span class="choice-letter">ค</span><span class="choice-text">โพสต์ในโซเชียลมีเดียเพื่อประจาน</span></label>
+        <label class="choice-label"><input type="radio" name="q13" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ใช้สติหยุดคิด สูดลมหายใจลึก ๆ และพูดด้วยคำสุภาพ</span></label>
+      </div>
+    </div>
+
+    <!-- Q14 (ก) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">14</div>
+        <div class="q-text">การนำหลักธรรมไปใช้ "ที่บ้าน" ควรทำอย่างไร</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q14" value="ก"><span class="choice-letter">ก</span><span class="choice-text">เชื่อฟังพ่อแม่ ช่วยงานบ้าน พูดจาไพเราะ และรู้จักขอบคุณ</span></label>
+        <label class="choice-label"><input type="radio" name="q14" value="ข"><span class="choice-letter">ข</span><span class="choice-text">เล่นเกมตลอดวันเพราะเป็นเวลาพัก</span></label>
+        <label class="choice-label"><input type="radio" name="q14" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ทำตามใจตัวเองเพราะอยู่บ้าน</span></label>
+        <label class="choice-label"><input type="radio" name="q14" value="ง"><span class="choice-letter">ง</span><span class="choice-text">รอให้พ่อแม่บอกก่อนแล้วค่อยช่วย</span></label>
+      </div>
+    </div>
+
+    <!-- Q15 (ค) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">15</div>
+        <div class="q-text">การนำหลักธรรมไปใช้ "ในชุมชน" ข้อใดถูกต้องที่สุด</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q15" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ทิ้งขยะในที่สาธารณะเพราะเป็นหน้าที่ของเทศบาล</span></label>
+        <label class="choice-label"><input type="radio" name="q15" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ไม่สนใจกิจกรรมของชุมชน</span></label>
+        <label class="choice-label"><input type="radio" name="q15" value="ค"><span class="choice-letter">ค</span><span class="choice-text">รักษาความสะอาด แยกขยะ ปลูกต้นไม้ และช่วยกิจกรรมส่วนรวม</span></label>
+        <label class="choice-label"><input type="radio" name="q15" value="ง"><span class="choice-letter">ง</span><span class="choice-text">รอให้ผู้ใหญ่ทำก่อนแล้วตามทีหลัง</span></label>
+      </div>
+    </div>
+
+    <!-- Q16 (ข) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">16</div>
+        <div class="q-text">ข้อใดแสดงถึงความเข้าใจที่ถูกต้องเกี่ยวกับ "ความสุขที่แท้จริง"</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q16" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ความสุขมาจากการมีสิ่งของมีราคาแพงมากมาย</span></label>
+        <label class="choice-label"><input type="radio" name="q16" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ความสุขเกิดจากจิตใจที่ดี การรู้จักแบ่งปัน และการทำประโยชน์ต่อผู้อื่น</span></label>
+        <label class="choice-label"><input type="radio" name="q16" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ความสุขเกิดจากการชนะเพื่อนในทุกเรื่อง</span></label>
+        <label class="choice-label"><input type="radio" name="q16" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ความสุขเกิดจากการไม่มีหน้าที่รับผิดชอบ</span></label>
+      </div>
+    </div>
+
+    <!-- Q17 (ง) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">17</div>
+        <div class="q-text">นักเรียนที่ใช้สื่อออนไลน์อย่างถูกต้องตามหลักธรรม "ศีล" ควรทำอย่างไร</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q17" value="ก"><span class="choice-letter">ก</span><span class="choice-text">แชร์ข่าวทุกอย่างที่เห็นเพื่อให้ข้อมูลแพร่หลาย</span></label>
+        <label class="choice-label"><input type="radio" name="q17" value="ข"><span class="choice-letter">ข</span><span class="choice-text">โพสต์รูปเพื่อนโดยไม่ขออนุญาตเพื่อความสนุก</span></label>
+        <label class="choice-label"><input type="radio" name="q17" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ใช้เวลาออนไลน์นาน ๆ เพราะฝึกการใช้เทคโนโลยี</span></label>
+        <label class="choice-label"><input type="radio" name="q17" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ไม่โพสต์ข้อความทำร้ายผู้อื่น ไม่แชร์ข้อมูลเท็จ</span></label>
+      </div>
+    </div>
+
+    <!-- Q18 (ก) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">18</div>
+        <div class="q-text">เมื่อเราทำดีและนำหลักธรรมไปใช้จริง ผลที่เกิดขึ้นตามข้อใด</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q18" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ความสุขขยายไปสู่คนรอบข้าง ครอบครัวอบอุ่น สังคมเข้มแข็ง</span></label>
+        <label class="choice-label"><input type="radio" name="q18" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ได้รับรางวัลและคำชมจากครูทันที</span></label>
+        <label class="choice-label"><input type="radio" name="q18" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ไม่มีผลอะไรเพราะความดีไม่มีคุณค่าในสังคมปัจจุบัน</span></label>
+        <label class="choice-label"><input type="radio" name="q18" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ทำให้ประสบความสำเร็จในการเรียนเท่านั้น</span></label>
+      </div>
+    </div>
+
+    <!-- Q19 (ค) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">19</div>
+        <div class="q-text">หลักธรรมข้อใดช่วยให้ห้องเรียนมีบรรยากาศที่ดี สงบสุข และน่าเรียนมากที่สุด</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q19" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ทาน — แบ่งปันของใช้กัน</span></label>
+        <label class="choice-label"><input type="radio" name="q19" value="ข"><span class="choice-letter">ข</span><span class="choice-text">กตัญญู — เคารพครู</span></label>
+        <label class="choice-label"><input type="radio" name="q19" value="ค"><span class="choice-letter">ค</span><span class="choice-text">เมตตา + ศีล — มีน้ำใจต่อกัน ไม่รังแก ทำตามกฎระเบียบ</span></label>
+        <label class="choice-label"><input type="radio" name="q19" value="ง"><span class="choice-letter">ง</span><span class="choice-text">สมาธิ — ทุกคนนั่งเงียบตลอดเวลา</span></label>
+      </div>
+    </div>
+
+    <!-- Q20 (ข) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">20</div>
+        <div class="q-text">ข้อสรุปใดถูกต้องที่สุดเกี่ยวกับ "หลักธรรมนำความสุข"</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q20" value="ก"><span class="choice-letter">ก</span><span class="choice-text">หลักธรรมเป็นเรื่องของพระสงฆ์เท่านั้น ไม่ใช่เรื่องของนักเรียน</span></label>
+        <label class="choice-label"><input type="radio" name="q20" value="ข"><span class="choice-letter">ข</span><span class="choice-text">หลักธรรมสามารถนำมาใช้ได้ทุกวัน ทั้งที่บ้าน โรงเรียน และชุมชน</span></label>
+        <label class="choice-label"><input type="radio" name="q20" value="ค"><span class="choice-letter">ค</span><span class="choice-text">หลักธรรมมีประโยชน์เฉพาะวันพระเท่านั้น</span></label>
+        <label class="choice-label"><input type="radio" name="q20" value="ง"><span class="choice-letter">ง</span><span class="choice-text">หลักธรรมทำให้คนร่ำรวยและมีชื่อเสียง</span></label>
+      </div>
+    </div>
+
+  </div><!-- end questions-container -->
+
+  <!-- SUBMIT -->
+  <div class="submit-area">
+    <button class="btn-submit" id="btnSubmit" onclick="submitAnswers(false,null)">📤 ส่งคำตอบ</button>
+    <div id="submitMsg"></div>
+  </div>
+
+  <!-- ANSWER KEY (ครูเท่านั้น) -->
+  <div class="answer-section">
+    <button class="answer-toggle" onclick="toggleAnswerKey()">🔑 เฉลย (ครูเท่านั้น)</button>
+    <div class="answer-key-grid" id="answerKeyGrid">
+      <div class="ans-cell"><div class="ans-q">ข้อ 1</div><div class="ans-a">ข</div></div>
+      <div class="ans-cell"><div class="ans-q">ข้อ 2</div><div class="ans-a">ก</div></div>
+      <div class="ans-cell"><div class="ans-q">ข้อ 3</div><div class="ans-a">ค</div></div>
+      <div class="ans-cell"><div class="ans-q">ข้อ 4</div><div class="ans-a">ง</div></div>
+      <div class="ans-cell"><div class="ans-q">ข้อ 5</div><div class="ans-a">ข</div></div>
+      <div class="ans-cell"><div class="ans-q">ข้อ 6</div><div class="ans-a">ก</div></div>
+      <div class="ans-cell"><div class="ans-q">ข้อ 7</div><div class="ans-a">ค</div></div>
+      <div class="ans-cell"><div class="ans-q">ข้อ 8</div><div class="ans-a">ง</div></div>
+      <div class="ans-cell"><div class="ans-q">ข้อ 9</div><div class="ans-a">ข</div></div>
+      <div class="ans-cell"><div class="ans-q">ข้อ 10</div><div class="ans-a">ก</div></div>
+      <div class="ans-cell"><div class="ans-q">ข้อ 11</div><div class="ans-a">ค</div></div>
+      <div class="ans-cell"><div class="ans-q">ข้อ 12</div><div class="ans-a">ข</div></div>
+      <div class="ans-cell"><div class="ans-q">ข้อ 13</div><div class="ans-a">ง</div></div>
+      <div class="ans-cell"><div class="ans-q">ข้อ 14</div><div class="ans-a">ก</div></div>
+      <div class="ans-cell"><div class="ans-q">ข้อ 15</div><div class="ans-a">ค</div></div>
+      <div class="ans-cell"><div class="ans-q">ข้อ 16</div><div class="ans-a">ข</div></div>
+      <div class="ans-cell"><div class="ans-q">ข้อ 17</div><div class="ans-a">ง</div></div>
+      <div class="ans-cell"><div class="ans-q">ข้อ 18</div><div class="ans-a">ก</div></div>
+      <div class="ans-cell"><div class="ans-q">ข้อ 19</div><div class="ans-a">ค</div></div>
+      <div class="ans-cell"><div class="ans-q">ข้อ 20</div><div class="ans-a">ข</div></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="exam-footer">
+    <strong>วิชาสังคมศึกษา ชั้น ป.6</strong> &nbsp;|&nbsp;
+    หลักธรรมนำความสุข &nbsp;|&nbsp;
+    จัดทำโดย <strong>ครูรณฤทธิ์ ศรีสองเมือง</strong> &nbsp;|&nbsp;
+    โรงเรียนหินฝนวิทยาคม
+  </div>
+
+</div><!-- end page-wrapper -->
+
+<!-- PASSWORD MODAL (เฉลย) -->
+<div class="pw-modal-overlay" id="pwModal">
+  <div class="pw-box">
+    <div class="pw-icon">🔐</div>
+    <div class="pw-title">รหัสผ่านครู</div>
+    <div class="pw-sub">กรุณากรอกรหัสผ่านเพื่อดูเฉลย</div>
+    <input type="password" class="pw-input" id="pwInput" placeholder="••••••" maxlength="10"
+      onkeydown="if(event.key==='Enter')checkPw()"/>
+    <div class="pw-error" id="pwError"></div>
+    <div class="pw-actions">
+      <button class="pw-btn-cancel" onclick="closePwModal()">ยกเลิก</button>
+      <button class="pw-btn-ok" onclick="checkPw()">ยืนยัน</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ==================== เฉลย ====================
+  var ANSWER_KEY = {
+    q1:'ข', q2:'ก', q3:'ค', q4:'ง', q5:'ข',
+    q6:'ก', q7:'ค', q8:'ง', q9:'ข', q10:'ก',
+    q11:'ค', q12:'ข', q13:'ง', q14:'ก', q15:'ค',
+    q16:'ข', q17:'ง', q18:'ก', q19:'ค', q20:'ข'
+  };
+
+  // ==================== ANTI-CHEAT ====================
+  var _examSubmitted = false;
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState==='hidden' && !_examSubmitted){
+      _examSubmitted = true;
+      showCheatOverlay('ตรวจพบการสลับหน้าจอ!');
+      submitAnswers(true,'สลับแท็บ/ซ่อนหน้าต่าง');
+    }
+  });
+  window.addEventListener('blur', function(){
+    if(!_examSubmitted){
+      _examSubmitted = true;
+      showCheatOverlay('ตรวจพบการสลับแอป!');
+      submitAnswers(true,'เปิดแอปซ้อน/split-screen');
+    }
+  });
+  function showCheatOverlay(msg){
+    var ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(198,40,40,.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:Sarabun,sans-serif;text-align:center;padding:20px';
+    ov.innerHTML = '<div style="font-size:60px;margin-bottom:14px">⚠️</div><div style="font-size:26px;font-weight:800;margin-bottom:8px">'+msg+'</div><div style="font-size:17px;opacity:.9">ระบบส่งคำตอบอัตโนมัติแล้ว</div>';
+    document.body.appendChild(ov);
+  }
+
+  // ==================== SUBMIT ====================
+  function submitAnswers(isCheat, cheatReason){
+    var name = document.getElementById('studentNameSel').value;
+    if(!name && !isCheat){ alert('⚠️ กรุณาเลือกชื่อนักเรียนก่อน'); return; }
+    if(!name) name = '(ไม่ระบุชื่อ)';
+    var answers = {};
+    for(var i=1;i<=20;i++){
+      var sel = document.querySelector('input[name="q'+i+'"]:checked');
+      answers['q'+i] = sel ? sel.value : '-';
+    }
+    // ตรวจอัตโนมัติ
+    var mcScore = 0, mcDetails = {};
+    for(var j=1;j<=20;j++){
+      var k='q'+j;
+      var correct = (answers[k]||'').trim() === ANSWER_KEY[k].trim();
+      mcDetails[k] = correct;
+      if(correct) mcScore++;
+    }
+    var finalScore = mcScore * 0.5; // ข้อละ 0.5 คะแนน = 10 คะแนนเต็ม
+
+    var btn = document.getElementById('btnSubmit');
+    btn.disabled = true; btn.textContent = '⏳ กำลังส่ง...';
+
+    var no = document.getElementById('studentNo').value || '-';
+    var data = {
+      studentName: name, studentNo: no,
+      grade: 'ป.6', subject: 'สังคมศึกษา',
+      unit: 'หลักธรรมนำความสุข',
+      answers: answers, mcScore: mcScore, finalScore: finalScore,
+      totalOutOf: 10, mcDetails: mcDetails
+    };
+    if(isCheat){ data.cheated = true; data.cheatReason = cheatReason||'unknown'; }
+
+    (function doSubmit(){
+      if(typeof window._submitAnswers === 'function'){
+        window._submitAnswers(data).then(function(){
+          var pct = Math.round(mcScore/20*100);
+          var html = '<div style="font-size:16px;font-weight:800;color:#2e7d32;margin-bottom:10px">✅ ส่งคำตอบสำเร็จ!</div>';
+          html += '<div style="font-size:15px;margin-bottom:10px">📊 <b>คะแนน:</b> <span style="font-size:22px;font-weight:900;color:'+(pct>=60?'#2e7d32':'#c62828')+'">'+finalScore+' / 10</span> (ตอบถูก '+mcScore+'/20 ข้อ)</div>';
+          html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">';
+          for(var qi=1;qi<=20;qi++){
+            var ok=mcDetails['q'+qi];
+            html += '<span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;font-size:13px;font-weight:800;background:'+(ok?'#e8f5e9':'#ffebee')+';color:'+(ok?'#2e7d32':'#c62828')+';border:1.5px solid '+(ok?'#a5d6a7':'#ef9a9a')+'">'+(ok?'✅':'❌')+qi+'</span>';
+          }
+          html += '</div>';
+          document.getElementById('submitMsg').innerHTML = html;
+          document.getElementById('submitMsg').style.display = 'block';
+          document.getElementById('scoreDisplay').textContent = finalScore;
+          btn.textContent = '✅ ส่งแล้ว';
+          btn.style.background = '#66bb6a';
+          document.getElementById('submitMsg').scrollIntoView({behavior:'smooth',block:'center'});
+        }).catch(function(e){
+          btn.disabled = false; btn.textContent = '📤 ส่งคำตอบ';
+          alert('❌ ส่งไม่สำเร็จ: '+e.message);
+        });
+      } else { setTimeout(doSubmit, 400); }
+    })();
+  }
+
+  // ==================== ANSWER KEY TOGGLE ====================
+  var _ansUnlocked = false;
+  function toggleAnswerKey(){
+    if(_ansUnlocked){
+      document.getElementById('answerKeyGrid').classList.toggle('show');
+    } else {
+      document.getElementById('pwModal').classList.add('show');
+      setTimeout(function(){ document.getElementById('pwInput').focus(); }, 100);
+    }
+  }
+  function closePwModal(){
+    document.getElementById('pwModal').classList.remove('show');
+    document.getElementById('pwInput').value='';
+    document.getElementById('pwError').textContent='';
+  }
+  function checkPw(){
+    var pwd = document.getElementById('pwInput').value;
+    if(pwd==='226005'){
+      _ansUnlocked = true;
+      closePwModal();
+      document.getElementById('answerKeyGrid').classList.add('show');
+    } else {
+      document.getElementById('pwError').textContent='รหัสผ่านไม่ถูกต้อง';
+    }
+  }
+</script>
+
+<script type="module">
+  import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore, getDoc, doc, collection, addDoc, serverTimestamp }
+                              from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { FIREBASE_CONFIG } from "./js/config.js";
+
+  var app  = initializeApp(FIREBASE_CONFIG);
+  var auth = getAuth(app);
+  var db   = getFirestore(app);
+
+  signInAnonymously(auth).catch(function(){});
+
+  // โหลดรายชื่อนักเรียน ป.6
+  (async function loadStudents(){
+    var sel = document.getElementById('studentNameSel');
+    try{
+      var snap = await getDoc(doc(db,'score_system','hinfon_scores'));
+      if(!snap.exists()) throw new Error('no data');
+      var classes = snap.data()?.data?.classes || {};
+      var key = Object.keys(classes).find(function(k){ return k==='ป.6'||k.startsWith('ป.6')||k.startsWith('ป6'); });
+      var students = key ? (classes[key].students||[]) : [];
+      sel.innerHTML = '<option value="">— เลือกชื่อนักเรียน —</option>';
+      students.forEach(function(s){
+        var full=[s.prefix,s.first,s.last].filter(Boolean).join(' ');
+        var opt=document.createElement('option');
+        opt.value=full; opt.textContent=full; sel.appendChild(opt);
+      });
+      if(students.length===0){
+        sel.innerHTML='<option value="">ไม่พบรายชื่อ — กรอกเองด้านล่าง</option>';
+      }
+    }catch(e){
+      sel.innerHTML='<option value="">โหลดรายชื่อไม่ได้</option>';
+    }
+  })();
+
+  // ส่งคำตอบ Firebase
+  window._submitAnswers = async function(data){
+    await addDoc(collection(db,'quiz_results'), Object.assign({},data,{timestamp:serverTimestamp()}));
+  };
+</script>
+
+</body>
+</html>
