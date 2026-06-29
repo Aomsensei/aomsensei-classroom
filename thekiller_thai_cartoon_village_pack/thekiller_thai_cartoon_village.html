@@ -313,7 +313,10 @@ input[type=text]::placeholder{color:#7a4f35} input[type=text]:focus{border-color
     <input type="text" id="playerName" placeholder="ใส่ชื่อของคุณ (ไม่เกิน 12 ตัว)" maxlength="12">
   </div>
 
-  <button class="btn btn-orange" onclick="G.createRoom()"><img class="icon-btn" src="thai_icon_home.png" alt="">สร้างห้องใหม่</button>
+  <div style="display:flex;gap:10px">
+    <button class="btn btn-orange" style="flex:1" onclick="G.createRoom()"><img class="icon-btn" src="thai_icon_home.png" alt="">สร้างห้อง</button>
+    <button class="btn btn-green" style="flex:1" onclick="G.createPublicRoom()">🌐 ห้องสาธารณะ</button>
+  </div>
 
   <div class="card flex-gap" style="align-items:center">
     <input type="text" id="joinCode" placeholder="รหัสห้อง 4 ตัว" maxlength="4"
@@ -321,6 +324,7 @@ input[type=text]::placeholder{color:#7a4f35} input[type=text]:focus{border-color
     <button class="btn btn-outline" style="width:auto;padding:12px 18px;white-space:nowrap"
       onclick="G.joinRoom()"><img class="icon-btn" src="thai_icon_target.png" alt="">เข้าร่วม</button>
   </div>
+  <button class="btn btn-dark" onclick="G.joinRandomRoom()">🎲 สุ่มเข้าห้องสาธารณะ</button>
 
   <button class="btn btn-outline tutorial-trigger" onclick="G.openTutorial()"><img class="icon-btn" src="thai_icon_book.png" alt="">เปิดวิธีเล่น</button>
 
@@ -725,6 +729,58 @@ function showDbError(e){
 // ──────────────────────────────────────────
 // SCREEN 1: หน้าแรก — สร้าง/เข้าร่วมห้อง
 // ──────────────────────────────────────────
+// ─── ห้องสาธารณะ ───────────────────────────
+async function createPublicRoom(){
+  const name=document.getElementById('playerName').value.trim();
+  if(!name){ alert('กรุณาใส่ชื่อก่อน'); return; }
+  myName=name; myId=crypto.randomUUID(); isHost=true;
+  const code=Math.random().toString(36).slice(2,6).toUpperCase();
+  roomCode=code;
+  setLoad(true,'กำลังสร้างห้องสาธารณะ...');
+  try{
+    await withTO(set(ref(db,`tk_rooms/${roomCode}`),{
+      phase:'lobby', round:0, timer:0, isPublic:true, createdAt:Date.now()
+    }));
+    await withTO(set(ref(db,`tk_rooms/${roomCode}/players/${myId}`),{
+      name:myName, role:'', isAlive:true, isReady:false, joinedAt:Date.now()
+    }));
+    onDisconnect(ref(db,`tk_rooms/${roomCode}/players/${myId}`)).remove();
+    setLoad(false);
+    enterLobby();
+  }catch(e){ showDbError(e); roomCode=''; isHost=false; }
+}
+
+async function joinRandomRoom(){
+  const name=document.getElementById('playerName').value.trim();
+  if(!name){ alert('กรุณาใส่ชื่อก่อน'); return; }
+  myName=name; myId=crypto.randomUUID(); isHost=false;
+  setLoad(true,'กำลังค้นหาห้องสาธารณะ...');
+  try{
+    const snap=await withTO(get(ref(db,'tk_rooms')));
+    const all=snap.val()||{};
+    // กรองเฉพาะห้อง: สาธารณะ + lobby + มีที่ว่าง
+    const available=Object.entries(all).filter(([,r])=>
+      r.isPublic && r.phase==='lobby' && Object.keys(r.players||{}).length<10
+    );
+    if(available.length===0){
+      setLoad(false);
+      alert('❌ ไม่พบห้องสาธารณะที่รอผู้เล่นอยู่
+ลองสร้างห้องใหม่แทน');
+      return;
+    }
+    // สุ่มห้อง
+    const [code]=available[Math.floor(Math.random()*available.length)];
+    roomCode=code;
+    await withTO(set(ref(db,`tk_rooms/${roomCode}/players/${myId}`),{
+      name:myName, role:'', isAlive:true, isReady:false, joinedAt:Date.now()
+    }));
+    onDisconnect(ref(db,`tk_rooms/${roomCode}/players/${myId}`)).remove();
+    setLoad(false);
+    enterLobby();
+  }catch(e){ showDbError(e); roomCode=''; isHost=false; }
+}
+// ────────────────────────────────────────────────
+
 async function createRoom(){
   myName = document.getElementById('playerName').value.trim();
   if(!myName){ alert('กรุณาใส่ชื่อผู้เล่น'); return; }
@@ -1461,10 +1517,7 @@ async function nextRound(){
   // ป้องกันเรียกซ้ำ: ต้องอยู่ใน phase 'arrested' เท่านั้น
   if(room.phase !== 'arrested') return;
   const players=room.players||{};
-  // ตรวจชนะก่อนรีเซ็ต (กัน edge case)
-  const win=checkWin(players);
-  if(win){ await doGameOver(players,win); return; }
-
+  // [checkWin ถูกลบออก — ตรวจชนะที่ processVote() และ enterMorning() แล้ว]
   const ids=Object.keys(players);
   const newRound=(room.round||1)+1;
 
@@ -1504,20 +1557,31 @@ function enterGameOver(players, winner){
   const killerWin=winner==='killers';
   document.getElementById('goCard').innerHTML=`<div class="go-card ${killerWin?'go-killers':'go-villagers'}"><div class="go-card-inner"><h1>${killerWin?'ฆาตกรชนะ!':'ชาวบ้านชนะ!'}</h1><div class="go-sub">${killerWin?'ฆาตกรครองบ้านห้วยหินฝนสำเร็จ!':'ชาวบ้านกำจัดฆาตกรหมดแล้ว!'}</div></div></div>`;
 
-  // Auto-return home countdown
-  let goT=20;
+  // Auto-return lobby countdown
+  let goT=15;
   const goBtn=document.getElementById('goHomeBtn');
-  if(goBtn) goBtn.innerHTML=`<img class=\"icon-btn\" src=\"${UI_ASSET.home}\" alt=\"\">กลับหน้าหลัก (${goT})`;
+  if(goBtn){ goBtn.innerHTML=`⏳ กลับล็อบบี้ใน ${goT} วิ`; goBtn.onclick=()=>{ clearInterval(goiv); G.returnToLobby(); }; }
   const goiv=setInterval(()=>{
     goT--;
-    if(goBtn) goBtn.innerHTML=`<img class=\"icon-btn\" src=\"${UI_ASSET.home}\" alt=\"\">กลับหน้าหลัก (${goT>0?goT:0})`;
-    if(goT<=0){ clearInterval(goiv); G.backToHome(); }
+    if(goBtn) goBtn.innerHTML=`⏳ กลับล็อบบี้ใน ${goT>0?goT:0} วิ`;
+    if(goT<=0){ clearInterval(goiv); G.returnToLobby(); }
   },1000);
+
+  // Non-host: ฟัง phase='lobby' → กลับล็อบบี้อัตโนมัติ
+  if(!isHost && roomCode){
+    const phRef2=ref(db,`tk_rooms/${roomCode}/phase`);
+    listeners.goLobby=(()=>{
+      const unsub=onValue(phRef2,snap=>{
+        if(snap.val()==='lobby'){ clearInterval(goiv); killListeners(); enterLobby(); }
+      });
+      return ()=>off(phRef2,'value',unsub);
+    })();
+  }
 
   // เปิดเผย Role ทุกคน
   document.getElementById('goRoleList').innerHTML=Object.entries(players).map(([id,p])=>{
     const info=ROLES[p.role]||ROLES.villager;
-    return `<div class=\"player-row\" style=\"justify-content:space-between\">\n      <span class=\"role-mini\"><img src=\"${info.icon}\" alt=\"${info.name}\"> ${p.name}${id===myId?' <span class=\"badge b-orange\">คุณ</span>':''}</span>\n      <span class=\"badge ${p.role==='killer'?'b-red':'b-green'}\">${info.name}</span>\n    </div>`;
+    return `<div class="player-row" style="justify-content:space-between">\n      <span class="role-mini"><img src="${info.icon}" alt="${info.name}"> ${p.name}${id===myId?' <span class="badge b-orange">คุณ</span>':''}</span>\n      <span class="badge ${p.role==='killer'?'b-red':'b-green'}">${info.name}</span>\n    </div>`;
   }).join('');
 }
 
@@ -1526,6 +1590,41 @@ function backToHome(){
   stopVoiceChat();
   roomCode=''; isHost=false; myRole='';
   show('sc-home');
+}
+
+// กลับล็อบบี้หลังจบเกม — รีเซ็ตห้องแต่เก็บผู้เล่นไว้
+async function returnToLobby(){
+  if(!roomCode) return;
+  killListeners();
+  myRole='';
+  if(isHost){
+    try{
+      // รีเซ็ตสถานะห้อง → lobby
+      const snap=await get(ref(db,`tk_rooms/${roomCode}/players`));
+      const pls=snap.val()||{};
+      const u={};
+      Object.keys(pls).forEach(id=>{
+        u[`tk_rooms/${roomCode}/players/${id}/role`]='';
+        u[`tk_rooms/${roomCode}/players/${id}/isAlive`]=true;
+        u[`tk_rooms/${roomCode}/players/${id}/isReady`]=false;
+      });
+      u[`tk_rooms/${roomCode}/phase`]='lobby';
+      u[`tk_rooms/${roomCode}/round`]=0;
+      u[`tk_rooms/${roomCode}/winner`]=null;
+      u[`tk_rooms/${roomCode}/timer`]=0;
+      u[`tk_rooms/${roomCode}/nightTarget`]=null;
+      u[`tk_rooms/${roomCode}/killerVotes`]=null;
+      u[`tk_rooms/${roomCode}/votes`]=null;
+      u[`tk_rooms/${roomCode}/arrestedId`]=null;
+      u[`tk_rooms/${roomCode}/chiefProtect`]=null;
+      u[`tk_rooms/${roomCode}/auntCheck`]=null;
+      u[`tk_rooms/${roomCode}/auntResult`]=null;
+      u[`tk_rooms/${roomCode}/messages`]=null;
+      u[`tk_rooms/${roomCode}/webrtc`]=null;
+      await update(ref(db),u);
+    }catch(e){ console.warn('returnToLobby error',e); }
+  }
+  enterLobby();
 }
 
 // ──────────────────────────────────────────
@@ -1691,7 +1790,8 @@ window.G={
   castVote, sendChat, goToChat,
   startReply, cancelReply,
   toggleMute,
-  nextRound, backToHome,
+  nextRound, backToHome, returnToLobby,
+  createPublicRoom, joinRandomRoom,
   openTutorial, closeTutorial,
 };
 
