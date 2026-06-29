@@ -1008,6 +1008,8 @@ async function enterNight(roomData){
   const players= snap.val()||{};
   const alive  = Object.entries(players).filter(([,p])=>p.isAlive);
 
+  // อ่านบทบาทจาก Firebase ทุกรอบ — ป้องกัน myRole ค้างจากรอบก่อน
+  myRole = players[myId]?.role || myRole || 'villager';
   const imAlive=players[myId]?.isAlive===true;
 
   // แสดง UI ตาม role — ผู้เล่นที่ตายแล้วไม่สามารถใช้ความสามารถได้
@@ -1223,7 +1225,6 @@ async function enterMorning(roomData){
     const unsub=onValue(phRef,snap=>{
       const ph=snap.val();
       if(ph==='chat') enterChat();
-      if(ph==='role_reveal') enterRoleReveal();
       if(ph==='gameover'){
         get(ref(db,`tk_rooms/${roomCode}`)).then(s=>{
           const d=s.val(); enterGameOver(d.players||{}, d.winner);
@@ -1495,7 +1496,6 @@ async function enterArrested(roomData){
   listeners.arrested=(()=>{
     const unsub=onValue(phRef,snap=>{
       const ph=snap.val();
-      if(ph==='role_reveal') enterRoleReveal(); // รอบใหม่ — แจกบทบาทใหม่
       if(ph==='night'){
         get(ref(db,`tk_rooms/${roomCode}`)).then(s=>enterNight(s.val()));
       }
