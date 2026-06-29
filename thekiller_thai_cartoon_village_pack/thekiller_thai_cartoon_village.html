@@ -371,7 +371,7 @@ input[type=text]::placeholder{color:#7a4f35} input[type=text]:focus{border-color
      SCREEN 3: เปิดเผยบทบาท
 ══════════════════════════════════════ -->
 <div id="sc-role" class="screen role-wrap">
-  <div class="card tc">
+  <div id="roleTopCard" class="card tc">
     <div style="font-size:14px;color:#888;margin-bottom:6px">บทบาทลับของคุณในเกมนี้...</div>
     <h2>กดปุ่มเพื่อเปิดดู</h2>
   </div>
@@ -883,6 +883,7 @@ async function leaveRoom(){
   if(!confirm('ออกจากห้องใช่ไหม?')) return;
   killListeners();
   stopVoiceChat();
+  releaseLocalStream();
   if(roomCode) await remove(ref(db,`tk_rooms/${roomCode}/players/${myId}`));
   roomCode=''; isHost=false;
   show('sc-home');
@@ -933,8 +934,8 @@ async function enterRoleReveal(){
   const snap = await get(ref(db,`tk_rooms/${roomCode}/players/${myId}/role`));
   myRole = snap.val()||'villager';
 
-  // รีเซ็ต UI
-  vis('roleCardWrap',false); vis('confirmWrap',false); vis('waitRoleWrap',false);
+  // รีเซ็ต UI (รวม roleTopCard ที่ซ่อนจากรอบก่อน)
+  vis('roleTopCard',true); vis('roleCardWrap',false); vis('confirmWrap',false); vis('waitRoleWrap',false);
   vis('showRoleBtn',true);
 }
 
@@ -952,8 +953,12 @@ function showRole(){
 }
 
 async function confirmRole(){
+  // ปิดหน้าจอบทบาททันที — ไม่ให้คนข้างๆ แอบดู
+  vis('roleTopCard',false);
+  vis('roleCardWrap',false);
+  vis('confirmWrap',false);
+  vis('waitRoleWrap',true);
   await update(ref(db,`tk_rooms/${roomCode}/players/${myId}`),{isReady:true});
-  vis('confirmWrap',false); vis('waitRoleWrap',true);
 
   // ฟัง ready count + phase night
   const rRef = ref(db,`tk_rooms/${roomCode}`);
@@ -1578,6 +1583,7 @@ function enterGameOver(players, winner){
 function backToHome(){
   killListeners();
   stopVoiceChat();
+  releaseLocalStream();
   roomCode=''; isHost=false; myRole='';
   show('sc-home');
 }
@@ -1641,12 +1647,15 @@ async function startVoiceChat(alivePlayers){
   const statusEl = document.getElementById('voiceStatus');
   const peersEl  = document.getElementById('voicePeers');
 
-  try {
-    localStream = await navigator.mediaDevices.getUserMedia({audio:true,video:false});
-  } catch(e) {
-    if(panelEl){ panelEl.classList.remove('hidden'); }
-    if(statusEl) statusEl.textContent='❌ ไม่สามารถเข้าถึงไมค์ได้ ('+e.name+')';
-    return;
+  // ถ้ามี localStream จากรอบก่อนให้ใช้ต่อ — ไม่ต้องขอ getUserMedia ใหม่
+  if(!localStream || localStream.getTracks().some(t=>t.readyState==='ended')){
+    try {
+      localStream = await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+    } catch(e) {
+      if(panelEl){ panelEl.classList.remove('hidden'); }
+      if(statusEl) statusEl.textContent='❌ ไม่สามารถเข้าถึงไมค์ได้ ('+e.name+')';
+      return;
+    }
   }
   voiceMuted = false;
   if(panelEl) panelEl.classList.remove('hidden');
@@ -1743,13 +1752,19 @@ async function startVoiceChat(alivePlayers){
 }
 
 function stopVoiceChat(){
+  // ปิดเฉพาะ peer connections + audio elements — เก็บ localStream ไว้ใช้รอบหน้า
   Object.values(voiceConns).forEach(pc=>{ try{pc.close();}catch(e){} });
   voiceConns = {};
   Object.values(voiceAudios).forEach(a=>{ a.pause(); a.srcObject=null; try{if(a.parentNode) a.parentNode.removeChild(a);}catch(e){} });
   voiceAudios = {};
-  if(localStream){ localStream.getTracks().forEach(t=>t.stop()); localStream=null; }
+  // ไม่ stop localStream ที่นี่ — เก็บ track ไว้เพื่อใช้รอบต่อไปไม่ต้องขอ getUserMedia ใหม่
   if(roomCode) remove(ref(db,`tk_rooms/${roomCode}/webrtc/${myId}`)).catch(()=>{});
   const p=document.getElementById('voicePanel'); if(p) p.classList.add('hidden');
+}
+
+// เรียกเฉพาะตอนออกจากเกมจริงๆ — หยุดไมค์และคืน resource ให้ระบบ
+function releaseLocalStream(){
+  if(localStream){ localStream.getTracks().forEach(t=>t.stop()); localStream=null; }
 }
 
 function toggleMute(){
