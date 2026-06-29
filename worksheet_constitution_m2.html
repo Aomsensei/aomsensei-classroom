@@ -184,33 +184,26 @@ textarea:focus{border-color:#ff9f68;box-shadow:0 0 0 3px rgba(255,159,104,.15)}
   <!-- MEMBER INFO -->
   <div class="section">
     <div class="section-title"><div class="icon-box">👥</div>ข้อมูลนักเรียนทั้งคู่</div>
-    <p id="loadingStudents">⏳ กำลังโหลดรายชื่อนักเรียน...</p>
-    <div id="memberArea">
-      <div class="pair-grid">
-        <!-- Partner A -->
-        <div class="partner-box partner-a">
-          <div class="partner-tag tag-a">🟠 คนที่ 1 (Partner A)</div>
-          <label class="field-label" for="nameA">ชื่อ–นามสกุล</label>
-          <select id="nameA" class="inp" onchange="pickName('A')">
-            <option value="">— เลือกชื่อนักเรียน —</option>
-          </select>
-          <label class="field-label" for="noA">เลขที่</label>
-          <input id="noA" class="inp" type="number" min="1" max="50" placeholder="เลขที่ (กรอกเอง)" oninput="checkProgress()"/>
-        </div>
-        <!-- Partner B -->
-        <div class="partner-box partner-b">
-          <div class="partner-tag tag-b">🔵 คนที่ 2 (Partner B)</div>
-          <label class="field-label blue" for="nameB">ชื่อ–นามสกุล</label>
-          <select id="nameB" class="inp-b" onchange="pickName('B')">
-            <option value="">— เลือกชื่อนักเรียน —</option>
-          </select>
-          <label class="field-label blue" for="noB">เลขที่</label>
-          <input id="noB" class="inp-b" type="number" min="1" max="50" placeholder="เลขที่ (กรอกเอง)" oninput="checkProgress()"/>
-        </div>
+    <div class="pair-grid">
+      <!-- Partner A -->
+      <div class="partner-box partner-a">
+        <div class="partner-tag tag-a">🟠 คนที่ 1 (Partner A)</div>
+        <label class="field-label" for="nameA">ชื่อ–นามสกุล</label>
+        <input id="nameA" class="inp" type="text" placeholder="ชื่อ-นามสกุล" oninput="checkProgress()"/>
+        <label class="field-label" for="noA">เลขที่</label>
+        <input id="noA" class="inp" type="number" min="1" max="50" placeholder="เลขที่" oninput="checkProgress()"/>
       </div>
-      <div class="cls-label">📚 ชั้นมัธยมศึกษาปีที่ 2 &nbsp;|&nbsp; <span id="dateDisplay"></span></div>
-      <input type="hidden" id="classroom" value="ม.2"/>
+      <!-- Partner B -->
+      <div class="partner-box partner-b">
+        <div class="partner-tag tag-b">🔵 คนที่ 2 (Partner B)</div>
+        <label class="field-label blue" for="nameB">ชื่อ–นามสกุล</label>
+        <input id="nameB" class="inp-b" type="text" placeholder="ชื่อ-นามสกุล" oninput="checkProgress()"/>
+        <label class="field-label blue" for="noB">เลขที่</label>
+        <input id="noB" class="inp-b" type="number" min="1" max="50" placeholder="เลขที่" oninput="checkProgress()"/>
+      </div>
     </div>
+    <div class="cls-label">📚 ชั้นมัธยมศึกษาปีที่ 2 &nbsp;|&nbsp; <span id="dateDisplay"></span></div>
+    <input type="hidden" id="classroom" value="ม.2"/>
   </div>
 
   <!-- ส่วนที่ 1: ตอบร่วมกัน -->
@@ -510,7 +503,7 @@ document.getElementById('dateDisplay').textContent = new Date().toLocaleDateStri
 
 <script type="module">
 import { initializeApp }  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, getDoc, addDoc, collection, serverTimestamp }
+import { getFirestore, addDoc, collection, serverTimestamp }
                            from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { FIREBASE_CONFIG } from "./js/config.js";
 
@@ -522,62 +515,6 @@ const ANSWER_KEY = {
   m1_1:'ค', m1_2:'ข', m1_3:'ก', m1_4:'ง',   // set 1
   m2_1:'ข', m2_2:'ก', m2_3:'ค',              // set 2
   m3_1:'ก', m3_2:'ข', m3_3:'ก', m3_4:'ข',   // set 3
-};
-
-// ── LOAD STUDENTS ──────────────────────────────────────────────────
-const FALLBACK=[{prefix:'เด็กชาย',first:'ทดสอบ',last:'ก'},{prefix:'เด็กหญิง',first:'ทดสอบ',last:'ข'}];
-(async function loadStudents(){
-  const loadEl=document.getElementById('loadingStudents');
-  const areaEl=document.getElementById('memberArea');
-  const selA=document.getElementById('nameA');
-  const selB=document.getElementById('nameB');
-  try{
-    const snap=await getDoc(doc(db,'score_system','hinfon_scores'));
-    let students=[];
-    if(snap.exists()){
-      const d=snap.data().data||{};
-      const key=Object.keys(d.classes||{}).find(k=>k==='ม.2'||k.startsWith('ม.2'));
-      students=key?(d.classes[key].students||[]):[];
-    }
-    if(!students.length) students=FALLBACK;
-    students.forEach((s,i)=>{
-      const full=[s.prefix,s.first,s.last].filter(Boolean).join(' ');
-      const no=s.no||s.number||(i+1);
-      [selA,selB].forEach(sel=>{
-        const opt=document.createElement('option');
-        opt.value=full;opt.textContent=full;
-        opt.dataset.no=no;
-        sel.appendChild(opt);
-      });
-    });
-  }catch(e){
-    FALLBACK.forEach((s,i)=>{
-      const full=[s.prefix,s.first,s.last].filter(Boolean).join(' ');
-      [selA,selB].forEach(sel=>{
-        const opt=document.createElement('option');opt.value=full;opt.textContent=full;
-        opt.dataset.no=i+1;
-        sel.appendChild(opt);
-      });
-    });
-  }
-  loadEl.style.display='none'; areaEl.style.display='';
-})();
-
-// ── PICK NAME → AUTO-FILL เลขที่ ──────────────────────────────────
-window.pickName=function(partner){
-  const sel=document.getElementById('name'+partner);
-  const noEl=document.getElementById('no'+partner);
-  const opt=sel.options[sel.selectedIndex];
-  if(opt&&opt.dataset.no){
-    noEl.value=opt.dataset.no;
-    noEl.style.background='#fff8f0';
-    noEl.style.borderColor='#ffaa70';
-  } else {
-    noEl.value='';
-    noEl.style.background='';
-    noEl.style.borderColor='';
-  }
-  checkProgress();
 };
 
 // ── CHAR COUNT ────────────────────────────────────────────────────
