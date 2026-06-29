@@ -678,7 +678,7 @@ let myId   = localStorage.getItem('tkId') || (() => {
   return id;
 })();
 let myName='', myRole='', roomCode='', isHost=false;
-let listeners={}, hostTimer=null;
+let listeners={}, hostTimer=null, nextRoundTimer=null;
 let replyTo=null; // {name,text} ข้อความที่กำลังตอบกลับ
 
 // ──────────────────────────────────────────
@@ -692,6 +692,7 @@ function killListeners(){
   Object.values(listeners).forEach(fn=>{ try{fn&&fn();}catch(e){} });
   listeners={};
   if(hostTimer){ clearInterval(hostTimer); hostTimer=null; }
+  if(nextRoundTimer){ clearTimeout(nextRoundTimer); nextRoundTimer=null; }
 }
 
 // ──────────────────────────────────────────
@@ -1051,6 +1052,7 @@ async function auntCheck(targetId){
 function startHostTimer(phase, secs){
   if(!isHost) return;
   if(hostTimer){ clearInterval(hostTimer); hostTimer=null; }
+  if(nextRoundTimer){ clearTimeout(nextRoundTimer); nextRoundTimer=null; }
   let t=secs;
   hostTimer=setInterval(async()=>{
     t--;
@@ -1431,7 +1433,7 @@ async function enterArrested(roomData){
     if(aWait) aWait.textContent=`⏳ รอบต่อไปอัตโนมัติใน ${aT>0?aT:0} วินาที...`;
     if(aT<=0) clearInterval(aiv);
   },1000);
-  if(isHost) setTimeout(async()=>{ if(roomCode) await nextRound(); }, 10000);
+  if(isHost) nextRoundTimer = setTimeout(async()=>{ nextRoundTimer=null; if(roomCode) await nextRound(); }, 10000);
 
   // ฟัง phase เปลี่ยน
   const phRef=ref(db,`tk_rooms/${roomCode}/phase`);
@@ -1453,8 +1455,11 @@ async function enterArrested(roomData){
 }
 
 async function nextRound(){
+  if(!roomCode) return;
   const snap   =await get(ref(db,`tk_rooms/${roomCode}`));
   const room   =snap.val()||{};
+  // ป้องกันเรียกซ้ำ: ต้องอยู่ใน phase 'arrested' เท่านั้น
+  if(room.phase !== 'arrested') return;
   const players=room.players||{};
   // ตรวจชนะก่อนรีเซ็ต (กัน edge case)
   const win=checkWin(players);
