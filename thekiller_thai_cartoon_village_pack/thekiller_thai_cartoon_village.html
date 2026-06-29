@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ตามล่าฆาตกร · Mystery Deluxe UI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=Sarabun:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ══════════════════════════════════
+       RESET & ROOT
+    ══════════════════════════════════ */
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    :root{
+      --orange:#f39800;--orange-d:#e07800;--orange-l:#fff3e0;--orange-ll:#fffbf0;
+      --red:#c62828;--red-l:#ffebee;--green:#2e7d32;--green-l:#e8f5e9;
+      --blue:#1565c0;--blue-l:#e3f2fd;--purple:#6a1b9a;--purple-l:#f3e5f5;
+      --dark:#1a1a2e;--gray:#757575;--gray-l:#f5f5f5;
+      --shadow:0 4px 20px rgba(0,0,0,0.13);--r:14px;
+      --font:'Sarabun',sans-serif;
+    }
+    body{
+      font-family:var(--font);
+      background-color:#c5e0a3;
+      background-image:
+        radial-gradient(ellipse at 82% 5%,rgba(255,236,60,.45) 0%,transparent 28%),
+        linear-gradient(180deg,
+          #87ceeb 0%,#b3e5fc 18%,#c8e6c9 32%,
+          #dcedc8 44%,#fff9c4 56%,#fff3e0 72%,#ffe0b2 100%);
+      min-height:100vh;color:#333;overflow-x:hidden;
+    }
+
+    /* ══════════════════════════════════
+       VILLAGE HEADER — แสดงชื่อหมู่บ้านตลอด
+    ══════════════════════════════════ */
+    .village-hd{
+      background:linear-gradient(135deg,#f39800,#e65100);
+      color:#fff;text-align:center;padding:10px 16px;
+      font-size:13px;font-weight:700;letter-spacing:.8px;
+      position:sticky;top:0;z-index:300;
+      box-shadow:0 2px 10px rgba(0,0,0,.25);
+    }
+
+    /* ══════════════════════════════════
+       SCREENS
+    ══════════════════════════════════ */
+    .screen{display:none;min-height:calc(100vh - 41px);padding:14px;
+      max-width:480px;margin:0 auto;flex-direction:column;gap:14px}
+    .screen.active{display:flex}
+
+    /* ══════════════════════════════════
+       CARDS & BUTTONS
+    ══════════════════════════════════ */
+    .card{background:rgba(255,255,255,.97);border-radius:var(--r);
+      padding:18px;box-shadow:var(--shadow)}
+    .card-warn{background:#fff8e1;border:1.5px solid #ffe082}
+    h1{font-size:26px;font-weight:800;line-height:1.25}
+    h2{font-size:20px;font-weight:700}
+    h3{font-size:16px;font-weight:700}
+
+    .btn{display:block;width:100%;padding:13px;border:none;border-radius:11px;
+      font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;
+      transition:transform .15s,box-shadow .15s;text-align:center}
+    .btn:active{transform:scale(.97)}
+    .btn-orange{background:linear-gradient(135deg,#f39800,#e07800);color:#fff}
+    .btn-orange:hover{box-shadow:0 4px 14px rgba(243,152,0,.4)}
+    .btn-red{background:linear-gradient(135deg,#e53935,#c62828);color:#fff}
+    .btn-green{background:linear-gradient(135deg,#43a047,#2e7d32);color:#fff}
+    .btn-outline{background:#fff;border:2px solid var(--orange);color:var(--orange-d)}
+    .btn-dark{background:linear-gradient(135deg,#37474f,#263238);color:#fff}
+    .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+
+    input[type=text]{width:100%;padding:11px 14px;border:2px solid #ffd0a0;
+      border-radius:9px;font-family:var(--font);font-size:15px;outline:none;background:#fff;
+      unicode-bidi:plaintext;-webkit-text-size-adjust:none;text-size-adjust:none}
+    input[type=text]:focus{border-color:var(--orange)}
+
+    /* ══════════════════════════════════
+       BADGES
+    ══════════════════════════════════ */
+    .badge{display:inline-block;padding:3px 10px;border-radius:20px;
+      font-size:11.5px;font-weight:700}
+    .b-orange{background:var(--orange-l);color:var(--orange-d)}
+    .b-red{background:var(--red-l);color:var(--red)}
+    .b-green{background:var(--green-l);color:var(--green)}
+    .b-gray{background:var(--gray-l);color:var(--gray)}
+    .b-dark{background:#37474f;color:#fff}
+    .b-purple{background:var(--purple-l);color:var(--purple)}
+
+    /* ══════════════════════════════════
+       TIMER
+    ══════════════════════════════════ */
+    .timer-wrap{text-align:center;padding:10px 0}
+    .timer-ring{width:78px;height:78px;border-radius:50%;border:5px solid var(--orange);
+      display:flex;align-items:center;justify-content:center;font-size:28px;
+      font-weight:800;margin:0 auto;color:var(--orange-d);background:var(--orange-l);
+      transition:all .4s}
+    .timer-ring.warn{border-color:#ff6f00;color:#ff6f00;background:#fff8e1;animation:tpulse .6s infinite}
+    .timer-ring.urgent{border-color:var(--red);color:var(--red);background:var(--red-l);animation:tpulse .35s infinite}
+    @keyframes tpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+
+    /* ══════════════════════════════════
+       ROLE CARDS
+    ══════════════════════════════════ */
+    .role-card{text-align:center;padding:28px 18px;border-radius:var(--r)}
+    .role-emoji{font-size:72px;margin-bottom:10px;display:block;
+      filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
+    .role-name{font-size:24px;font-weight:800;margin-bottom:6px}
+    .role-desc{font-size:14px;opacity:.88;line-height:1.5}
+    .rc-killer{background:linear-gradient(135deg,#1a1a2e,#4a0e0e);color:#fff}
+    .rc-chief{background:linear-gradient(135deg,#0d47a1,#1976d2);color:#fff}
+    .rc-aunt{background:linear-gradient(135deg,#4a148c,#7b1fa2);color:#fff}
+    .rc-villager{background:linear-gradient(135deg,#1b5e20,#388e3c);color:#fff}
+    .rc-dead{background:linear-gradient(135deg,#37474f,#607d8b);color:#fff}
+
+    /* ══════════════════════════════════
+       PLAYER LIST ITEMS
+    ══════════════════════════════════ */
+    .player-row{display:flex;align-items:center;gap:9px;padding:9px 12px;
+      background:#fff8f0;border-radius:9px;margin-bottom:7px;
+      border:1.5px solid #ffd0a0;font-size:14px;font-weight:600}
+    .player-row.dead{opacity:.45;text-decoration:line-through;
+      background:var(--gray-l);border-color:#ddd}
+
+    /* ══════════════════════════════════
+       NIGHT ACTION BUTTONS
+    ══════════════════════════════════ */
+    .action-btn{display:flex;align-items:center;gap:10px;padding:11px 14px;
+      background:#fff;border:2px solid #ffd0a0;border-radius:9px;margin-bottom:7px;
+      cursor:pointer;width:100%;font-family:var(--font);font-size:14px;
+      font-weight:600;transition:all .15s;text-align:left}
+    .action-btn:hover{border-color:var(--orange);background:var(--orange-l)}
+    .action-btn.selected-killer{border-color:var(--red);background:var(--red-l);color:var(--red)}
+    .action-btn.selected-chief{border-color:var(--blue);background:var(--blue-l);color:var(--blue)}
+    .action-btn.selected-aunt{border-color:var(--purple);background:var(--purple-l);color:var(--purple)}
+    .action-btn:disabled{opacity:.4;cursor:not-allowed}
+
+    /* ══════════════════════════════════
+       CHAT
+    ══════════════════════════════════ */
+    #chatBox{height:190px;overflow-y:auto;background:#f9f9f9;
+      border-radius:9px;padding:10px;border:1.5px solid #ffe0b2;margin-bottom:8px;
+      scroll-behavior:smooth}
+    .chat-msg{margin-bottom:7px;font-size:13.5px;line-height:1.45}
+    .chat-name{font-weight:700;color:var(--orange-d)}
+    .chat-sys{color:#888;font-style:italic;font-size:12.5px}
+    /* ── CHAT REPLY ── */
+    .reply-bar{background:#fff8e1;border-left:3px solid var(--orange);padding:7px 10px;
+      border-radius:7px;margin-bottom:7px;display:flex;align-items:center;gap:8px}
+    .reply-bar-name{font-weight:700;color:var(--orange-d);font-size:11.5px}
+    .reply-bar-text{font-size:12px;color:#888;white-space:nowrap;overflow:hidden;
+      text-overflow:ellipsis;flex:1;min-width:0}
+    .msg-reply-tag{background:rgba(243,152,0,.1);border-left:2px solid var(--orange);
+      padding:2px 7px;border-radius:4px;font-size:11px;color:#999;
+      margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+      display:block;max-width:100%}
+
+    /* ══════════════════════════════════
+       VOICE CHAT
+    ══════════════════════════════════ */
+    .voice-panel{background:var(--green-l);border:1.5px solid #a5d6a7;border-radius:var(--r);padding:12px}
+    .voice-peer{display:inline-block;margin:3px 4px 3px 0;padding:3px 10px;
+      background:#fff;border-radius:20px;border:1.5px solid #c8e6c9;
+      font-size:12px;font-weight:600;transition:border-color .3s}
+    .voice-peer.active{border-color:var(--green);background:var(--green-l)}
+    .mute-btn{background:var(--green);color:#fff;border:none;border-radius:8px;
+      padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;
+      font-family:var(--font);transition:background .2s}
+    .mute-btn.muted{background:#e53935}
+
+    /* ══════════════════════════════════
+       ANNOUNCE BANNERS
+    ══════════════════════════════════ */
+    .banner{padding:16px;border-radius:12px;text-align:center;font-size:18px;font-weight:800;line-height:1.4}
+    .banner-death{background:var(--red-l);color:var(--red);border:2px solid #ef9a9a}
+    .banner-safe{background:var(--green-l);color:var(--green);border:2px solid #a5d6a7}
+    .banner-neutral{background:var(--gray-l);color:#555;border:2px solid #ddd}
+
+    /* ══════════════════════════════════
+       AUNT RESULT
+    ══════════════════════════════════ */
+    .aunt-result{padding:16px;border-radius:11px;text-align:center;
+      font-size:16px;font-weight:700;margin-top:4px}
+    .aunt-guilty{background:var(--red-l);color:var(--red);border:2px solid #ef9a9a}
+    .aunt-safe{background:var(--green-l);color:var(--green);border:2px solid #a5d6a7}
+
+    /* ══════════════════════════════════
+       LAW CARD
+    ══════════════════════════════════ */
+    .law-card{background:linear-gradient(135deg,#263238,#37474f);color:#fff;
+      border-radius:12px;padding:18px;text-align:center}
+    .law-sec{font-size:22px;font-weight:800;margin-bottom:5px}
+    .law-title{font-size:15px;font-weight:700;margin-bottom:8px;opacity:.95}
+    .law-desc{font-size:13px;opacity:.82;line-height:1.6}
+
+    /* ══════════════════════════════════
+       GAME OVER
+    ══════════════════════════════════ */
+    .go-card{text-align:center;padding:30px 18px;border-radius:var(--r)}
+    .go-killers{background:linear-gradient(135deg,#1a1a2e,#b71c1c);color:#fff}
+    .go-villagers{background:linear-gradient(135deg,#1b5e20,#2e7b32);color:#fff}
+
+    /* ══════════════════════════════════
+       OVERLAY (loading)
+    ══════════════════════════════════ */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;
+      display:flex;align-items:center;justify-content:center;padding:20px}
+    .ov-card{background:#fff;border-radius:var(--r);padding:26px;
+      max-width:340px;width:100%;text-align:center}
+
+    /* ══════════════════════════════════
+       ROOM CODE
+    ══════════════════════════════════ */
+    .room-code{font-size:38px;font-weight:800;color:var(--orange-d);
+      letter-spacing:8px;text-align:center;padding:12px;
+      background:var(--orange-l);border-radius:10px}
+
+    /* utils */
+    .tc{text-align:center}.tm{color:var(--gray);font-size:13px}
+    .mt8{margin-top:8px}.mt14{margin-top:14px}
+    .flex-gap{display:flex;gap:8px}
+    .hidden{display:none!important}
+    .night-hint{background:rgba(255,255,255,.1);border-radius:8px;padding:10px;
+      font-size:12.5px;margin-top:10px;opacity:.88;line-height:1.6}
+    .phase-hd{padding:20px 18px;border-radius:var(--r);text-align:center;color:#fff}
+  
+
+/* ===== Mystery Deluxe UI Theme (visual only, gameplay untouched) ===== */
+:root{
+  --ink:#f7e9c1;
+  --text:#f4e8ca;
+  --text-soft:#d6c39d;
+  --soft-shadow:0 18px 44px rgba(0,0,0,.42);
+  --asset-home:url("thai_icon_home.png");
+  --asset-book:url("thai_icon_book.png");
+  --asset-eye:url("thai_icon_eye.png");
+  --asset-target:url("thai_icon_target.png");
+  --asset-trophy:url("thai_icon_trophy.png");
+  --asset-exit:url("thai_icon_exit.png");
+  --line-soft:rgba(255,208,122,.28);
+}
+body{color:var(--text);background:radial-gradient(circle at 18% 10%, rgba(255,223,136,.15), transparent 20%),radial-gradient(circle at 84% 8%, rgba(186,70,98,.16), transparent 22%),radial-gradient(circle at 50% 120%, rgba(255,208,122,.13), transparent 34%),linear-gradient(180deg,#160814 0%, #231021 28%, #371729 62%, #20101c 100%)}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;opacity:.22;background-image:radial-gradient(circle at 18px 18px, rgba(255,217,139,.18) 0 1.6px, transparent 1.9px),radial-gradient(circle at 74px 52px, rgba(255,255,255,.06) 0 1.2px, transparent 1.5px);background-size:110px 110px}
+.village-hd{display:flex;align-items:center;justify-content:center;gap:12px;max-width:850px;margin:0 auto;padding:12px 18px;border-radius:0 0 24px 24px;color:#fff4d2;background:linear-gradient(135deg,#2a1023,#4a1831 55%, #7d2e2d);border:1px solid rgba(255,211,121,.28);box-shadow:0 12px 24px rgba(0,0,0,.35);letter-spacing:.02em;font-family:'Kanit',sans-serif;font-weight:700}
+.village-hd::before{content:'';width:34px;height:34px;flex:0 0 34px;background:var(--asset-home) center/contain no-repeat;filter:drop-shadow(0 4px 8px rgba(0,0,0,.32))}
+.screen{max-width:590px;min-height:calc(100vh - 48px);padding:18px 15px 30px;gap:16px}
+.card{background:linear-gradient(180deg, rgba(62,28,47,.96), rgba(36,17,30,.97));color:var(--text);border:1.8px solid var(--line-soft);border-radius:26px;padding:18px;box-shadow:var(--soft-shadow);backdrop-filter:blur(8px)}
+.card-warn{background:linear-gradient(180deg, rgba(74,34,52,.96), rgba(46,21,35,.98));border-color:rgba(255,208,122,.35)}
+h1,h2,h3{color:#fff0c9;font-family:'Kanit',sans-serif} h1{font-size:35px;line-height:1.03} h2{font-size:24px} h3{font-size:18px}
+.tm{color:var(--text-soft)}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;border-radius:18px;font-weight:800;font-family:'Kanit',sans-serif;box-shadow:0 10px 22px rgba(0,0,0,.25);padding:13px 16px;border:1px solid transparent}
+.btn-orange{background:linear-gradient(135deg,#f6cf7c,#cb7d2e 56%, #8d2739);color:#24110c}.btn-outline{background:linear-gradient(180deg,#3f2034,#2b1627);border:2px solid rgba(255,204,108,.45);color:#ffe3a8}.btn-dark{background:linear-gradient(135deg,#6338b2,#40216d);color:#fff7d9}.btn-red{background:linear-gradient(135deg,#ff7b8f,#a61d42);color:#fff7ed}.btn-green{background:linear-gradient(135deg,#8cd07e,#2f6e4f);color:#fff9ec}.btn:disabled{opacity:.45}
+.icon-btn{width:24px;height:24px;object-fit:contain;flex:0 0 24px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.28))}
+input[type=text]{background:linear-gradient(180deg,#fff6e0,#f7e7c1);border:2px solid rgba(196,131,52,.65);color:#331912;border-radius:16px;padding:12px 14px;font-weight:700;box-shadow:inset 0 2px 0 rgba(255,255,255,.75)}
+input[type=text]::placeholder{color:#7a4f35} input[type=text]:focus{border-color:#ffd580;box-shadow:0 0 0 5px rgba(255,204,108,.14)}
+.badge{font-family:'Kanit',sans-serif;font-weight:700}.b-orange{background:#f8de9e;color:#5c300b}.b-red{background:#ffd3db;color:#8a1e39}.b-green{background:#d5ffe6;color:#1a6b49}.b-gray{background:#dedbe4;color:#52495c}.b-dark{background:#2c1727;color:#ffe6ac}.b-purple{background:#ecd6ff;color:#5d349b}
+.home-hero{position:relative;overflow:hidden;background:linear-gradient(180deg, rgba(74,29,49,.98), rgba(34,14,25,.98));border:1.8px solid rgba(255,212,122,.35);border-radius:34px;padding:20px 16px 18px;text-align:center;box-shadow:var(--soft-shadow)}
+.home-hero::before{content:'';position:absolute;inset:-20% auto auto -12%;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle, rgba(255,214,111,.18) 0, transparent 68%)}
+.home-hero::after{content:'';position:absolute;right:-28px;bottom:-28px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle, rgba(173,56,91,.20) 0, transparent 68%)}
+.home-hero img{width:min(100%,400px);display:block;margin:0 auto;position:relative;z-index:1;filter:drop-shadow(0 14px 24px rgba(0,0,0,.44))}.home-sub{position:relative;z-index:1;margin-top:10px;font-size:14px;font-weight:700;color:#f2ddb2;line-height:1.6}
+.quick-badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px;position:relative;z-index:1}.quick-badges span{border-radius:999px;background:rgba(255,235,193,.12);border:1.3px solid rgba(255,211,121,.38);padding:7px 11px;font-size:12px;font-weight:800;color:#ffe7b7}
+.section-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}.section-head img{width:34px;height:34px;object-fit:contain;border-radius:10px;filter:drop-shadow(0 4px 7px rgba(0,0,0,.24))}.section-head h3{margin:0}
+.room-code{background:linear-gradient(180deg,#f6e6ba,#d7a04f);border:2px solid rgba(255,224,152,.8);border-radius:20px;padding:14px 18px;font-size:38px;letter-spacing:10px;color:#431f0f;box-shadow:inset 0 3px 0 rgba(255,255,255,.85), 0 10px 22px rgba(0,0,0,.18)}
+.player-row{align-items:center;border-radius:16px;background:linear-gradient(180deg,rgba(255,244,218,.11),rgba(255,212,132,.06));border:1.4px solid rgba(255,212,122,.2);padding:10px 12px;box-shadow:0 6px 12px rgba(0,0,0,.12)}.player-row.dead{opacity:.62;background:linear-gradient(180deg,rgba(93,93,104,.55),rgba(58,58,66,.62));border-color:rgba(215,215,224,.2)}
+.action-btn{display:flex;align-items:center;gap:10px;border-radius:16px;background:linear-gradient(180deg,rgba(255,245,225,.12),rgba(255,229,180,.08));border:1.6px solid rgba(255,211,121,.24);color:#fff3d5;padding:12px 14px;box-shadow:0 4px 10px rgba(0,0,0,.16)}
+.action-btn::before{content:'';width:30px;height:30px;flex:0 0 30px;background-size:contain;background-position:center;background-repeat:no-repeat;filter:drop-shadow(0 3px 5px rgba(0,0,0,.18))} #uiKiller .action-btn::before{background-image:url("thai_role_killer.png")} #uiChief .action-btn::before{background-image:url("thai_role_chief.png")} #uiAunt .action-btn::before{background-image:url("thai_role_aunt.png")} #voteList .action-btn::before{background-image:var(--asset-target)}
+.phase-hd{border-radius:30px;padding:20px 18px;box-shadow:var(--soft-shadow);border:1.8px solid rgba(255,212,122,.18);overflow:hidden;position:relative}.phase-hd::after{content:'';position:absolute;right:-18px;bottom:-18px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.06)}
+.phase-badge{width:64px;height:64px;object-fit:contain;display:block;margin:0 auto 4px;filter:drop-shadow(0 8px 12px rgba(0,0,0,.28))}
+.timer-wrap{text-align:center}.timer-ring{width:88px;height:88px;border:5px solid rgba(255,210,112,.78);color:#ffd775;background:linear-gradient(180deg,#3d1b2f,#25121d);box-shadow:0 10px 20px rgba(0,0,0,.3)}
+.banner{display:flex;align-items:center;justify-content:center;gap:10px;border-radius:18px;box-shadow:var(--soft-shadow)}.banner::before{content:'';width:34px;height:34px;flex:0 0 34px;background-size:contain;background-repeat:no-repeat;background-position:center}.banner-death::before{background-image:url("thai_icon_target.png")} .banner-safe::before{background-image:url("thai_icon_home.png")}
+.aunt-result{border-radius:18px;box-shadow:var(--soft-shadow);padding:12px 14px}
+.voice-panel{border-radius:24px;background:linear-gradient(180deg,#2b3f35,#1c2a25);border:2px solid rgba(140,219,172,.28);box-shadow:var(--soft-shadow)}.mute-btn{border-radius:999px;background:#ffe4a4;color:#3d2208;border:none;padding:8px 12px;font-weight:800} #chatBox{height:210px;border:2px solid rgba(255,214,121,.18);border-radius:16px;background:linear-gradient(180deg,rgba(255,244,222,.92),rgba(245,229,198,.92));color:#2f1b18}.reply-bar{background:rgba(255,233,180,.16);border-radius:14px}
+.role-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0 10px}.role-pill{background:linear-gradient(180deg,#3d1d31,#291321);border:1.6px solid rgba(255,212,122,.25);border-radius:16px;padding:8px;text-align:center;box-shadow:0 4px 10px rgba(0,0,0,.18)}.role-pill img{width:100%;aspect-ratio:1/1;object-fit:contain;border-radius:12px}.role-pill span{display:block;font-size:11px;font-weight:800;color:#ffe4aa;margin-top:4px}
+.role-card{padding:20px 18px 22px;border-radius:28px;box-shadow:0 16px 34px rgba(0,0,0,.28);border:1px solid rgba(255,212,122,.16)}.role-card .role-emoji{display:none}.role-illust{display:block;width:min(100%,220px);margin:0 auto 10px auto;border-radius:20px;background:rgba(255,255,255,.08);box-shadow:0 10px 20px rgba(0,0,0,.18)}.role-name{font-size:28px}.role-desc{font-size:15px;line-height:1.58;background:rgba(255,255,255,.12);border-radius:14px;padding:10px 12px;margin-top:10px}
+#roleCardWrap,#arrestedCard,#goCard{animation:popUp .22s ease}@keyframes popUp{from{transform:translateY(8px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+.role-mini{display:flex;align-items:center;gap:8px}.role-mini img{width:34px;height:34px;object-fit:contain;border-radius:10px;box-shadow:0 4px 8px rgba(0,0,0,.10)}
+.scene-card{position:relative;background:linear-gradient(180deg,#2d1727,#1d1018)!important;border:1.6px solid rgba(255,212,122,.18);padding:18px 16px;overflow:hidden}.scene-card::before{content:'';position:absolute;inset:0;background-position:center;background-size:cover;background-repeat:no-repeat;opacity:.9;pointer-events:none}.scene-card>*{position:relative;z-index:1}.scene-arrest::before{background-image:url("neo_ui_frame_dark.png")} .scene-announce::before{background-image:url("neo_ui_frame_announce.png")}
+.scene-content-pad{padding-top:115px;padding-bottom:22px;min-height:320px;display:flex;flex-direction:column;justify-content:flex-end}.scene-content-pad.small{min-height:240px;padding-top:100px}
+.law-frame{position:relative;border-radius:28px;overflow:hidden}.law-frame::before{content:'';position:absolute;inset:0;background:url("neo_ui_frame_dark.png") center/cover no-repeat;opacity:1}.law-frame>*{position:relative;z-index:1}.law-card{background:transparent;box-shadow:none;min-height:280px;display:flex;flex-direction:column;justify-content:flex-end;padding:130px 22px 26px;border-radius:0}.law-sec{display:inline-block;align-self:center;background:#f3d089;color:#4f250d;border-radius:999px;padding:7px 14px;font-weight:800;margin-bottom:8px}.law-title{font-size:24px;text-align:center;color:#fff6d8;text-shadow:0 2px 4px rgba(0,0,0,.25)}.law-desc{background:rgba(45,20,31,.8);padding:12px 14px;border-radius:16px;color:#ffe8b9;line-height:1.6;text-align:center;margin-top:10px;font-weight:500}
+.go-card{border-radius:30px;box-shadow:var(--soft-shadow);overflow:hidden;position:relative;padding:0}.go-card-inner{position:relative;min-height:350px;padding:125px 24px 34px;display:flex;flex-direction:column;justify-content:flex-end;text-align:center}.go-card::before{content:'';position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;opacity:1}.go-villagers::before{background-image:url("neo_ui_frame_win.png")} .go-killers::before{background-image:url("neo_ui_frame_dark.png")}.go-card-inner h1{color:#fff;font-size:34px;text-shadow:0 2px 5px rgba(0,0,0,.25)}.go-card-inner .go-sub{color:rgba(255,255,255,.92);font-size:15px;line-height:1.55;margin-top:6px}
+.overlay{background:rgba(8,4,10,.72);backdrop-filter:blur(6px)} .ov-card{border-radius:26px;border:1.8px solid rgba(255,214,121,.45);box-shadow:var(--soft-shadow);background:linear-gradient(180deg,#4a2238,#2b1628);color:#ffe9be}
+.tutorial-trigger{margin-top:-4px}.tutorial-mini{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}.tutorial-mini div{background:linear-gradient(180deg,#37192b,#271320);color:#ffe8b8;border:1.5px solid rgba(255,214,121,.28);border-radius:16px;padding:10px;font-size:12px;font-weight:700;text-align:center}.tutorial-modal{max-width:520px;padding:0;overflow:hidden;background:linear-gradient(180deg,#4d223a,#26111e)}.tutorial-hero{padding:18px 18px 14px;background:linear-gradient(135deg,#240c1a,#41203a 54%,#6e2a2a);color:#fff;text-align:center;position:relative}.tutorial-hero img{width:96px;height:96px;object-fit:contain;filter:drop-shadow(0 8px 14px rgba(0,0,0,.35))}.tutorial-hero h2{color:#fff4d5;font-size:24px;margin-top:4px}.tutorial-hero p{font-size:13px;color:#ffe2ad;margin-top:4px}.tutorial-body{padding:16px}.tutorial-steps{display:grid;gap:10px}.tutorial-step{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:start;background:rgba(255,248,232,.92);border:1.7px solid rgba(126,75,24,.22);border-radius:18px;padding:11px}.tutorial-step img{width:44px;height:44px;object-fit:contain}.tutorial-step b{display:block;color:#2c1715;font-size:14px}.tutorial-step span{display:block;color:#6c4a31;font-size:12.5px;line-height:1.5;margin-top:2px}.tutorial-roles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.tutorial-role{background:#2f1b22;border:1.6px solid rgba(255,214,121,.32);border-radius:15px;padding:7px;text-align:center}.tutorial-role img{width:100%;aspect-ratio:1/1;object-fit:contain}.tutorial-role span{display:block;font-size:10.5px;color:#ffe0a0;font-weight:800}.tutorial-actions{padding:0 16px 16px}
+.loading-card{position:relative;overflow:hidden;background:linear-gradient(180deg,#4a2238,#27121f)}.loading-card::before{content:'';position:absolute;inset:-80px;background:conic-gradient(from 0deg,transparent,rgba(255,236,178,.55),transparent);animation:spinLoad 2.2s linear infinite}.loading-card>*{position:relative;z-index:1}.loading-logo{width:88px;height:88px;object-fit:contain;margin:0 auto 8px;filter:drop-shadow(0 8px 14px rgba(0,0,0,.25))}.loading-title{font-weight:800;font-size:18px;color:#fff0c9}.loading-sub{font-size:12px;color:#ffe0ac;margin-top:4px}.loading-bar{height:10px;background:#1f0f1a;border-radius:999px;margin-top:14px;overflow:hidden;border:1px solid rgba(255,212,122,.2)}.loading-bar i{display:block;width:42%;height:100%;background:linear-gradient(90deg,#ffda78,#f28c34);border-radius:999px;animation:barMove 1.2s ease-in-out infinite}.loading-tip{font-size:11.5px;color:#ffe4b4;margin-top:10px;font-weight:700}@keyframes spinLoad{to{transform:rotate(360deg)}}@keyframes barMove{0%{transform:translateX(-120%)}100%{transform:translateX(260%)}}
+@media (max-width:520px){.screen{padding:16px 12px 24px}h1{font-size:30px}.role-strip,.tutorial-roles{grid-template-columns:repeat(2,1fr)}.tutorial-mini{grid-template-columns:1fr}.tutorial-step{grid-template-columns:38px 1fr}.tutorial-hero img{width:82px;height:82px}.scene-content-pad{min-height:290px;padding-top:105px}.go-card-inner{min-height:310px;padding-top:110px}}
+
+
+/* ===== Thai cartoon village asset overrides ===== */
+.home-hero img{width:min(100%,470px)!important;max-height:330px;object-fit:contain}
+.tutorial-hero img{width:128px!important;height:128px!important;object-fit:contain}
+.loading-logo{width:118px!important;height:118px!important;object-fit:contain}
+.role-illust{width:min(100%,240px)!important;max-height:260px;object-fit:contain}
+.role-pill img,.tutorial-role img{height:88px;object-fit:contain}
+.section-head img{background:rgba(255,255,255,.04);padding:2px}
+.icon-btn{background:transparent}
+
+</style>
+</head>
+<body>
+
+<!-- ══ หัวเว็บ แสดงชื่อหมู่บ้านตลอดเวลา ══ -->
+<div class="village-hd">หมู่บ้านห้วยหินฝน · ตามล่าฆาตกร</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 1: หน้าแรก
+══════════════════════════════════════ -->
+<div id="sc-home" class="screen active">
+  <div class="home-hero">
+    <img src="thai_characters_group.png" alt="ตามล่าฆาตกร">
+    <div class="home-sub">เกมตามล่าฆาตกรเวอร์ชันการ์ตูนไทย กลิ่นอายชาวบ้านชนบท เล่นง่ายบนมือถือ และยังคงระบบเดิมครบถ้วน</div>
+    <div class="quick-badges"><span>4–10 ผู้เล่น</span><span>ใช้มือถือของตัวเอง</span><span>เล่นเป็นรอบ ๆ</span></div>
+  </div>
+  <div class="card">
+    <div class="section-head"><img src="thai_icon_home.png" alt=""><h3>ชื่อผู้เล่น</h3></div>
+    <input type="text" id="playerName" placeholder="ใส่ชื่อของคุณ (ไม่เกิน 12 ตัว)" maxlength="12">
+  </div>
+
+  <button class="btn btn-orange" onclick="G.createRoom()"><img class="icon-btn" src="thai_icon_home.png" alt="">สร้างห้องใหม่</button>
+
+  <div class="card flex-gap" style="align-items:center">
+    <input type="text" id="joinCode" placeholder="รหัสห้อง 4 ตัว" maxlength="4"
+      style="text-transform:uppercase;flex:1;font-size:18px;font-weight:700;letter-spacing:4px">
+    <button class="btn btn-outline" style="width:auto;padding:12px 18px;white-space:nowrap"
+      onclick="G.joinRoom()"><img class="icon-btn" src="thai_icon_target.png" alt="">เข้าร่วม</button>
+  </div>
+
+  <button class="btn btn-outline tutorial-trigger" onclick="G.openTutorial()"><img class="icon-btn" src="thai_icon_book.png" alt="">เปิดวิธีเล่น</button>
+
+  <div class="card card-warn">
+    <div class="section-head"><img src="thai_icon_book.png" alt=""><h3>วิธีเล่น</h3></div>
+    <div class="role-strip"><div class="role-pill"><img src="thai_role_killer.png" alt="ฆาตกร"><span>ฆาตกร</span></div><div class="role-pill"><img src="thai_role_chief.png" alt="ผู้ใหญ่บ้าน"><span>ผู้ใหญ่บ้าน</span></div><div class="role-pill"><img src="thai_role_aunt.png" alt="ป้าข้างบ้าน"><span>ป้าข้างบ้าน</span></div><div class="role-pill"><img src="thai_role_villager.png" alt="ชาวบ้าน"><span>ชาวบ้าน</span></div></div><div style="font-size:13px;color:#555;line-height:1.8">
+      🔴 <b>ฆาตกร</b> — สังหารชาวบ้านทุกคืน ไม่ให้ใครรู้ตัว<br>
+      👮 <b>ผู้ใหญ่บ้าน</b> — คุ้มครองชาวบ้าน 1 คนต่อคืน<br>
+      🔍 <b>ป้าข้างบ้าน</b> — ตรวจสอบตัวตนผู้เล่น 1 คนต่อคืน<br>
+      🌾 <b>ชาวบ้าน</b> — ช่วยกันสืบและโหวตจับฆาตกร<br>
+      <br>ต้องการ <b>4–10 คน</b> แต่ละคนใช้โทรศัพท์ตัวเอง
+      <div class="tutorial-mini"><div>กลางคืน: ใช้สกิลลับ</div><div>กลางวัน: คุยหาเบาะแส</div><div>โหวต: จับผู้ต้องสงสัย</div><div>ชนะ: จับฆาตกรให้หมด</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 2: ห้องรอ (Lobby)
+══════════════════════════════════════ -->
+<div id="sc-lobby" class="screen lobby-wrap">
+  <div class="card tc">
+    <div class="tm" style="margin-bottom:4px">รหัสห้อง — แชร์ให้เพื่อน</div>
+    <div class="room-code" id="lobbyCode">----</div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px">
+      <div class="section-head"><img src="thai_icon_eye.png" alt=""><h3>ผู้เล่นในห้อง</h3></div>
+      <span id="playerCount" class="badge b-orange">0/10</span>
+    </div>
+    <div id="lobbyList"></div>
+  </div>
+
+  <div id="startWrap" class="hidden">
+    <button class="btn btn-orange" id="startBtn" onclick="G.startGame()"><img class="icon-btn" src="thai_icon_trophy.png" alt="">เริ่มเกม!</button>
+    <div class="tm tc mt8" id="startHint">ต้องการผู้เล่นอย่างน้อย 4 คน</div>
+  </div>
+  <div id="waitMsg" class="card tc" style="background:#f9f9f9;color:#888">⏳ รอ Host เริ่มเกม...</div>
+
+  <button class="btn btn-outline" style="margin-top:auto" onclick="G.leaveRoom()"><img class="icon-btn" src="thai_icon_exit.png" alt="">ออกจากห้อง</button>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 3: เปิดเผยบทบาท
+══════════════════════════════════════ -->
+<div id="sc-role" class="screen role-wrap">
+  <div class="card tc">
+    <div style="font-size:14px;color:#888;margin-bottom:6px">บทบาทลับของคุณในเกมนี้...</div>
+    <h2>กดปุ่มเพื่อเปิดดู</h2>
+  </div>
+
+  <div id="roleCardWrap" class="hidden"></div>
+
+  <button class="btn btn-orange" id="showRoleBtn" onclick="G.showRole()"><img class="icon-btn" src="thai_icon_eye.png" alt="">เปิดดูบทบาท</button>
+
+  <div id="confirmWrap" class="hidden">
+    <button class="btn btn-outline" onclick="G.confirmRole()"><img class="icon-btn" src="thai_icon_book.png" alt="">รับทราบแล้ว — ซ่อนบทบาท</button>
+  </div>
+
+  <div id="waitRoleWrap" class="hidden">
+    <div class="card tc" style="background:#f9f9f9">
+      <img class="phase-badge" src="thai_icon_book.png" alt="lock">
+      <div style="font-weight:700;color:#888;margin-top:6px">ซ่อนบทบาทแล้ว</div>
+      <div id="readyCount" class="tm mt8"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 4: กลางคืน
+══════════════════════════════════════ -->
+<div id="sc-night" class="screen night-wrap">
+  <div class="phase-hd" style="background:linear-gradient(135deg,#1a1a2e,#2d1b69)">
+    <img class="phase-badge" src="thai_icon_eye.png" alt="กลางคืน">
+    <h2 style="color:#fff;margin-top:4px">กลางคืน</h2>
+    <div style="color:rgba(255,255,255,.75);font-size:13px;margin-top:2px">รอบที่ <span id="nightRound">1</span></div>
+  </div>
+
+  <div class="timer-wrap">
+    <div class="timer-ring" id="nightTimer">10</div>
+    <div class="tm tc" style="margin-top:6px">วินาที</div>
+  </div>
+
+  <!-- ฆาตกร -->
+  <div id="uiKiller" class="hidden">
+    <div class="card" style="background:var(--red-l);border:2px solid #ef9a9a">
+      <div style="font-size:12.5px;color:var(--red);font-weight:700;margin-bottom:10px">🔪 เลือกเหยื่อที่จะสังหาร</div>
+      <div id="killerList"></div>
+      <div id="killerHint" class="tm mt8"></div>
+    </div>
+  </div>
+
+  <!-- ผู้ใหญ่บ้าน -->
+  <div id="uiChief" class="hidden">
+    <div class="card" style="background:var(--blue-l);border:2px solid #90caf9">
+      <div style="font-size:12.5px;color:var(--blue);font-weight:700;margin-bottom:10px">🛡️ เลือกคนที่จะคุ้มครองคืนนี้</div>
+      <div id="chiefList"></div>
+      <div id="chiefHint" class="tm mt8"></div>
+    </div>
+  </div>
+
+  <!-- ป้าข้างบ้าน -->
+  <div id="uiAunt" class="hidden">
+    <div class="card" style="background:var(--purple-l);border:2px solid #ce93d8">
+      <div style="font-size:12.5px;color:var(--purple);font-weight:700;margin-bottom:10px">🔍 เลือกผู้เล่นที่จะตรวจสอบตัวตน</div>
+      <div id="auntList"></div>
+      <div id="auntHint" class="tm mt8"></div>
+    </div>
+  </div>
+
+  <!-- ชาวบ้าน -->
+  <div id="uiVillager" class="hidden">
+    <div class="card tc" style="background:var(--green-l);border:2px solid #a5d6a7;padding:28px">
+      <img class="phase-badge" src="thai_icon_book.png" alt="sleep">
+      <h3 style="color:var(--green);margin-top:10px">คุณกำลังหลับอยู่...</h3>
+      <div class="tm mt8">รอให้รอบกลางคืนผ่านไป</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 5: รุ่งเช้า
+══════════════════════════════════════ -->
+<div id="sc-morning" class="screen morning-wrap">
+  <div class="phase-hd" style="background:linear-gradient(135deg,#f57f17,#ff8f00)">
+    <img class="phase-badge" src="thai_icon_home.png" alt="รุ่งเช้า">
+    <h2 style="color:#fff;margin-top:4px">รุ่งเช้า</h2>
+    <div style="color:rgba(255,255,255,.8);font-size:13px;margin-top:2px">รอบที่ <span id="morningRound">1</span></div>
+  </div>
+
+  <div id="morningBanner"></div>
+  <div id="auntPrivate" class="hidden"></div>
+
+  <div class="card">
+    <div class="section-head"><img src="thai_icon_eye.png" alt=""><h3>ผู้เล่นที่เหลือ</h3></div>
+    <div id="morningList"></div>
+  </div>
+
+  <div id="mornHostBtn" class="hidden">
+    <button class="btn btn-orange" onclick="G.goToChat()"><img class="icon-btn" src="thai_icon_book.png" alt="">เริ่มการสืบสวน →</button>
+  </div>
+  <div id="mornWait" class="card tc hidden" style="background:#f9f9f9;color:#888">⏳ รอ Host...</div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 6: สืบสวน (แชท)
+══════════════════════════════════════ -->
+<div id="sc-chat" class="screen chat-wrap">
+  <div class="phase-hd" style="background:linear-gradient(135deg,#01579b,#0288d1)">
+    <img class="phase-badge" src="thai_icon_book.png" alt="สืบสวน">
+    <h2 style="color:#fff;margin-top:2px">ช่วงสืบสวน</h2>
+    <div style="color:rgba(255,255,255,.8);font-size:13px;margin-top:2px">พูดคุยหาเบาะแสก่อนโหวต</div>
+  </div>
+
+  <div class="timer-wrap">
+    <div class="timer-ring" id="chatTimer">60</div>
+    <div class="tm tc" style="margin-top:6px">วินาทีเหลือ</div>
+  </div>
+
+  <!-- Voice Chat Panel — แสดงเฉพาะช่วงสืบสวน -->
+  <div id="voicePanel" class="voice-panel hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="font-weight:700;font-size:13px;color:var(--green)">🎙️ แชทเสียง</div>
+      <button id="muteBtn" class="mute-btn" onclick="G.toggleMute()">🎙️ เปิดอยู่</button>
+    </div>
+    <div id="voiceStatus" style="font-size:12px;color:#888;margin-bottom:6px">กำลังเชื่อมต่อ...</div>
+    <div id="voicePeers"></div>
+  </div>
+
+  <div class="card" style="padding:12px">
+    <div id="chatBox"></div>
+    <div id="replyBar" class="reply-bar hidden">
+      <div style="min-width:0;flex:1">
+        <div class="reply-bar-name">↩️ ตอบกลับ</div>
+        <div id="replyPreview" class="reply-bar-text"></div>
+      </div>
+      <button onclick="G.cancelReply()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#aaa;flex-shrink:0;padding:0">✕</button>
+    </div>
+    <div class="flex-gap">
+      <input type="text" id="chatInput" placeholder="พิมพ์ข้อความ..." style="flex:1" maxlength="80">
+      <button class="btn btn-orange" style="width:auto;padding:11px 16px" onclick="G.sendChat()"><img class="icon-btn" src="thai_icon_book.png" alt="">ส่ง</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 7: โหวต
+══════════════════════════════════════ -->
+<div id="sc-vote" class="screen vote-wrap">
+  <div class="phase-hd" style="background:linear-gradient(135deg,#880e4f,#c2185b)">
+    <img class="phase-badge" src="thai_icon_target.png" alt="โหวต">
+    <h2 style="color:#fff;margin-top:2px">โหวตจับผู้ต้องสงสัย</h2>
+    <div style="color:rgba(255,255,255,.8);font-size:13px;margin-top:2px">ใครคือฆาตกรในหมู่บ้าน?</div>
+  </div>
+
+  <div class="timer-wrap">
+    <div class="timer-ring" id="voteTimer">20</div>
+    <div class="tm tc" style="margin-top:6px">วินาทีเหลือ</div>
+  </div>
+
+  <div class="card">
+    <div class="section-head"><img src="thai_icon_target.png" alt=""><h3>เลือกผู้ต้องสงสัย</h3></div>
+    <div id="voteList"></div>
+  </div>
+
+  <div id="voteStatus" class="card tc" style="background:#f9f9f9;color:#888"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 8: จับเข้าคุก
+══════════════════════════════════════ -->
+<div id="sc-arrested" class="screen arrested-wrap">
+  <div class="phase-hd" style="background:linear-gradient(135deg,#263238,#37474f)">
+    <img class="phase-badge" src="thai_icon_target.png" alt="จับกุม">
+    <h2 style="color:#fff;margin-top:4px">จับได้แล้ว!</h2>
+  </div>
+
+  <div id="arrestedCard"></div>
+
+  <div class="card">
+    <div class="section-head" style="justify-content:center;margin-bottom:12px"><img src="neo_ui_frame_dark.png" alt=""><h3>กฎหมายอาญาที่เกี่ยวข้อง</h3></div>
+    <div id="lawCard"></div>
+  </div>
+
+  <div id="arrestHostBtn" class="hidden">
+    <button class="btn btn-orange" onclick="G.nextRound()"><img class="icon-btn" src="thai_icon_trophy.png" alt="">รอบต่อไป</button>
+  </div>
+  <div id="arrestWait" class="card tc hidden" style="background:#f9f9f9;color:#888">⏳ รอ Host เริ่มรอบต่อไป...</div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 9: จบเกม
+══════════════════════════════════════ -->
+<div id="sc-gameover" class="screen gameover-wrap">
+  <div id="goCard"></div>
+
+  <div class="card">
+    <div class="section-head"><img src="thai_icon_eye.png" alt=""><h3>เปิดเผยบทบาททุกคน</h3></div>
+    <div id="goRoleList"></div>
+  </div>
+
+  <button id="goHomeBtn" class="btn btn-orange" onclick="G.backToHome()"><img class="icon-btn" src="thai_icon_home.png" alt="">กลับหน้าหลัก</button>
+</div>
+
+<!-- ══ LOADING OVERLAY ══ -->
+<div id="loadOv" class="overlay hidden">
+  <div class="ov-card loading-card">
+    <img class="loading-logo" src="thai_characters_group.png" alt="loading">
+    <div class="loading-title" id="loadMsg">กำลังโหลด...</div>
+    <div class="loading-sub">กำลังเชื่อมต่อหมู่บ้านและเตรียมบทบาทลับ</div>
+    <div class="loading-bar"><i></i></div>
+    <div class="loading-tip">เคล็ดลับ: ฟังเหตุผลของทุกคนก่อนโหวต อย่ารีบเชื่อใครง่าย ๆ</div>
+  </div>
+</div>
+
+<!-- ══ TUTORIAL MODAL ══ -->
+<div id="tutorialOv" class="overlay hidden">
+  <div class="ov-card tutorial-modal">
+    <div class="tutorial-hero">
+      <img src="thai_icon_book.png" alt="tutorial">
+      <h2>คู่มือนักสืบมือใหม่</h2>
+      <p>อ่านสั้น ๆ ก่อนเริ่มเกม เพื่อให้เล่นสนุกและเข้าใจกติกาเร็วขึ้น</p>
+    </div>
+    <div class="tutorial-body">
+      <div class="tutorial-steps">
+        <div class="tutorial-step"><img src="thai_icon_home.png" alt=""><div><b>1. สร้างห้อง / เข้าร่วมห้อง</b><span>ใส่ชื่อผู้เล่น แชร์รหัส 4 ตัวให้เพื่อน แล้วรอให้ผู้เล่นครบอย่างน้อย 4 คน</span></div></div>
+        <div class="tutorial-step"><img src="thai_icon_eye.png" alt=""><div><b>2. เปิดดูบทบาทลับ</b><span>แต่ละคนเห็นบทบาทของตัวเองเท่านั้น ห้ามให้คนอื่นเห็นหน้าจอ</span></div></div>
+        <div class="tutorial-step"><img src="thai_icon_target.png" alt=""><div><b>3. กลางคืนใช้ความสามารถ</b><span>ฆาตกรเลือกเหยื่อ ผู้ใหญ่บ้านคุ้มครอง และป้าข้างบ้านตรวจสอบตัวตน</span></div></div>
+        <div class="tutorial-step"><img src="thai_icon_book.png" alt=""><div><b>4. กลางวันสืบสวนและโหวต</b><span>พูดคุย จับพิรุธ แล้วโหวตคนที่คิดว่าเป็นฆาตกร</span></div></div>
+      </div>
+      <div class="tutorial-roles">
+        <div class="tutorial-role"><img src="thai_role_killer.png" alt=""><span>ฆาตกร</span></div>
+        <div class="tutorial-role"><img src="thai_role_chief.png" alt=""><span>ผู้ใหญ่บ้าน</span></div>
+        <div class="tutorial-role"><img src="thai_role_aunt.png" alt=""><span>ป้าข้างบ้าน</span></div>
+        <div class="tutorial-role"><img src="thai_role_villager.png" alt=""><span>ชาวบ้าน</span></div>
+      </div>
+    </div>
+    <div class="tutorial-actions">
+      <button class="btn btn-orange" onclick="G.closeTutorial()"><img class="icon-btn" src="thai_icon_trophy.png" alt="">เข้าใจแล้ว เริ่มเล่นได้!</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     JAVASCRIPT — Firebase Realtime Database + Game Logic
+══════════════════════════════════════════════════════════ -->
+<script type="module">
+// ──────────────────────────────────────────
+// Firebase Setup
+// ──────────────────────────────────────────
+import { initializeApp }          from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, set, get, push, update, remove,
+         onValue, off, serverTimestamp, onDisconnect }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+/* ⚠️ ใช้ Firebase config ของเว็บไซต์
+   REALTIME DATABASE ต้องเปิดใช้งานใน Firebase Console ก่อน
+   Database URL อาจต้องแก้ให้ตรงกับ Region ที่เลือก:
+   - Asia : https://aomsensei-classroom-default-rtdb.asia-southeast1.firebasedatabase.app
+   - US   : https://aomsensei-classroom-default-rtdb.firebaseio.com              */
+const FB_CFG = {
+  apiKey:            "AIzaSyAYFY_9VqMFsVX22EW2aPVq7NawWQV-n_g",
+  authDomain:        "aomsensei-classroom.firebaseapp.com",
+  databaseURL:       "https://aomsensei-classroom-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:         "aomsensei-classroom",
+  storageBucket:     "aomsensei-classroom.firebasestorage.app",
+  messagingSenderId: "152996049271",
+  appId:             "1:152996049271:web:a9a2927490e1e908d9f172",
+};
+const fbApp = initializeApp(FB_CFG, 'thekiller');
+const db    = getDatabase(fbApp);
+
+// ──────────────────────────────────────────
+// กฎหมายอาญา 17 มาตรา
+// ──────────────────────────────────────────
+const LAWS = [
+  {s:'มาตรา 288', t:'ฆ่าผู้อื่น',             d:'ผู้ใดฆ่าผู้อื่น ต้องระวางโทษประหารชีวิต จำคุกตลอดชีวิต หรือจำคุก 15–20 ปี'},
+  {s:'มาตรา 289', t:'ฆ่าโดยไตร่ตรองไว้ก่อน', d:'วางแผนสังหารล่วงหน้า ต้องระวางโทษประหารชีวิตเพียงสถานเดียว'},
+  {s:'มาตรา 290', t:'ทำร้ายจนถึงแก่ความตาย', d:'ทำร้ายโดยไม่เจตนาให้ตาย แต่ตายในที่สุด จำคุก 3–15 ปี'},
+  {s:'มาตรา 295', t:'ทำร้ายร่างกาย',          d:'ทำให้ผู้อื่นได้รับอันตรายแก่กายหรือจิตใจ จำคุกไม่เกิน 2 ปี หรือปรับไม่เกิน 4,000 บาท'},
+  {s:'มาตรา 296', t:'ทำร้ายร่างกายสาหัส',     d:'ทำให้เสียโฉม ทุพพลภาพ หรือป่วยเรื้อรัง จำคุก 6 เดือน – 10 ปี'},
+  {s:'มาตรา 309', t:'ข่มขู่บังคับ',           d:'ข่มขู่ให้กระทำการหรือจำยอม จำคุกไม่เกิน 3 ปี หรือปรับไม่เกิน 6,000 บาท'},
+  {s:'มาตรา 326', t:'หมิ่นประมาท',            d:'ใส่ความผู้อื่นต่อบุคคลที่สาม จำคุกไม่เกิน 1 ปี หรือปรับไม่เกิน 20,000 บาท'},
+  {s:'มาตรา 334', t:'ลักทรัพย์',              d:'ลักทรัพย์ผู้อื่น จำคุกไม่เกิน 3 ปี หรือปรับไม่เกิน 6,000 บาท'},
+  {s:'มาตรา 335', t:'ลักทรัพย์ฉกรรจ์',        d:'ลักทรัพย์โดยมีเหตุฉกรรจ์ เช่น ปีนเข้าบ้าน จำคุก 1–5 ปี'},
+  {s:'มาตรา 339', t:'ชิงทรัพย์',              d:'ลักทรัพย์โดยใช้กำลังหรือขู่เข็ญทันที จำคุก 5–10 ปี'},
+  {s:'มาตรา 341', t:'ฉ้อโกง',                d:'หลอกลวงผู้อื่นให้เสียทรัพย์ จำคุกไม่เกิน 3 ปี หรือปรับไม่เกิน 6,000 บาท'},
+  {s:'มาตรา 362', t:'บุกรุก',                d:'เข้าไปในอสังหาริมทรัพย์ผู้อื่นโดยไม่มีสิทธิ จำคุกไม่เกิน 1 ปี'},
+  {s:'มาตรา 365', t:'บุกรุกฉกรรจ์',          d:'บุกรุกโดยใช้กำลังหรือหมู่คณะ จำคุก 1–5 ปี หรือปรับไม่เกิน 10,000 บาท'},
+  {s:'มาตรา 368', t:'ขัดคำสั่งเจ้าพนักงาน', d:'ไม่ปฏิบัติตามคำสั่งเจ้าพนักงาน จำคุกไม่เกิน 10 วัน หรือปรับไม่เกิน 500 บาท'},
+  {s:'มาตรา 371', t:'พาอาวุธในที่สาธารณะ',  d:'พาอาวุธไปในเมืองหรือทางสาธารณะโดยไม่มีเหตุอันควร ปรับไม่เกิน 1,000 บาท'},
+  {s:'มาตรา 374', t:'ละเว้นช่วยผู้อื่น',    d:'เห็นผู้ตกอันตรายไม่ช่วยทั้งที่ช่วยได้ จำคุกไม่เกิน 1 เดือน หรือปรับไม่เกิน 1,000 บาท'},
+  {s:'มาตรา 376', t:'โกงน้ำหนัก',           d:'ใช้เครื่องชั่งที่ไม่ถูกต้อง จำคุกไม่เกิน 3 เดือน หรือปรับไม่เกิน 500 บาท'},
+];
+
+// ──────────────────────────────────────────
+// ข้อมูลบทบาท
+// ──────────────────────────────────────────
+const ROLES = {
+  killer:   {emoji:'🔪', name:'ฆาตกร',      desc:'แฝงตัวแนบเนียน เลือกสังหารชาวบ้านในทุกค่ำคืน', cls:'rc-killer',   icon:'thai_role_killer.png'},
+  chief:    {emoji:'👨‍⚖️', name:'ผู้ใหญ่บ้าน', desc:'ผู้คุ้มครองหมู่บ้าน เลือกปกป้องผู้เล่น 1 คนในคืนนี้', cls:'rc-chief',    icon:'thai_role_chief.png'},
+  aunt:     {emoji:'👵', name:'ป้าข้างบ้าน', desc:'นักสืบแห่งหมู่บ้าน ตรวจสอบตัวตนผู้เล่นได้ 1 คนต่อคืน', cls:'rc-aunt',     icon:'thai_role_aunt.png'},
+  villager: {emoji:'🧑‍🌾', name:'ชาวบ้าน',    desc:'ช่วยกันจับพิรุธ พูดคุย และโหวตหาตัวฆาตกรให้พบ', cls:'rc-villager', icon:'thai_role_villager.png'},
+  dead:     {emoji:'👻', name:'เสียชีวิต',   desc:'ดูเกมต่อได้ แต่ไม่สามารถใช้ความสามารถหรือโหวตได้แล้ว', cls:'rc-dead',     icon:'thai_role_dead.png'},
+};
+const UI_ASSET = {home:'thai_icon_home.png', book:'thai_icon_book.png', eye:'thai_icon_eye.png', target:'thai_icon_target.png', trophy:'thai_icon_trophy.png', exit:'thai_icon_exit.png', frameAnnounce:'neo_ui_frame_announce.png', frameDark:'neo_ui_frame_dark.png', frameWin:'neo_ui_frame_win.png'};
+
+
+// ──────────────────────────────────────────
+// State ของเกม
+// ──────────────────────────────────────────
+let myId   = localStorage.getItem('tkId') || (() => {
+  const id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+  localStorage.setItem('tkId', id);
+  return id;
+})();
+let myName='', myRole='', roomCode='', isHost=false;
+let listeners={}, hostTimer=null;
+let replyTo=null; // {name,text} ข้อความที่กำลังตอบกลับ
+
+// ──────────────────────────────────────────
+// ยูทิลิตี้: หน้าจอ / loading
+// ──────────────────────────────────────────
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function vis(id,v){ const el=document.getElementById(id); if(el) el.classList.toggle('hidden',!v); }
+function setLoad(show,msg='กำลังโหลด...'){ document.getElementById('loadMsg').textContent=msg; document.getElementById('loadOv').classList.toggle('hidden',!show); }
+
+function killListeners(){
+  Object.values(listeners).forEach(fn=>{ try{fn&&fn();}catch(e){} });
+  listeners={};
+  if(hostTimer){ clearInterval(hostTimer); hostTimer=null; }
+}
+
+// ──────────────────────────────────────────
+// Helper: Firebase + timeout 8 วินาที
+// ──────────────────────────────────────────
+function withTO(promise, ms=8000){
+  return Promise.race([
+    promise,
+    new Promise((_,rej)=>setTimeout(()=>rej(new Error('TIMEOUT')),ms))
+  ]);
+}
+function showDbError(e){
+  setLoad(false);
+  if(e.message==='TIMEOUT'){
+    alert(
+      '⏱️ การเชื่อมต่อค้าง (timeout)\n\n'+
+      'ต้องทำก่อนใช้งาน:\n'+
+      '1. เปิด Firebase Console\n'+
+      '2. Realtime Database → Create database\n'+
+      '3. ตั้ง Rules เป็น:\n'+
+      '   {"rules":{".read":true,".write":true}}\n\n'+
+      'หรือ databaseURL อาจผิด Region\n'+
+      'ลองเปลี่ยนเป็น:\nhttps://aomsensei-classroom-default-rtdb.firebaseio.com'
+    );
+  } else {
+    alert('Firebase Error: '+e.message);
+  }
+}
+
+// ──────────────────────────────────────────
+// SCREEN 1: หน้าแรก — สร้าง/เข้าร่วมห้อง
+// ──────────────────────────────────────────
+async function createRoom(){
+  myName = document.getElementById('playerName').value.trim();
+  if(!myName){ alert('กรุณาใส่ชื่อผู้เล่น'); return; }
+  localStorage.setItem('tkName', myName);
+  setLoad(true,'กำลังสร้างห้อง...');
+  roomCode = Math.random().toString(36).slice(2,6).toUpperCase();
+  isHost   = true;
+  try{
+    await withTO(set(ref(db,`tk_rooms/${roomCode}`),{
+      host:roomCode, hostId:myId, phase:'lobby', round:0, timer:0,
+      createdAt: Date.now(),
+    }));
+    await withTO(set(ref(db,`tk_rooms/${roomCode}/players/${myId}`),{
+      name:myName, role:'', isAlive:true, isReady:false, joinedAt:Date.now()
+    }));
+    onDisconnect(ref(db,`tk_rooms/${roomCode}/players/${myId}`)).remove();
+    setLoad(false);
+    enterLobby();
+  }catch(e){ showDbError(e); roomCode=''; isHost=false; }
+}
+
+async function joinRoom(){
+  myName = document.getElementById('playerName').value.trim();
+  const code = document.getElementById('joinCode').value.trim().toUpperCase();
+  if(!myName){ alert('กรุณาใส่ชื่อผู้เล่น'); return; }
+  if(code.length!==4){ alert('รหัสห้องต้องเป็น 4 ตัวอักษร'); return; }
+  setLoad(true,'กำลังเข้าร่วม...');
+  try{
+    const snap = await withTO(get(ref(db,`tk_rooms/${code}`)));
+    if(!snap.exists()){ setLoad(false); alert('ไม่พบห้องนี้'); return; }
+    const room = snap.val();
+    if(room.phase!=='lobby'){ setLoad(false); alert('เกมนี้เริ่มไปแล้ว'); return; }
+    const cnt = Object.keys(room.players||{}).length;
+    if(cnt>=10){ setLoad(false); alert('ห้องเต็มแล้ว (10/10)'); return; }
+    roomCode = code;
+    isHost   = (room.hostId === myId);
+    localStorage.setItem('tkName', myName);
+    await withTO(set(ref(db,`tk_rooms/${roomCode}/players/${myId}`),{
+      name:myName, role:'', isAlive:true, isReady:false, joinedAt:Date.now()
+    }));
+    onDisconnect(ref(db,`tk_rooms/${roomCode}/players/${myId}`)).remove();
+    setLoad(false);
+    enterLobby();
+  }catch(e){ showDbError(e); roomCode=''; isHost=false; }
+}
+
+// ──────────────────────────────────────────
+// SCREEN 2: Lobby
+// ──────────────────────────────────────────
+function enterLobby(){
+  show('sc-lobby');
+  document.getElementById('lobbyCode').textContent = roomCode;
+
+  // ฟังรายชื่อผู้เล่น + ตรวจจับการถูกเตะ
+  const pRef = ref(db,`tk_rooms/${roomCode}/players`);
+  listeners.players = (()=>{
+    const unsub = onValue(pRef, snap=>{
+      const p = snap.val()||{};
+      // ถูกเตะออก
+      if(!p[myId]){
+        killListeners();
+        roomCode=''; isHost=false;
+        alert('❌ คุณถูกเตะออกจากห้อง');
+        show('sc-home');
+        return;
+      }
+      renderLobby(p);
+    });
+    return ()=>off(pRef,'value',unsub);
+  })();
+
+  // ฟัง phase เพื่อรู้ว่าเกมเริ่มแล้ว
+  const phRef = ref(db,`tk_rooms/${roomCode}/phase`);
+  listeners.phase = (()=>{
+    const unsub = onValue(phRef, snap=>{
+      if(snap.val()==='role_reveal') enterRoleReveal();
+    });
+    return ()=>off(phRef,'value',unsub);
+  })();
+}
+
+function renderLobby(players){
+  const cnt = Object.keys(players).length;
+  document.getElementById('playerCount').textContent = `${cnt}/10`;
+  document.getElementById('lobbyList').innerHTML = Object.entries(players).map(([id,p])=>`
+    <div class="player-row">
+      <span style="font-size:20px">${id===myId?'⭐':'🧑'}</span>
+      <span>${p.name}</span>
+      ${id===myId ?'<span class="badge b-orange" style="margin-left:auto">คุณ</span>':isHost?`<button onclick="G.kickPlayer('${id}')" style="margin-left:auto;background:#fff;border:1.5px solid #ffc8d5;border-radius:999px;color:#e65a78;font-size:11px;padding:4px 10px;cursor:pointer;font-weight:800">เตะ</button>`:''}
+    </div>
+  `).join('');
+  if(isHost){ vis('startWrap',true); vis('waitMsg',false); const btn=document.getElementById('startBtn'); btn.disabled=cnt<4; document.getElementById('startHint').textContent=cnt<4?`ต้องการผู้เล่นอีก ${4-cnt} คน`:`พร้อมเริ่มเกมแล้ว (${cnt} คน)`; } else { vis('startWrap',false); vis('waitMsg',true); }
+}
+
+async function kickPlayer(targetId){
+  if(!isHost || !roomCode) return;
+  await remove(ref(db,`tk_rooms/${roomCode}/players/${targetId}`));
+}
+
+async function leaveRoom(){
+  if(!confirm('ออกจากห้องใช่ไหม?')) return;
+  killListeners();
+  stopVoiceChat();
+  if(roomCode) await remove(ref(db,`tk_rooms/${roomCode}/players/${myId}`));
+  roomCode=''; isHost=false;
+  show('sc-home');
+}
+
+// ──────────────────────────────────────────
+// เริ่มเกม — Host เท่านั้น
+// ──────────────────────────────────────────
+async function startGame(){
+  const snap = await get(ref(db,`tk_rooms/${roomCode}/players`));
+  const pls  = snap.val()||{};
+  const ids  = Object.keys(pls);
+  if(ids.length<4){ alert('ต้องมีผู้เล่นอย่างน้อย 4 คน'); return; }
+
+  // แจกบทบาท
+  const roles = makeRoles(ids.length);
+  const shuffled = [...ids].sort(()=>Math.random()-.5);
+  const upd = {};
+  shuffled.forEach((id,i)=>{
+    upd[`tk_rooms/${roomCode}/players/${id}/role`]    = roles[i];
+    upd[`tk_rooms/${roomCode}/players/${id}/isAlive`] = true;
+    upd[`tk_rooms/${roomCode}/players/${id}/isReady`] = false;
+  });
+  upd[`tk_rooms/${roomCode}/phase`] = 'role_reveal';
+  upd[`tk_rooms/${roomCode}/round`] = 1;
+  upd[`tk_rooms/${roomCode}/nightTarget`]  = null;
+  upd[`tk_rooms/${roomCode}/protectedLast`]= null;
+  await update(ref(db), upd);
+}
+
+function makeRoles(n){
+  const r=[];
+  r.push('killer');           // ฆาตกรคนที่ 1 (ทุกเกม)
+  if(n>5) r.push('killer');  // ฆาตกรคนที่ 2 (มากกว่า 5 คน)
+  r.push('chief'); r.push('aunt');
+  while(r.length<n) r.push('villager');
+  return r.sort(()=>Math.random()-.5);
+}
+
+// ──────────────────────────────────────────
+// SCREEN 3: เปิดเผยบทบาท
+// ──────────────────────────────────────────
+async function enterRoleReveal(){
+  killListeners();
+  show('sc-role');
+  // ยกเลิก onDisconnect — พับหน้าจอ/สลับแอปได้โดยไม่ถูกเตะ
+  try{ onDisconnect(ref(db,`tk_rooms/${roomCode}/players/${myId}`)).cancel(); }catch(e){}
+  const snap = await get(ref(db,`tk_rooms/${roomCode}/players/${myId}/role`));
+  myRole = snap.val()||'villager';
+
+  // รีเซ็ต UI
+  vis('roleCardWrap',false); vis('confirmWrap',false); vis('waitRoleWrap',false);
+  vis('showRoleBtn',true);
+}
+
+function showRole(){
+  const info = ROLES[myRole]||ROLES.villager;
+  document.getElementById('roleCardWrap').innerHTML=`
+    <div class="role-card ${info.cls}">
+      <img class="role-illust" src="${info.icon}" alt="${info.name}">
+      <div class="role-name">${info.name}</div>
+      <div class="role-desc">${info.desc}</div>
+      ${myRole==='killer'?'<div class="night-hint">⚠️ จำบทบาทไว้ให้ดี และอย่าให้ใครเห็นหน้าจอของคุณ</div>':''}
+      ${myRole==='aunt'?'<div class="night-hint">🔍 คืนนี้คุณจะได้รู้ความจริงของผู้เล่น 1 คน</div>':''}
+    </div>`;
+  vis('roleCardWrap',true); vis('showRoleBtn',false); vis('confirmWrap',true);
+}
+
+async function confirmRole(){
+  await update(ref(db,`tk_rooms/${roomCode}/players/${myId}`),{isReady:true});
+  vis('confirmWrap',false); vis('waitRoleWrap',true);
+
+  // ฟัง ready count + phase night
+  const rRef = ref(db,`tk_rooms/${roomCode}`);
+  let started=false;
+  listeners.roleWait=(()=>{
+    const unsub=onValue(rRef,snap=>{
+      const room=snap.val(); if(!room) return;
+      const pls=room.players||{};
+      const readyN=Object.values(pls).filter(p=>p.isReady).length;
+      const total=Object.keys(pls).length;
+      document.getElementById('readyCount').textContent=`รับทราบแล้ว ${readyN}/${total} คน`;
+      if(room.phase==='night' && !started){ started=true; enterNight(room); }
+    });
+    return ()=>off(rRef,'value',unsub);
+  })();
+
+  // Host: ตรวจทุก 1.5 วินาที → ถ้าทุกคนพร้อม → night
+  if(isHost){
+    let chk=setInterval(async()=>{
+      const s=await get(ref(db,`tk_rooms/${roomCode}/players`));
+      const pls=s.val()||{};
+      if(Object.values(pls).every(p=>p.isReady)){
+        clearInterval(chk);
+        const u={};
+        Object.keys(pls).forEach(id=>u[`tk_rooms/${roomCode}/players/${id}/isReady`]=false);
+        u[`tk_rooms/${roomCode}/phase`]='night';
+        u[`tk_rooms/${roomCode}/timer`]=10;
+        u[`tk_rooms/${roomCode}/killerVotes`]=null;
+        u[`tk_rooms/${roomCode}/chiefProtect`]=null;
+        u[`tk_rooms/${roomCode}/auntCheck`]=null;
+        await update(ref(db),u);
+        startHostTimer('night',10);
+      }
+    },1500);
+    listeners.readyChk=()=>clearInterval(chk);
+  }
+}
+
+// ──────────────────────────────────────────
+// SCREEN 4: กลางคืน
+// ──────────────────────────────────────────
+async function enterNight(roomData){
+  killListeners();
+  stopVoiceChat(); // ออกจาก chat/vote — ปิด voice ถ้ายังเปิดอยู่
+  show('sc-night');
+  document.getElementById('nightRound').textContent = roomData?.round||1;
+
+  // ซ่อน UI ทั้งหมด
+  ['uiKiller','uiChief','uiAunt','uiVillager'].forEach(id=>vis(id,false));
+
+  const snap   = await get(ref(db,`tk_rooms/${roomCode}/players`));
+  const players= snap.val()||{};
+  const alive  = Object.entries(players).filter(([,p])=>p.isAlive);
+
+  const imAlive=players[myId]?.isAlive===true;
+
+  // แสดง UI ตาม role — ผู้เล่นที่ตายแล้วไม่สามารถใช้ความสามารถได้
+  if(!imAlive){
+    const vEl=document.getElementById('uiVillager');
+    vEl.innerHTML=`<div class="card tc" style="background:#eceff1;border:2px solid #cfd8dc;padding:28px"><img class="phase-badge" src="thai_role_dead.png" alt="dead"><h3 style="color:#607d8b;margin-top:10px">คุณเสียชีวิตแล้ว</h3><div class="tm mt8">ดูเกมต่อได้ แต่ใช้ความสามารถไม่ได้</div></div>`;
+    vis('uiVillager',true);
+  } else if(myRole==='killer'){
+    renderKillerUI(alive);
+  } else if(myRole==='chief'){
+    const lpSnap=await get(ref(db,`tk_rooms/${roomCode}/protectedLast`));
+    renderChiefUI(alive, lpSnap.val());
+  } else if(myRole==='aunt'){
+    renderAuntUI(alive);
+  } else {
+    // คืนค่า UI หลับ (กรณีรอบใหม่หลังรีเซ็ต — เพื่อป้องกัน innerHTML ค้างจากรอบก่อน)
+    document.getElementById('uiVillager').innerHTML=`<div class="card tc" style="background:var(--green-l);border:2px solid #a5d6a7;padding:28px"><img class="phase-badge" src="thai_icon_book.png" alt="sleep"><h3 style="color:var(--green);margin-top:10px">คุณกำลังหลับอยู่...</h3><div class="tm mt8">รอให้รอบกลางคืนผ่านไป</div></div>`;
+    vis('uiVillager',true);
+  }
+
+  // ฟัง timer + phase เปลี่ยน
+  const rRef=ref(db,`tk_rooms/${roomCode}`);
+  let wentMorning=false;
+  listeners.night=(()=>{
+    const unsub=onValue(rRef,snap=>{
+      const room=snap.val(); if(!room) return;
+      updateTimerUI('nightTimer', room.timer||0);
+      if(room.phase==='morning' && !wentMorning){ wentMorning=true; enterMorning(room); }
+    });
+    return ()=>off(rRef,'value',unsub);
+  })();
+
+  if(isHost) startHostTimer('night',10);
+}
+
+function renderKillerUI(alive){
+  vis('uiKiller',true);
+  // ป้าเหยื่อเฉพาะคนที่ไม่ใช่ฆาตกร
+  const targets=alive.filter(([id,p])=>p.role!=='killer');
+  document.getElementById('killerList').innerHTML=targets.map(([id,p])=>`
+    <button class="action-btn" id="k_${id}" onclick="G.killerVote('${id}')">
+      ${p.name}
+    </button>
+  `).join('')||'<div class="tm">ไม่มีเป้าหมาย</div>';
+  // แสดงชื่อฆาตกรร่วม
+  const partners=alive.filter(([id,p])=>p.role==='killer'&&id!==myId).map(([,p])=>p.name);
+  if(partners.length) document.getElementById('killerHint').textContent=`🔪 ฆาตกรร่วม: ${partners.join(', ')}`;
+}
+
+async function killerVote(targetId){
+  document.querySelectorAll('[id^="k_"]').forEach(b=>b.classList.remove('selected-killer'));
+  const btn=document.getElementById(`k_${targetId}`);
+  if(btn) btn.classList.add('selected-killer');
+  document.getElementById('killerHint').textContent='✅ เลือกแล้ว รอผลรวม...';
+  await set(ref(db,`tk_rooms/${roomCode}/killerVotes/${myId}`), targetId);
+}
+
+function renderChiefUI(alive, lastProtected){
+  vis('uiChief',true);
+  const targets=alive.filter(([id])=>id!==lastProtected);
+  document.getElementById('chiefList').innerHTML=targets.map(([id,p])=>`
+    <button class="action-btn" id="c_${id}" onclick="G.chiefProtect('${id}')">
+      ${p.name}${id===myId?' (ตัวเอง)':''}
+    </button>
+  `).join('')||'<div class="tm">ไม่มีตัวเลือก</div>';
+}
+
+async function chiefProtect(targetId){
+  document.querySelectorAll('[id^="c_"]').forEach(b=>b.classList.remove('selected-chief'));
+  const btn=document.getElementById(`c_${targetId}`);
+  if(btn) btn.classList.add('selected-chief');
+  document.getElementById('chiefHint').textContent='✅ คุ้มครองแล้ว';
+  await set(ref(db,`tk_rooms/${roomCode}/chiefProtect`), targetId);
+}
+
+function renderAuntUI(alive){
+  vis('uiAunt',true);
+  const targets=alive.filter(([id])=>id!==myId);
+  document.getElementById('auntList').innerHTML=targets.map(([id,p])=>`
+    <button class="action-btn" id="a_${id}" onclick="G.auntCheck('${id}')">
+      ${p.name}
+    </button>
+  `).join('')||'<div class="tm">ไม่มีตัวเลือก</div>';
+}
+
+async function auntCheck(targetId){
+  document.querySelectorAll('[id^="a_"]').forEach(b=>b.classList.remove('selected-aunt'));
+  const btn=document.getElementById(`a_${targetId}`);
+  if(btn) btn.classList.add('selected-aunt');
+  document.getElementById('auntHint').textContent='✅ ส่งการตรวจแล้ว';
+  await set(ref(db,`tk_rooms/${roomCode}/auntCheck`),{targetId, by:myId});
+}
+
+// ──────────────────────────────────────────
+// HOST: Timer + ประมวลผลกลางคืน
+// ──────────────────────────────────────────
+function startHostTimer(phase, secs){
+  if(!isHost) return;
+  if(hostTimer){ clearInterval(hostTimer); hostTimer=null; }
+  let t=secs;
+  hostTimer=setInterval(async()=>{
+    t--;
+    await set(ref(db,`tk_rooms/${roomCode}/timer`), t<0?0:t);
+    if(t<=0){
+      clearInterval(hostTimer); hostTimer=null;
+      if(phase==='night')  await processNight();
+      else if(phase==='chat') await startVotePhase();
+      else if(phase==='vote') await processVote();
+    }
+  },1000);
+}
+
+async function processNight(){
+  const snap   = await get(ref(db,`tk_rooms/${roomCode}`));
+  const room   = snap.val()||{};
+  const players= room.players||{};
+  const kVotes = room.killerVotes||{};
+  const protect= room.chiefProtect||null;
+  const auntCk = room.auntCheck||null;
+
+  // ── ประมวลผลการโหวตฆาตกร ──
+  let victim=null;
+  const vArr=Object.values(kVotes);
+  if(vArr.length>0){
+    const cnt={};
+    vArr.forEach(id=>{ cnt[id]=(cnt[id]||0)+1; });
+    const maxV=Math.max(...Object.values(cnt));
+    const tops=Object.entries(cnt).filter(([,v])=>v===maxV).map(([id])=>id);
+    victim=tops[Math.floor(Math.random()*tops.length)];
+    if(protect && victim===protect) victim=null; // ผู้ใหญ่คุ้มครองสำเร็จ
+  }
+
+  // ── ผลป้าตรวจ ──
+  let auntResult=null;
+  if(auntCk){
+    const tRole=players[auntCk.targetId]?.role||'';
+    auntResult={targetId:auntCk.targetId, isKiller:tRole==='killer', by:auntCk.by};
+  }
+
+  const u={
+    [`tk_rooms/${roomCode}/phase`]:'morning',
+    [`tk_rooms/${roomCode}/nightTarget`]:victim,
+    [`tk_rooms/${roomCode}/protectedLast`]:protect,
+    [`tk_rooms/${roomCode}/auntResult`]:auntResult,
+    [`tk_rooms/${roomCode}/timer`]:0,
+  };
+  if(victim) u[`tk_rooms/${roomCode}/players/${victim}/isAlive`]=false;
+  await update(ref(db),u);
+}
+
+// ──────────────────────────────────────────
+// SCREEN 5: รุ่งเช้า
+// ──────────────────────────────────────────
+async function enterMorning(roomData){
+  killListeners();
+  show('sc-morning');
+  document.getElementById('morningRound').textContent = roomData?.round||1;
+
+  const snap   = await get(ref(db,`tk_rooms/${roomCode}`));
+  const room   = snap.val()||{};
+  const players= room.players||{};
+  const victim = room.nightTarget;
+  const auntR  = room.auntResult;
+
+  // ประกาศผล
+  const banEl=document.getElementById('morningBanner');
+  if(victim && players[victim]){
+    banEl.innerHTML=`<div class="banner banner-death">💀 ${players[victim].name} ถูกสังหารคืนนี้!</div>`;
+  } else {
+    banEl.innerHTML=`<div class="banner banner-safe">✨ คืนนี้ไม่มีใครเสียชีวิต!</div>`;
+  }
+
+  // ป้าดูผลลับเฉพาะตัวเอง
+  const aptEl=document.getElementById('auntPrivate');
+  if(myRole==='aunt' && auntR && auntR.by===myId){
+    const tn=players[auntR.targetId]?.name||'???';
+    aptEl.innerHTML=`<div class="aunt-result ${auntR.isKiller?'aunt-guilty':'aunt-safe'}">
+      👵 ผลตรวจลับ: <b>${tn}</b> ${auntR.isKiller?'✅ ใช่ฆาตกร!':'❌ ไม่ใช่ฆาตกร'}
+    </div>`;
+    vis('auntPrivate',true);
+  } else { vis('auntPrivate',false); }
+
+  // รายชื่อ
+  document.getElementById('morningList').innerHTML=Object.entries(players).map(([id,p])=>`
+    <div class="player-row ${!p.isAlive?'dead':''}">
+      ${p.isAlive?'🟢':'💀'} ${p.name}
+      ${id===myId?'<span class="badge b-orange" style="margin-left:auto">คุณ</span>':''}
+    </div>
+  `).join('');
+
+  // ตรวจเงื่อนไขชนะ
+  if(isHost){
+    const win=checkWin(players);
+    if(win){ await doGameOver(players,win); return; }
+    // Auto-advance to chat after 5s
+    setTimeout(async()=>{ if(roomCode) await goToChat(); }, 5000);
+  }
+  // แสดง countdown ให้ทุกคน
+  vis('mornHostBtn',false); vis('mornWait',true);
+  let mT=5;
+  const mWait=document.getElementById('mornWait');
+  mWait.textContent=`⏳ ไปสืบสวนอัตโนมัติใน ${mT} วินาที...`;
+  const miv=setInterval(()=>{
+    mT--;
+    if(mWait) mWait.textContent=`⏳ ไปสืบสวนอัตโนมัติใน ${mT>0?mT:0} วินาที...`;
+    if(mT<=0) clearInterval(miv);
+  },1000);
+
+  // ฟัง phase เปลี่ยน
+  const phRef=ref(db,`tk_rooms/${roomCode}/phase`);
+  listeners.morning=(()=>{
+    const unsub=onValue(phRef,snap=>{
+      const ph=snap.val();
+      if(ph==='chat') enterChat();
+      if(ph==='role_reveal') enterRoleReveal();
+      if(ph==='gameover'){
+        get(ref(db,`tk_rooms/${roomCode}`)).then(s=>{
+          const d=s.val(); enterGameOver(d.players||{}, d.winner);
+        });
+      }
+    });
+    return ()=>off(phRef,'value',unsub);
+  })();
+}
+
+function checkWin(players){
+  const alive=Object.values(players).filter(p=>p.isAlive);
+  const kN=alive.filter(p=>p.role==='killer').length;
+  const vN=alive.filter(p=>p.role!=='killer').length;
+  if(kN===0) return 'villagers';
+  if(kN>=vN) return 'killers';
+  return null;
+}
+
+async function doGameOver(players, winner){
+  await update(ref(db,`tk_rooms/${roomCode}`),{phase:'gameover', winner});
+  enterGameOver(players, winner);
+}
+
+async function goToChat(){
+  // ล้างแชทเก่า (ทุกต้นรอบ)
+  await set(ref(db,`tk_rooms/${roomCode}/messages`), null);
+  await update(ref(db,`tk_rooms/${roomCode}`),{
+    phase:'chat', timer:30, votes:null, killerVotes:null,
+    chiefProtect:null, auntCheck:null, auntResult:null,
+  });
+  startHostTimer('chat',30);
+}
+
+// ──────────────────────────────────────────
+// SCREEN 6: สืบสวน (แชท)
+// ──────────────────────────────────────────
+async function enterChat(){
+  killListeners();
+  stopVoiceChat(); // ล้าง voice connections เก่า
+  show('sc-chat');
+
+  const snap    = await get(ref(db,`tk_rooms/${roomCode}/players`));
+  const players = snap.val()||{};
+  const alive   = players[myId]?.isAlive===true;
+  document.getElementById('chatInput').disabled=!alive;
+  if(!alive) document.getElementById('chatInput').placeholder='💀 คุณเสียชีวิตแล้ว ไม่สามารถแชทได้';
+
+  // เริ่ม voice chat สำหรับผู้เล่นที่ยังมีชีวิต
+  if(alive){
+    const alivePlayers=Object.entries(players)
+      .filter(([,p])=>p.isAlive)
+      .map(([id,p])=>({id,name:p.name}));
+    startVoiceChat(alivePlayers);
+  }
+
+  // ฟัง timer + phase
+  const rRef=ref(db,`tk_rooms/${roomCode}`);
+  let wentVote=false;
+  listeners.chat=(()=>{
+    const unsub=onValue(rRef,snap=>{
+      const room=snap.val(); if(!room) return;
+      updateTimerUI('chatTimer', room.timer||0);
+      if(room.phase==='vote' && !wentVote){ wentVote=true; enterVote(); }
+    });
+    return ()=>off(rRef,'value',unsub);
+  })();
+
+  // ฟังแชท
+  const msgRef=ref(db,`tk_rooms/${roomCode}/messages`);
+  listeners.msgs=(()=>{
+    const unsub=onValue(msgRef,snap=>{
+      const msgs=snap.val()||{};
+      const chatEl=document.getElementById('chatBox');
+      window._cm={}; // message map สำหรับ reply
+      const sorted=Object.values(msgs).sort((a,b)=>(a.ts||0)-(b.ts||0));
+      sorted.forEach((m,i)=>{ window._cm['c'+i]={name:m.name,text:m.text}; });
+      chatEl.innerHTML=sorted.map((m,i)=>{
+        const rTag=m.replyTo
+          ?`<span class="msg-reply-tag">↩️ <b>${escHtml(m.replyTo.name)}</b>: ${escHtml((m.replyTo.text||'').slice(0,36))}${(m.replyTo.text||'').length>36?'…':''}</span>`
+          :'';
+        const rBtn=alive
+          ?`<button onclick="G.startReply(window._cm['c${i}'])" style="float:right;background:none;border:none;font-size:12px;color:#ccc;cursor:pointer;padding:0 3px;line-height:1.6" title="ตอบกลับ">↩</button>`
+          :'';
+        return `<div class="chat-msg">${rBtn}${rTag}<span class="chat-name">${escHtml(m.name)}:</span> ${escHtml(m.text)}</div>`;
+      }).join('')||'<div class="chat-sys">ยังไม่มีข้อความ...</div>';
+      chatEl.scrollTop=chatEl.scrollHeight;
+    });
+    return ()=>off(msgRef,'value',unsub);
+  })();
+
+  // หมายเหตุ: goToChat() เริ่ม timer 30s ไว้แล้ว; ไม่ restart ที่นี่อีกครั้ง
+}
+
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function sendChat(){
+  const inp=document.getElementById('chatInput');
+  const text=inp.value.trim();
+  if(!text) return;
+  const mySnap=await get(ref(db,`tk_rooms/${roomCode}/players/${myId}/isAlive`));
+  if(!mySnap.val()) return;
+  const msgData={name:myName, text, ts:Date.now()};
+  if(replyTo) msgData.replyTo={name:replyTo.name, text:replyTo.text};
+  await push(ref(db,`tk_rooms/${roomCode}/messages`), msgData);
+  inp.value='';
+  cancelReply();
+}
+
+function startReply(msg){
+  if(!msg) return;
+  replyTo={name:msg.name, text:msg.text};
+  document.getElementById('replyPreview').textContent=`${msg.name}: ${(msg.text||'').slice(0,40)}${(msg.text||'').length>40?'…':''}`;
+  document.getElementById('replyBar').classList.remove('hidden');
+  document.getElementById('chatInput').focus();
+}
+
+function cancelReply(){
+  replyTo=null;
+  const bar=document.getElementById('replyBar');
+  if(bar) bar.classList.add('hidden');
+}
+
+document.getElementById('chatInput').addEventListener('keypress',e=>{ if(e.key==='Enter') G.sendChat(); });
+
+// ──────────────────────────────────────────
+// SCREEN 7: โหวต
+// ──────────────────────────────────────────
+async function startVotePhase(){
+  await update(ref(db,`tk_rooms/${roomCode}`),{phase:'vote', timer:20, votes:null});
+  startHostTimer('vote',20);
+}
+
+async function enterVote(){
+  killListeners();
+  stopVoiceChat(); // ออกจาก chat phase — ปิด voice
+  show('sc-vote');
+
+  const snap   =await get(ref(db,`tk_rooms/${roomCode}/players`));
+  const players=snap.val()||{};
+  const myAlive=players[myId]?.isAlive===true;
+
+  // แสดงปุ่มโหวต (ไม่รวมตัวเอง)
+  const alive=Object.entries(players).filter(([,p])=>p.isAlive&&true);
+  document.getElementById('voteList').innerHTML=alive
+    .filter(([id])=>id!==myId)
+    .map(([id,p])=>`
+      <button class="action-btn${!myAlive?' disabled':''}" id="v_${id}"
+        onclick="${myAlive?`G.castVote('${id}')`:''}">
+        ${p.name}
+      </button>
+    `).join('')||'<div class="tm">ไม่มีผู้เล่น</div>';
+
+  const aliveN=Object.values(players).filter(p=>p.isAlive).length;
+  const needV=Math.floor(aliveN/2)+1;
+  if(!myAlive){
+    document.getElementById('voteStatus').textContent='💀 คุณเสียชีวิตแล้ว ไม่สามารถโหวตได้';
+  } else {
+    document.getElementById('voteStatus').textContent=`ต้องการ ${needV} เสียงขึ้นไปถึงจะจับได้ · โหวตแล้ว 0/${aliveN} คน`;
+  }
+
+  // ฟัง timer + เสียงโหวต + phase
+  const rRef=ref(db,`tk_rooms/${roomCode}`);
+  let wentArrested=false;
+  listeners.vote=(()=>{
+    const unsub=onValue(rRef,snap=>{
+      const room=snap.val(); if(!room) return;
+      updateTimerUI('voteTimer', room.timer||0);
+      const votes=room.votes||{};
+      const total=Object.values(room.players||{}).filter(p=>p.isAlive).length;
+      const needV2=Math.floor(total/2)+1;
+      document.getElementById('voteStatus').textContent=`ต้องการ ${needV2} เสียง · โหวตแล้ว ${Object.keys(votes).length}/${total} คน`;
+      if(room.phase==='arrested' && !wentArrested){ wentArrested=true; enterArrested(room); }
+      if(room.phase==='gameover'){
+        get(ref(db,`tk_rooms/${roomCode}`)).then(s=>{
+          const d=s.val(); enterGameOver(d.players||{}, d.winner);
+        });
+      }
+    });
+    return ()=>off(rRef,'value',unsub);
+  })();
+
+  if(isHost) startHostTimer('vote',20);
+}
+
+async function castVote(targetId){
+  const s=await get(ref(db,`tk_rooms/${roomCode}/players/${myId}/isAlive`));
+  if(!s.val()) return;
+  document.querySelectorAll('[id^="v_"]').forEach(b=>b.classList.remove('selected-killer'));
+  const btn=document.getElementById(`v_${targetId}`);
+  if(btn) btn.classList.add('selected-killer');
+  await set(ref(db,`tk_rooms/${roomCode}/votes/${myId}`), targetId);
+}
+
+async function processVote(){
+  const snap   =await get(ref(db,`tk_rooms/${roomCode}`));
+  const room   =snap.val()||{};
+  const players=room.players||{};
+  const votes  =room.votes||{};
+
+  // นับเสียง (ต้องมากกว่าครึ่งของผู้เล่นที่เหลือ)
+  const aliveCount=Object.values(players).filter(p=>p.isAlive).length;
+  const halfPlus=Math.floor(aliveCount/2)+1;
+  const cnt={};
+  Object.values(votes).forEach(id=>{ cnt[id]=(cnt[id]||0)+1; });
+  let arrested=null;
+  if(Object.keys(cnt).length>0){
+    const maxV=Math.max(...Object.values(cnt));
+    const tops=Object.entries(cnt).filter(([,v])=>v===maxV).map(([id])=>id);
+    if(tops.length===1 && maxV>=halfPlus) arrested=tops[0]; // เสียงเดียวและมากกว่าครึ่ง
+  }
+
+  const law=LAWS[Math.floor(Math.random()*LAWS.length)];
+  const u={
+    [`tk_rooms/${roomCode}/phase`]:'arrested',
+    [`tk_rooms/${roomCode}/arrestedId`]:arrested,
+    [`tk_rooms/${roomCode}/currentLaw`]:law,
+    [`tk_rooms/${roomCode}/timer`]:0,
+  };
+  if(arrested) u[`tk_rooms/${roomCode}/players/${arrested}/isAlive`]=false;
+  await update(ref(db),u);
+
+  // ตรวจชนะ
+  const newPSnap=await get(ref(db,`tk_rooms/${roomCode}/players`));
+  const newP=newPSnap.val()||{};
+  const win=checkWin(newP);
+  if(win) await update(ref(db,`tk_rooms/${roomCode}`),{phase:'gameover', winner:win});
+}
+
+// ──────────────────────────────────────────
+// SCREEN 8: จับเข้าคุก
+// ──────────────────────────────────────────
+async function enterArrested(roomData){
+  killListeners();
+  show('sc-arrested');
+
+  const snap   =await get(ref(db,`tk_rooms/${roomCode}`));
+  const room   =snap.val()||{};
+  const players=room.players||{};
+  const arId   =room.arrestedId;
+  const law    =room.currentLaw||LAWS[0];
+
+  // แสดงผู้ถูกจับ (ไม่เปิดเผยบทบาท — จะเปิดเมื่อเกมจบ)
+  const cardEl=document.getElementById('arrestedCard');
+  if(arId && players[arId]){
+    const p=players[arId];
+    cardEl.innerHTML=`<div class="card tc scene-card scene-arrest"><div class="scene-content-pad small"><div style="font-size:12px;color:#8a6a54;font-weight:700">ถูกจับกุมโดยชาวบ้าน</div><h2 style="margin-top:6px">${escHtml(p.name)}</h2><div style="margin-top:12px;background:#f5f5f5;border-radius:12px;padding:10px;font-size:13px;color:#aaa">🔒 บทบาทเป็นความลับ<br><span style="font-size:11px">จะเปิดเผยเมื่อเกมจบ</span></div></div></div>`;
+  } else {
+    cardEl.innerHTML=`<div class="card tc scene-card scene-announce"><div class="scene-content-pad small"><h3 style="margin-top:4px">เสียงเท่ากัน!</h3><div class="tm mt8">ไม่มีใครถูกจับในรอบนี้</div></div></div>`;
+  }
+
+  // กฎหมาย
+  document.getElementById('lawCard').innerHTML=`<div class="law-frame"><div class="law-card"><div class="law-sec">${law.s}</div><div class="law-title">${law.t}</div><div class="law-desc">${law.d}</div></div></div>`;
+
+  // Auto-advance to next round after 10s
+  vis('arrestHostBtn',false); vis('arrestWait',true);
+  let aT=10;
+  const aWait=document.getElementById('arrestWait');
+  aWait.textContent=`⏳ รอบต่อไปอัตโนมัติใน ${aT} วินาที...`;
+  const aiv=setInterval(()=>{
+    aT--;
+    if(aWait) aWait.textContent=`⏳ รอบต่อไปอัตโนมัติใน ${aT>0?aT:0} วินาที...`;
+    if(aT<=0) clearInterval(aiv);
+  },1000);
+  if(isHost) setTimeout(async()=>{ if(roomCode) await nextRound(); }, 10000);
+
+  // ฟัง phase เปลี่ยน
+  const phRef=ref(db,`tk_rooms/${roomCode}/phase`);
+  listeners.arrested=(()=>{
+    const unsub=onValue(phRef,snap=>{
+      const ph=snap.val();
+      if(ph==='role_reveal') enterRoleReveal(); // รอบใหม่ — แจกบทบาทใหม่
+      if(ph==='night'){
+        get(ref(db,`tk_rooms/${roomCode}`)).then(s=>enterNight(s.val()));
+      }
+      if(ph==='gameover'){
+        get(ref(db,`tk_rooms/${roomCode}`)).then(s=>{
+          const d=s.val(); enterGameOver(d.players||{}, d.winner);
+        });
+      }
+    });
+    return ()=>off(phRef,'value',unsub);
+  })();
+}
+
+async function nextRound(){
+  const snap   =await get(ref(db,`tk_rooms/${roomCode}`));
+  const room   =snap.val()||{};
+  const players=room.players||{};
+  // ตรวจชนะก่อนรีเซ็ต (กัน edge case)
+  const win=checkWin(players);
+  if(win){ await doGameOver(players,win); return; }
+
+  const ids=Object.keys(players);
+  const newRound=(room.round||1)+1;
+
+  // แจกบทบาทใหม่ทุกรอบ — รีเซ็ตสถานะทั้งหมด เก็บแค่ชื่อ
+  const roles=makeRoles(ids.length);
+  const shuffled=[...ids].sort(()=>Math.random()-.5);
+  const u={};
+  shuffled.forEach((id,i)=>{
+    u[`tk_rooms/${roomCode}/players/${id}/role`]    = roles[i];
+    u[`tk_rooms/${roomCode}/players/${id}/isAlive`] = true;
+    u[`tk_rooms/${roomCode}/players/${id}/isReady`] = false;
+  });
+  u[`tk_rooms/${roomCode}/phase`]        = 'role_reveal';
+  u[`tk_rooms/${roomCode}/round`]        = newRound;
+  u[`tk_rooms/${roomCode}/timer`]        = 0;
+  u[`tk_rooms/${roomCode}/killerVotes`]  = null;
+  u[`tk_rooms/${roomCode}/nightTarget`]  = null;
+  u[`tk_rooms/${roomCode}/protectedLast`]= null;
+  u[`tk_rooms/${roomCode}/votes`]        = null;
+  u[`tk_rooms/${roomCode}/arrestedId`]   = null;
+  u[`tk_rooms/${roomCode}/chiefProtect`] = null;
+  u[`tk_rooms/${roomCode}/auntCheck`]    = null;
+  u[`tk_rooms/${roomCode}/auntResult`]   = null;
+  u[`tk_rooms/${roomCode}/messages`]     = null;
+  u[`tk_rooms/${roomCode}/webrtc`]       = null;
+  await update(ref(db),u);
+  // enterRoleReveal จะถูกเรียกโดย listener เมื่อ phase = 'role_reveal'
+}
+
+// ──────────────────────────────────────────
+// SCREEN 9: จบเกม
+// ──────────────────────────────────────────
+function enterGameOver(players, winner){
+  killListeners();
+  show('sc-gameover');
+
+  const killerWin=winner==='killers';
+  document.getElementById('goCard').innerHTML=`<div class="go-card ${killerWin?'go-killers':'go-villagers'}"><div class="go-card-inner"><h1>${killerWin?'ฆาตกรชนะ!':'ชาวบ้านชนะ!'}</h1><div class="go-sub">${killerWin?'ฆาตกรครองบ้านห้วยหินฝนสำเร็จ!':'ชาวบ้านกำจัดฆาตกรหมดแล้ว!'}</div></div></div>`;
+
+  // Auto-return home countdown
+  let goT=20;
+  const goBtn=document.getElementById('goHomeBtn');
+  if(goBtn) goBtn.innerHTML=`<img class=\"icon-btn\" src=\"${UI_ASSET.home}\" alt=\"\">กลับหน้าหลัก (${goT})`;
+  const goiv=setInterval(()=>{
+    goT--;
+    if(goBtn) goBtn.innerHTML=`<img class=\"icon-btn\" src=\"${UI_ASSET.home}\" alt=\"\">กลับหน้าหลัก (${goT>0?goT:0})`;
+    if(goT<=0){ clearInterval(goiv); G.backToHome(); }
+  },1000);
+
+  // เปิดเผย Role ทุกคน
+  document.getElementById('goRoleList').innerHTML=Object.entries(players).map(([id,p])=>{
+    const info=ROLES[p.role]||ROLES.villager;
+    return `<div class=\"player-row\" style=\"justify-content:space-between\">\n      <span class=\"role-mini\"><img src=\"${info.icon}\" alt=\"${info.name}\"> ${p.name}${id===myId?' <span class=\"badge b-orange\">คุณ</span>':''}</span>\n      <span class=\"badge ${p.role==='killer'?'b-red':'b-green'}\">${info.name}</span>\n    </div>`;
+  }).join('');
+}
+
+function backToHome(){
+  killListeners();
+  stopVoiceChat();
+  roomCode=''; isHost=false; myRole='';
+  show('sc-home');
+}
+
+// ──────────────────────────────────────────
+// ยูทิลิตี้: Update Timer UI
+// ──────────────────────────────────────────
+function updateTimerUI(elId, t){
+  const el=document.getElementById(elId); if(!el) return;
+  el.textContent=t;
+  el.className='timer-ring' + (t<=5?' urgent':t<=10?' warn':'');
+}
+
+// ──────────────────────────────────────────
+// VOICE CHAT — WebRTC + Firebase signaling
+// ──────────────────────────────────────────
+let voiceConns  = {};   // { peerId: RTCPeerConnection }
+let voiceAudios = {};   // { peerId: HTMLAudioElement }
+let localStream = null;
+let voiceMuted  = false;
+const ICE_SERVERS = [{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}];
+
+async function startVoiceChat(alivePlayers){
+  // alivePlayers = [{id, name}] รวมตัวเอง
+  const panelEl  = document.getElementById('voicePanel');
+  const statusEl = document.getElementById('voiceStatus');
+  const peersEl  = document.getElementById('voicePeers');
+
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+  } catch(e) {
+    if(panelEl){ panelEl.classList.remove('hidden'); }
+    if(statusEl) statusEl.textContent='❌ ไม่สามารถเข้าถึงไมค์ได้ ('+e.name+')';
+    return;
+  }
+  voiceMuted = false;
+  if(panelEl) panelEl.classList.remove('hidden');
+  const muteBtn = document.getElementById('muteBtn');
+  if(muteBtn){ muteBtn.textContent='🎙️ เปิดอยู่'; muteBtn.classList.remove('muted'); }
+
+  const peers = alivePlayers.filter(p=>p.id!==myId);
+  if(!peers.length){ if(statusEl) statusEl.textContent='✅ ไม่มีผู้เล่นคนอื่นในรอบนี้'; return; }
+
+  if(peersEl) peersEl.innerHTML=peers.map(p=>
+    `<span class="voice-peer" id="vp_${p.id}">🔇 ${p.name}</span>`).join('');
+  if(statusEl) statusEl.textContent=`✅ ไมค์พร้อม · กำลังเชื่อมต่อ ${peers.length} คน...`;
+
+  for(const peer of peers){
+    const pc = new RTCPeerConnection({iceServers:ICE_SERVERS});
+    voiceConns[peer.id] = pc;
+
+    // เพิ่ม local audio
+    localStream.getTracks().forEach(t=>pc.addTrack(t,localStream));
+
+    // รับ remote audio
+    pc.ontrack = (e)=>{
+      if(!voiceAudios[peer.id]){
+        const audio = new Audio();
+        audio.autoplay = true;
+        document.body.appendChild(audio);
+        voiceAudios[peer.id] = audio;
+      }
+      voiceAudios[peer.id].srcObject = e.streams[0];
+      const vpEl = document.getElementById(`vp_${peer.id}`);
+      if(vpEl){ vpEl.textContent=`🔊 ${peer.name}`; vpEl.classList.add('active'); }
+    };
+
+    // ICE candidate
+    pc.onicecandidate = (e)=>{
+      if(!e.candidate||!roomCode) return;
+      push(ref(db,`tk_rooms/${roomCode}/webrtc/${myId}/${peer.id}/ice`), e.candidate.toJSON());
+    };
+
+    // Initiator: ผู้ที่มี myId น้อยกว่าเป็นคนส่ง offer
+    if(myId < peer.id){
+      try{
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        await set(ref(db,`tk_rooms/${roomCode}/webrtc/${myId}/${peer.id}/offer`),
+          {type:offer.type, sdp:offer.sdp});
+      }catch(e){ console.warn('voice offer error',e); }
+    }
+
+    // Answerer: ฟัง offer จาก peer แล้วตอบกลับ
+    if(myId > peer.id){
+      const ofRef = ref(db,`tk_rooms/${roomCode}/webrtc/${peer.id}/${myId}/offer`);
+      listeners[`vof_${peer.id}`]=(()=>{
+        const unsub=onValue(ofRef, async snap=>{
+          if(!snap.val()||pc.signalingState!=='stable') return;
+          try{
+            await pc.setRemoteDescription(snap.val());
+            const ans = await pc.createAnswer();
+            await pc.setLocalDescription(ans);
+            await set(ref(db,`tk_rooms/${roomCode}/webrtc/${peer.id}/${myId}/answer`),
+              {type:ans.type, sdp:ans.sdp});
+          }catch(e){ console.warn('voice answer error',e); }
+        });
+        return ()=>off(ofRef,'value',unsub);
+      })();
+    }
+
+    // Initiator: ฟัง answer
+    if(myId < peer.id){
+      const anRef = ref(db,`tk_rooms/${roomCode}/webrtc/${myId}/${peer.id}/answer`);
+      listeners[`van_${peer.id}`]=(()=>{
+        const unsub=onValue(anRef, async snap=>{
+          if(!snap.val()||pc.signalingState!=='have-local-offer') return;
+          try{ await pc.setRemoteDescription(snap.val()); }catch(e){ console.warn('voice setRemote ans',e); }
+        });
+        return ()=>off(anRef,'value',unsub);
+      })();
+    }
+
+    // ICE จาก peer
+    const iceRef = ref(db,`tk_rooms/${roomCode}/webrtc/${peer.id}/${myId}/ice`);
+    const knownIce = new Set();
+    listeners[`vic_${peer.id}`]=(()=>{
+      const unsub=onValue(iceRef, snap=>{
+        const ices=snap.val(); if(!ices) return;
+        Object.entries(ices).forEach(([k,ice])=>{
+          if(knownIce.has(k)) return; knownIce.add(k);
+          pc.addIceCandidate(ice).catch(()=>{});
+        });
+      });
+      return ()=>off(iceRef,'value',unsub);
+    })();
+  }
+}
+
+function stopVoiceChat(){
+  Object.values(voiceConns).forEach(pc=>{ try{pc.close();}catch(e){} });
+  voiceConns = {};
+  Object.values(voiceAudios).forEach(a=>{ a.pause(); a.srcObject=null; try{if(a.parentNode) a.parentNode.removeChild(a);}catch(e){} });
+  voiceAudios = {};
+  if(localStream){ localStream.getTracks().forEach(t=>t.stop()); localStream=null; }
+  if(roomCode) remove(ref(db,`tk_rooms/${roomCode}/webrtc/${myId}`)).catch(()=>{});
+  const p=document.getElementById('voicePanel'); if(p) p.classList.add('hidden');
+}
+
+function toggleMute(){
+  voiceMuted=!voiceMuted;
+  if(localStream) localStream.getAudioTracks().forEach(t=>{ t.enabled=!voiceMuted; });
+  const btn=document.getElementById('muteBtn');
+  if(btn){ btn.textContent=voiceMuted?'🔇 ปิดอยู่':'🎙️ เปิดอยู่'; btn.classList.toggle('muted',voiceMuted); }
+}
+
+
+function openTutorial(){
+  const ov=document.getElementById('tutorialOv');
+  if(ov) ov.classList.remove('hidden');
+}
+function closeTutorial(){
+  const ov=document.getElementById('tutorialOv');
+  if(ov) ov.classList.add('hidden');
+}
+
+// ──────────────────────────────────────────
+// Export ฟังก์ชันเป็น Global (onclick ใช้ได้)
+// ──────────────────────────────────────────
+window.G={
+  createRoom, joinRoom, leaveRoom, startGame,
+  kickPlayer,
+  showRole, confirmRole,
+  killerVote, chiefProtect, auntCheck,
+  castVote, sendChat, goToChat,
+  startReply, cancelReply,
+  toggleMute,
+  nextRound, backToHome,
+  openTutorial, closeTutorial,
+};
+
+// โหลดชื่อเก่า
+const savedName=localStorage.getItem('tkName');
+if(savedName) document.getElementById('playerName').value=savedName;
+document.getElementById('playerName').addEventListener('change',function(){
+  localStorage.setItem('tkName',this.value.trim());
+});
+
+// ล้าง input รหัสห้องให้เป็น uppercase อัตโนมัติ
+document.getElementById('tutorialOv')?.addEventListener('click',function(e){ if(e.target===this) G.closeTutorial(); });
+
+document.getElementById('joinCode').addEventListener('input',function(){
+  this.value=this.value.toUpperCase();
+});
+</script>
+</body>
+</html>
