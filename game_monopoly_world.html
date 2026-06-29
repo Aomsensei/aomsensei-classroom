@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>เกมเศรษฐี ท่องโลกมหาสนุก</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#eee;min-height:100vh;overflow-x:hidden}
+.screen{display:none;min-height:100vh;padding:12px}
+.screen.active{display:flex;flex-direction:column}
+
+/* HOME */
+#sc-home{align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)}
+.logo{text-align:center;margin-bottom:30px}
+.logo h1{font-size:2em;color:#ffd700;text-shadow:0 0 20px #ffd700aa;margin-bottom:4px}
+.logo p{color:#aaa;font-size:.95em}
+.globe{font-size:4em;animation:spin 8s linear infinite;display:inline-block}
+@keyframes spin{from{transform:rotateY(0)}to{transform:rotateY(360deg)}}
+.home-card{background:#ffffff10;border:1px solid #ffffff20;border-radius:16px;padding:20px;width:100%;max-width:380px}
+.inp{width:100%;padding:12px 16px;border-radius:10px;border:1px solid #ffffff30;background:#ffffff15;color:#fff;font-size:1em;margin-bottom:10px}
+.inp::placeholder{color:#888}
+.inp:focus{outline:none;border-color:#ffd700;background:#ffffff20}
+
+/* BUTTONS */
+.btn{display:block;width:100%;padding:13px;border-radius:12px;border:none;font-size:1em;font-weight:700;cursor:pointer;transition:all .2s;margin-bottom:8px;font-family:'Sarabun',sans-serif}
+.btn:active{transform:scale(.96)}
+.btn-gold{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#1a1a2e}
+.btn-blue{background:linear-gradient(135deg,#0099ff,#0055cc);color:#fff}
+.btn-green{background:linear-gradient(135deg,#00c853,#007e33);color:#fff}
+.btn-red{background:linear-gradient(135deg,#ff4444,#cc0000);color:#fff}
+.btn-gray{background:#ffffff20;color:#eee;border:1px solid #ffffff30}
+.btn-sm{padding:8px 14px;border-radius:8px;font-size:.85em;width:auto;display:inline-block;margin:3px}
+
+/* LOBBY */
+#sc-lobby{background:#0f0f1e}
+.lobby-header{background:#ffffff10;border-radius:12px;padding:14px;margin-bottom:12px;text-align:center}
+.room-code{font-size:2.5em;font-weight:900;letter-spacing:.15em;color:#ffd700}
+.player-list{display:grid;gap:8px;margin-bottom:14px}
+.player-card{background:#ffffff10;border:1px solid #ffffff20;border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px}
+.player-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4em;flex-shrink:0}
+.player-ready-badge{margin-left:auto;font-size:.75em;padding:4px 8px;border-radius:6px}
+.ready-yes{background:#00c85330;color:#00c853;border:1px solid #00c853}
+.ready-no{background:#ff444430;color:#ff4444;border:1px solid #ff4444}
+
+/* BOARD SCREEN */
+#sc-game{background:#0d1117;padding:0}
+.game-top{padding:8px;background:#111827;border-bottom:1px solid #ffffff15}
+.players-strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.pstrip{background:#ffffff10;border:1px solid #ffffff20;border-radius:8px;padding:6px 10px;text-align:center;min-width:80px;font-size:.78em;white-space:nowrap}
+.pstrip.active-turn{border-color:#ffd700;background:#ffd70015}
+.pstrip.bankrupt{opacity:.4;text-decoration:line-through}
+.pstrip .pmoney{font-weight:700;color:#4cff91;font-size:.9em}
+
+/* BOARD */
+.board-wrap{position:relative;padding:6px}
+.board{display:grid;grid-template-columns:repeat(11,1fr);grid-template-rows:repeat(11,1fr);gap:1px;background:#ffffff20;border-radius:4px;aspect-ratio:1;max-width:min(100vw - 12px, 460px);margin:0 auto}
+.sq{background:#1a2035;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1px;overflow:hidden;cursor:pointer}
+.sq:hover{background:#ffffff15}
+.sq-name{font-size:.38em;text-align:center;line-height:1.1;color:#ccc;padding:1px}
+.sq-price{font-size:.32em;color:#ffd700}
+.sq-color{height:5px;width:100%;border-radius:1px;flex-shrink:0}
+.sq-icon{font-size:.9em}
+.sq.corner{background:#111827}
+.sq-tokens{display:flex;flex-wrap:wrap;gap:1px;position:absolute;bottom:1px;left:1px;right:1px;justify-content:center}
+.token{width:10px;height:10px;border-radius:50%;border:1px solid #000;flex-shrink:0}
+.sq-owned-bar{position:absolute;top:0;left:0;right:0;height:3px}
+.sq-level{position:absolute;top:3px;right:2px;font-size:.5em;color:#ffd700}
+/* center of board */
+.board-center{grid-column:2/11;grid-row:2/11;background:linear-gradient(135deg,#0d1b2a,#1a2035);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:4px;padding:8px;gap:6px}
+.center-title{font-size:.7em;color:#ffd700;font-weight:700;letter-spacing:.05em;text-align:center}
+.dice-wrap{display:flex;gap:8px}
+.die{width:36px;height:36px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.4em;color:#1a1a2e;font-weight:900;box-shadow:0 2px 8px #0008;transition:transform .1s}
+.die.rolling{animation:droll .4s ease-out}
+@keyframes droll{0%{transform:rotate(0)}25%{transform:rotate(15deg)}75%{transform:rotate(-15deg)}100%{transform:rotate(0)}}
+.center-btn{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#1a1a2e;border:none;border-radius:10px;padding:8px 18px;font-size:.8em;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif}
+.center-btn:disabled{opacity:.4;cursor:not-allowed}
+.center-info{font-size:.65em;color:#aaa;text-align:center}
+
+/* INFO PANEL */
+.info-panel{background:#111827;border-top:2px solid #ffd700;padding:10px 12px;min-height:110px}
+.info-country{display:flex;gap:10px}
+.info-flag{font-size:2.5em;flex-shrink:0}
+.info-text{}
+.info-text h3{color:#ffd700;font-size:1em;margin-bottom:4px}
+.info-row{font-size:.78em;color:#ccc;margin-bottom:2px}
+.info-row span{color:#fff}
+.info-action{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
+.action-btn{padding:7px 14px;border-radius:8px;border:none;font-size:.82em;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif}
+.buy-btn{background:#ffd700;color:#1a1a2e}
+.buy-btn:disabled{opacity:.4;cursor:not-allowed}
+.skip-btn{background:#ffffff20;color:#eee;border:1px solid #ffffff30}
+
+/* LOG */
+.game-log{padding:8px 12px;max-height:120px;overflow-y:auto;background:#0d1117;border-top:1px solid #ffffff15}
+.log-entry{font-size:.75em;color:#aaa;padding:2px 0;border-bottom:1px solid #ffffff08}
+.log-entry.highlight{color:#ffd700}
+.log-entry.bad{color:#ff6b6b}
+.log-entry.good{color:#4cff91}
+
+/* GAMEOVER */
+#sc-gameover{background:#0d1117;align-items:center;justify-content:center;padding:20px}
+.winner-card{background:linear-gradient(135deg,#1a2035,#2d1b69);border:2px solid #ffd700;border-radius:20px;padding:24px;text-align:center;width:100%;max-width:360px}
+.winner-crown{font-size:4em;margin-bottom:10px}
+.winner-name{font-size:1.8em;font-weight:900;color:#ffd700}
+
+/* OVERLAYS */
+.overlay{display:none;position:fixed;inset:0;background:#000b;z-index:100;align-items:center;justify-content:center;padding:20px}
+.overlay.active{display:flex}
+.modal{background:#1a2035;border:1px solid #ffffff30;border-radius:16px;padding:20px;width:100%;max-width:340px}
+.modal h3{color:#ffd700;margin-bottom:12px;font-size:1.1em}
+
+/* CHANCE CARD */
+.chance-modal{background:linear-gradient(135deg,#1a2035,#2d1b69);text-align:center}
+.chance-icon{font-size:3em;margin-bottom:8px}
+.chance-text{color:#ffd700;font-size:1em;font-weight:700}
+.chance-desc{color:#aaa;font-size:.85em;margin-top:6px}
+
+/* COLORS */
+:root{
+  --c-brown:#8B4513;--c-lblue:#87CEEB;--c-pink:#FF69B4;
+  --c-orange:#FFA500;--c-red:#FF4444;--c-yellow:#FFD700;
+  --c-green:#00C853;--c-dblue:#0055CC;--c-rail:#555;--c-util:#888
+}
+.loading{text-align:center;padding:40px 20px;color:#aaa}
+.loading .spin{font-size:2em;animation:rot 1s linear infinite;display:block;margin-bottom:10px}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* join code input */
+.code-inp{width:100%;padding:14px;border-radius:10px;border:2px solid #ffd700;background:#ffffff10;color:#ffd700;font-size:1.6em;font-weight:900;letter-spacing:.2em;text-align:center;font-family:'Sarabun',sans-serif}
+.code-inp::placeholder{color:#555;font-size:.6em;letter-spacing:0}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="sc-home" class="screen active">
+  <div class="logo">
+    <div class="globe">🌍</div>
+    <h1>เกมเศรษฐี</h1>
+    <p>ท่องโลกมหาสนุก 🗺️</p>
+  </div>
+  <div class="home-card">
+    <input class="inp" id="playerName" placeholder="ชื่อของคุณ" maxlength="12">
+    <button class="btn btn-gold" onclick="G.createRoom()">🏠 สร้างห้อง</button>
+    <hr style="border-color:#ffffff20;margin:10px 0">
+    <input class="code-inp" id="joinCode" placeholder="รหัสห้อง" maxlength="4" style="margin-bottom:10px" oninput="this.value=this.value.toUpperCase()">
+    <button class="btn btn-blue" onclick="G.joinRoom()">🚀 เข้าห้อง</button>
+    <button class="btn btn-gray" onclick="G.joinRandom()" style="margin-top:4px">🎲 สุ่มเข้าห้องสาธารณะ</button>
+  </div>
+  <div style="text-align:center;margin-top:16px;color:#555;font-size:.8em">ผู้เล่น 2–4 คนต่อรอบ • ใช้ Firebase</div>
+</div>
+
+<!-- LOBBY -->
+<div id="sc-lobby" class="screen">
+  <div class="lobby-header">
+    <div style="font-size:.8em;color:#aaa">รหัสห้อง</div>
+    <div class="room-code" id="lbCode">----</div>
+    <div id="lbStatus" style="font-size:.8em;color:#aaa"></div>
+  </div>
+  <div class="player-list" id="lbPlayers"></div>
+  <div id="lbHost" style="display:none">
+    <button class="btn btn-gold" id="startBtn" onclick="G.startGame()" disabled>▶ เริ่มเกม (ต้องการ 2–4 คน)</button>
+  </div>
+  <div id="lbGuest" style="display:none">
+    <button class="btn btn-green" id="readyBtn" onclick="G.toggleReady()">✅ พร้อมแล้ว</button>
+  </div>
+  <button class="btn btn-gray" onclick="G.leaveRoom()" style="margin-top:8px">🚪 ออกจากห้อง</button>
+</div>
+
+<!-- GAME -->
+<div id="sc-game" class="screen">
+  <div class="game-top">
+    <div class="players-strip" id="gPlayers"></div>
+  </div>
+  <div class="board-wrap">
+    <div class="board" id="gameBoard"></div>
+  </div>
+  <div class="info-panel" id="infoPanel">
+    <div style="color:#555;font-size:.85em;text-align:center;padding:20px 0">เดินหมากเพื่อสำรวจโลก 🌍</div>
+  </div>
+  <div class="game-log" id="gameLog"></div>
+</div>
+
+<!-- GAMEOVER -->
+<div id="sc-gameover" class="screen">
+  <div class="winner-card">
+    <div class="winner-crown">👑</div>
+    <div id="goWinner" class="winner-name"></div>
+    <div id="goMoney" style="color:#4cff91;font-size:1.1em;margin:8px 0"></div>
+    <div id="goRanking" style="font-size:.85em;color:#aaa;margin-top:10px"></div>
+    <button class="btn btn-gold" onclick="G.backHome()" style="margin-top:20px">🏠 กลับหน้าหลัก</button>
+  </div>
+</div>
+
+<!-- CHANCE OVERLAY -->
+<div class="overlay" id="chanceOverlay">
+  <div class="modal chance-modal">
+    <div class="chance-icon" id="chIcon">🎴</div>
+    <div class="chance-text" id="chTitle"></div>
+    <div class="chance-desc" id="chDesc"></div>
+    <button class="btn btn-gold" style="margin-top:16px" onclick="G.closeChance()">ตกลง</button>
+  </div>
+</div>
+
+<!-- PROPERTY DETAIL OVERLAY -->
+<div class="overlay" id="propOverlay">
+  <div class="modal">
+    <div id="propDetail"></div>
+    <button class="btn btn-gray" style="margin-top:12px" onclick="G.closeProp()">ปิด</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, set, get, update, onValue, off, remove, onDisconnect }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+// ── FIREBASE ──
+const FB_CFG = {
+  apiKey:"AIzaSyAYFY_9VqMFsVX22EW2aPVq7NawWQV-n_g",
+  authDomain:"aomsensei-classroom.firebaseapp.com",
+  databaseURL:"https://aomsensei-classroom-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"aomsensei-classroom",
+  storageBucket:"aomsensei-classroom.firebasestorage.app",
+  messagingSenderId:"152996049271",
+  appId:"1:152996049271:web:a9a2927490e1e908d9f172"
+};
+const fbApp = initializeApp(FB_CFG,'mw_game');
+const db = getDatabase(fbApp);
+
+// ── BOARD DATA ──
+// 40 squares, index 0–39, going clockwise: bottom-left=0, bottom-right=10, top-right=20, top-left=30
+const SQUARES = [
+  // 0–10 bottom row (L→R)
+  {i:0, type:'go', name:'จุดเริ่มต้น', icon:'🏁'},
+  {i:1, type:'prop', name:'ไทย', flag:'🇹🇭', group:'brown', price:60, rent:[2,10,30,90,160,250], rentHotel:250, buildCost:50, food:'ต้มยำกุ้ง', tourism:'วัดพระแก้ว, พัทยา', culture:'สงกรานต์, ผ้าไหมไทย'},
+  {i:2, type:'community', name:'กองทุนชุมชน', icon:'📦'},
+  {i:3, type:'prop', name:'ญี่ปุ่น', flag:'🇯🇵', group:'brown', price:60, rent:[4,20,60,180,320,450], rentHotel:450, buildCost:50, food:'ซูชิ, ราเมน', tourism:'ภูเขาฟูจิ, วัดคินคาคุจิ', culture:'ซามูไร, ดอกซากุระ'},
+  {i:4, type:'tax', name:'ภาษีรายได้', icon:'💸', amount:200},
+  {i:5, type:'airport', name:'สนามบินนานาชาติ A', icon:'✈️', group:'rail'},
+  {i:6, type:'prop', name:'จีน', flag:'🇨🇳', group:'lblue', price:100, rent:[6,30,90,270,400,550], rentHotel:550, buildCost:50, food:'เป็ดปักกิ่ง, ติ่มซำ', tourism:'กำแพงเมืองจีน, พระราชวังต้องห้าม', culture:'ตรุษจีน, งิ้ว'},
+  {i:7, type:'chance', name:'โชคลาภ', icon:'🎴'},
+  {i:8, type:'prop', name:'เกาหลีใต้', flag:'🇰🇷', group:'lblue', price:100, rent:[6,30,90,270,400,550], rentHotel:550, buildCost:50, food:'กิมจิ, ข้าวบิบิมบับ', tourism:'พระราชวังเคียงบกกุง, เกาะเชจู', culture:'เคป็อป, ฮันบก'},
+  {i:9, type:'prop', name:'อินเดีย', flag:'🇮🇳', group:'lblue', price:120, rent:[8,40,100,300,450,600], rentHotel:600, buildCost:50, food:'แกงกะหรี่, โรตี', tourism:'ทัชมาฮาล, วาราณสี', culture:'โยคะ, โบลลีวูด'},
+  {i:10, type:'jail', name:'คุก/แค่แวะ', icon:'⛓️'},
+  // 11–19 right column (B→T)
+  {i:11, type:'prop', name:'อินโดนีเซีย', flag:'🇮🇩', group:'pink', price:140, rent:[10,50,150,450,625,750], rentHotel:750, buildCost:100, food:'นาซิโกเร็ง, ซาเต', tourism:'บาหลี, บุโรพุทโธ', culture:'บาติก, วายัง'},
+  {i:12, type:'utility', name:'สายการบิน', icon:'🛩️', group:'util'},
+  {i:13, type:'prop', name:'เวียดนาม', flag:'🇻🇳', group:'pink', price:140, rent:[10,50,150,450,625,750], rentHotel:750, buildCost:100, food:'เฝอ, บัญห์มี', tourism:'ฮาลองเบย์, โฮยอัน', culture:'อาο đài, เทศกาลเต็ต'},
+  {i:14, type:'chance', name:'โชคลาภ', icon:'🎴'},
+  {i:15, type:'airport', name:'สนามบินนานาชาติ B', icon:'✈️', group:'rail'},
+  {i:16, type:'prop', name:'ฝรั่งเศส', flag:'🇫🇷', group:'orange', price:180, rent:[14,70,200,550,750,950], rentHotel:950, buildCost:100, food:'ขนมปังบาแกตต์, ชีสหลากชนิด', tourism:'หอไอเฟล, พิพิธภัณฑ์ลูฟร์', culture:'ศิลปะแบบฝรั่งเศส, แฟชั่น'},
+  {i:17, type:'community', name:'กองทุนชุมชน', icon:'📦'},
+  {i:18, type:'prop', name:'เยอรมนี', flag:'🇩🇪', group:'orange', price:180, rent:[14,70,200,550,750,950], rentHotel:950, buildCost:100, food:'ไส้กรอก, เบรตเซล', tourism:'ปราสาทนอยชวานชไตน์, ประตูบรันเดนบูร์ก', culture:'เทศกาลเบียร์ออคโตเบอร์เฟสต์'},
+  {i:19, type:'prop', name:'สเปน', flag:'🇪🇸', group:'orange', price:200, rent:[16,80,220,600,800,1000], rentHotel:1000, buildCost:100, food:'ปาเอย่า, ทาปาส', tourism:'ซาเกรดา ฟามีเลีย, อัลฮัมบรา', culture:'ฟลาเมงโก, กีฬาวัวกระทิง'},
+  {i:20, type:'parking', name:'จอดพักผ่อน', icon:'🅿️'},
+  // 21–29 top row (R→L)
+  {i:21, type:'prop', name:'อิตาลี', flag:'🇮🇹', group:'red', price:220, rent:[18,90,250,700,875,1050], rentHotel:1050, buildCost:150, food:'พิซซ่า, สปาเกตตี', tourism:'โคลอสเซียม, หอเอนเมืองปิซา', culture:'ศิลปะเรอเนสซองส์, โอเปรา'},
+  {i:22, type:'chance', name:'โชคลาภ', icon:'🎴'},
+  {i:23, type:'prop', name:'กรีซ', flag:'🇬🇷', group:'red', price:220, rent:[18,90,250,700,875,1050], rentHotel:1050, buildCost:150, food:'ซูวลากิ, มูซากา', tourism:'พาร์เธนอน, เกาะซานโตรินี', culture:'โอลิมปิก, ปรัชญาโบราณ'},
+  {i:24, type:'tax', name:'ภาษีฟุ่มเฟือย', icon:'💎', amount:100},
+  {i:25, type:'airport', name:'สนามบินนานาชาติ C', icon:'✈️', group:'rail'},
+  {i:26, type:'prop', name:'บราซิล', flag:'🇧🇷', group:'yellow', price:260, rent:[22,110,330,800,975,1150], rentHotel:1150, buildCost:150, food:'เฟยโฌอาดา, ชูราสโก', tourism:'โคปาคาบานา, น้ำตกอีกวาซู', culture:'คาร์นิวัล, ฟุตบอล'},
+  {i:27, type:'prop', name:'อาร์เจนตินา', flag:'🇦🇷', group:'yellow', price:260, rent:[22,110,330,800,975,1150], rentHotel:1150, buildCost:150, food:'แอสซาโด, เอมปานาดา', tourism:'ปาตาโกเนีย, บัวโนสไอเรส', culture:'ตังโก, มาตา'},
+  {i:28, type:'community', name:'กองทุนชุมชน', icon:'📦'},
+  {i:29, type:'prop', name:'เม็กซิโก', flag:'🇲🇽', group:'yellow', price:280, rent:[24,120,360,850,1025,1200], rentHotel:1200, buildCost:150, food:'ทาโก้, กัวคาโมเล', tourism:'ชิเชนอิตซา, คาบสมุทรยูคาทาน', culture:'วันแห่งความตาย, มาริอาชิ'},
+  {i:30, type:'gotojail', name:'ไปคุก!', icon:'👮'},
+  // 31–39 left column (T→B)
+  {i:31, type:'prop', name:'สหรัฐฯ', flag:'🇺🇸', group:'green', price:300, rent:[26,130,390,900,1100,1275], rentHotel:1275, buildCost:200, food:'เบอร์เกอร์, แอปเปิลพาย', tourism:'เทพีเสรีภาพ, แกรนด์แคนยอน', culture:'ฮอลลีวูด, NBA'},
+  {i:32, type:'prop', name:'ออสเตรเลีย', flag:'🇦🇺', group:'green', price:300, rent:[26,130,390,900,1100,1275], rentHotel:1275, buildCost:200, food:'เวจีไมต์, พาฟโลวา', tourism:'โอเปราเฮาส์ซิดนีย์, เกรทแบร์ริเออร์รีฟ', culture:'คังการู, ชาวอะบอริจิน'},
+  {i:33, type:'chance', name:'โชคลาภ', icon:'🎴'},
+  {i:34, type:'prop', name:'นิวซีแลนด์', flag:'🇳🇿', group:'green', price:320, rent:[28,150,450,1000,1200,1400], rentHotel:1400, buildCost:200, food:'ฮางิ, ปลาและมันฝรั่งทอด', tourism:'ฟยอร์ดแลนด์, ฮอบบิตัน', culture:'ฮากา, ชาวเมารี'},
+  {i:35, type:'airport', name:'สนามบินนานาชาติ D', icon:'✈️', group:'rail'},
+  {i:36, type:'community', name:'กองทุนชุมชน', icon:'📦'},
+  {i:37, type:'prop', name:'แอฟริกาใต้', flag:'🇿🇦', group:'dblue', price:350, rent:[35,175,500,1100,1300,1500], rentHotel:1500, buildCost:200, food:'บรายวเลส, บันนี่โชว', tourism:'เทเบิลเมาน์เทน, อุทยานครูเกอร์', culture:'เนลสัน แมนเดลา, สีสันแอฟริกา'},
+  {i:38, type:'tax', name:'ซุปเปอร์แทกซ์', icon:'🚨', amount:100},
+  {i:39, type:'prop', name:'อียิปต์', flag:'🇪🇬', group:'dblue', price:400, rent:[50,200,600,1400,1700,2000], rentHotel:2000, buildCost:200, food:'โคชาริ, ฟูล', tourism:'พีระมิดกีซา, แม่น้ำไนล์', culture:'อารยธรรมฟาโรห์, ปาปิรัส'},
+];
+
+const GROUP_COLOR = {
+  brown:'#8B4513', lblue:'#87CEEB', pink:'#FF69B4', orange:'#FFA500',
+  red:'#FF4444', yellow:'#FFD700', green:'#00C853', dblue:'#0055CC',
+  rail:'#555555', util:'#888888'
+};
+
+const PLAYER_COLORS = ['#FF6B6B','#4ECDC4','#FFE66D','#A8E6CF'];
+const PLAYER_TOKENS = ['🦁','🐯','🐻','🦊'];
+
+// Board grid positions: index → [row, col] in 11×11 grid (0-indexed)
+// Bottom row: i=0→(10,0), i=1→(10,1)...i=10→(10,10)
+// Right col: i=11→(9,10)...i=19→(1,10), i=20→(0,10)
+// Top row: i=21→(0,9)...i=29→(0,1), i=30→(0,0)
+// Left col: i=31→(1,0)...i=39→(9,0)
+function sqPos(i) {
+  if(i<=10)    return [10, i];
+  if(i<=20)    return [10-(i-10), 10];
+  if(i<=30)    return [0, 10-(i-20)];
+  return [i-30, 0];
+}
+
+// CHANCE CARDS
+const CHANCE = [
+  {icon:'💰', t:'รับเงินโบนัส!', d:'รับเงิน 200 บาท', fn:p=>({money:200})},
+  {icon:'✈️', t:'ตั๋วเครื่องบิน!', d:'เดินทางไปจุดเริ่มต้น รับ 200', fn:p=>({move:0, money:200})},
+  {icon:'🎂', t:'วันเกิดของคุณ', d:'รับเงินจากทุกคน 50 บาท', fn:p=>({birthday:50})},
+  {icon:'🏦', t:'ธนาคารคืนเงิน', d:'รับเงิน 150 บาท', fn:p=>({money:150})},
+  {icon:'🚔', t:'ตำรวจจับ!', d:'ไปคุกทันที', fn:p=>({jail:true})},
+  {icon:'🏗️', t:'ค่าซ่อมแซม', d:'เสียเงิน 50 ต่อบ้าน', fn:p=>({repair:50})},
+  {icon:'📉', t:'ค่าปรับ', d:'เสียเงิน 100 บาท', fn:p=>({money:-100})},
+  {icon:'🎁', t:'ของขวัญ!', d:'รับเงิน 100 บาท', fn:p=>({money:100})},
+  {icon:'🗺️', t:'ท่องเที่ยวฟรี!', d:'เดินไปจอดพักผ่อน', fn:p=>({move:20})},
+  {icon:'💊', t:'ค่ารักษาพยาบาล', d:'เสียเงิน 150 บาท', fn:p=>({money:-150})},
+];
+const COMMUNITY = [
+  {icon:'🏆', t:'รางวัลความงาม', d:'รับเงิน 100 บาท', fn:p=>({money:100})},
+  {icon:'🏥', t:'ค่าโรงพยาบาล', d:'เสียเงิน 100 บาท', fn:p=>({money:-100})},
+  {icon:'📚', t:'ทุนการศึกษา', d:'รับเงิน 200 บาท', fn:p=>({money:200})},
+  {icon:'🎉', t:'ปาร์ตี้ชุมชน', d:'รับเงินจากทุกคน 30 บาท', fn:p=>({birthday:30})},
+  {icon:'⚡', t:'ค่าไฟฟ้า', d:'เสียเงิน 75 บาท', fn:p=>({money:-75})},
+  {icon:'🎓', t:'รับปริญญา', d:'รับเงิน 250 บาท', fn:p=>({money:250})},
+  {icon:'🚧', t:'ค่าถนน', d:'เสียเงิน 50 บาท', fn:p=>({money:-50})},
+  {icon:'🌊', t:'ค่าน้ำ', d:'เสียเงิน 50 บาท', fn:p=>({money:-50})},
+];
+
+// AIRPORT RENT TABLE (own 1,2,3,4)
+const AIRPORT_RENT = [0, 25, 50, 100, 200];
+
+// ── STATE ──
+let myId='', myName='', roomCode='', isHost=false, isReady=false;
+let listeners={}, myTurn=false, currentChanceFn=null;
+
+// ── HELPERS ──
+const $=id=>document.getElementById(id);
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); }
+function log(msg, cls=''){
+  const el=document.createElement('div');
+  el.className='log-entry '+(cls||'');
+  el.textContent=msg;
+  const lg=$('gameLog');
+  lg.prepend(el);
+  while(lg.children.length>30) lg.removeChild(lg.lastChild);
+}
+function killListeners(){
+  Object.values(listeners).forEach(fn=>{ try{fn&&fn();}catch(e){} });
+  listeners={};
+}
+async function withTO(p, ms=8000){
+  return Promise.race([p, new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),ms))]);
+}
+
+// ── BUILD BOARD ──
+function buildBoard(){
+  const board=$('gameBoard');
+  board.innerHTML='';
+  // Create 11×11 cells
+  const cells=[];
+  for(let r=0;r<11;r++){
+    for(let c=0;c<11;c++){
+      const cell=document.createElement('div');
+      cell.style.cssText=`grid-row:${r+1};grid-column:${c+1}`;
+      cell.className='sq';
+      cells.push({r,c,el:cell});
+      board.appendChild(cell);
+    }
+  }
+  // Center
+  const center=document.createElement('div');
+  center.className='board-center';
+  center.style.cssText=`grid-row:2/11;grid-column:2/11;`;
+  center.innerHTML=`
+    <div class="center-title">🌍 เกมเศรษฐี<br>ท่องโลกมหาสนุก</div>
+    <div class="dice-wrap"><div class="die" id="d1">?</div><div class="die" id="d2">?</div></div>
+    <button class="center-btn" id="rollBtn" onclick="G.rollDice()" disabled>🎲 ทอยลูกเต๋า</button>
+    <div class="center-info" id="turnInfo">รอเริ่มเกม...</div>
+  `;
+  board.appendChild(center);
+  // Fill perimeter squares
+  SQUARES.forEach(sq=>{
+    const [r,c]=sqPos(sq.i);
+    const cellEl=cells.find(x=>x.r===r&&x.c===c)?.el;
+    if(!cellEl) return;
+    cellEl.id=`sq${sq.i}`;
+    cellEl.dataset.sq=sq.i;
+    cellEl.onclick=()=>G.tapSquare(sq.i);
+    if(sq.type==='go'||sq.type==='jail'||sq.type==='parking'||sq.type==='gotojail'){
+      cellEl.classList.add('corner');
+    }
+    let html='';
+    if(sq.type==='prop'){
+      html+=`<div class="sq-color" style="background:${GROUP_COLOR[sq.group]}"></div>`;
+      html+=`<div class="sq-icon">${sq.flag}</div>`;
+      html+=`<div class="sq-name">${sq.name}</div>`;
+      html+=`<div class="sq-price">฿${sq.price}</div>`;
+    } else if(sq.type==='airport'||sq.type==='utility'){
+      html+=`<div class="sq-icon">${sq.icon}</div>`;
+      html+=`<div class="sq-name">${sq.name.replace('สนามบินนานาชาติ ','✈️')}</div>`;
+    } else {
+      html+=`<div class="sq-icon">${sq.icon||''}</div>`;
+      html+=`<div class="sq-name">${sq.name}</div>`;
+    }
+    html+=`<div class="sq-owned-bar" id="ob${sq.i}"></div>`;
+    html+=`<div class="sq-level" id="sl${sq.i}"></div>`;
+    html+=`<div class="sq-tokens" id="st${sq.i}"></div>`;
+    cellEl.innerHTML=html;
+  });
+}
+
+// ── RENDER GAME STATE ──
+function renderState(room){
+  if(!room) return;
+  const players=room.players||{};
+  const board=room.board||{};
+  const pids=Object.keys(players);
+  // Players strip
+  const strip=$('gPlayers');
+  strip.innerHTML='';
+  pids.forEach((pid,idx)=>{
+    const p=players[pid];
+    const div=document.createElement('div');
+    div.className='pstrip'+(room.currentPlayer===pid?' active-turn':'')+(p.bankrupt?' bankrupt':'');
+    div.innerHTML=`<div>${PLAYER_TOKENS[idx]||'👤'} <b>${p.name}</b></div><div class="pmoney">฿${p.money??1500}</div>${p.jailTurns?'<div style="color:#ff6b6b;font-size:.7em">⛓️คุก</div>':''}`;
+    strip.appendChild(div);
+  });
+  // Board tokens & ownership
+  SQUARES.forEach(sq=>{
+    // tokens
+    const tEl=$(`st${sq.i}`);
+    if(tEl){
+      tEl.innerHTML='';
+      pids.forEach((pid,idx)=>{
+        const p=players[pid];
+        if(p.position===sq.i&&!p.bankrupt){
+          const t=document.createElement('div');
+          t.className='token';
+          t.style.background=PLAYER_COLORS[idx]||'#fff';
+          tEl.appendChild(t);
+        }
+      });
+    }
+    // ownership
+    const obEl=$(`ob${sq.i}`);
+    const slEl=$(`sl${sq.i}`);
+    if(obEl){
+      const bsq=board[sq.i];
+      if(bsq?.owner){
+        const ownerIdx=pids.indexOf(bsq.owner);
+        obEl.style.background=PLAYER_COLORS[ownerIdx]||'#fff';
+        if(slEl) slEl.textContent=bsq.level>0?('⭐'.repeat(Math.min(bsq.level,4))+(bsq.level>=5?'🏨':'')):'';
+      } else {
+        obEl.style.background='';
+        if(slEl) slEl.textContent='';
+      }
+    }
+  });
+  // My turn
+  myTurn = room.currentPlayer===myId && !players[myId]?.bankrupt;
+  const rb=$('rollBtn');
+  const ti=$('turnInfo');
+  if(rb){
+    rb.disabled=!myTurn||room.phase!=='playing'||room.waitingAction;
+  }
+  if(ti){
+    if(room.phase==='playing'){
+      const cp=players[room.currentPlayer];
+      ti.textContent=room.currentPlayer===myId?'ตาของคุณ!':'ตาของ '+( cp?.name||'?');
+    }
+  }
+  // Info panel if on action
+  if(room.waitingAction && room.currentPlayer===myId){
+    showActionPanel(room);
+  }
+}
+
+function showActionPanel(room){
+  const pos=room.players?.[myId]?.position??0;
+  const sq=SQUARES[pos];
+  if(!sq) return;
+  const bsq=room.board?.[pos];
+  const players=room.players||{};
+  const pids=Object.keys(players);
+  let html='';
+  if(sq.type==='prop'||sq.type==='airport'||sq.type==='utility'){
+    const owner=bsq?.owner;
+    if(!owner){
+      const canAfford=(players[myId]?.money||0)>=sq.price;
+      html=`<div class="info-country">
+        <div class="info-flag">${sq.flag||sq.icon}</div>
+        <div class="info-text">
+          <h3>${sq.name} ${sq.flag||''}</h3>
+          ${sq.food?`<div class="info-row">🍜 อาหาร: <span>${sq.food}</span></div>`:''}
+          ${sq.tourism?`<div class="info-row">📸 ท่องเที่ยว: <span>${sq.tourism}</span></div>`:''}
+          ${sq.culture?`<div class="info-row">🎭 วัฒนธรรม: <span>${sq.culture}</span></div>`:''}
+          <div class="info-row">💰 ราคา: <span>฿${sq.price}</span></div>
+          <div class="info-action">
+            <button class="action-btn buy-btn" ${canAfford?'':'disabled'} onclick="G.buyProp()">🛒 ซื้อ ฿${sq.price}</button>
+            <button class="action-btn skip-btn" onclick="G.skipAction()">ไม่ซื้อ</button>
+          </div>
+        </div>
+      </div>`;
+    } else if(owner===myId){
+      const level=bsq?.level||0;
+      const sc=SQUARES[pos];
+      const canUpgrade=level<5 && isMonopoly(room,pos) && (players[myId]?.money||0)>=sc.buildCost;
+      html=`<div class="info-country">
+        <div class="info-flag">${sq.flag||sq.icon}</div>
+        <div class="info-text">
+          <h3>${sq.name} — ของคุณ</h3>
+          <div class="info-row">ระดับ: <span>${level===0?'ที่ดิน':level<5?'⭐'.repeat(level):'🏨โรงแรม'}</span></div>
+          ${sq.buildCost&&level<5?`<div class="info-row">ค่าก่อสร้าง: <span>฿${sq.buildCost}</span></div>`:''}
+          <div class="info-action">
+            ${sq.type==='prop'&&level<5?`<button class="action-btn buy-btn" ${canUpgrade?'':'disabled'} onclick="G.upgradeProp()">🏗️ อัปเกรด ฿${sq.buildCost}</button>`:''}
+            <button class="action-btn skip-btn" onclick="G.skipAction()">ต่อไป</button>
+          </div>
+        </div>
+      </div>`;
+    } else {
+      html=`<div class="info-country">
+        <div class="info-flag">${sq.flag||sq.icon}</div>
+        <div class="info-text">
+          <h3>${sq.name}</h3>
+          <div class="info-row">เจ้าของ: <span>${players[owner]?.name||'?'}</span></div>
+          <div class="info-action">
+            <button class="action-btn skip-btn" onclick="G.skipAction()">ต่อไป</button>
+          </div>
+        </div>
+      </div>`;
+    }
+  } else {
+    html=`<div style="text-align:center;padding:10px"><button class="action-btn skip-btn" onclick="G.skipAction()">ต่อไป</button></div>`;
+  }
+  $('infoPanel').innerHTML=html;
+}
+
+function isMonopoly(room, sqIdx){
+  const sq=SQUARES[sqIdx];
+  if(sq.type!=='prop') return false;
+  const group=sq.group;
+  const groupSquares=SQUARES.filter(s=>s.type==='prop'&&s.group===group);
+  const board=room.board||{};
+  return groupSquares.every(s=>(board[s.i]?.owner||'')===(board[sqIdx]?.owner||''));
+}
+
+function showLandInfo(sq){
+  if(!sq||sq.type!=='prop') return;
+  $('infoPanel').innerHTML=`<div class="info-country">
+    <div class="info-flag">${sq.flag}</div>
+    <div class="info-text">
+      <h3>${sq.name} ${sq.flag}</h3>
+      ${sq.food?`<div class="info-row">🍜 อาหารขึ้นชื่อ: <span>${sq.food}</span></div>`:''}
+      ${sq.tourism?`<div class="info-row">📸 แหล่งท่องเที่ยว: <span>${sq.tourism}</span></div>`:''}
+      ${sq.culture?`<div class="info-row">🎭 วัฒนธรรม: <span>${sq.culture}</span></div>`:''}
+      <div class="info-row">💰 ราคา: <span>฿${sq.price}</span></div>
+    </div>
+  </div>`;
+}
+
+// ── CORE GAME FUNCTIONS ──
+async function rollDice(){
+  if(!myTurn||!roomCode) return;
+  const rb=$('rollBtn'); rb.disabled=true;
+  // Animate
+  const d1=$('d1'), d2=$('d2');
+  d1.classList.add('rolling'); d2.classList.add('rolling');
+  await new Promise(r=>setTimeout(r,400));
+  const r1=Math.ceil(Math.random()*6), r2=Math.ceil(Math.random()*6);
+  const faces=['','⚀','⚁','⚂','⚃','⚄','⚅'];
+  d1.textContent=faces[r1]; d2.textContent=faces[r2];
+  d1.classList.remove('rolling'); d2.classList.remove('rolling');
+  const snap=await get(ref(db,`mw_rooms/${roomCode}`));
+  const room=snap.val()||{};
+  const players=room.players||{};
+  const me=players[myId]||{};
+  let newPos=me.position??0;
+  let money=me.money??1500;
+  let jailTurns=me.jailTurns||0;
+  let goToJail=false;
+  const doublesCount=(me.doublesCount||0);
+  const isDouble=r1===r2;
+  // Jail check
+  if(jailTurns>0){
+    if(isDouble){ jailTurns=0; log('🔓 ทอยคู่! หลุดจากคุก','good'); }
+    else if(jailTurns>=3){ money-=50; jailTurns=0; log('💸 จ่ายค่าประกัน 50 บาทออกจากคุก','bad'); }
+    else { jailTurns++; log(`⛓️ ติดคุกอีก (${jailTurns}/3 รอบ)`,'bad');
+      await update(ref(db),{
+        [`mw_rooms/${roomCode}/players/${myId}/jailTurns`]:jailTurns,
+        [`mw_rooms/${roomCode}/players/${myId}/money`]:money,
+        [`mw_rooms/${roomCode}/dice`]:[r1,r2],
+      });
+      await endTurn(room, isDouble&&doublesCount<2);
+      return;
+    }
+  }
+  // Three doubles = jail
+  const newDoubles=isDouble?doublesCount+1:0;
+  if(newDoubles>=3){ goToJail=true; }
+  // Move
+  const prevPos=newPos;
+  newPos=(newPos+r1+r2)%40;
+  // Passed GO?
+  if(!goToJail && newPos<prevPos && prevPos+r1+r2>=40){
+    money+=200; log('🏁 ผ่านจุดเริ่มต้น! รับ ฿200','good');
+  }
+  if(goToJail){ newPos=10; jailTurns=1; log('👮 ทอยคู่ 3 ครั้งติด! ไปคุก','bad'); }
+  log(`🎲 ${me.name||myName} ทอย ${r1}+${r2}=${r1+r2} → ช่องที่ ${newPos} (${SQUARES[newPos]?.name})`);
+  const sq=SQUARES[newPos];
+  let waitingAction=false;
+  let updates={
+    [`mw_rooms/${roomCode}/players/${myId}/position`]:newPos,
+    [`mw_rooms/${roomCode}/players/${myId}/money`]:money,
+    [`mw_rooms/${roomCode}/players/${myId}/jailTurns`]:jailTurns,
+    [`mw_rooms/${roomCode}/players/${myId}/doublesCount`]:newDoubles,
+    [`mw_rooms/${roomCode}/dice`]:[r1,r2],
+  };
+  // Handle square
+  if(sq.type==='gotojail'){ updates[`mw_rooms/${roomCode}/players/${myId}/position`]=10; updates[`mw_rooms/${roomCode}/players/${myId}/jailTurns`]=1; log('👮 ไปคุก!','bad'); }
+  else if(sq.type==='go'){ updates[`mw_rooms/${roomCode}/players/${myId}/money`]=(money+200); log('🏁 ลงที่จุดเริ่มต้น รับ ฿200 เพิ่ม','good'); }
+  else if(sq.type==='tax'){ updates[`mw_rooms/${roomCode}/players/${myId}/money`]=(money-sq.amount); log(`💸 เสียภาษี ฿${sq.amount}`,'bad'); }
+  else if(sq.type==='chance'||sq.type==='community'){
+    const deck=sq.type==='chance'?CHANCE:COMMUNITY;
+    const card=deck[Math.floor(Math.random()*deck.length)];
+    const eff=card.fn(me);
+    let cardMoney=money;
+    if(eff.money) cardMoney+=eff.money;
+    if(eff.move!==undefined){ updates[`mw_rooms/${roomCode}/players/${myId}/position`]=eff.move; }
+    if(eff.jail){ updates[`mw_rooms/${roomCode}/players/${myId}/position`]=10; updates[`mw_rooms/${roomCode}/players/${myId}/jailTurns`]=1; }
+    if(eff.birthday){
+      const pids=Object.keys(players);
+      pids.forEach(pid=>{ if(pid!==myId){ const u={}; u[`mw_rooms/${roomCode}/players/${pid}/money`]=(players[pid].money||1500)-eff.birthday; update(ref(db),u); } });
+      cardMoney+=eff.birthday*(pids.length-1);
+    }
+    updates[`mw_rooms/${roomCode}/players/${myId}/money`]=Math.max(0,cardMoney);
+    // Show card
+    showChance(card.icon,card.t,card.desc||card.d);
+    log(`🎴 ${card.t}`,'highlight');
+  }
+  else if(sq.type==='prop'||sq.type==='airport'||sq.type==='utility'){
+    const bsq=(room.board||{})[newPos];
+    if(bsq?.owner && bsq.owner!==myId && !players[bsq.owner]?.bankrupt){
+      const owner=players[bsq.owner];
+      let rent=calcRent(sq,bsq,room,[r1,r2]);
+      const myMoney=money-rent;
+      updates[`mw_rooms/${roomCode}/players/${myId}/money`]=myMoney;
+      updates[`mw_rooms/${roomCode}/players/${bsq.owner}/money`]=(owner.money||0)+rent;
+      log(`💸 จ่ายค่าเช่า ฿${rent} ให้ ${owner.name}`,'bad');
+      if(myMoney<=0){ updates[`mw_rooms/${roomCode}/players/${myId}/bankrupt`]=true; log(`💀 ${me.name||myName} ล้มละลาย!`,'bad'); }
+    } else if(!bsq?.owner){
+      waitingAction=true;
+      showLandInfo(sq);
+    } else if(bsq?.owner===myId){
+      waitingAction=true;
+    }
+  }
+  if(waitingAction){ updates[`mw_rooms/${roomCode}/waitingAction`]=true; }
+  await update(ref(db),updates);
+  if(!waitingAction){ await endTurn(room, isDouble&&!goToJail&&newDoubles<3); }
+}
+
+function calcRent(sq, bsq, room, dice){
+  if(sq.type==='airport'){
+    const count=Object.values(room.board||{}).filter(b=>b?.owner===bsq.owner&&SQUARES[Object.keys(room.board||{}).find(k=>room.board[k]===b)]?.type==='airport').length;
+    // Count airports owned
+    let n=0; Object.entries(room.board||{}).forEach(([k,v])=>{ if(v?.owner===bsq.owner&&SQUARES[+k]?.type==='airport') n++; });
+    return AIRPORT_RENT[n]||25;
+  }
+  if(sq.type==='utility'){
+    let n=0; Object.entries(room.board||{}).forEach(([k,v])=>{ if(v?.owner===bsq.owner&&SQUARES[+k]?.type==='utility') n++; });
+    const diceSum=dice[0]+dice[1];
+    return n>=2?diceSum*10:diceSum*4;
+  }
+  const level=bsq?.level||0;
+  if(level===0){
+    // Check monopoly for double base rent
+    if(isMonopoly(room, sq.i)) return sq.rent[0]*2;
+    return sq.rent[0];
+  }
+  return sq.rent[Math.min(level,5)]||sq.rent[sq.rent.length-1];
+}
+
+async function endTurn(room, playAgain=false){
+  if(playAgain){
+    await update(ref(db),{
+      [`mw_rooms/${roomCode}/waitingAction`]:false,
+    });
+    return; // same player rolls again
+  }
+  const players=room.players||{};
+  // Check win: only one non-bankrupt player
+  const alive=Object.entries(players).filter(([,p])=>!p.bankrupt);
+  if(alive.length<=1){
+    const winner=alive[0];
+    await update(ref(db),{
+      [`mw_rooms/${roomCode}/phase`]:'gameover',
+      [`mw_rooms/${roomCode}/winner`]:winner?.[0]||'',
+    });
+    return;
+  }
+  // Next player
+  const pids=Object.keys(players);
+  const cur=pids.indexOf(room.currentPlayer);
+  let next=(cur+1)%pids.length;
+  while(players[pids[next]]?.bankrupt) next=(next+1)%pids.length;
+  await update(ref(db),{
+    [`mw_rooms/${roomCode}/currentPlayer`]:pids[next],
+    [`mw_rooms/${roomCode}/waitingAction`]:false,
+  });
+}
+
+async function buyProp(){
+  if(!roomCode) return;
+  const snap=await get(ref(db,`mw_rooms/${roomCode}`));
+  const room=snap.val()||{};
+  const me=room.players?.[myId]||{};
+  const pos=me.position??0;
+  const sq=SQUARES[pos];
+  if(!sq) return;
+  const cost=sq.price;
+  if((me.money||0)<cost){ alert('เงินไม่พอ!'); return; }
+  await update(ref(db),{
+    [`mw_rooms/${roomCode}/players/${myId}/money`]:(me.money||0)-cost,
+    [`mw_rooms/${roomCode}/board/${pos}/owner`]:myId,
+    [`mw_rooms/${roomCode}/board/${pos}/level`]:0,
+    [`mw_rooms/${roomCode}/waitingAction`]:false,
+  });
+  log(`🛒 ${myName} ซื้อ ${sq.name} ฿${cost}`,'good');
+  await endTurn(room);
+}
+
+async function upgradeProp(){
+  if(!roomCode) return;
+  const snap=await get(ref(db,`mw_rooms/${roomCode}`));
+  const room=snap.val()||{};
+  const me=room.players?.[myId]||{};
+  const pos=me.position??0;
+  const sq=SQUARES[pos];
+  const bsq=(room.board||{})[pos];
+  if(!sq||!bsq) return;
+  const cost=sq.buildCost||100;
+  if((me.money||0)<cost){ alert('เงินไม่พอ!'); return; }
+  const newLevel=Math.min((bsq.level||0)+1,5);
+  await update(ref(db),{
+    [`mw_rooms/${roomCode}/players/${myId}/money`]:(me.money||0)-cost,
+    [`mw_rooms/${roomCode}/board/${pos}/level`]:newLevel,
+    [`mw_rooms/${roomCode}/waitingAction`]:false,
+  });
+  log(`🏗️ ${myName} อัปเกรด ${sq.name} → ระดับ ${newLevel}`,'good');
+  await endTurn(room);
+}
+
+async function skipAction(){
+  if(!roomCode) return;
+  const snap=await get(ref(db,`mw_rooms/${roomCode}`));
+  const room=snap.val()||{};
+  await update(ref(db),{ [`mw_rooms/${roomCode}/waitingAction`]:false });
+  await endTurn(room);
+}
+
+function tapSquare(i){
+  const sq=SQUARES[i];
+  if(!sq) return;
+  if(sq.type==='prop'){
+    $('propDetail').innerHTML=`
+      <h3>${sq.flag} ${sq.name}</h3>
+      <div style="margin:8px 0;color:#aaa;font-size:.85em">
+        ${sq.food?`<p>🍜 <b>อาหารขึ้นชื่อ:</b> ${sq.food}</p>`:''}
+        ${sq.tourism?`<p>📸 <b>แหล่งท่องเที่ยว:</b> ${sq.tourism}</p>`:''}
+        ${sq.culture?`<p>🎭 <b>วัฒนธรรม:</b> ${sq.culture}</p>`:''}
+        <p>💰 <b>ราคา:</b> ฿${sq.price}</p>
+        <p>🏠 <b>ค่าเช่า:</b> ${sq.rent?.map((r,i)=>i===0?`ที่ดิน:฿${r}`:i<=4?`${'⭐'.repeat(i)}:฿${r}`:`🏨:฿${r}`).join(' / ')}</p>
+        <p>🏗️ <b>ค่าก่อสร้าง:</b> ฿${sq.buildCost}</p>
+      </div>`;
+    $('propOverlay').classList.add('active');
+  }
+}
+
+function showChance(icon,title,desc){
+  $('chIcon').textContent=icon;
+  $('chTitle').textContent=title;
+  $('chDesc').textContent=desc||'';
+  $('chanceOverlay').classList.add('active');
+}
+
+// ── ROOM MANAGEMENT ──
+async function createRoom(){
+  const name=$('playerName').value.trim();
+  if(!name){ alert('กรุณาใส่ชื่อก่อน'); return; }
+  myName=name; myId=crypto.randomUUID(); isHost=true;
+  const code=Math.random().toString(36).slice(2,6).toUpperCase();
+  roomCode=code;
+  try{
+    await withTO(set(ref(db,`mw_rooms/${roomCode}`),{
+      phase:'lobby', isPublic:false, createdAt:Date.now()
+    }));
+    await withTO(set(ref(db,`mw_rooms/${roomCode}/players/${myId}`),{
+      name:myName, money:1500, position:0, ready:true, bankrupt:false, jailTurns:0
+    }));
+    onDisconnect(ref(db,`mw_rooms/${roomCode}/players/${myId}`)).remove();
+    enterLobby();
+  }catch(e){ alert('เชื่อมต่อ Firebase ไม่ได้: '+e.message); roomCode=''; isHost=false; }
+}
+
+async function joinRoom(){
+  const name=$('playerName').value.trim();
+  const code=$('joinCode').value.trim().toUpperCase();
+  if(!name){ alert('กรุณาใส่ชื่อก่อน'); return; }
+  if(!code||code.length!==4){ alert('กรุณาใส่รหัสห้อง 4 ตัวอักษร'); return; }
+  myName=name; myId=crypto.randomUUID(); isHost=false; roomCode=code;
+  try{
+    const snap=await withTO(get(ref(db,`mw_rooms/${roomCode}`)));
+    const room=snap.val();
+    if(!room){ alert('ไม่พบห้องนี้'); roomCode=''; return; }
+    if(room.phase!=='lobby'){ alert('เกมเริ่มไปแล้ว'); roomCode=''; return; }
+    const cnt=Object.keys(room.players||{}).length;
+    if(cnt>=4){ alert('ห้องเต็มแล้ว (สูงสุด 4 คน)'); roomCode=''; return; }
+    await withTO(set(ref(db,`mw_rooms/${roomCode}/players/${myId}`),{
+      name:myName, money:1500, position:0, ready:false, bankrupt:false, jailTurns:0
+    }));
+    onDisconnect(ref(db,`mw_rooms/${roomCode}/players/${myId}`)).remove();
+    enterLobby();
+  }catch(e){ alert('เข้าห้องไม่ได้: '+e.message); roomCode=''; isHost=false; }
+}
+
+async function joinRandom(){
+  const name=$('playerName').value.trim();
+  if(!name){ alert('กรุณาใส่ชื่อก่อน'); return; }
+  myName=name; myId=crypto.randomUUID(); isHost=false;
+  try{
+    const snap=await withTO(get(ref(db,'mw_rooms')));
+    const all=snap.val()||{};
+    const avail=Object.entries(all).filter(([,r])=>r.isPublic&&r.phase==='lobby'&&Object.keys(r.players||{}).length<4);
+    if(!avail.length){ alert('ไม่พบห้องสาธารณะ ลองสร้างห้องใหม่แทน'); return; }
+    const [code]=avail[Math.floor(Math.random()*avail.length)];
+    roomCode=code;
+    await withTO(set(ref(db,`mw_rooms/${roomCode}/players/${myId}`),{
+      name:myName, money:1500, position:0, ready:false, bankrupt:false, jailTurns:0
+    }));
+    onDisconnect(ref(db,`mw_rooms/${roomCode}/players/${myId}`)).remove();
+    enterLobby();
+  }catch(e){ alert('ข้อผิดพลาด: '+e.message); roomCode=''; }
+}
+
+function enterLobby(){
+  killListeners();
+  $('lbCode').textContent=roomCode;
+  show('sc-lobby');
+  $('lbHost').style.display=isHost?'block':'none';
+  $('lbGuest').style.display=isHost?'none':'block';
+  // Listen
+  const rRef=ref(db,`mw_rooms/${roomCode}`);
+  const unsub=onValue(rRef,snap=>{
+    const room=snap.val();
+    if(!room) return backHome();
+    if(room.phase==='playing'){ killListeners(); enterGame(); return; }
+    // Render lobby
+    const players=room.players||{};
+    const pids=Object.keys(players);
+    $('lbStatus').textContent=`ผู้เล่น ${pids.length}/4 คน`;
+    $('lbPlayers').innerHTML='';
+    pids.forEach((pid,idx)=>{
+      const p=players[pid];
+      const div=document.createElement('div');
+      div.className='player-card';
+      div.innerHTML=`<div class="player-avatar" style="background:${PLAYER_COLORS[idx]}">${PLAYER_TOKENS[idx]}</div>
+        <div><b>${p.name}</b>${pid===myId?' (คุณ)':''}</div>
+        <div class="player-ready-badge ${p.ready?'ready-yes':'ready-no'}">${p.ready?'พร้อม':'รอ'}</div>`;
+      $('lbPlayers').appendChild(div);
+    });
+    if(isHost){
+      const allReady=pids.every(pid=>players[pid].ready);
+      const btn=$('startBtn');
+      btn.disabled=pids.length<2||!allReady;
+      btn.textContent=pids.length<2?'▶ รอผู้เล่น (ต้องการ 2–4 คน)':!allReady?'▶ รอทุกคนพร้อม':'▶ เริ่มเกม!';
+    }
+  });
+  listeners.lobby=()=>off(rRef,'value',unsub);
+}
+
+async function toggleReady(){
+  if(!roomCode) return;
+  const snap=await get(ref(db,`mw_rooms/${roomCode}/players/${myId}/ready`));
+  const cur=snap.val()||false;
+  await set(ref(db,`mw_rooms/${roomCode}/players/${myId}/ready`),!cur);
+  $('readyBtn').textContent=!cur?'❌ ยกเลิกพร้อม':'✅ พร้อมแล้ว';
+}
+
+async function startGame(){
+  if(!isHost||!roomCode) return;
+  const snap=await get(ref(db,`mw_rooms/${roomCode}/players`));
+  const players=snap.val()||{};
+  const pids=Object.keys(players);
+  if(pids.length<2){ alert('ต้องการอย่างน้อย 2 คน'); return; }
+  // Shuffle turn order → first player
+  const shuffled=[...pids].sort(()=>Math.random()-.5);
+  await update(ref(db),{
+    [`mw_rooms/${roomCode}/phase`]:'playing',
+    [`mw_rooms/${roomCode}/currentPlayer`]:shuffled[0],
+    [`mw_rooms/${roomCode}/board`]:{},
+    [`mw_rooms/${roomCode}/round`]:1,
+    [`mw_rooms/${roomCode}/waitingAction`]:false,
+  });
+}
+
+function enterGame(){
+  buildBoard();
+  show('sc-game');
+  const rRef=ref(db,`mw_rooms/${roomCode}`);
+  const unsub=onValue(rRef,snap=>{
+    const room=snap.val();
+    if(!room) return backHome();
+    if(room.phase==='gameover'){
+      killListeners();
+      enterGameOver(room);
+      return;
+    }
+    renderState(room);
+  });
+  listeners.game=()=>off(rRef,'value',unsub);
+}
+
+function enterGameOver(room){
+  const players=room.players||{};
+  const winnerId=room.winner;
+  const winner=players[winnerId];
+  const pids=Object.keys(players);
+  $('goWinner').textContent=winner?.name||'ไม่มีผู้ชนะ';
+  $('goMoney').textContent=winner?`เงินคงเหลือ ฿${winner.money}฿`:'';
+  const rank=pids.sort((a,b)=>(players[b].money||0)-(players[a].money||0));
+  $('goRanking').innerHTML='<b>อันดับ:</b><br>'+rank.map((pid,i)=>`${i+1}. ${players[pid].name} — ฿${players[pid].money}`).join('<br>');
+  show('sc-gameover');
+}
+
+async function leaveRoom(){
+  killListeners();
+  if(roomCode){
+    await remove(ref(db,`mw_rooms/${roomCode}/players/${myId}`)).catch(()=>{});
+    if(isHost){
+      await remove(ref(db,`mw_rooms/${roomCode}`)).catch(()=>{});
+    }
+  }
+  roomCode=''; isHost=false; isReady=false;
+  backHome();
+}
+
+function backHome(){ killListeners(); roomCode=''; isHost=false; show('sc-home'); }
+
+// ── EXPOSE ──
+window.G={
+  createRoom, joinRoom, joinRandom,
+  toggleReady, startGame, leaveRoom, backHome,
+  rollDice, buyProp, upgradeProp, skipAction,
+  tapSquare,
+  closeProp(){ $('propOverlay').classList.remove('active'); },
+  closeChance(){ $('chanceOverlay').classList.remove('active'); if(myTurn&&roomCode) {} },
+};
+</script>
+</body>
+</html>
