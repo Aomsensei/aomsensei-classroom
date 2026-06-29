@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ใบงานคู่ออนไลน์ — ความสำคัญของรัฐธรรมนูญ ม.2</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --orange:#ff9f68;--orange2:#ffbf93;--orange3:#ffe1cd;--orange4:#fff1e6;
+  --cream:#fffaf5;--brown:#6c4030;--text:#5c3b2d;--muted:#85675b;
+  --radius:22px;--shadow:0 18px 48px rgba(160,92,42,.13);--soft:0 8px 24px rgba(118,68,35,.08);
+  --blue:#5b8cda;--blue-light:#edf2ff;--blue-border:#a8c5f5;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Noto Sans Thai',system-ui,sans-serif;color:var(--text);
+  background:
+    radial-gradient(circle at 5% 10%,rgba(255,191,147,.5),transparent 24%),
+    radial-gradient(circle at 90% 16%,rgba(255,231,167,.5),transparent 22%),
+    radial-gradient(circle at 50% 100%,rgba(255,215,223,.4),transparent 22%),
+    linear-gradient(135deg,#fffaf5 0%,#fff1e6 55%,#ffe8d8 100%);
+  min-height:100vh;
+}
+.page{width:min(840px,calc(100% - 24px));margin:0 auto;padding:24px 0 80px}
+
+/* HERO */
+.hero{
+  background:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.9);
+  border-radius:32px;box-shadow:var(--shadow);padding:28px 32px;
+  backdrop-filter:blur(12px);position:relative;overflow:hidden;
+}
+.hero::before{content:"";position:absolute;width:260px;height:260px;right:-80px;top:-80px;border-radius:50%;background:rgba(255,159,104,.13);pointer-events:none}
+.hero::after{content:"";position:absolute;width:200px;height:200px;left:-60px;bottom:-80px;border-radius:50%;background:rgba(255,215,223,.15);pointer-events:none}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;background:#fff3e8;color:#ba612c;border:1px solid #ffd8bb;border-radius:999px;padding:8px 14px;font-weight:800;font-size:13px;margin-bottom:14px}
+.hero h1{font-size:clamp(24px,4.5vw,38px);line-height:1.15;color:#6a3823;margin-bottom:8px;font-weight:900}
+.hero-sub{color:var(--muted);font-size:16px;line-height:1.8;margin-bottom:18px}
+.meta{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:14px;background:#fff;border:1px solid #ffe2d0;box-shadow:var(--soft);font-weight:700;color:#7a472d;font-size:13.5px}
+
+/* PROGRESS */
+.progress-bar{background:#ffe3cd;border-radius:99px;height:8px;margin:20px 0 4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#ff9f68,#ffcf8f);border-radius:99px;transition:width .4s ease}
+.progress-text{font-size:12px;color:var(--muted);font-weight:700;text-align:right}
+
+/* SECTION CARD */
+.section{margin-top:20px;padding:26px 28px;border-radius:var(--radius);background:rgba(255,255,255,.86);border:1px solid rgba(255,255,255,.95);box-shadow:var(--soft);backdrop-filter:blur(10px)}
+.section-title{display:flex;align-items:center;gap:12px;margin-bottom:18px;font-size:20px;font-weight:800;color:#6a3925}
+.icon-box{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;flex:0 0 auto;background:linear-gradient(135deg,#ff9f68,#ffbf93);color:#fff;font-size:22px;box-shadow:0 8px 18px rgba(255,159,104,.3)}
+
+/* PAIR INFO */
+.pair-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.partner-box{border-radius:18px;padding:16px 18px;border:1.5px solid}
+.partner-a{background:#fff7f2;border-color:#ffcda0}
+.partner-b{background:#f0f5ff;border-color:var(--blue-border)}
+.partner-tag{font-size:13px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.tag-a{color:#c05820}.tag-b{color:#2e5eb0}
+.field-label{font-size:12.5px;font-weight:700;color:#7a3e25;margin-bottom:5px;display:block}
+.field-label.blue{color:#2e5eb0}
+select.inp,input.inp{
+  width:100%;padding:10px 13px;border:1.5px solid #ffd0a0;border-radius:11px;
+  font-size:14px;font-family:inherit;background:#fffaf5;color:var(--text);
+  outline:none;transition:border-color .2s;margin-bottom:10px
+}
+select.inp-b,input.inp-b{
+  width:100%;padding:10px 13px;border:1.5px solid var(--blue-border);border-radius:11px;
+  font-size:14px;font-family:inherit;background:#f8faff;color:var(--text);
+  outline:none;transition:border-color .2s;margin-bottom:10px
+}
+select.inp:focus,input.inp:focus{border-color:#ff9f68}
+select.inp-b:focus,input.inp-b:focus{border-color:var(--blue)}
+.cls-label{background:#fff3e8;border:1px solid #ffd8bb;border-radius:11px;padding:10px 14px;font-weight:700;color:#7a3e25;font-size:14px;margin-top:14px}
+
+/* QUESTIONS */
+.q-block{margin-bottom:20px}
+.q-label{font-size:15px;font-weight:800;color:#6a3823;margin-bottom:8px;line-height:1.5;display:flex;align-items:flex-start;gap:8px}
+.q-hint{font-size:13px;color:var(--muted);margin-bottom:8px;line-height:1.6;padding:8px 12px;background:#fffaf2;border-radius:10px;border-left:3px solid #ffcf99}
+textarea{
+  width:100%;padding:13px 15px;border:1.5px solid #ffd0a0;border-radius:14px;
+  font-size:14px;font-family:inherit;color:var(--text);background:#fffaf5;
+  resize:vertical;min-height:80px;outline:none;transition:border-color .2s,box-shadow .2s;line-height:1.75
+}
+textarea:focus{border-color:#ff9f68;box-shadow:0 0 0 3px rgba(255,159,104,.15)}
+.char-count{font-size:11px;color:#c0a090;text-align:right;margin-top:3px}
+.step-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:9px;flex:0 0 auto;margin-top:1px;background:linear-gradient(135deg,#ff9f68,#ffbf93);color:#fff;font-weight:900;font-size:14px}
+.review-box{background:#fff8f2;border:1px solid #ffd8bb;border-radius:16px;padding:16px 18px;margin-bottom:18px}
+.review-box p{font-size:14px;line-height:1.85;color:#6a4b40}
+.review-box strong{color:#8b3e0f}
+.divider{display:flex;align-items:center;gap:12px;margin:8px 0 16px;color:#d4a080;font-size:13px;font-weight:700}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:#ffd8bb}
+
+/* ─── MATCHING ─── */
+.match-instruct{background:linear-gradient(135deg,#fff6ee,#fffdf9);border:2px dashed #ffc89a;border-radius:16px;padding:14px 18px;margin-bottom:18px;font-size:14px;color:#7a4a30;line-height:1.75}
+.match-set{margin-bottom:24px}
+.match-set-title{font-size:15px;font-weight:800;color:#6a3823;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.match-set-title .set-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#ff9f68,#ff7d3f);color:#fff;font-weight:900;font-size:13px}
+.match-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:10px 12px;align-items:center}
+.match-left{background:#fffaf6;border:1px solid #ffe4d5;border-radius:12px;padding:10px 14px;font-size:14.5px;color:#6a3823;font-weight:600;line-height:1.5}
+.match-arrow{color:#ffaa70;font-size:20px;text-align:center;font-weight:900}
+.match-select{
+  width:100%;padding:9px 12px;border:1.5px solid #ffd0a0;border-radius:11px;
+  font-size:14px;font-family:inherit;background:#fffaf5;color:var(--text);
+  outline:none;transition:border-color .2s;cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23ff9f68' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px
+}
+.match-select:focus{border-color:#ff9f68;box-shadow:0 0 0 3px rgba(255,159,104,.15)}
+.match-select.correct{border-color:#66bb6a;background-color:#f1fff3}
+.match-select.wrong  {border-color:#ef5350;background-color:#fff4f4}
+.match-options-col{background:#f8f5ff;border:1px solid #d8d0f5;border-radius:14px;padding:14px 16px;margin-top:10px}
+.match-options-col h4{font-size:13px;font-weight:800;color:#6a3860;margin-bottom:10px}
+.match-opt-item{display:flex;align-items:flex-start;gap:8px;background:#fff;border:1px solid #e8e0fa;border-radius:10px;padding:9px 12px;margin-bottom:8px;font-size:14px;color:#5a3870;line-height:1.5}
+.opt-letter{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#9575cd,#b39ddb);color:#fff;font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center}
+
+/* REFLECTION SPLIT */
+.reflect-split{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.reflect-card{border-radius:16px;padding:16px 18px;border:1.5px solid}
+.reflect-a{background:#fff7f2;border-color:#ffd0a8}
+.reflect-b{background:#f0f5ff;border-color:var(--blue-border)}
+.reflect-card textarea{border:1.5px solid #ffd0a0;background:#fffaf5}
+.reflect-b textarea{border-color:var(--blue-border);background:#f8faff}
+
+/* SITUATION */
+.situation{background:linear-gradient(135deg,#fff3e8,#fffdf9);border:2px dashed #ffc89a;border-radius:18px;padding:16px 20px;margin-bottom:16px}
+.situation .sit-label{font-size:13px;font-weight:800;color:#ff8040;margin-bottom:8px}
+.situation .sit-text{font-size:15px;line-height:1.85;color:#5a3828;font-style:italic}
+
+/* SUBMIT */
+.submit-area{margin-top:24px;background:linear-gradient(135deg,rgba(255,159,104,.1),rgba(255,215,223,.1));border:1px solid #ffd8bb;border-radius:var(--radius);padding:24px;text-align:center}
+.btn-submit{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(90deg,#e65c00,#ff9f68);color:#fff;border:none;border-radius:14px;padding:15px 36px;font-size:17px;font-weight:800;font-family:inherit;cursor:pointer;box-shadow:0 8px 22px rgba(255,100,0,.3);transition:transform .15s,box-shadow .15s}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(255,100,0,.4)}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.msg{display:none;padding:14px 18px;border-radius:14px;font-weight:700;font-size:15px;margin-top:16px}
+.msg-error{background:#ffebee;color:#c62828;border:1px solid #ef9a9a}
+
+/* LOADING */
+#loadingStudents{font-size:14px;color:var(--muted);padding:12px 0;text-align:center}
+#memberArea{display:none}
+
+/* SCORE CARD */
+.score-card{display:none;margin-top:20px;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.score-card-header{background:linear-gradient(90deg,#e65c00,#ff9f68,#ffb85c);padding:22px 28px;color:#fff;text-align:center}
+.score-big{font-size:64px;font-weight:900;line-height:1;text-shadow:0 3px 10px rgba(0,0,0,.2)}
+.score-label{font-size:14px;opacity:.92;margin-top:6px}
+.score-card-body{background:#fff;padding:20px 24px}
+.score-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #ffeee0;font-size:14px}
+.score-row:last-of-type{border-bottom:none;font-weight:800;color:#b05020;font-size:15px;padding-top:14px}
+.pts{font-weight:700;color:#e65c00}
+.mini-bar{background:#ffe3cd;border-radius:99px;height:6px;width:80px;overflow:hidden;display:inline-block;vertical-align:middle;margin:0 8px}
+.mini-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#ff9f68,#ffcf8f);transition:width .6s}
+.score-note{font-size:12.5px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.7;padding-top:12px;border-top:1px dashed #ffd0a0}
+
+/* MATCH RESULT CHIP */
+.match-result{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:700;padding:3px 9px;border-radius:8px;margin-left:6px}
+.match-result.ok{background:#e8f5e9;color:#2e7d32}
+.match-result.no{background:#ffebee;color:#c62828}
+
+@media(max-width:640px){
+  .pair-grid,.reflect-split,.match-grid{grid-template-columns:1fr}
+  .match-arrow{display:none}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="eyebrow">📘 ใบงานคู่ออนไลน์ • วิชาสังคมศึกษา ศาสนา และวัฒนธรรม</div>
+    <h1>🤝 ใบงานคู่ — ความสำคัญของรัฐธรรมนูญ</h1>
+    <p class="hero-sub">ทำงานร่วมกันเป็นคู่ สำรวจ จับคู่ และวิเคราะห์เรื่อง <strong>รัฐธรรมนูญ</strong> กฎหมายสูงสุดของประเทศ — ชั้นมัธยมศึกษาปีที่ 2</p>
+    <div class="meta">
+      <span class="chip">🤝 ทำเป็นคู่</span>
+      <span class="chip">🏫 ม.2</span>
+      <span class="chip">⭐ 10 คะแนน</span>
+      <span class="chip">⏱️ 50 นาที</span>
+      <span class="chip">👨‍🏫 นายรณฤทธิ์ ศรีสองเมือง</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="progress-text" id="progressText">กรอกข้อมูลให้ครบเพื่อส่งงาน (0/0)</div>
+  </div>
+
+  <!-- MEMBER INFO -->
+  <div class="section">
+    <div class="section-title"><div class="icon-box">👥</div>ข้อมูลนักเรียนทั้งคู่</div>
+    <p id="loadingStudents">⏳ กำลังโหลดรายชื่อนักเรียน...</p>
+    <div id="memberArea">
+      <div class="pair-grid">
+        <!-- Partner A -->
+        <div class="partner-box partner-a">
+          <div class="partner-tag tag-a">🟠 คนที่ 1 (Partner A)</div>
+          <label class="field-label" for="nameA">ชื่อ–นามสกุล</label>
+          <select id="nameA" class="inp" onchange="checkProgress()">
+            <option value="">— เลือกชื่อนักเรียน —</option>
+          </select>
+          <label class="field-label" for="noA">เลขที่</label>
+          <input id="noA" class="inp" type="number" min="1" max="50" placeholder="เลขที่" oninput="checkProgress()"/>
+        </div>
+        <!-- Partner B -->
+        <div class="partner-box partner-b">
+          <div class="partner-tag tag-b">🔵 คนที่ 2 (Partner B)</div>
+          <label class="field-label blue" for="nameB">ชื่อ–นามสกุล</label>
+          <select id="nameB" class="inp-b" onchange="checkProgress()">
+            <option value="">— เลือกชื่อนักเรียน —</option>
+          </select>
+          <label class="field-label blue" for="noB">เลขที่</label>
+          <input id="noB" class="inp-b" type="number" min="1" max="50" placeholder="เลขที่" oninput="checkProgress()"/>
+        </div>
+      </div>
+      <div class="cls-label">📚 ชั้นมัธยมศึกษาปีที่ 2 &nbsp;|&nbsp; <span id="dateDisplay"></span></div>
+      <input type="hidden" id="classroom" value="ม.2"/>
+    </div>
+  </div>
+
+  <!-- ส่วนที่ 1: ตอบร่วมกัน -->
+  <div class="section">
+    <div class="section-title"><div class="icon-box">📖</div>ส่วนที่ 1 — ตอบร่วมกัน (3 คะแนน)</div>
+    <div class="review-box">
+      <p><strong>คำสั่ง:</strong> ให้ทั้งคู่ร่วมกันคิดและเขียนคำตอบ โดยใช้ใบความรู้เป็นแหล่งอ้างอิง</p>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label"><span class="step-num">1</span>รัฐธรรมนูญคืออะไร และมีสาระสำคัญอะไรบ้าง (อย่างน้อย 3 ประการ)</div>
+      <div class="q-hint">💡 อธิบายความหมายและระบุสิ่งที่รัฐธรรมนูญกำหนดไว้</div>
+      <textarea id="q1" placeholder="รัฐธรรมนูญ คือ กฎหมาย... สาระสำคัญ ได้แก่ 1)... 2)... 3)..." rows="4"
+        oninput="countChars(this,'c1');checkProgress()"></textarea>
+      <div class="char-count" id="c1">0 ตัวอักษร</div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label"><span class="step-num">2</span>อำนาจรัฐ 3 ฝ่ายตามรัฐธรรมนูญมีหน้าที่อย่างไร</div>
+      <div class="q-hint">💡 ระบุชื่อและหน้าที่ของอำนาจทั้งสามฝ่าย</div>
+      <textarea id="q2" placeholder="ฝ่ายนิติบัญญัติ: ...&#10;ฝ่ายบริหาร: ...&#10;ฝ่ายตุลาการ: ..." rows="5"
+        oninput="countChars(this,'c2');checkProgress()"></textarea>
+      <div class="char-count" id="c2">0 ตัวอักษร</div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label"><span class="step-num">3</span>รัฐธรรมนูญเชื่อมโยงกับระบอบประชาธิปไตยอย่างไร</div>
+      <div class="q-hint">💡 อธิบายบทบาทของรัฐธรรมนูญในการสนับสนุนประชาธิปไตย พร้อมยกตัวอย่าง</div>
+      <textarea id="q3" placeholder="รัฐธรรมนูญเชื่อมโยงกับประชาธิปไตย โดย..." rows="4"
+        oninput="countChars(this,'c3');checkProgress()"></textarea>
+      <div class="char-count" id="c3">0 ตัวอักษร</div>
+    </div>
+  </div>
+
+  <!-- ส่วนที่ 2: จับคู่ -->
+  <div class="section">
+    <div class="section-title"><div class="icon-box">🔗</div>ส่วนที่ 2 — จับคู่ความรู้ (2 คะแนน)</div>
+
+    <div class="match-instruct">
+      🤝 <strong>คำสั่ง:</strong> ให้ทั้งคู่ช่วยกันพิจารณาและเลือกคำตอบที่จับคู่ตรงกันจากตัวเลือกในแต่ละชุด
+    </div>
+
+    <!-- ชุดที่ 1 -->
+    <div class="match-set">
+      <div class="match-set-title"><span class="set-badge">1</span>จับคู่ความสำคัญของรัฐธรรมนูญ กับ ผลที่เกิดขึ้น</div>
+
+      <div class="match-options-col" style="margin-bottom:14px">
+        <h4>📋 ตัวเลือก (ผลที่เกิดขึ้น)</h4>
+        <div class="match-opt-item"><span class="opt-letter">ก</span>ลดความขัดแย้ง สังคมอยู่ร่วมกันสงบเรียบร้อย</div>
+        <div class="match-opt-item"><span class="opt-letter">ข</span>สิทธิและเสรีภาพของประชาชนทุกคนได้รับการรับรอง</div>
+        <div class="match-opt-item"><span class="opt-letter">ค</span>ทุกฝ่ายรู้ขอบเขตอำนาจและหน้าที่ของตนอย่างชัดเจน</div>
+        <div class="match-opt-item"><span class="opt-letter">ง</span>กฎหมายอื่นต้องสอดคล้องและไม่ขัดแย้งกับรัฐธรรมนูญ</div>
+      </div>
+
+      <div class="match-grid">
+        <div class="match-left">1. กำหนดกติกาของประเทศ</div>
+        <div class="match-arrow">→</div>
+        <select id="m1_1" class="match-select" onchange="checkProgress()">
+          <option value="">— เลือก —</option>
+          <option value="ก">ก</option><option value="ข">ข</option>
+          <option value="ค">ค</option><option value="ง">ง</option>
+        </select>
+
+        <div class="match-left">2. คุ้มครองประชาชน</div>
+        <div class="match-arrow">→</div>
+        <select id="m1_2" class="match-select" onchange="checkProgress()">
+          <option value="">— เลือก —</option>
+          <option value="ก">ก</option><option value="ข">ข</option>
+          <option value="ค">ค</option><option value="ง">ง</option>
+        </select>
+
+        <div class="match-left">3. ส่งเสริมความมั่นคงของประเทศ</div>
+        <div class="match-arrow">→</div>
+        <select id="m1_3" class="match-select" onchange="checkProgress()">
+          <option value="">— เลือก —</option>
+          <option value="ก">ก</option><option value="ข">ข</option>
+          <option value="ค">ค</option><option value="ง">ง</option>
+        </select>
+
+        <div class="match-left">4. เป็นกฎหมายสูงสุดของประเทศ</div>
+        <div class="match-arrow">→</div>
+        <select id="m1_4" class="match-select" onchange="checkProgress()">
+          <option value="">— เลือก —</option>
+          <option value="ก">ก</option><option value="ข">ข</option>
+          <option value="ค">ค</option><option value="ง">ง</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="divider">ชุดที่ 2</div>
+
+    <!-- ชุดที่ 2 -->
+    <div class="match-set">
+      <div class="match-set-title"><span class="set-badge">2</span>จับคู่อำนาจรัฐ กับ ตัวอย่างการใช้อำนาจ</div>
+
+      <div class="match-options-col" style="margin-bottom:14px">
+        <h4>📋 ตัวเลือก (ตัวอย่างการใช้อำนาจ)</h4>
+        <div class="match-opt-item"><span class="opt-letter">ก</span>นายกรัฐมนตรีประกาศนโยบายพัฒนาประเทศ</div>
+        <div class="match-opt-item"><span class="opt-letter">ข</span>รัฐสภาลงมติผ่านกฎหมายคุ้มครองสิ่งแวดล้อม</div>
+        <div class="match-opt-item"><span class="opt-letter">ค</span>ศาลตัดสินคดีละเมิดสิทธิผู้บริโภค</div>
+      </div>
+
+      <div class="match-grid">
+        <div class="match-left">5. ฝ่ายนิติบัญญัติ</div>
+        <div class="match-arrow">→</div>
+        <select id="m2_1" class="match-select" onchange="checkProgress()">
+          <option value="">— เลือก —</option>
+          <option value="ก">ก</option><option value="ข">ข</option><option value="ค">ค</option>
+        </select>
+
+        <div class="match-left">6. ฝ่ายบริหาร</div>
+        <div class="match-arrow">→</div>
+        <select id="m2_2" class="match-select" onchange="checkProgress()">
+          <option value="">— เลือก —</option>
+          <option value="ก">ก</option><option value="ข">ข</option><option value="ค">ค</option>
+        </select>
+
+        <div class="match-left">7. ฝ่ายตุลาการ</div>
+        <div class="match-arrow">→</div>
+        <select id="m2_3" class="match-select" onchange="checkProgress()">
+          <option value="">— เลือก —</option>
+          <option value="ก">ก</option><option value="ข">ข</option><option value="ค">ค</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="divider">ชุดที่ 3</div>
+
+    <!-- ชุดที่ 3 -->
+    <div class="match-set">
+      <div class="match-set-title"><span class="set-badge">3</span>จับคู่ตัวอย่าง กับ ประเภท (สิทธิ/เสรีภาพ หรือ หน้าที่)</div>
+
+      <div class="match-options-col" style="margin-bottom:14px">
+        <h4>📋 ตัวเลือก</h4>
+        <div class="match-opt-item"><span class="opt-letter">ก</span>สิทธิและเสรีภาพของประชาชน</div>
+        <div class="match-opt-item"><span class="opt-letter">ข</span>หน้าที่ของประชาชน</div>
+      </div>
+
+      <div class="match-grid">
+        <div class="match-left">8. สิทธิในการได้รับการศึกษาขั้นพื้นฐาน</div>
+        <div class="match-arrow">→</div>
+        <select id="m3_1" class="match-select" onchange="checkProgress()">
+          <option value="">— เลือก —</option><option value="ก">ก</option><option value="ข">ข</option>
+        </select>
+
+        <div class="match-left">9. เคารพและปฏิบัติตามกฎหมายของบ้านเมือง</div>
+        <div class="match-arrow">→</div>
+        <select id="m3_2" class="match-select" onchange="checkProgress()">
+          <option value="">— เลือก —</option><option value="ก">ก</option><option value="ข">ข</option>
+        </select>
+
+        <div class="match-left">10. เสรีภาพในการแสดงความคิดเห็นอย่างเหมาะสม</div>
+        <div class="match-arrow">→</div>
+        <select id="m3_3" class="match-select" onchange="checkProgress()">
+          <option value="">— เลือก —</option><option value="ก">ก</option><option value="ข">ข</option>
+        </select>
+
+        <div class="match-left">11. ร่วมกันรักษาประโยชน์ของประเทศชาติและสังคม</div>
+        <div class="match-arrow">→</div>
+        <select id="m3_4" class="match-select" onchange="checkProgress()">
+          <option value="">— เลือก —</option><option value="ก">ก</option><option value="ข">ข</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ส่วนที่ 3: วิเคราะห์สถานการณ์ -->
+  <div class="section">
+    <div class="section-title"><div class="icon-box">🔍</div>ส่วนที่ 3 — วิเคราะห์สถานการณ์ร่วมกัน (3 คะแนน)</div>
+    <div class="review-box">
+      <p><strong>คำสั่ง:</strong> อ่านสถานการณ์แล้วช่วยกันตอบคำถาม โดยเชื่อมโยงกับหลักการของรัฐธรรมนูญ</p>
+    </div>
+
+    <div class="situation">
+      <div class="sit-label">📋 สถานการณ์ที่ 1</div>
+      <div class="sit-text">รัฐบาลออกกฎหมายห้ามประชาชนแสดงความคิดเห็นวิจารณ์นโยบายใด ๆ ของรัฐบาล โดยอ้างว่าเพื่อความสงบเรียบร้อยของบ้านเมือง</div>
+    </div>
+    <div class="q-block">
+      <div class="q-label"><span class="step-num">4</span>กฎหมายนี้ขัดต่อรัฐธรรมนูญหรือไม่ เพราะเหตุใด และสิทธิ/เสรีภาพใดได้รับผลกระทบ</div>
+      <textarea id="q4" placeholder="กฎหมายนี้... เพราะ... ละเมิดสิทธิ/เสรีภาพด้าน..." rows="4"
+        oninput="countChars(this,'c4');checkProgress()"></textarea>
+      <div class="char-count" id="c4">0 ตัวอักษร</div>
+    </div>
+
+    <div class="situation">
+      <div class="sit-label">📋 สถานการณ์ที่ 2</div>
+      <div class="sit-text">เด็กนักเรียนยากจนถูกปฏิเสธการเข้าเรียนในโรงเรียนรัฐบาลเพราะไม่มีเงินจ่ายค่าใช้จ่ายต่าง ๆ ทั้งที่กฎหมายรับรองสิทธิการศึกษาแก่เด็กทุกคน</div>
+    </div>
+    <div class="q-block">
+      <div class="q-label"><span class="step-num">5</span>รัฐธรรมนูญมีบทบาทอย่างไรในการปกป้องเด็กคนนี้ และหน่วยงานใดควรรับผิดชอบ</div>
+      <textarea id="q5" placeholder="รัฐธรรมนูญ... โดย... หน่วยงานที่ควรรับผิดชอบ คือ..." rows="4"
+        oninput="countChars(this,'c5');checkProgress()"></textarea>
+      <div class="char-count" id="c5">0 ตัวอักษร</div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-label"><span class="step-num">6</span>ถ้าไม่มีรัฐธรรมนูญ ประเทศจะเกิดปัญหาอะไรบ้าง — ทั้งคู่ช่วยกันคาดการณ์</div>
+      <textarea id="q6" placeholder="ถ้าไม่มีรัฐธรรมนูญ จะเกิด... เพราะ..." rows="4"
+        oninput="countChars(this,'c6');checkProgress()"></textarea>
+      <div class="char-count" id="c6">0 ตัวอักษร</div>
+    </div>
+  </div>
+
+  <!-- ส่วนที่ 4: Reflection (แยกกันตอบ) -->
+  <div class="section">
+    <div class="section-title"><div class="icon-box">💡</div>ส่วนที่ 4 — สะท้อนความคิด (แต่ละคนตอบของตัวเอง) (2 คะแนน)</div>
+    <div class="review-box">
+      <p><strong>คำสั่ง:</strong> ส่วนนี้ให้แต่ละคนเขียนคำตอบของตัวเองโดยไม่ปรึกษากัน เพื่อสะท้อนความเข้าใจส่วนตัว</p>
+    </div>
+
+    <div class="reflect-split">
+      <div class="reflect-card reflect-a">
+        <div class="partner-tag tag-a" style="margin-bottom:12px">🟠 Partner A สะท้อนความคิด</div>
+        <div class="q-block">
+          <div class="q-label" style="font-size:14px"><span class="step-num">7</span>สิ่งที่ได้เรียนรู้จากใบงานนี้คืออะไร</div>
+          <textarea id="q7a" placeholder="ฉันได้เรียนรู้ว่า..." rows="3"
+            oninput="countChars(this,'c7a');checkProgress()"></textarea>
+          <div class="char-count" id="c7a">0 ตัวอักษร</div>
+        </div>
+        <div class="q-block">
+          <div class="q-label" style="font-size:14px"><span class="step-num">8</span>จะนำความรู้นี้ไปใช้ในชีวิตจริงอย่างไร</div>
+          <textarea id="q8a" placeholder="ฉันจะนำไปใช้โดย..." rows="3"
+            oninput="countChars(this,'c8a');checkProgress()"></textarea>
+          <div class="char-count" id="c8a">0 ตัวอักษร</div>
+        </div>
+      </div>
+
+      <div class="reflect-card reflect-b">
+        <div class="partner-tag tag-b" style="margin-bottom:12px">🔵 Partner B สะท้อนความคิด</div>
+        <div class="q-block">
+          <div class="q-label" style="font-size:14px"><span class="step-num">7</span>สิ่งที่ได้เรียนรู้จากใบงานนี้คืออะไร</div>
+          <textarea id="q7b" placeholder="ฉันได้เรียนรู้ว่า..." rows="3"
+            oninput="countChars(this,'c7b');checkProgress()"></textarea>
+          <div class="char-count" id="c7b">0 ตัวอักษร</div>
+        </div>
+        <div class="q-block">
+          <div class="q-label" style="font-size:14px"><span class="step-num">8</span>จะนำความรู้นี้ไปใช้ในชีวิตจริงอย่างไร</div>
+          <textarea id="q8b" placeholder="ฉันจะนำไปใช้โดย..." rows="3"
+            oninput="countChars(this,'c8b');checkProgress()"></textarea>
+          <div class="char-count" id="c8b">0 ตัวอักษร</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUBMIT -->
+  <div class="submit-area">
+    <p style="font-size:15px;color:#8b5e42;margin-bottom:16px;font-weight:600">
+      ตรวจสอบคำตอบครบแล้วกด <strong>ส่งใบงาน</strong> เพื่อบันทึกลงระบบ
+    </p>
+    <button class="btn-submit" id="btnSubmit" onclick="submitWorksheet()" disabled>📤 ส่งใบงาน</button>
+    <div class="msg msg-error" id="msgError"></div>
+  </div>
+
+  <!-- SCORE CARD -->
+  <div class="score-card" id="scoreCard">
+    <div class="score-card-header">
+      <div style="font-size:15px;font-weight:700;opacity:.9;margin-bottom:6px">🎉 ส่งใบงานสำเร็จ! ผลการประเมินเบื้องต้น</div>
+      <div class="score-big" id="scoreBig">—</div>
+      <div class="score-label">จาก 10 คะแนน</div>
+    </div>
+    <div class="score-card-body">
+      <div class="score-row">
+        <span>ส่วนที่ 1 ตอบร่วมกัน (ข้อ 1–3)</span>
+        <span><div class="mini-bar"><div class="mini-fill" id="bar1" style="width:0%"></div></div><span class="pts" id="pts1">0/3</span></span>
+      </div>
+      <div class="score-row">
+        <span>ส่วนที่ 2 จับคู่ (ชุด 1–3)</span>
+        <span><div class="mini-bar"><div class="mini-fill" id="bar2" style="width:0%"></div></div><span class="pts" id="pts2">0/2</span></span>
+      </div>
+      <div class="score-row">
+        <span>ส่วนที่ 3 วิเคราะห์สถานการณ์ (ข้อ 4–6)</span>
+        <span><div class="mini-bar"><div class="mini-fill" id="bar3" style="width:0%"></div></div><span class="pts" id="pts3">0/3</span></span>
+      </div>
+      <div class="score-row">
+        <span>ส่วนที่ 4 สะท้อนความคิด (ข้อ 7–8)</span>
+        <span><div class="mini-bar"><div class="mini-fill" id="bar4" style="width:0%"></div></div><span class="pts" id="pts4">0/2</span></span>
+      </div>
+      <div class="score-row">
+        <span>✨ รวมทั้งหมด</span>
+        <span class="pts" id="ptsTotal" style="font-size:18px">0/10</span>
+      </div>
+      <div id="matchDetail" style="margin-top:12px;padding-top:12px;border-top:1px dashed #ffd0a0;font-size:13px;color:var(--muted)"></div>
+      <div class="score-note">
+        ⚠️ คะแนนนี้เป็นการประเมินเบื้องต้นจากความครบถ้วนและคำสำคัญในคำตอบ<br/>
+        ครูจะตรวจให้คะแนนจริงอีกครั้งจากระบบ admin และบันทึกคะแนนสุดท้ายให้นักเรียน
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .page -->
+
+<script>
+// DATE
+document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+</script>
+
+<script type="module">
+import { initializeApp }  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, getDoc, addDoc, collection, serverTimestamp }
+                           from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { FIREBASE_CONFIG } from "./js/config.js";
+
+const app = initializeApp(FIREBASE_CONFIG);
+const db  = getFirestore(app);
+
+// ── ANSWER KEY (matching) ─────────────────────────────────────────
+const ANSWER_KEY = {
+  m1_1:'ค', m1_2:'ข', m1_3:'ก', m1_4:'ง',   // set 1
+  m2_1:'ข', m2_2:'ก', m2_3:'ค',              // set 2
+  m3_1:'ก', m3_2:'ข', m3_3:'ก', m3_4:'ข',   // set 3
+};
+
+// ── LOAD STUDENTS ──────────────────────────────────────────────────
+const FALLBACK=[{prefix:'เด็กชาย',first:'ทดสอบ',last:'ก'},{prefix:'เด็กหญิง',first:'ทดสอบ',last:'ข'}];
+(async function loadStudents(){
+  const loadEl=document.getElementById('loadingStudents');
+  const areaEl=document.getElementById('memberArea');
+  const selA=document.getElementById('nameA');
+  const selB=document.getElementById('nameB');
+  try{
+    const snap=await getDoc(doc(db,'score_system','hinfon_scores'));
+    let students=[];
+    if(snap.exists()){
+      const d=snap.data().data||{};
+      const key=Object.keys(d.classes||{}).find(k=>k==='ม.2'||k.startsWith('ม.2'));
+      students=key?(d.classes[key].students||[]):[];
+    }
+    if(!students.length) students=FALLBACK;
+    students.forEach(s=>{
+      const full=[s.prefix,s.first,s.last].filter(Boolean).join(' ');
+      [selA,selB].forEach(sel=>{
+        const opt=document.createElement('option');
+        opt.value=full;opt.textContent=full;sel.appendChild(opt);
+      });
+    });
+  }catch(e){
+    FALLBACK.forEach(s=>{
+      const full=[s.prefix,s.first,s.last].filter(Boolean).join(' ');
+      [selA,selB].forEach(sel=>{
+        const opt=document.createElement('option');opt.value=full;opt.textContent=full;sel.appendChild(opt);
+      });
+    });
+  }
+  loadEl.style.display='none'; areaEl.style.display='';
+})();
+
+// ── CHAR COUNT ────────────────────────────────────────────────────
+window.countChars=function(el,id){
+  document.getElementById(id).textContent=el.value.length+' ตัวอักษร';
+};
+
+// ── PROGRESS ──────────────────────────────────────────────────────
+const REQUIRED=['nameA','noA','nameB','noB',
+  'q1','q2','q3',
+  'm1_1','m1_2','m1_3','m1_4','m2_1','m2_2','m2_3','m3_1','m3_2','m3_3','m3_4',
+  'q4','q5','q6',
+  'q7a','q8a','q7b','q8b'];
+window.checkProgress=function(){
+  let filled=0;
+  REQUIRED.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&el.value.trim().length>0) filled++;
+  });
+  const pct=Math.round(filled/REQUIRED.length*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressText').textContent=`ความคืบหน้า ${pct}% (${filled}/${REQUIRED.length})`;
+  document.getElementById('btnSubmit').disabled=(filled<REQUIRED.length);
+};
+
+// ── KEYWORD SCORE ─────────────────────────────────────────────────
+function kwScore(text,kws,minLen,max){
+  const t=text.trim().toLowerCase();
+  if(t.length<10) return 0;
+  const matched=kws.filter(k=>t.includes(k)).length;
+  const lenOk=t.length>=minLen;
+  const kwRatio=matched/Math.max(1,kws.length);
+  return Math.min(max, Math.round((kwRatio*0.5+(lenOk?0.5:t.length/(minLen*2)*0.5))*max*2)/2);
+}
+
+// ── MATCHING SCORE ────────────────────────────────────────────────
+function matchScore(){
+  let correct=0, total=Object.keys(ANSWER_KEY).length;
+  const details=[];
+  Object.entries(ANSWER_KEY).forEach(([id,ans])=>{
+    const el=document.getElementById(id);
+    const ok=el&&el.value===ans;
+    if(ok) correct++;
+    details.push({id,ok,selected:el?el.value:'',ans});
+    if(el) el.classList.toggle('correct',ok);
+    if(el) el.classList.toggle('wrong',!ok&&el.value!=='');
+  });
+  // scale to 2 points
+  const pts=Math.round((correct/total)*2*2)/2;
+  return {pts:Math.min(2,pts),correct,total,details};
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────────
+window.submitWorksheet=async function(){
+  const btn=document.getElementById('btnSubmit');
+  const nameA=document.getElementById('nameA').value.trim();
+  const nameB=document.getElementById('nameB').value.trim();
+  const noA=document.getElementById('noA').value.trim();
+  const noB=document.getElementById('noB').value.trim();
+  if(!nameA||!nameB||!noA||!noB){alert('กรุณากรอกข้อมูลทั้งสองคนให้ครบ');return;}
+  if(nameA===nameB){alert('กรุณาเลือกชื่อนักเรียนคนละคน');return;}
+
+  btn.disabled=true; btn.textContent='⏳ กำลังส่ง...';
+  document.getElementById('msgError').style.display='none';
+
+  // calc scores
+  const m=matchScore();
+  const p1a=kwScore(document.getElementById('q1').value,['กฎหมาย','สูงสุด','ปกครอง','ประชาชน','สิทธิ','อำนาจ'],50,1);
+  const p1b=kwScore(document.getElementById('q2').value,['นิติบัญญัติ','บริหาร','ตุลาการ','รัฐสภา','ศาล','กฎหมาย'],50,1);
+  const p1c=kwScore(document.getElementById('q3').value,['ประชาธิปไตย','ประชาชน','อำนาจ','ส่วนร่วม','ตรวจสอบ','รากฐาน'],45,1);
+  const part1=Math.min(3,p1a+p1b+p1c);
+
+  const p3a=kwScore(document.getElementById('q4').value,['ขัด','สิทธิ','เสรีภาพ','ความคิดเห็น','รัฐธรรมนูญ','ละเมิด'],50,1);
+  const p3b=kwScore(document.getElementById('q5').value,['คุ้มครอง','สิทธิ','การศึกษา','รัฐธรรมนูญ','ยุติธรรม'],45,1);
+  const p3c=kwScore(document.getElementById('q6').value,['ปัญหา','อำนาจ','ไม่มีขอบเขต','ความวุ่นวาย','สิทธิ','ประชาชน'],40,1);
+  const part3=Math.min(3,p3a+p3b+p3c);
+
+  const r7a=Math.min(0.5,document.getElementById('q7a').value.trim().length>=30?0.5:0.25);
+  const r8a=Math.min(0.5,document.getElementById('q8a').value.trim().length>=20?0.5:0.25);
+  const r7b=Math.min(0.5,document.getElementById('q7b').value.trim().length>=30?0.5:0.25);
+  const r8b=Math.min(0.5,document.getElementById('q8b').value.trim().length>=20?0.5:0.25);
+  const part4=Math.min(2,r7a+r8a+r7b+r8b);
+
+  const total=Math.min(10,Math.round((part1+m.pts+part3+part4)*2)/2);
+
+  const payload={
+    worksheet:'ความสำคัญของรัฐธรรมนูญ',
+    subject:'สังคมศึกษา ศาสนา และวัฒนธรรม',
+    grade:'ม.2', classroom:'ม.2', pairWork:true,
+    partnerA_name:nameA, partnerA_no:noA,
+    partnerB_name:nameB, partnerB_no:noB,
+    q1:document.getElementById('q1').value.trim(),
+    q2:document.getElementById('q2').value.trim(),
+    q3:document.getElementById('q3').value.trim(),
+    match_set1:{m1_1:document.getElementById('m1_1').value,m1_2:document.getElementById('m1_2').value,m1_3:document.getElementById('m1_3').value,m1_4:document.getElementById('m1_4').value},
+    match_set2:{m2_1:document.getElementById('m2_1').value,m2_2:document.getElementById('m2_2').value,m2_3:document.getElementById('m2_3').value},
+    match_set3:{m3_1:document.getElementById('m3_1').value,m3_2:document.getElementById('m3_2').value,m3_3:document.getElementById('m3_3').value,m3_4:document.getElementById('m3_4').value},
+    q4:document.getElementById('q4').value.trim(),
+    q5:document.getElementById('q5').value.trim(),
+    q6:document.getElementById('q6').value.trim(),
+    q7a:document.getElementById('q7a').value.trim(),
+    q8a:document.getElementById('q8a').value.trim(),
+    q7b:document.getElementById('q7b').value.trim(),
+    q8b:document.getElementById('q8b').value.trim(),
+    autoScore:total, part1, matchScore:m.pts, matchCorrect:m.correct, matchTotal:m.total,
+    part3, part4, maxScore:10, submittedAt:serverTimestamp()
+  };
+
+  try{
+    await addDoc(collection(db,'worksheet_submissions'),payload);
+    btn.textContent='✅ ส่งงานแล้ว';
+
+    // show score card
+    const card=document.getElementById('scoreCard');
+    card.style.display='block';
+    document.getElementById('scoreBig').textContent=total;
+    document.getElementById('pts1').textContent=part1+'/3';
+    document.getElementById('pts2').textContent=m.pts+'/2';
+    document.getElementById('pts3').textContent=part3+'/3';
+    document.getElementById('pts4').textContent=part4+'/2';
+    document.getElementById('ptsTotal').textContent=total+'/10';
+    document.getElementById('bar1').style.width=(part1/3*100)+'%';
+    document.getElementById('bar2').style.width=(m.pts/2*100)+'%';
+    document.getElementById('bar3').style.width=(part3/3*100)+'%';
+    document.getElementById('bar4').style.width=(part4/2*100)+'%';
+
+    // match detail
+    const names=['กำหนดกติกา','คุ้มครองประชาชน','ส่งเสริมความมั่นคง','กฎหมายสูงสุด','ฝ่ายนิติบัญญัติ','ฝ่ายบริหาร','ฝ่ายตุลาการ','สิทธิการศึกษา','ปฏิบัติตามกฎหมาย','เสรีภาพแสดงความคิดเห็น','รักษาประโยชน์ชาติ'];
+    let dhtml='<strong>ผลการจับคู่:</strong> ถูก '+m.correct+'/'+m.total+' ข้อ &nbsp;';
+    m.details.forEach((d,i)=>{
+      dhtml+=`<span class="match-result ${d.ok?'ok':'no'}">${d.ok?'✅':'❌'} ${names[i]||''} → ${d.selected||'?'}${!d.ok?' (เฉลย:'+d.ans+')':''}</span> `;
+    });
+    document.getElementById('matchDetail').innerHTML=dhtml;
+    card.scrollIntoView({behavior:'smooth',block:'center'});
+
+    document.querySelectorAll('textarea,select,input[type=number]').forEach(el=>el.disabled=true);
+  }catch(e){
+    btn.disabled=false; btn.textContent='📤 ส่งใบงาน';
+    const errEl=document.getElementById('msgError');
+    errEl.textContent='❌ เกิดข้อผิดพลาด: '+e.message;
+    errEl.style.display='block';
+  }
+};
+</script>
+</body>
+</html>
