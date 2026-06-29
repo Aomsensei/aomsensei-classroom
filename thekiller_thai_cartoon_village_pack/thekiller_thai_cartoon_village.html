@@ -261,7 +261,7 @@ input[type=text]::placeholder{color:#7a4f35} input[type=text]:focus{border-color
 .section-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}.section-head img{width:34px;height:34px;object-fit:contain;border-radius:10px;filter:drop-shadow(0 4px 7px rgba(0,0,0,.24))}.section-head h3{margin:0}
 .room-code{background:linear-gradient(180deg,#f6e6ba,#d7a04f);border:2px solid rgba(255,224,152,.8);border-radius:20px;padding:14px 18px;font-size:38px;letter-spacing:10px;color:#431f0f;box-shadow:inset 0 3px 0 rgba(255,255,255,.85), 0 10px 22px rgba(0,0,0,.18)}
 .player-row{align-items:center;border-radius:16px;background:linear-gradient(180deg,rgba(255,244,218,.11),rgba(255,212,132,.06));border:1.4px solid rgba(255,212,122,.2);padding:10px 12px;box-shadow:0 6px 12px rgba(0,0,0,.12)}.player-row.dead{opacity:.62;background:linear-gradient(180deg,rgba(93,93,104,.55),rgba(58,58,66,.62));border-color:rgba(215,215,224,.2)}
-.action-btn{display:flex;align-items:center;gap:10px;border-radius:16px;background:linear-gradient(180deg,rgba(255,245,225,.12),rgba(255,229,180,.08));border:1.6px solid rgba(255,211,121,.24);color:#fff3d5;padding:12px 14px;box-shadow:0 4px 10px rgba(0,0,0,.16)}
+.action-btn{display:flex;align-items:center;gap:10px;border-radius:16px;background:linear-gradient(180deg,rgba(255,245,225,.12),rgba(255,229,180,.08));border:1.6px solid rgba(255,211,121,.24);color:#1a0a00;padding:12px 14px;box-shadow:0 4px 10px rgba(0,0,0,.16)}
 .action-btn::before{content:'';width:30px;height:30px;flex:0 0 30px;background-size:contain;background-position:center;background-repeat:no-repeat;filter:drop-shadow(0 3px 5px rgba(0,0,0,.18))} #uiKiller .action-btn::before{background-image:url("thai_role_killer.png")} #uiChief .action-btn::before{background-image:url("thai_role_chief.png")} #uiAunt .action-btn::before{background-image:url("thai_role_aunt.png")} #voteList .action-btn::before{background-image:var(--asset-target)}
 .phase-hd{border-radius:30px;padding:20px 18px;box-shadow:var(--soft-shadow);border:1.8px solid rgba(255,212,122,.18);overflow:hidden;position:relative}.phase-hd::after{content:'';position:absolute;right:-18px;bottom:-18px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.06)}
 .phase-badge{width:64px;height:64px;object-fit:contain;display:block;margin:0 auto 4px;filter:drop-shadow(0 8px 12px rgba(0,0,0,.28))}
@@ -1515,21 +1515,12 @@ async function nextRound(){
   const room   =snap.val()||{};
   // ป้องกันเรียกซ้ำ: ต้องอยู่ใน phase 'arrested' เท่านั้น
   if(room.phase !== 'arrested') return;
-  const players=room.players||{};
-  // [checkWin ถูกลบออก — ตรวจชนะที่ processVote() และ enterMorning() แล้ว]
-  const ids=Object.keys(players);
   const newRound=(room.round||1)+1;
 
-  // แจกบทบาทใหม่ทุกรอบ — รีเซ็ตสถานะทั้งหมด เก็บแค่ชื่อ
-  const roles=makeRoles(ids.length);
-  const shuffled=[...ids].sort(()=>Math.random()-.5);
+  // ไม่เปลี่ยนบทบาท — เล่นต่อด้วยบทบาทเดิม ผู้ตายยังคงตาย
+  // รีเซ็ตเฉพาะสถานะรอบ (votes, killerVotes, messages ฯลฯ)
   const u={};
-  shuffled.forEach((id,i)=>{
-    u[`tk_rooms/${roomCode}/players/${id}/role`]    = roles[i];
-    u[`tk_rooms/${roomCode}/players/${id}/isAlive`] = true;
-    u[`tk_rooms/${roomCode}/players/${id}/isReady`] = false;
-  });
-  u[`tk_rooms/${roomCode}/phase`]        = 'role_reveal';
+  u[`tk_rooms/${roomCode}/phase`]        = 'night';
   u[`tk_rooms/${roomCode}/round`]        = newRound;
   u[`tk_rooms/${roomCode}/timer`]        = 0;
   u[`tk_rooms/${roomCode}/killerVotes`]  = null;
@@ -1543,7 +1534,7 @@ async function nextRound(){
   u[`tk_rooms/${roomCode}/messages`]     = null;
   u[`tk_rooms/${roomCode}/webrtc`]       = null;
   await update(ref(db),u);
-  // enterRoleReveal จะถูกเรียกโดย listener เมื่อ phase = 'role_reveal'
+  // enterNight จะถูกเรียกโดย listener เมื่อ phase = 'night'
 }
 
 // ──────────────────────────────────────────
