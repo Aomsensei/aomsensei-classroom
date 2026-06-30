@@ -1403,6 +1403,11 @@ const RUBRICS = {
     { key:'scoreCooper',    label:'🤝 ความร่วมมือในกลุ่ม',              max:5  },
     { key:'scoreSummary',   label:'🚀 สรุปและประยุกต์ใช้',              max:5  },
   ],
+  'วิธีการทางประวัติศาสตร์': [
+    { key:'scoreMission',   label:'🔍 ภารกิจนักสืบ (ข้อ 1–5)',          max:15 },
+    { key:'scoreReview',    label:'🧠 แบบทบทวน ก–ค (ข้อ 6–8)',          max:9  },
+    { key:'scoreReflect',   label:'💡 สะท้อนความคิด (ข้อ 9–10)',        max:6  },
+  ],
 };
 
 window.viewWorkSubmission = function(docId){
@@ -1453,6 +1458,26 @@ window.viewWorkSubmission = function(docId){
     html += `<div style="font-weight:800;color:#006064;font-size:13px;margin:14px 0 8px">🌟 ส่วนที่ 3 — Reflection</div>`;
     html += ansBlock('สิ่งที่เรียนรู้ / ความสำเร็จ', r.learned, '#e0f7fa','#80deea');
     html += ansBlock('นำไปใช้ในชีวิตประจำวัน', r.apply,   '#e0f7fa','#80deea');
+
+  } else if(wsName==='วิธีการทางประวัติศาสตร์'){
+    const ans = (label, val, color='#fafafa', border='#eee') =>
+      `<div style="margin-bottom:10px;padding:12px;background:${color};border-radius:10px;border:1.5px solid ${border}">
+        <div style="font-size:11.5px;font-weight:800;color:#666;margin-bottom:5px">${label}</div>
+        <div style="font-size:13.5px;line-height:1.7;white-space:pre-wrap">${esc(val||'(ไม่ได้ตอบ)')}</div>
+       </div>`;
+    html += `<div style="font-weight:800;color:#ba612c;font-size:13px;margin:12px 0 8px">🔍 ส่วนที่ 1 — ภารกิจนักสืบประวัติศาสตร์</div>`;
+    html += ans('1. หัวข้อที่ต้องการศึกษา', r.q1_topic,   '#fff8f2','#ffd8bb');
+    html += ans('2. แหล่งหลักฐาน',          r.q2_sources, '#fff8f2','#ffd8bb');
+    html += ans('3. จำแนกหลักฐาน',          r.q3_classify,'#fff8f2','#ffd8bb');
+    html += ans('4. หลักฐานที่น่าเชื่อถือ', r.q4_reliable,'#fff8f2','#ffd8bb');
+    html += ans('5. สรุปสิ่งที่ค้นพบ',      r.q5_summary, '#fff8f2','#ffd8bb');
+    html += `<div style="font-weight:800;color:#6a3823;font-size:13px;margin:14px 0 8px">🧠 ส่วนที่ 2 — แบบทบทวนความเข้าใจ</div>`;
+    html += ans('ก. ความสำคัญของวิธีการทางประวัติศาสตร์', r.q6_importance,'#f3f8ff','#c5d8f5');
+    html += ans('ข. หลักฐานชั้นต้น vs ชั้นรอง',           r.q7_compare,   '#f3f8ff','#c5d8f5');
+    html += ans('ค. เหตุที่ต้องตรวจสอบหลักฐาน',           r.q8_verify,    '#f3f8ff','#c5d8f5');
+    html += `<div style="font-weight:800;color:#2e6b3e;font-size:13px;margin:14px 0 8px">💡 Reflection</div>`;
+    html += ans('สิ่งที่เรียนรู้จากใบความรู้', r.q9_learned,'#f0fff4','#a5d6a7');
+    html += ans('นำไปประยุกต์ใช้',             r.q10_apply, '#f0fff4','#a5d6a7');
 
   } else {
     /* generic display */
@@ -2192,9 +2217,11 @@ window.renderPasswordTable = function(){
            ${r.password || '(ว่าง)'}
          </span>`
       : `<span style="color:#ccc;font-size:12px">—</span>`;
+    const viewBtn = `<button class="btn btn-sm" onclick="window.viewAsStudent('${r.roomId}','${r.name.replace(/'/g,"\\'")}')"
+        style="background:#e3f2fd;color:#1565c0;border:1px solid #90caf9;margin-left:4px">👁️ ดูหน้า</button>`;
     const actionCell = r.hasPassword
-      ? `<button class="btn btn-red btn-sm" onclick="window.deletePwd(${i})">🗑️ ลบรหัสผ่าน</button>`
-      : `<span style="color:#ccc;font-size:12px">—</span>`;
+      ? `<button class="btn btn-red btn-sm" onclick="window.deletePwd(${i})">🗑️ ลบรหัสผ่าน</button>${viewBtn}`
+      : viewBtn;
 
     return `<tr>
       <td style="text-align:center;color:#aaa;font-size:12px">${i + 1}</td>
@@ -2207,6 +2234,13 @@ window.renderPasswordTable = function(){
   }).join('');
 
   tableWrap.style.display = 'block';
+};
+
+window.viewAsStudent = function(roomId, name){
+  // สร้าง token อายุ 30 วินาที ใช้ได้ครั้งเดียว
+  const token = { roomId, name, exp: Date.now() + 7200000 }; // 2 ชั่วโมง
+  localStorage.setItem('adminViewToken', JSON.stringify(token));
+  window.open('student.html', '_blank');
 };
 
 window.togglePwd = function(el, pwd){
