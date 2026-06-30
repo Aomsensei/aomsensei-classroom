@@ -54,11 +54,11 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#eee;min-height:1
 
 /* BOARD */
 .board-wrap{position:relative;padding:6px}
-.board{display:grid;grid-template-columns:repeat(11,1fr);grid-template-rows:repeat(11,1fr);gap:1px;background:#ffffff20;border-radius:4px;aspect-ratio:1;max-width:min(100vw - 12px, 460px);margin:0 auto}
+.board{display:grid;grid-template-columns:1.8fr repeat(9,1fr) 1.8fr;grid-template-rows:1.8fr repeat(9,1fr) 1.8fr;gap:1px;background:#ffffff20;border-radius:4px;aspect-ratio:1;max-width:min(100vw - 12px, 400px);margin:0 auto}
 .sq{background:#1a2035;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1px;overflow:hidden;cursor:pointer}
 .sq:hover{background:#ffffff15}
-.sq-name{font-size:.38em;text-align:center;line-height:1.1;color:#ccc;padding:1px}
-.sq-price{font-size:.32em;color:#ffd700}
+.sq-name{font-size:.43em;text-align:center;line-height:1.1;color:#ccc;padding:1px}
+.sq-price{font-size:.36em;color:#ffd700}
 .sq-color{height:5px;width:100%;border-radius:1px;flex-shrink:0}
 .sq-icon{font-size:.9em}
 .sq.corner{background:#111827}
@@ -109,6 +109,11 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#eee;min-height:1
 .overlay.active{display:flex}
 .modal{background:#1a2035;border:1px solid #ffffff30;border-radius:16px;padding:20px;width:100%;max-width:340px}
 .modal h3{color:#ffd700;margin-bottom:12px;font-size:1.1em}
+
+/* DICE TURN POPUP */
+.dice-popup-die{width:56px;height:56px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:2.2em;color:#1a1a2e;font-weight:900;box-shadow:0 4px 16px #0008;transition:transform .1s}
+.dice-popup-die.rolling{animation:droll .4s ease-out}
+#diceOverlay .modal{background:linear-gradient(135deg,#1a2035,#0f3460);border:2px solid #ffd70060;text-align:center;padding:28px 24px}
 
 /* CHANCE CARD */
 .chance-modal{background:linear-gradient(135deg,#1a2035,#2d1b69);text-align:center}
@@ -208,6 +213,20 @@ body{font-family:'Sarabun',sans-serif;background:#1a1a2e;color:#eee;min-height:1
   <div class="modal">
     <div id="propDetail"></div>
     <button class="btn btn-gray" style="margin-top:12px" onclick="G.closeProp()">ปิด</button>
+  </div>
+</div>
+
+<!-- DICE TURN OVERLAY -->
+<div class="overlay" id="diceOverlay">
+  <div class="modal">
+    <div style="font-size:1.1em;font-weight:700;color:#ffd700;margin-bottom:4px" id="diceWhose">🎲 ถึงตาของคุณแล้ว!</div>
+    <div style="color:#aaa;font-size:.85em;margin-bottom:20px">ทอยลูกเต๋าเพื่อเดินหมาก</div>
+    <div class="dice-wrap" style="justify-content:center;gap:16px;margin-bottom:24px">
+      <div class="dice-popup-die" id="pd1">?</div>
+      <div class="dice-popup-die" id="pd2">?</div>
+    </div>
+    <button class="btn btn-gold" id="popRollBtn" onclick="G.rollDice()" style="max-width:200px;margin:0 auto">🎲 ทอยลูกเต๋า</button>
+    <div id="popRollInfo" style="color:#aaa;font-size:.8em;margin-top:10px"></div>
   </div>
 </div>
 
@@ -466,6 +485,19 @@ function renderState(room){
       ti.textContent=room.currentPlayer===myId?'ตาของคุณ!':'ตาของ '+( cp?.name||'?');
     }
   }
+  // Dice popup — แสดงเมื่อถึงตา ซ่อนเมื่อไม่ใช่ตาหรือกำลังรอ action
+  const dov=$('diceOverlay');
+  if(dov){
+    const shouldShow = myTurn && room.phase==='playing' && !room.waitingAction;
+    if(shouldShow){
+      dov.classList.add('active');
+      const pw=$('diceWhose'); if(pw) pw.textContent='🎲 ถึงตาของคุณแล้ว!';
+      const prb=$('popRollBtn'); if(prb) prb.disabled=false;
+      const pri=$('popRollInfo'); if(pri) pri.textContent='';
+    } else {
+      dov.classList.remove('active');
+    }
+  }
   // Info panel if on action
   if(room.waitingAction && room.currentPlayer===myId){
     showActionPanel(room);
@@ -558,15 +590,21 @@ function showLandInfo(sq){
 // ── CORE GAME FUNCTIONS ──
 async function rollDice(){
   if(!myTurn||!roomCode) return;
-  const rb=$('rollBtn'); rb.disabled=true;
-  // Animate
-  const d1=$('d1'), d2=$('d2');
-  d1.classList.add('rolling'); d2.classList.add('rolling');
+  const rb=$('rollBtn'); if(rb) rb.disabled=true;
+  const prb=$('popRollBtn'); if(prb) prb.disabled=true;
+  // Animate both board center dice and popup dice
+  const d1=$('d1'), d2=$('d2'), pd1=$('pd1'), pd2=$('pd2');
+  [d1,d2,pd1,pd2].forEach(d=>d&&d.classList.add('rolling'));
   await new Promise(r=>setTimeout(r,400));
   const r1=Math.ceil(Math.random()*6), r2=Math.ceil(Math.random()*6);
   const faces=['','⚀','⚁','⚂','⚃','⚄','⚅'];
-  d1.textContent=faces[r1]; d2.textContent=faces[r2];
-  d1.classList.remove('rolling'); d2.classList.remove('rolling');
+  [d1,d2,pd1,pd2].forEach(d=>d&&d.classList.remove('rolling'));
+  if(d1) d1.textContent=faces[r1]; if(d2) d2.textContent=faces[r2];
+  if(pd1) pd1.textContent=faces[r1]; if(pd2) pd2.textContent=faces[r2];
+  // แสดงผลรวมในป๊อปอัพ แล้วปิดหลัง 1 วินาที
+  const pri=$('popRollInfo');
+  if(pri) pri.textContent=`ได้ ${r1}+${r2} = ${r1+r2} 🎯`;
+  setTimeout(()=>{ const dov=$('diceOverlay'); if(dov) dov.classList.remove('active'); },900);
   const snap=await get(ref(db,`mw_rooms/${roomCode}`));
   const room=snap.val()||{};
   const players=room.players||{};
