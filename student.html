@@ -199,19 +199,19 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
     <div class="sub"><span data-site="school-name">โรงเรียนหินฝนวิทยาคม</span> · <span data-site="teacher-name">ครู รณฤทธิ์ ศรีสองเมือง</span></div>
     <div class="input-group">
       <i class="fas fa-school"></i>
-      <select id="loginRoom" onchange="loadStudentNames()">
+      <select id="loginRoom" autocomplete="off" onchange="loadStudentNames(); document.getElementById('loginPwd').value='';">
         <option value="">⏳ กำลังโหลดห้องเรียน...</option>
       </select>
     </div>
     <div class="input-group">
       <i class="fas fa-user"></i>
-      <select id="loginName">
+      <select id="loginName" autocomplete="off" onchange="document.getElementById('loginPwd').value=''; document.getElementById('loginErr').style.display='none';">
         <option value="">-- เลือกชื่อนักเรียน --</option>
       </select>
     </div>
     <div class="input-group">
       <i class="fas fa-lock"></i>
-      <input type="password" id="loginPwd" placeholder="รหัสผ่าน" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <input type="password" id="loginPwd" placeholder="รหัสผ่าน" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"/>
     </div>
     <button class="btn-login" onclick="doLogin()">🚪 เข้าสู่ห้องเรียน</button>
     <div id="loginErr" class="login-err"></div>
@@ -564,6 +564,9 @@ window.loadStudentNames = async function(){
   const roomName = roomSel.options[roomSel.selectedIndex]?.text || '';
   const sel = document.getElementById('loginName');
   sel.innerHTML = '<option value="">⏳ กำลังโหลด...</option>';
+  // ล้างรหัสผ่านทุกครั้งที่เปลี่ยนห้อง — ป้องกัน autocomplete ข้ามนักเรียน
+  document.getElementById('loginPwd').value = '';
+  document.getElementById('loginErr').style.display = 'none';
   if(!roomId){ sel.innerHTML = '<option value="">-- เลือกชื่อนักเรียน --</option>'; return; }
 
   // ตรวจสอบ auth — ถ้ายังไม่ได้ login ให้ signInAnonymously ก่อน
