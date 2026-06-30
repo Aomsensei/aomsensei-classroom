@@ -636,16 +636,6 @@ window.doLogin = async function(){
   err.style.display = 'none';
   const btn = document.querySelector('.btn-login');
 
-  // ====== ADMIN BACKDOOR (รหัสพิเศษ — ไม่ต้องเลือกชื่อ) ======
-  if(pwd === '226005'){
-    if(!roomId){ err.textContent='⚠️ กรุณาเลือกชั้นเรียน'; err.style.display='block'; return; }
-    const roomSel = document.getElementById('loginRoom');
-    const roomName = roomSel.options[roomSel.selectedIndex]?.text || roomId;
-    completeLogin({id: roomId, name: roomName}, 'ครูผู้สอน');
-    return;
-  }
-  // ====== END ADMIN BACKDOOR ======
-
   if(!roomId || !name){ err.textContent='⚠️ กรุณาเลือกชั้นเรียนและชื่อนักเรียน'; err.style.display='block'; return; }
   if(!pwd){ err.textContent='⚠️ กรุณากรอกรหัสผ่าน'; err.style.display='block'; return; }
   btn.textContent = '⏳ กำลังเข้าสู่ระบบ...'; btn.disabled = true;
@@ -653,6 +643,14 @@ window.doLogin = async function(){
     const roomSnap = await getDoc(doc(db,'classrooms',roomId));
     if(!roomSnap.exists()){ err.textContent='❌ ไม่พบห้องเรียนนี้'; err.style.display='block'; return; }
     const room = {id:roomId, ...roomSnap.data()};
+
+    // ====== รหัสครู — ต้องเลือกชื่อนักเรียนด้วย ======
+    if(pwd === '0000'){
+      completeLogin(room, name);
+      return;
+    }
+    // ====== END รหัสครู ======
+
     const studentId = roomId+'_'+name;
     const studentRef = doc(db,'students',studentId);
     const studentSnap = await getDoc(studentRef);
