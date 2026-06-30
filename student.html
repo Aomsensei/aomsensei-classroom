@@ -524,6 +524,25 @@ async function loadSiteSettings(){
 async function initPage(){
   try{ await signInAnonymously(auth); }catch(_){}
   loadSiteSettings();
+
+  // ── ตรวจ admin view token (ครูกดดูหน้านักเรียนจาก admin.html) ──
+  const raw = localStorage.getItem('adminViewToken');
+  if(raw){
+    try{
+      const t = JSON.parse(raw);
+      if(t.exp > Date.now() && t.roomId && t.name){
+        localStorage.removeItem('adminViewToken'); // ใช้ครั้งเดียว
+        const roomSnap = await getDoc(doc(db,'classrooms', t.roomId));
+        if(roomSnap.exists()){
+          completeLogin({id: t.roomId, ...roomSnap.data()}, t.name);
+          return; // ข้าม loadClassrooms ไปเลย
+        }
+      } else {
+        localStorage.removeItem('adminViewToken'); // หมดอายุ ลบทิ้ง
+      }
+    } catch(_){ localStorage.removeItem('adminViewToken'); }
+  }
+
   loadClassrooms();
 }
 
