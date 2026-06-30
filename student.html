@@ -211,7 +211,8 @@ body{font-family:'Sarabun',sans-serif;background:#fff8f3;color:#333;min-height:1
     </div>
     <div class="input-group">
       <i class="fas fa-lock"></i>
-      <input type="password" id="loginPwd" placeholder="รหัสผ่าน" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <input type="password" id="loginPwd" placeholder="รหัสผ่าน" autocomplete="new-password" readonly
+        onfocus="this.removeAttribute('readonly')" onkeydown="if(event.key==='Enter')doLogin()"/>
     </div>
     <button class="btn-login" onclick="doLogin()">🚪 เข้าสู่ห้องเรียน</button>
     <div id="loginErr" class="login-err"></div>
@@ -643,14 +644,6 @@ window.doLogin = async function(){
     const roomSnap = await getDoc(doc(db,'classrooms',roomId));
     if(!roomSnap.exists()){ err.textContent='❌ ไม่พบห้องเรียนนี้'; err.style.display='block'; return; }
     const room = {id:roomId, ...roomSnap.data()};
-
-    // ====== รหัสครู — ต้องเลือกชื่อนักเรียนด้วย ======
-    if(pwd === '0000'){
-      completeLogin(room, name);
-      return;
-    }
-    // ====== END รหัสครู ======
-
     const studentId = roomId+'_'+name;
     const studentRef = doc(db,'students',studentId);
     const studentSnap = await getDoc(studentRef);
