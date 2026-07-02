@@ -112,8 +112,11 @@
   .top-bar .turn-banner{
     background:#101820; border:2px solid var(--gold); border-radius:10px; padding:6px 16px; font-weight:700;
   }
+  .top-bar .top-actions{display:flex; gap:8px; flex-wrap:wrap;}
   .room-tag{font-size:12px; background:#101820; border:1px solid var(--gold); border-radius:8px; padding:4px 10px; color:var(--gold); font-weight:700;}
   .wait-banner{background:rgba(0,0,0,.55); border:2px solid var(--gold); border-radius:10px; padding:10px 16px; text-align:center; font-weight:700; color:#ffd447; margin:0 0 8px;}
+  .trade-banner{background:#101820; border:2px solid #3aa0e6; border-radius:10px; padding:8px 14px; margin:0 0 8px; font-size:12.5px; text-align:center;}
+  .trade-banner button{margin-left:8px;}
   .main-layout{display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;}
   #players-panel{
     display:flex; flex-direction:column; gap:10px; width:270px; flex-shrink:0;
@@ -139,17 +142,19 @@
     font-size:10px; padding:2px 5px; border-radius:4px; color:#111; font-weight:700;
   }
   .pc-jail{color:#ff9b7a; font-weight:700; font-size:11px; margin-top:4px;}
+  .pc-laps{font-size:10px; color:#7fd1ff; margin-top:2px;}
 
-  #board-wrap{flex:1; min-width:640px; display:flex; justify-content:center;}
+  #board-wrap{flex:1 1 320px; min-width:0; display:flex; justify-content:center;}
   #board{
     display:grid; grid-template-columns:repeat(11,1fr); grid-template-rows:repeat(11,1fr);
-    width:min(78vw,760px); height:min(78vw,760px); background:var(--felt);
+    width:min(84vw,860px); height:min(84vw,860px); background:var(--felt);
     border:6px solid #06331f; border-radius:10px; box-shadow:inset 0 0 30px rgba(0,0,0,.5);
   }
   .cell{
     position:relative; border:1px solid rgba(255,255,255,.12); background:#0f2419;
     display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
     font-size:9px; text-align:center; padding:3px 2px; overflow:hidden; cursor:pointer;
+    box-shadow: inset 0 0 0 0 transparent; transition: box-shadow .25s;
   }
   .cell:hover{background:#173a29;}
   .cell.corner{background:#0d2e1f; font-size:11px; justify-content:center;}
@@ -164,7 +169,7 @@
   .cell .tokens{position:absolute; bottom:2px; right:2px; display:flex; flex-wrap:wrap; gap:1px; max-width:70%; justify-content:flex-end;}
   .token-dot{
     width:11px; height:11px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-    font-size:7px; border:1px solid #fff; box-shadow:0 0 2px rgba(0,0,0,.6);
+    font-size:7px; border:1px solid #fff; box-shadow:0 0 2px rgba(0,0,0,.6); transition:opacity .2s;
   }
 
   #center-area{
@@ -182,7 +187,7 @@
   #turn-msg{background:rgba(0,0,0,.45); border-radius:8px; padding:6px 12px; font-size:12px; min-height:18px; max-width:420px;}
 
   #log-panel{
-    width:280px; flex-shrink:0; background:var(--panel); border-radius:12px; padding:10px; height:min(78vw,760px);
+    width:280px; flex-shrink:0; background:var(--panel); border-radius:12px; padding:10px; height:min(84vw,860px);
     display:flex; flex-direction:column;
   }
   #log-panel h3{margin:0 0 8px; font-size:14px; color:var(--gold);}
@@ -221,11 +226,31 @@
   #rules-modal .modal-box{max-width:560px; text-align:left; font-size:13px; line-height:1.7;}
   #rules-modal h3{color:var(--gold); margin-bottom:4px;}
 
+  .trade-cols{display:flex; gap:10px; flex-wrap:wrap; text-align:left; margin-top:10px;}
+  .trade-col{flex:1; min-width:150px; background:#101820; border-radius:10px; padding:10px;}
+  .trade-col h4{margin:0 0 6px; font-size:13px; color:var(--gold);}
+  .trade-prop-list{display:flex; flex-direction:column; gap:4px; max-height:160px; overflow-y:auto; margin-bottom:8px;}
+  .trade-prop-list label{display:flex; align-items:center; gap:6px; font-size:11.5px; background:#182430; padding:4px 6px; border-radius:6px; cursor:pointer;}
+  .trade-money-input{width:100%; padding:6px 8px; border-radius:6px; border:1px solid #33414f; background:#0d141c; color:#eef3f5; font-size:13px;}
+  .trade-target-select{width:100%; padding:8px; border-radius:8px; border:1px solid #33414f; background:#0d141c; color:#eef3f5; font-size:13px; margin-top:10px;}
+
   @media (max-width:1100px){
-    #board{width:92vw; height:92vw;}
-    #log-panel{width:100%; height:220px;}
-    #players-panel{width:100%; flex-direction:row; flex-wrap:wrap;}
+    .main-layout{flex-direction:column; align-items:stretch;}
+    #board-wrap{order:1; width:100%; min-width:0;}
+    #board{width:min(94vw,820px); height:min(94vw,820px); margin:0 auto;}
+    #players-panel{order:2; width:100%; flex-direction:row; flex-wrap:wrap;}
     .player-card{flex:1; min-width:200px;}
+    #log-panel{order:3; width:100%; height:220px;}
+  }
+  @media (max-width:600px){
+    #board{width:97vw; height:97vw;}
+    .cell{font-size:7.3px; padding:2px 1px;}
+    .cell .flag{font-size:13px;}
+    .cell .cprice{font-size:6.5px;}
+    .die{width:34px; height:34px; font-size:17px;}
+    #center-area h2{font-size:14px;}
+    .top-bar h1{font-size:17px;}
+    .btn{padding:10px 14px; font-size:13px;}
   }
 </style>
 </head>
@@ -239,7 +264,7 @@
       <span class="emoji">🧳🌍✈️</span>
       <h1>ท่องโลกมหาสนุก</h1>
       <div class="home-sub">เกมเศรษฐีรอบโลกออนไลน์ ชวนเพื่อน 2-4 คนมาเล่นพร้อมกันได้จากคนละเครื่อง!</div>
-      <div class="quick-badges"><span>2–4 ผู้เล่น</span><span>เล่นออนไลน์คนละเครื่อง</span><span>ใช้รหัสห้อง</span></div>
+      <div class="quick-badges"><span>2–4 ผู้เล่น</span><span>เล่นออนไลน์คนละเครื่อง</span><span>ใช้รหัสห้อง</span><span>🎁 เริ่มมีที่ดิน 3 แห่ง</span><span>🤝 แลกเปลี่ยนได้</span></div>
     </div>
 
     <div class="tv-card">
@@ -267,9 +292,11 @@
     <div class="tv-card">
       <div class="tv-section-head"><span class="ic">📖</span><h3>วิธีเล่นโดยย่อ</h3></div>
       <div class="tv-rules-box">
-        🎲 <b>ทอยลูกเต๋า</b> เดินไปรอบโลก ผ่าน GO รับ 200 เหรียญ<br>
-        🌍 <b>ซื้อประเทศ</b> ที่ยังไม่มีเจ้าของ หรือจ่ายค่าเช่าถ้ามีเจ้าของแล้ว<br>
-        🏠 <b>สร้างบ้าน/โรงแรม</b> เมื่อครองครบกลุ่มสีเพื่อเพิ่มค่าเช่า<br>
+        🎲 <b>ทอยลูกเต๋า</b> เดินไปรอบโลก ผ่าน GO รับ 200 เหรียญทุกรอบ<br>
+        🎁 <b>เริ่มเกม</b> ทุกคนจะได้รับกรรมสิทธิ์ประเทศแบบสุ่มคนละ 3 แห่งทันที<br>
+        🌍 <b>ซื้อประเทศ</b> ที่ยังไม่มีเจ้าของ หรือจ่ายค่าเช่าถ้ามีเจ้าของแล้ว (ช่องที่มีเจ้าของจะขึ้นกรอบสีของเจ้าของ)<br>
+        🏠 <b>สร้างบ้าน/โรงแรม</b> ได้เมื่อครองครบกลุ่มสี และเดินผ่านจุดเริ่มต้นครบ 1 รอบแล้วเท่านั้น<br>
+        🤝 <b>แลกเปลี่ยน</b> ทรัพย์สิน/เงินกับผู้เล่นคนอื่นได้ตลอดเวลา<br>
         🚔 <b>ระวังด่านตรวจคนเข้าเมือง!</b> ออกเบิ้ล 3 ครั้งติดจะถูกจับ<br>
         🏆 เป็นผู้เล่นคนสุดท้ายที่ไม่ล้มละลายเพื่อชนะเกม
       </div>
@@ -306,13 +333,18 @@
     <h1>🌍 ท่องโลกมหาสนุก</h1>
     <div class="room-tag" id="game-room-tag">ห้อง ----</div>
     <div class="turn-banner" id="turn-banner">รอเริ่มเกม...</div>
-    <div style="display:flex; gap:8px;">
+    <div class="top-actions">
+      <button class="btn btn-blue" id="btn-trade" style="display:none;">🤝 แลกเปลี่ยน</button>
       <button class="btn btn-grey" id="btn-rules">📖 กติกา</button>
       <button class="btn btn-red" id="btn-leave-game">🚪 ออกจากห้อง</button>
     </div>
   </div>
 
   <div class="wait-banner" id="wait-banner" style="display:none;"></div>
+  <div class="trade-banner" id="trade-wait-banner" style="display:none;">
+    ⏳ กำลังรอการตอบรับข้อเสนอแลกเปลี่ยน...
+    <button class="btn btn-grey" id="trade-cancel" style="padding:4px 10px; font-size:11px;">ยกเลิก</button>
+  </div>
 
   <div class="main-layout">
     <div id="players-panel"></div>
@@ -399,6 +431,43 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="modal-trade">
+  <div class="modal-box" style="max-width:540px;">
+    <h2>🤝 เสนอแลกเปลี่ยน</h2>
+    <select class="trade-target-select" id="trade-target"></select>
+    <div class="trade-cols">
+      <div class="trade-col">
+        <h4>สิ่งที่คุณจะให้</h4>
+        <div class="trade-prop-list" id="trade-my-props"></div>
+        <label style="font-size:11px;">เงิน (เหรียญ)</label>
+        <input type="number" class="trade-money-input" id="trade-offer-money" min="0" value="0">
+      </div>
+      <div class="trade-col">
+        <h4>สิ่งที่คุณต้องการ</h4>
+        <div class="trade-prop-list" id="trade-their-props"></div>
+        <label style="font-size:11px;">เงิน (เหรียญ)</label>
+        <input type="number" class="trade-money-input" id="trade-request-money" min="0" value="0">
+      </div>
+    </div>
+    <div id="trade-error" style="color:#ff8a7a; font-size:12px; margin-top:8px; min-height:14px;"></div>
+    <div class="modal-btns">
+      <button class="btn btn-green" id="trade-send">📨 ส่งข้อเสนอ</button>
+      <button class="btn btn-grey" id="trade-cancel-compose">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-trade-incoming">
+  <div class="modal-box">
+    <h2>🤝 ข้อเสนอแลกเปลี่ยน</h2>
+    <div class="card-visual" id="trade-incoming-text"></div>
+    <div class="modal-btns">
+      <button class="btn btn-green" id="trade-accept">✅ ยอมรับ</button>
+      <button class="btn btn-red" id="trade-decline">❌ ปฏิเสธ</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-gameover">
   <div class="modal-box">
     <h2 id="gameover-title">🏆 จบเกม!</h2>
@@ -415,12 +484,16 @@
     <div>
       <h3>เป้าหมาย</h3>
       ท่องเที่ยวรอบโลก ซื้อประเทศ เก็บค่าเช่าจากผู้เล่นคนอื่น และเป็นผู้เล่นคนสุดท้ายที่ไม่ล้มละลาย
+      <h3>เริ่มเกม</h3>
+      ทุกคนจะได้รับกรรมสิทธิ์ประเทศแบบสุ่มคนละ 3 แห่งทันทีที่เริ่มเกม (ฟรี ไม่เสียเงิน) ก่อนเริ่มทอยลูกเต๋า
       <h3>การเดิน</h3>
-      ทอยลูกเต๋า 2 ลูก เดินตามแต้มที่ได้ ผ่านช่อง GO รับ 200 เหรียญ ถ้าออกเบิ้ล (แต้มเท่ากัน) ได้ทอยซ้ำ แต่ถ้าออกเบิ้ล 3 ครั้งติดต่อกัน ต้องไปด่านตรวจคนเข้าเมืองทันที
+      ทอยลูกเต๋า 2 ลูก เดินตามแต้มที่ได้ ผ่านช่อง GO รับ 200 เหรียญทุกครั้งที่ผ่าน (นับเป็น 1 รอบ) ถ้าออกเบิ้ล (แต้มเท่ากัน) ได้ทอยซ้ำ แต่ถ้าออกเบิ้ล 3 ครั้งติดต่อกัน ต้องไปด่านตรวจคนเข้าเมืองทันที
       <h3>ซื้อประเทศ / จ่ายค่าเช่า</h3>
-      เมื่อเดินไปตกช่องประเทศที่ยังไม่มีเจ้าของ สามารถซื้อได้ ถ้ามีเจ้าของแล้วต้องจ่ายค่าเช่าให้เจ้าของอัตโนมัติ ค่าเช่าจะสูงขึ้นถ้าเจ้าของมีประเทศครบสีเดียวกัน หรือมีบ้าน/โรงแรม
+      เมื่อเดินไปตกช่องประเทศที่ยังไม่มีเจ้าของ สามารถซื้อได้ ถ้ามีเจ้าของแล้วต้องจ่ายค่าเช่าให้เจ้าของอัตโนมัติ ค่าเช่าจะสูงขึ้นถ้าเจ้าของมีประเทศครบสีเดียวกัน หรือมีบ้าน/โรงแรม ช่องที่มีเจ้าของแล้วจะขึ้นกรอบสีตามสีของเจ้าของให้ดูง่าย
       <h3>สร้างบ้าน/โรงแรม</h3>
-      หากคุณเป็นเจ้าของประเทศครบทุกช่องในกลุ่มสีเดียวกัน สามารถซื้อบ้าน (สูงสุด 4 หลัง) แล้วอัพเป็นโรงแรมได้ที่เมนู "จัดการทรัพย์สิน" เพื่อเพิ่มค่าเช่า
+      หากคุณเป็นเจ้าของประเทศครบทุกช่องในกลุ่มสีเดียวกัน และเดินผ่านจุดเริ่มต้น (GO) มาแล้วอย่างน้อย 1 รอบ สามารถซื้อบ้าน (สูงสุด 4 หลัง) แล้วอัพเป็นโรงแรมได้ที่เมนู "จัดการทรัพย์สิน" เพื่อเพิ่มค่าเช่า (ในรอบแรกจะยังอัพเกรดไม่ได้)
+      <h3>แลกเปลี่ยน</h3>
+      กดปุ่ม "🤝 แลกเปลี่ยน" เพื่อเสนอแลกทรัพย์สิน/เงินกับผู้เล่นคนอื่นได้ตลอดเวลา ไม่ต้องรอถึงตาตัวเอง ผู้ถูกเสนอสามารถกดยอมรับหรือปฏิเสธได้
       <h3>จำนอง</h3>
       หากเงินไม่พอ สามารถจำนองประเทศเพื่อรับเงินสดได้ (ระหว่างจำนองจะไม่เก็บค่าเช่า) และไถ่ถอนคืนได้ภายหลังโดยจ่ายเงินต้น+ดอกเบี้ย 10%
       <h3>สนามบิน (4 ช่อง)</h3>
@@ -432,7 +505,7 @@
       <h3>ล้มละลาย</h3>
       หากมีเงินติดลบและไม่สามารถจำนองทรัพย์สินเพื่อชดใช้หนี้ได้ ผู้เล่นนั้นจะตกรอบทันที
       <h3>ออนไลน์</h3>
-      แต่ละคนเล่นจากเครื่องของตัวเอง ระบบจะสลับให้ทำการเฉพาะตาของตัวเองเท่านั้น ปุ่มต่างๆ จะแสดงเมื่อถึงตาคุณ
+      แต่ละคนเล่นจากเครื่องของตัวเอง ระบบจะสลับให้ทำการเฉพาะตาของตัวเองเท่านั้น ปุ่มต่างๆ จะแสดงเมื่อถึงตาคุณ (ยกเว้นปุ่มแลกเปลี่ยนที่ใช้ได้ตลอดเวลา)
     </div>
     <div class="modal-btns">
       <button class="btn btn-gold" id="rules-close">เข้าใจแล้ว</button>
@@ -523,7 +596,13 @@ function changeMoneyLocal(p, amt){
 function moveTo(p, pos, passGo){
   const passed = pos < p.pos;
   p.pos = pos;
-  if(passed && passGo!==false){ p.money+=200; addLog(`🏁 ${p.name} ผ่าน GO รับ 200 เหรียญ`); }
+  if(passed){
+    p.laps = (p.laps||0) + 1;
+    if(passGo!==false){
+      p.money+=200;
+      addLog(`🏁 ${p.name} ผ่าน GO รับ 200 เหรียญ (เดินครบรอบที่ ${p.laps})`);
+    }
+  }
 }
 function moveBy(p, delta){ p.pos = (p.pos + delta + 40) % 40; }
 function toNearestRailroad(p){
@@ -586,6 +665,8 @@ let myId = null;
 let roomCode = null;
 let room = null;          // latest synced snapshot mirror (also used as local working buffer during my turn)
 let roomRef = null;
+let lastPositions = {};   // client-local: playerId -> last rendered board position (for movement animation)
+let animatingTokens = {}; // client-local: playerId -> true while a walk animation is in progress
 
 function getMyId(){
   let id = localStorage.getItem('mp_myid');
@@ -706,6 +787,7 @@ function attachRoomListener(){
 function onRoomGone(){
   clearSession();
   roomCode = null; room = null;
+  lastPositions = {}; animatingTokens = {};
   showScreen('home');
   setHomeStatus('ห้องถูกปิดหรือไม่มีอยู่แล้ว');
 }
@@ -765,6 +847,7 @@ async function leaveRoom(){
   }catch(e){ /* ignore */ }
   clearSession();
   roomCode=null; room=null; roomRef=null;
+  lastPositions = {}; animatingTokens = {};
   showScreen('home');
 }
 
@@ -790,13 +873,25 @@ async function startGame(){
     const base = players[id];
     newPlayers[id] = {
       name: base.name, token: base.token, color: base.color,
-      money:1500, pos:0, jail:false, jailTurns:0, jailFreeCards:0, bankrupt:false, doublesStreak:0
+      money:1500, pos:0, jail:false, jailTurns:0, jailFreeCards:0, bankrupt:false, doublesStreak:0, laps:0
     };
   });
+
+  /* ---- แจกกรรมสิทธิ์เริ่มต้นแบบสุ่มคนละ 3 แห่ง ---- */
+  const ownership = freshOwnership();
+  const ownableIds = Object.keys(ownership);
+  for(let i=ownableIds.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=ownableIds[i]; ownableIds[i]=ownableIds[j]; ownableIds[j]=t; }
+  let cursor = 0;
+  ids.forEach(id=>{
+    for(let k=0;k<3 && cursor<ownableIds.length;k++,cursor++){
+      ownership[ownableIds[cursor]].ownerId = id;
+    }
+  });
+
   await roomRef.update({
     phase:'playing',
     players: newPlayers,
-    ownership: freshOwnership(),
+    ownership: ownership,
     order,
     currentTurn: order[0],
     dice:[0,0],
@@ -804,7 +899,11 @@ async function startGame(){
     canEndTurn:false,
     awaitingDecision:false,
     pendingSpaceId:null,
-    log: [ '🎉 เริ่มเกม! ผู้เล่น: ' + ids.map(id=>newPlayers[id].name).join(', ') ],
+    pendingTrade:null,
+    log: [
+      '🎉 เริ่มเกม! ผู้เล่น: ' + ids.map(id=>newPlayers[id].name).join(', '),
+      '🎁 แจกพื้นที่เริ่มต้นให้ผู้เล่นคนละ 3 แห่งแบบสุ่มเรียบร้อย'
+    ],
     winnerId:null
   });
 }
@@ -902,21 +1001,98 @@ function paintBoard(){
     const housesEl = cell.querySelector('[data-houses]');
     if(own && own.ownerId){
       const owner = room.players[own.ownerId];
+      const ownerColor = owner ? owner.color : '#888';
       ownerDot.style.display='block';
-      ownerDot.style.background = owner ? owner.color : '#888';
+      ownerDot.style.background = ownerColor;
       mortTag.style.display = own.mortgaged ? 'block':'none';
+      cell.style.boxShadow = 'inset 0 0 0 4px ' + ownerColor;
       if(sp.type==='property'){
         housesEl.innerHTML = own.houses===5 ? '<span>🏨</span>' : '🏠'.repeat(own.houses||0);
       }
     } else {
       ownerDot.style.display='none';
       mortTag.style.display='none';
+      cell.style.boxShadow = '';
       if(housesEl) housesEl.innerHTML='';
     }
-    const tokensEl = cell.querySelector('[data-tokens]');
-    const players = room.players||{};
-    const here = Object.values(players).filter(p=>!p.bankrupt && p.pos===id);
-    tokensEl.innerHTML = here.map(p=>`<div class="token-dot" style="background:${p.color}">${p.token}</div>`).join('');
+  });
+  paintTokens();
+}
+
+/* ---- token movement + walk animation (client-local visual only; state truth stays in `room`) ---- */
+function animStepDelay(){ return (typeof window!=='undefined' && window.__FAST_ANIM__) ? 2 : 90; }
+function animTeleportDelay(){ return (typeof window!=='undefined' && window.__FAST_ANIM__) ? 10 : 260; }
+function sleep(ms){ return new Promise(function(resolve){ setTimeout(resolve, ms); }); }
+function placeTokenInCell(id, pos, p){
+  const cell = document.querySelector('#board .cell[data-id="'+pos+'"]');
+  if(!cell) return;
+  const tokensEl = cell.querySelector('[data-tokens]');
+  if(!tokensEl) return;
+  let el = document.getElementById('token-'+id);
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'token-'+id;
+    el.className = 'token-dot';
+  }
+  el.style.background = p.color;
+  el.textContent = p.token;
+  if(el.parentNode !== tokensEl) tokensEl.appendChild(el);
+}
+async function animateWalk(id, from, to, p){
+  animatingTokens[id] = true;
+  let pos = from;
+  const steps = (to - from + 40) % 40;
+  for(let i=0;i<steps;i++){
+    pos = (pos+1)%40;
+    placeTokenInCell(id, pos, p);
+    await sleep(animStepDelay());
+  }
+  animatingTokens[id] = false;
+  const latest = room && room.players ? room.players[id] : null;
+  if(latest && !latest.bankrupt && latest.pos!==pos){
+    lastPositions[id] = latest.pos;
+    placeTokenInCell(id, latest.pos, latest);
+  }
+}
+function animateTeleport(id, from, to, p){
+  placeTokenInCell(id, from, p);
+  const el = document.getElementById('token-'+id);
+  if(el) el.style.opacity = '0.15';
+  setTimeout(function(){
+    placeTokenInCell(id, to, p);
+    const el2 = document.getElementById('token-'+id);
+    if(el2) el2.style.opacity = '1';
+  }, animTeleportDelay());
+}
+function paintTokens(){
+  const players = room.players||{};
+  Object.keys(players).forEach(id=>{
+    const p = players[id];
+    if(!p) return;
+    if(p.bankrupt){
+      const el = document.getElementById('token-'+id);
+      if(el && el.parentNode) el.parentNode.removeChild(el);
+      delete lastPositions[id];
+      return;
+    }
+    const prev = lastPositions[id];
+    if(prev === undefined){
+      lastPositions[id] = p.pos;
+      placeTokenInCell(id, p.pos, p);
+      return;
+    }
+    if(prev === p.pos){
+      placeTokenInCell(id, p.pos, p);
+      return;
+    }
+    if(animatingTokens[id]) return;
+    const steps = (p.pos - prev + 40) % 40;
+    lastPositions[id] = p.pos;
+    if(steps>=1 && steps<=12){
+      animateWalk(id, prev, p.pos, p);
+    } else {
+      animateTeleport(id, prev, p.pos, p);
+    }
   });
 }
 
@@ -945,6 +1121,7 @@ function paintPlayers(){
       <div class="pc-row"><span>ทรัพย์สิน</span><span>${ownedEntries.length} แห่ง</span></div>
       <div class="pc-row"><span>บัตรผ่านด่านฟรี</span><span>${p.jailFreeCards||0}</span></div>
       ${p.jail?'<div class="pc-jail">🚔 ติดด่านตรวจคนเข้าเมือง</div>':''}
+      <div class="pc-laps">🔄 เดินครบ ${p.laps||0} รอบ ${(p.laps||0)<1?'(ยังอัพเกรดไม่ได้)':''}</div>
       <div class="pc-props">${chips}</div>
     </div>`;
   }).join('');
@@ -998,6 +1175,7 @@ function renderGameFromRoom(){
   paintPlayers();
   paintLog();
   paintTurnUI();
+  paintTradeUI();
   if(room.phase==='gameover'){
     showGameOverIfNeeded();
   }
@@ -1286,18 +1464,25 @@ document.getElementById('mgmt-close').addEventListener('click', ()=>closeModal('
 function openManageModal(){
   if(!isMyTurn()) return;
   const list = document.getElementById('mgmt-list');
+  const laps = (me().laps||0);
   const owned = Object.entries(room.ownership).filter(([id,o])=>o.ownerId===myId);
+  let html = '';
+  if(laps<1){
+    html += '<div style="text-align:center;color:#ffb066;font-size:11.5px;margin-bottom:6px;">🔒 คุณจะสามารถสร้างบ้าน/โรงแรมได้เมื่อเดินผ่านจุดเริ่มต้น (GO) ครบ 1 รอบ — แต่ยังจำนอง/ไถ่ถอนได้ตามปกติ</div>';
+  }
   if(owned.length===0){
-    list.innerHTML = '<div style="text-align:center; color:#8aa;">คุณยังไม่มีทรัพย์สิน</div>';
+    html += '<div style="text-align:center; color:#8aa;">คุณยังไม่มีทรัพย์สิน</div>';
   } else {
-    list.innerHTML = owned.map(([idx,o])=>{
+    html += owned.map(([idx,o])=>{
       const sp = BOARD[idx];
       const color = sp.group ? GROUP_COLORS[sp.group] : '#666';
       let canBuildHouse=false, canSellHouse=o.houses>0, canMortgage=!o.mortgaged, canUnmortgage=o.mortgaged;
+      let lockedNote = '';
       if(sp.type==='property'){
         const groupSpaces = BOARD.filter(s=>s.group===sp.group);
         const ownsAll = groupSpaces.every(s=>room.ownership[s.id].ownerId===myId);
-        canBuildHouse = ownsAll && o.houses<5 && !o.mortgaged;
+        canBuildHouse = ownsAll && o.houses<5 && !o.mortgaged && laps>=1;
+        if(ownsAll && o.houses<5 && !o.mortgaged && laps<1) lockedNote = '<br><span style="color:#ffb066; font-size:10.5px;">🔒 รอผ่านรอบแรกก่อนอัพเกรด</span>';
       }
       return `
       <div class="mgmt-item">
@@ -1306,6 +1491,7 @@ function openManageModal(){
           <b>${sp.icon} ${sp.name}</b><br>
           ${sp.type==='property'?`บ้าน/โรงแรม: ${o.houses===5?'โรงแรม':o.houses+' หลัง'}`:''}
           ${o.mortgaged?'<br><span style="color:#ff8a7a">จำนองอยู่</span>':''}
+          ${lockedNote}
         </div>
         <div class="mi-actions">
           ${canBuildHouse?`<button class="btn-green" data-act="build" data-idx="${idx}">+ ${o.houses===4?'โรงแรม':'บ้าน'} ($${HOUSE_COST[sp.group]})</button>`:''}
@@ -1315,13 +1501,14 @@ function openManageModal(){
         </div>
       </div>`;
     }).join('');
-    list.querySelectorAll('button').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        doPropertyAction(parseInt(btn.dataset.idx), btn.dataset.act);
-        openManageModal();
-      });
-    });
   }
+  list.innerHTML = html;
+  list.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      doPropertyAction(parseInt(btn.dataset.idx), btn.dataset.act);
+      openManageModal();
+    });
+  });
   showModal('modal-manage');
 }
 function doPropertyAction(idx, act){
@@ -1329,6 +1516,10 @@ function doPropertyAction(idx, act){
   const sp = BOARD[idx];
   const o = room.ownership[idx];
   if(act==='build'){
+    if((p.laps||0) < 1){
+      localInfo('ยังไม่สามารถอัพเกรดได้', 'คุณต้องเดินผ่านจุดเริ่มต้น (GO) ให้ครบ 1 รอบก่อน ถึงจะสร้างบ้าน/โรงแรมได้');
+      return;
+    }
     const cost = HOUSE_COST[sp.group];
     if(p.money<cost){ localInfo('เงินไม่พอ','เงินไม่พอสำหรับสร้างบ้าน/โรงแรม'); return; }
     p.money -= cost; o.houses++;
@@ -1348,6 +1539,122 @@ function doPropertyAction(idx, act){
     addLog(`📄 ${p.name} ไถ่ถอน ${sp.name} จ่าย $${cost}`);
   }
   syncGame();
+}
+
+/* ================= TRADE SYSTEM ================= */
+document.getElementById('btn-trade').addEventListener('click', openTradeModal);
+document.getElementById('trade-cancel-compose').addEventListener('click', ()=>closeModal('modal-trade'));
+
+function openTradeModal(){
+  if(!room || room.phase!=='playing') return;
+  const meP = me();
+  if(!meP || meP.bankrupt) return;
+  if(room.pendingTrade){ localInfo('มีข้อเสนอค้างอยู่', 'ระบบรองรับการแลกเปลี่ยนทีละ 1 ข้อเสนอเท่านั้น กรุณารอให้ข้อเสนอปัจจุบันเสร็จสิ้นก่อน'); return; }
+  const targetSel = document.getElementById('trade-target');
+  const others = Object.keys(room.players).filter(id=>id!==myId && !room.players[id].bankrupt);
+  if(others.length===0){ localInfo('ไม่มีคู่เทรด','ไม่มีผู้เล่นคนอื่นให้แลกเปลี่ยนด้วย'); return; }
+  targetSel.innerHTML = others.map(id=>`<option value="${id}">${room.players[id].name}</option>`).join('');
+  document.getElementById('trade-error').textContent = '';
+  document.getElementById('trade-offer-money').value = 0;
+  document.getElementById('trade-request-money').value = 0;
+  renderTradePropLists();
+  targetSel.onchange = renderTradePropLists;
+  showModal('modal-trade');
+}
+function renderTradePropLists(){
+  const targetId = document.getElementById('trade-target').value;
+  const myProps = Object.entries(room.ownership).filter(([id,o])=>o.ownerId===myId);
+  const theirProps = Object.entries(room.ownership).filter(([id,o])=>o.ownerId===targetId);
+  document.getElementById('trade-my-props').innerHTML = myProps.length ? myProps.map(([id])=>{
+    const sp = BOARD[id];
+    return `<label><input type="checkbox" value="${id}" class="trade-my-check"> ${sp.icon} ${sp.name}</label>`;
+  }).join('') : '<div style="font-size:11px;color:#889;">ไม่มีทรัพย์สิน</div>';
+  document.getElementById('trade-their-props').innerHTML = theirProps.length ? theirProps.map(([id])=>{
+    const sp = BOARD[id];
+    return `<label><input type="checkbox" value="${id}" class="trade-their-check"> ${sp.icon} ${sp.name}</label>`;
+  }).join('') : '<div style="font-size:11px;color:#889;">ไม่มีทรัพย์สิน</div>';
+}
+document.getElementById('trade-send').addEventListener('click', async ()=>{
+  const targetId = document.getElementById('trade-target').value;
+  const offerProps = Array.from(document.querySelectorAll('.trade-my-check:checked')).map(el=>parseInt(el.value));
+  const requestProps = Array.from(document.querySelectorAll('.trade-their-check:checked')).map(el=>parseInt(el.value));
+  const offerMoney = Math.max(0, parseInt(document.getElementById('trade-offer-money').value)||0);
+  const requestMoney = Math.max(0, parseInt(document.getElementById('trade-request-money').value)||0);
+  const errEl = document.getElementById('trade-error');
+  if(offerProps.length===0 && requestProps.length===0 && offerMoney===0 && requestMoney===0){
+    errEl.textContent = 'กรุณาเลือกอย่างน้อย 1 รายการเพื่อแลกเปลี่ยน'; return;
+  }
+  const meP = room.players[myId];
+  if(offerMoney > meP.money){ errEl.textContent = 'คุณมีเงินไม่พอสำหรับข้อเสนอนี้'; return; }
+  if(room.pendingTrade){ errEl.textContent = 'มีข้อเสนอค้างอยู่แล้ว'; return; }
+  const trade = {
+    id: 't'+Date.now(), fromId: myId, toId: targetId,
+    offerProps, offerMoney, requestProps, requestMoney, status:'pending'
+  };
+  const newLog = (room.log||[]).concat(`🤝 ${meP.name} เสนอแลกเปลี่ยนกับ ${room.players[targetId].name}`);
+  await roomRef.update({ pendingTrade: trade, log: newLog });
+  closeModal('modal-trade');
+});
+document.getElementById('trade-cancel').addEventListener('click', async ()=>{
+  if(!room.pendingTrade || room.pendingTrade.fromId!==myId) return;
+  const newLog = (room.log||[]).concat(`↩️ ${me().name} ยกเลิกข้อเสนอแลกเปลี่ยน`);
+  await roomRef.update({ pendingTrade: null, log: newLog });
+});
+document.getElementById('trade-accept').addEventListener('click', async ()=>{
+  const trade = room.pendingTrade;
+  if(!trade || trade.toId!==myId) return;
+  closeModal('modal-trade-incoming');
+  const players = JSON.parse(JSON.stringify(room.players));
+  const ownership = JSON.parse(JSON.stringify(room.ownership));
+  const fromP = players[trade.fromId], toP = players[trade.toId];
+  const offerValid = !!fromP && !!toP
+    && trade.offerProps.every(id=>ownership[id] && ownership[id].ownerId===trade.fromId)
+    && trade.requestProps.every(id=>ownership[id] && ownership[id].ownerId===trade.toId)
+    && fromP.money>=trade.offerMoney && toP.money>=trade.requestMoney;
+  if(!offerValid){
+    const newLog = (room.log||[]).concat('⚠️ ข้อเสนอแลกเปลี่ยนไม่ถูกต้องแล้ว (มีการเปลี่ยนแปลงระหว่างทาง) ถูกยกเลิกอัตโนมัติ');
+    await roomRef.update({ pendingTrade:null, log:newLog });
+    return;
+  }
+  trade.offerProps.forEach(id=>{ ownership[id].ownerId = trade.toId; });
+  trade.requestProps.forEach(id=>{ ownership[id].ownerId = trade.fromId; });
+  fromP.money += (trade.requestMoney - trade.offerMoney);
+  toP.money += (trade.offerMoney - trade.requestMoney);
+  const newLog = (room.log||[]).concat(`✅ การแลกเปลี่ยนระหว่าง ${fromP.name} และ ${toP.name} สำเร็จ!`);
+  await roomRef.update({ players, ownership, pendingTrade:null, log:newLog });
+});
+document.getElementById('trade-decline').addEventListener('click', async ()=>{
+  const trade = room.pendingTrade;
+  if(!trade || trade.toId!==myId) return;
+  closeModal('modal-trade-incoming');
+  const fromName = room.players[trade.fromId] ? room.players[trade.fromId].name : '?';
+  const newLog = (room.log||[]).concat(`❌ ${room.players[trade.toId].name} ปฏิเสธข้อเสนอแลกเปลี่ยนจาก ${fromName}`);
+  await roomRef.update({ pendingTrade:null, log:newLog });
+});
+
+function paintTradeUI(){
+  const btnTrade = document.getElementById('btn-trade');
+  const meP = me();
+  btnTrade.style.display = (room.phase==='playing' && meP && !meP.bankrupt) ? 'inline-block' : 'none';
+
+  const trade = room.pendingTrade;
+  const waitBanner = document.getElementById('trade-wait-banner');
+  waitBanner.style.display = (trade && trade.fromId===myId) ? 'block' : 'none';
+
+  if(trade && trade.toId===myId){
+    if(!document.getElementById('modal-trade-incoming').classList.contains('show')){
+      const fromP = room.players[trade.fromId];
+      const offerNames = trade.offerProps.map(id=>BOARD[id].icon+' '+BOARD[id].name).join(', ') || '-';
+      const requestNames = trade.requestProps.map(id=>BOARD[id].icon+' '+BOARD[id].name).join(', ') || '-';
+      document.getElementById('trade-incoming-text').innerHTML =
+        `<b>${fromP?fromP.name:'?'}</b> เสนอแลกเปลี่ยนกับคุณ:<br><br>`+
+        `🎁 เขาจะให้: ${offerNames}${trade.offerMoney?` + ${trade.offerMoney} เหรียญ`:''}<br>`+
+        `🙏 เขาต้องการ: ${requestNames}${trade.requestMoney?` + ${trade.requestMoney} เหรียญ`:''}`;
+      showModal('modal-trade-incoming');
+    }
+  } else {
+    closeModal('modal-trade-incoming');
+  }
 }
 
 /* ================= BANKRUPTCY / WIN ================= */
