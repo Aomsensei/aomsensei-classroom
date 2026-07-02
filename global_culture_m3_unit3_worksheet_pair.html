@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang='th'>
+<head>
+  <meta charset='UTF-8'/>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
+  <title>ใบงานคู่ ม.3 เรื่อง วัฒนธรรมสากล</title>
+  <link rel='preconnect' href='https://fonts.googleapis.com'>
+  <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
+  <link href='https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800;900&display=swap' rel='stylesheet'>
+  <style>
+    :root{
+      --orange:#ff9f68;--orange2:#ffbf93;--orange3:#ffe3cf;
+      --cream:#fffaf5;--text:#5a3b30;--muted:#86675c;
+      --soft-shadow:0 12px 28px rgba(120,72,40,.10);--shadow:0 24px 60px rgba(150,84,39,.14);--radius:28px;
+      --teal:#36b8a0;--blue:#5b8cda;--pink:#e87c9b;--yellow:#e8a82a;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;font-family:'Noto Sans Thai',system-ui,sans-serif;color:var(--text);
+      background:
+        radial-gradient(circle at 8% 10%,rgba(255,191,147,.50),transparent 24%),
+        radial-gradient(circle at 92% 18%,rgba(255,231,168,.45),transparent 20%),
+        radial-gradient(circle at 50% 100%,rgba(214,234,255,.40),transparent 24%),
+        linear-gradient(135deg,#fffaf5 0%,#f0f6ff 55%,#e8f4ff 100%);
+      min-height:100vh;
+    }
+    .page{width:min(1100px,calc(100% - 28px));margin:0 auto;padding:24px 0 72px}
+
+    .hero{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:start;background:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.95);border-radius:36px;padding:32px 36px;box-shadow:var(--shadow);backdrop-filter:blur(10px);overflow:hidden;position:relative;margin-bottom:20px}
+    .hero::before{content:'';position:absolute;right:-80px;top:-80px;width:240px;height:240px;border-radius:50%;background:rgba(91,140,218,.10)}
+    .hero::after{content:'';position:absolute;left:-60px;bottom:-90px;width:200px;height:200px;border-radius:50%;background:rgba(54,184,160,.10)}
+    .hero>*{position:relative;z-index:1}
+    .eyebrow{display:inline-flex;gap:8px;align-items:center;padding:8px 14px;border-radius:999px;background:#eef3ff;color:#2e5eb0;border:1px solid #c8d8f5;font-weight:800;font-size:13px;margin-bottom:12px}
+    .hero h1{margin:0 0 8px;font-size:clamp(24px,3.5vw,38px);line-height:1.15;color:#1e3a6e;font-weight:900}
+    .hero .subtitle{margin:0 0 16px;font-size:15.5px;line-height:1.85;color:var(--muted)}
+    .hero-meta{display:flex;flex-wrap:wrap;gap:8px}
+    .meta-chip{padding:8px 12px;border-radius:14px;background:#fff;border:1px solid #c8d8f5;box-shadow:var(--soft-shadow);font-weight:700;font-size:13px;color:#2e4870}
+    .pair-badge{background:linear-gradient(135deg,#5b8cda,#3a6fc0);color:#fff;border-radius:18px;padding:18px 24px;text-align:center;box-shadow:0 10px 30px rgba(58,111,192,.28);flex-shrink:0;min-width:130px}
+    .pair-badge .icon{font-size:36px;margin-bottom:6px}
+    .pair-badge .label{font-size:13px;font-weight:800;opacity:.92}
+    .pair-badge .big{font-size:22px;font-weight:900}
+
+    .names-box{background:rgba(255,255,255,.88);border:1.5px dashed #a8c5f5;border-radius:24px;padding:24px 28px;margin-bottom:20px;box-shadow:var(--soft-shadow)}
+    .names-box h2{font-size:17px;font-weight:800;color:#2e5eb0;margin:0 0 16px;display:flex;align-items:center;gap:8px}
+    .names-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .name-card{background:linear-gradient(135deg,#f8f2ff,#f0f4ff);border-radius:18px;padding:16px 20px;border:1px solid #c8d8f5}
+    .name-card .role{font-size:13px;font-weight:800;color:var(--orange);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+    .name-field{display:flex;flex-direction:column;gap:8px}
+    .name-field label{font-size:13px;font-weight:700;color:#4a6898}
+    .il{border:none;border-bottom:2px solid #b0c8f0;background:transparent;width:100%;padding:4px 2px;font-size:15px;font-family:'Noto Sans Thai',sans-serif;color:var(--text);outline:none;transition:border-color .2s}
+    .il:focus{border-bottom-color:var(--blue)}
+    .meta-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+    .meta-field label{font-size:12.5px;font-weight:700;color:#4a6898;display:block;margin-bottom:4px}
+
+    .section{margin-top:20px;background:rgba(255,255,255,.86);border:1px solid rgba(255,255,255,.96);border-radius:var(--radius);padding:28px 32px;box-shadow:var(--soft-shadow)}
+    .section-header{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+    .badge{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;font-weight:900;font-size:18px;box-shadow:0 8px 20px rgba(0,0,0,.12);flex-shrink:0}
+    .badge-orange{background:linear-gradient(135deg,#ff9f68,#ff7d3f);color:#fff}
+    .badge-teal{background:linear-gradient(135deg,#36b8a0,#2a9e87);color:#fff}
+    .badge-blue{background:linear-gradient(135deg,#5b8cda,#3a6fc0);color:#fff}
+    .badge-pink{background:linear-gradient(135deg,#e87c9b,#d45a7a);color:#fff}
+    .badge-yellow{background:linear-gradient(135deg,#e8a82a,#c98b10);color:#fff}
+    .badge-purple{background:linear-gradient(135deg,#9575cd,#7c5ab8);color:#fff}
+    .badge-green{background:linear-gradient(135deg,#4caf7d,#379962);color:#fff}
+    .section-header h2{font-size:21px;font-weight:800;color:#1e3a6e;margin:0;line-height:1.3}
+    .section-header .score{margin-left:auto;background:#eef3ff;border:1px solid #b0c8f5;border-radius:12px;padding:6px 14px;font-size:13px;font-weight:800;color:#2e5eb0;white-space:nowrap}
+
+    .instruct{background:linear-gradient(135deg,#eef3ff,#f8fbff);border:2px dashed #a8c5f5;border-radius:18px;padding:14px 18px;margin-bottom:18px;font-size:14.5px;color:#2e4870;line-height:1.75}
+    .instruct strong{color:#2e5eb0}
+
+    .word-box{background:#eef3ff;border:1.5px solid #b0c8f5;border-radius:16px;padding:14px 18px;margin-bottom:18px}
+    .word-box .wb-label{font-size:13px;font-weight:800;color:#2e5eb0;margin-bottom:10px}
+    .word-chips{display:flex;flex-wrap:wrap;gap:8px}
+    .word-chip{background:#fff;border:1.5px solid #86b5f0;border-radius:10px;padding:6px 14px;font-size:14px;font-weight:700;color:#2e4870}
+
+    .q-card{background:#f8fbff;border:1px solid #c8d8f5;border-radius:20px;padding:18px 22px;margin-bottom:14px;box-shadow:0 6px 18px rgba(58,111,192,.06)}
+    .q-card .q-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#5b8cda,#3a6fc0);color:#fff;font-weight:900;font-size:13px;margin-right:10px;flex-shrink:0}
+    .q-card .q-label{font-size:15.5px;font-weight:700;color:#1e3a6e;line-height:1.65}
+    .q-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px}
+    .answer-box{border:1.5px solid #b0c8f0;border-radius:14px;padding:12px 16px;min-height:72px;background:#f8fbff;width:100%;font-family:'Noto Sans Thai',sans-serif;font-size:15px;color:var(--text);outline:none;resize:vertical;line-height:1.75;transition:border-color .2s;margin-top:10px;display:block}
+    .answer-box:focus{border-color:var(--blue)}
+    .answer-line-box{border:none;border-bottom:1.5px solid #b0c8f0;background:transparent;width:100%;padding:6px 2px;font-size:15px;font-family:'Noto Sans Thai',sans-serif;color:var(--text);outline:none;display:block;margin-top:8px}
+    .answer-line-box:focus{border-bottom-color:var(--blue)}
+
+    .partner-split{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:6px}
+    .partner-box{border-radius:18px;padding:20px;border:1.5px solid}
+    .partner-a{background:#fff6f0;border-color:#ffc49a}
+    .partner-b{background:#f0f6ff;border-color:#a8c5f5}
+    .partner-box .partner-tag{font-size:14px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+    .tag-a{color:#c05820}
+    .tag-b{color:#2e5eb0}
+    .q-num-a{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#ff9f68,#ff7d3f);color:#fff;font-weight:900;font-size:12px;margin-right:8px;flex-shrink:0}
+    .q-num-b{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#5b8cda,#3a6fc0);color:#fff;font-weight:900;font-size:12px;margin-right:8px;flex-shrink:0}
+    .pq-text{font-size:14.5px;font-weight:600;color:#3a2820;line-height:1.65}
+    .pq-row{display:flex;align-items:flex-start;gap:4px;margin-bottom:8px}
+    .ab-sm{border:1.5px solid #ffd0ad;border-radius:12px;padding:10px 14px;min-height:64px;background:#fffcfa;width:100%;font-family:'Noto Sans Thai',sans-serif;font-size:14px;color:var(--text);outline:none;resize:vertical;line-height:1.7;transition:border-color .2s;margin-top:6px;display:block}
+    .ab-sm:focus{border-color:var(--orange)}
+    .ab-sm.blue{border-color:#b8d0f5;background:#f8fbff}
+    .ab-sm.blue:focus{border-color:var(--blue)}
+
+    .match-wrap{margin-top:14px}
+    .match-table{width:100%;border-collapse:collapse}
+    .match-table th{background:#eef3ff;color:#2e4870;font-size:13.5px;padding:10px 14px;text-align:left;font-weight:800;border-bottom:2px solid #b0c8f5}
+    .match-table td{padding:10px 14px;border-bottom:1px solid #ddeaff;font-size:14.5px;vertical-align:middle;color:#3a4870;line-height:1.55}
+    .match-table tr:hover td{background:#f4f8ff}
+    .match-table .num-cell{width:36px;text-align:center;font-weight:800;color:#2e5eb0}
+    .match-table .ans-cell{width:130px;text-align:center}
+    .match-answer{border:none;border-bottom:2px solid #86b5f0;background:#eef3ff;border-radius:6px 6px 0 0;width:110px;padding:4px 8px;font-size:14px;font-family:'Noto Sans Thai',sans-serif;color:#2e5eb0;font-weight:700;text-align:center;outline:none}
+    .match-answer:focus{border-bottom-color:#3a6fc0;background:#ddeaff}
+    .match-answer.sm{width:36px}
+
+    .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:14px}
+    .match-col h4{font-size:14px;font-weight:800;color:#2e5eb0;margin:0 0 10px;padding-bottom:6px;border-bottom:2px solid #b0c8f5}
+    .match-item{display:flex;align-items:flex-start;gap:10px;background:#f4f8ff;border:1px solid #c8d8f5;border-radius:14px;padding:11px 14px;margin-bottom:8px;font-size:14px;line-height:1.65;color:#2e3870}
+    .match-bullet{flex-shrink:0;width:28px;height:28px;border-radius:50%;background:#fff;border:2px solid #86b5f0;color:#2e5eb0;font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center}
+    .choice-item{display:flex;align-items:flex-start;gap:10px;background:#fff8f0;border:1px solid #ffd3a8;border-radius:14px;padding:11px 14px;margin-bottom:8px;font-size:14px;line-height:1.65;color:#5a3220}
+    .choice-bullet{flex-shrink:0;width:28px;height:28px;border-radius:50%;background:#fff;border:2px solid #ffb07a;color:#c06030;font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center}
+
+    .situation{background:linear-gradient(135deg,#eef3ff,#f8fbff);border:2px solid #b0c8f5;border-radius:20px;padding:18px 22px;margin-bottom:16px}
+    .situation .sit-label{font-size:13px;font-weight:800;color:var(--blue);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+    .situation .sit-text{font-size:15px;line-height:1.85;color:#2e3870}
+
+    .principle-card{background:#f0f6ff;border:1.5px solid #b0c8f5;border-radius:16px;padding:16px 20px;margin-bottom:12px}
+    .principle-card .pc-title{font-size:14px;font-weight:800;color:#2e5eb0;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+    .principle-card textarea{border:1.5px solid #b0c8f0;border-radius:10px;padding:8px 12px;min-height:56px;background:#fff;width:100%;font-family:'Noto Sans Thai',sans-serif;font-size:14px;color:var(--text);outline:none;resize:vertical;line-height:1.7;display:block}
+    .principle-card textarea:focus{border-color:var(--blue)}
+
+    .cmp-table{width:100%;border-collapse:collapse;border-radius:16px;overflow:hidden;margin-top:14px;box-shadow:0 8px 20px rgba(40,80,160,.08)}
+    .cmp-table th{background:linear-gradient(135deg,#5b8cda,#3a6fc0);color:#fff;padding:12px 16px;text-align:center;font-size:14px;font-weight:800}
+    .cmp-table th:first-child{background:linear-gradient(135deg,#2e5eb0,#1e3a80)}
+    .cmp-table td{border-bottom:1px solid #ddeaff;padding:0;vertical-align:top}
+    .cmp-table td:first-child{background:#eef3ff;font-weight:800;color:#2e4870;font-size:14px;padding:12px 14px;text-align:center}
+    .cmp-table td textarea{border:none;width:100%;padding:12px 14px;font-size:14px;font-family:'Noto Sans Thai',sans-serif;color:var(--text);outline:none;resize:none;min-height:60px;background:transparent;line-height:1.7}
+    .cmp-table td textarea:focus{background:#f4f8ff}
+
+    .score-table{width:100%;border-collapse:collapse;margin-top:16px;border-radius:16px;overflow:hidden}
+    .score-table th{background:#eef3ff;color:#2e4870;font-size:13.5px;padding:12px 14px;text-align:center;font-weight:800}
+    .score-table td{background:#f8fbff;color:#3a4870;border-bottom:1px solid #ddeaff;font-size:13.5px;padding:10px 14px;text-align:center;vertical-align:middle}
+    .score-table tr:last-child td{font-weight:800;background:#eef3ff;color:#2e5eb0}
+
+    .reflection-box{background:linear-gradient(135deg,#eef3ff,#f8fbff);border-radius:20px;padding:20px;border:1px solid #b0c8f5;margin-top:14px}
+    .reflect-q{font-size:15px;font-weight:700;color:#2e4870;margin-bottom:8px;display:flex;align-items:flex-start;gap:8px}
+
+    .divider{display:flex;align-items:center;gap:12px;margin:8px 0 16px}
+    .divider::before,.divider::after{content:'';flex:1;border-top:1.5px solid #b0c8f5}
+    .divider span{font-size:13px;font-weight:700;color:#4a6898;white-space:nowrap}
+
+    .submit-area{text-align:center;padding:8px 0 24px}
+    .btn-submit{border:0;cursor:pointer;padding:16px 40px;border-radius:999px;background:linear-gradient(135deg,#5b8cda,#3a6fc0);color:#fff;font-family:'Noto Sans Thai',sans-serif;font-weight:900;font-size:16px;box-shadow:0 12px 30px rgba(58,111,192,.38);transition:transform .15s,box-shadow .15s}
+    .btn-submit:hover{transform:translateY(-2px);box-shadow:0 16px 36px rgba(58,111,192,.50)}
+    .btn-submit:disabled{opacity:.55;cursor:default;transform:none}
+    #submitMsg{display:none;margin:16px auto;max-width:480px;padding:20px 24px;border-radius:20px;background:#eef3ff;border:2px solid #86b5f0;text-align:center}
+
+    .fab-group{position:fixed;right:20px;bottom:20px;z-index:10;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
+    .print-btn{border:0;cursor:pointer;padding:12px 16px;border-radius:999px;background:#5b8cda;color:#fff;font-family:'Noto Sans Thai',sans-serif;font-weight:900;font-size:13px;box-shadow:0 10px 24px rgba(91,140,218,.34);transition:transform .15s}
+    .print-btn:hover{transform:translateY(-2px)}
+
+    @media print{
+      body{background:#fff}
+      .page{width:100%;padding:0}
+      .fab-group,.submit-area{display:none}
+      .hero,.section,.names-box{box-shadow:none;background:#fff;break-inside:avoid}
+      .answer-box,.ab-sm{border:1.5px solid #86b5f0}
+    }
+    @media (max-width:700px){
+      .names-grid,.partner-split,.match-grid{grid-template-columns:1fr}
+      .hero{grid-template-columns:1fr}
+      .pair-badge{display:none}
+      .meta-fields{grid-template-columns:1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+
+<div class='fab-group'>
+  <button class='print-btn' onclick='window.print()'>🖨️ พิมพ์</button>
+</div>
+
+<main class='page'>
+
+  <!-- HERO -->
+  <section class='hero'>
+    <div>
+      <div class='eyebrow'>🌍 ใบงานวิชาสังคมศึกษา ศาสนา และวัฒนธรรม • ชั้นมัธยมศึกษาปีที่ 3 • หน่วยที่ 3</div>
+      <h1>ใบงานคู่ 🤝<br/>วัฒนธรรมสากล</h1>
+      <p class='subtitle'>ร่วมกันเรียนรู้ความหมาย ลักษณะสำคัญ และอิทธิพลของ<strong>วัฒนธรรมสากล</strong><br/>พร้อมฝึกเลือกรับอย่างมีวิจารณญาณ และเคารพ<strong>ความหลากหลายทางวัฒนธรรม</strong></p>
+      <div class='hero-meta'>
+        <span class='meta-chip'>🤝 ทำเป็นคู่</span>
+        <span class='meta-chip'>⏱️ 50 นาที</span>
+        <span class='meta-chip'>⭐ 30 คะแนน</span>
+        <span class='meta-chip'>📖 หน่วยที่ 3</span>
+      </div>
+    </div>
+    <div class='pair-badge'>
+      <div class='icon'>🌐</div>
+      <div class='big'>คู่</div>
+      <div class='label'>ใบงาน ม.3</div>
+    </div>
+  </section>
+
+  <!-- NAMES BOX -->
+  <div class='names-box'>
+    <h2>✏️ ข้อมูลนักเรียน</h2>
+    <div class='names-grid'>
+      <div class='name-card'>
+        <div class='role'>🟠 นักเรียนคนที่ 1 (พาร์ตเนอร์ A)</div>
+        <div class='name-field'>
+          <label>ชื่อ-นามสกุล</label>
+          <input id='name1' class='il' type='text' placeholder='ชื่อ นามสกุล'/>
+        </div>
+        <div class='name-field' style='margin-top:8px'>
+          <label>เลขที่</label>
+          <input id='num1' class='il' type='text' placeholder='เลขที่'/>
+        </div>
+      </div>
+      <div class='name-card' style='background:linear-gradient(135deg,#f0f6ff,#eaf1ff);border-color:#a8c5f5'>
+        <div class='role' style='color:var(--blue)'>🔵 นักเรียนคนที่ 2 (พาร์ตเนอร์ B)</div>
+        <div class='name-field'>
+          <label>ชื่อ-นามสกุล</label>
+          <input id='name2' class='il' type='text' placeholder='ชื่อ นามสกุล'/>
+        </div>
+        <div class='name-field' style='margin-top:8px'>
+          <label>เลขที่</label>
+          <input id='num2' class='il' type='text' placeholder='เลขที่'/>
+        </div>
+      </div>
+    </div>
+    <div class='meta-fields'>
+      <div class='meta-field'><label>ชั้น</label><input id='grade' class='il' type='text' placeholder='ม.3/_'/></div>
+      <div class='meta-field'><label>วันที่</label><input id='subdate' class='il' type='text' placeholder='__/__/____'/></div>
+      <div class='meta-field'><label>คะแนนที่ได้ / 30</label><input class='il' type='text' placeholder='(ครูกรอก)' disabled style='opacity:.5'/></div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: จับคู่คำศัพท์ -->
+  <section class='section'>
+    <div class='section-header'>
+      <div class='badge badge-blue'>📌</div>
+      <h2>ส่วนที่ 1 — จับคู่คำศัพท์กับความหมาย</h2>
+      <span class='score'>8 คะแนน</span>
+    </div>
+    <div class='instruct'>
+      <strong>คำชี้แจง :</strong> เลือกคำจากกล่องด้านล่างให้ตรงกับความหมายในแต่ละข้อ (ทำร่วมกันทั้งคู่)
+    </div>
+    <div class='word-box'>
+      <div class='wb-label'>📦 คำให้เลือก</div>
+      <div class='word-chips'>
+        <span class='word-chip'>วัฒนธรรมสากล</span>
+        <span class='word-chip'>โลกาภิวัตน์</span>
+        <span class='word-chip'>วิจารณญาณ</span>
+        <span class='word-chip'>อัตลักษณ์</span>
+        <span class='word-chip'>บริโภคนิยม</span>
+        <span class='word-chip'>สื่อดิจิทัล</span>
+        <span class='word-chip'>การผสมผสานทางวัฒนธรรม</span>
+        <span class='word-chip'>ความหลากหลายทางวัฒนธรรม</span>
+      </div>
+    </div>
+    <div class='match-wrap'>
+      <table class='match-table'>
+        <thead>
+          <tr><th class='num-cell'>ข้อ</th><th>ความหมาย / คำอธิบาย</th><th class='ans-cell'>คำตอบ</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class='num-cell'>1</td>
+            <td>วัฒนธรรมที่แพร่หลายและได้รับการยอมรับในหลายประเทศทั่วโลก เกิดจากการแลกเปลี่ยนความคิด วิถีชีวิต และเทคโนโลยีระหว่างผู้คนต่างชาติในยุคโลกาภิวัตน์</td>
+            <td class='ans-cell'><input id='s1_1' class='match-answer' type='text' placeholder='........'/></td>
+          </tr>
+          <tr>
+            <td class='num-cell'>2</td>
+            <td>กระบวนการที่โลกเชื่อมต่อกันมากขึ้นผ่านการค้า การสื่อสาร และเทคโนโลยี จนเกิดการพึ่งพาอาศัยกันระหว่างประเทศ ทำให้วัฒนธรรมแพร่กระจายได้รวดเร็ว</td>
+            <td class='ans-cell'><input id='s1_2' class='match-answer' type='text' placeholder='........'/></td>
+          </tr>
+          <tr>
+            <td class='num-cell'>3</td>
+            <td>ความสามารถในการคิดวิเคราะห์ แยกแยะสิ่งที่ดีหรือไม่ดี เหมาะสมหรือไม่เหมาะสม ก่อนตัดสินใจเชื่อหรือปฏิบัติตามสิ่งที่ได้รับจากสื่อหรือวัฒนธรรมต่างๆ</td>
+            <td class='ans-cell'><input id='s1_3' class='match-answer' type='text' placeholder='........'/></td>
+          </tr>
+          <tr>
+            <td class='num-cell'>4</td>
+            <td>ลักษณะเฉพาะตัวที่บ่งบอกความเป็นตัวเองของบุคคลหรือกลุ่มสังคม เช่น ภาษา ประเพณี และค่านิยม ซึ่งควรรักษาไว้แม้จะเปิดรับวัฒนธรรมจากภายนอก</td>
+            <td class='ans-cell'><input id='s1_4' class='match-answer' type='text' placeholder='........'/></td>
+          </tr>
+          <tr>
+            <td class='num-cell'>5</td>
+            <td>ค่านิยมที่ให้ความสำคัญกับการซื้อและบริโภคสินค้าหรือบริการมากเกินความจำเป็น มักเกิดจากอิทธิพลสื่อและโฆษณา อาจส่งผลเสียต่อสุขภาพการเงิน</td>
+            <td class='ans-cell'><input id='s1_5' class='match-answer' type='text' placeholder='........'/></td>
+          </tr>
+          <tr>
+            <td class='num-cell'>6</td>
+            <td>ช่องทางการสื่อสารและเผยแพร่ข้อมูลผ่านอินเทอร์เน็ตและอุปกรณ์อิเล็กทรอนิกส์ เช่น โซเชียลมีเดีย เว็บไซต์ แอปพลิเคชัน และแพลตฟอร์มออนไลน์ต่างๆ</td>
+            <td class='ans-cell'><input id='s1_6' class='match-answer' type='text' placeholder='........'/></td>
+          </tr>
+          <tr>
+            <td class='num-cell'>7</td>
+            <td>ปรากฏการณ์ที่วัฒนธรรมจากหลายแหล่งมาผสมผสานกันจนเกิดรูปแบบใหม่ เช่น อาหารฟิวชัน เพลงที่ผสมหลายสไตล์ หรือแฟชั่นที่รวมองค์ประกอบจากหลายวัฒนธรรม</td>
+            <td class='ans-cell'><input id='s1_7' class='match-answer' type='text' placeholder='........'/></td>
+          </tr>
+          <tr>
+            <td class='num-cell'>8</td>
+            <td>การมีอยู่ของวัฒนธรรม ภาษา ประเพณี และวิถีชีวิตที่แตกต่างหลากหลายในโลก ซึ่งควรได้รับการเคารพ เข้าใจ และอยู่ร่วมกันอย่างสันติ</td>
+            <td class='ans-cell'><input id='s1_8' class='match-answer' type='text' placeholder='........'/></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 2: จำแนกประเภท -->
+  <section class='section'>
+    <div class='section-header'>
+      <div class='badge badge-teal'>🔗</div>
+      <h2>ส่วนที่ 2 — จำแนกตัวอย่างวัฒนธรรมสากล</h2>
+      <span class='score'>6 คะแนน</span>
+    </div>
+    <div class='instruct'>
+      <strong>คำชี้แจง :</strong> พิจารณาตัวอย่างในคอลัมน์ซ้าย แล้วเขียนอักษร <strong>ก / ข / ค / ง / จ</strong> ให้ตรงกับประเภทวัฒนธรรมสากลในคอลัมน์ขวา
+    </div>
+    <div class='match-grid'>
+      <div>
+        <div class='match-col'><h4>📋 ตัวอย่าง</h4></div>
+        <div class='match-item'>
+          <div class='match-bullet'>1</div>
+          <div style='flex:1'>การรับประทานพิซซ่า ซูชิ เบอร์เกอร์ และชานานาชาติ
+            <input id='s2_1' class='match-answer sm' type='text' placeholder='...' style='margin-left:8px'/>
+          </div>
+        </div>
+        <div class='match-item'>
+          <div class='match-bullet'>2</div>
+          <div style='flex:1'>การใช้คำทับศัพท์อังกฤษในชีวิตประจำวัน เช่น "selfie" "comment" "update"
+            <input id='s2_2' class='match-answer sm' type='text' placeholder='...' style='margin-left:8px'/>
+          </div>
+        </div>
+        <div class='match-item'>
+          <div class='match-bullet'>3</div>
+          <div style='flex:1'>การรับชมซีรีส์เกาหลีและภาพยนตร์ฮอลลีวูดผ่านแพลตฟอร์มออนไลน์
+            <input id='s2_3' class='match-answer sm' type='text' placeholder='...' style='margin-left:8px'/>
+          </div>
+        </div>
+        <div class='match-item'>
+          <div class='match-bullet'>4</div>
+          <div style='flex:1'>การแต่งกายตามกระแสแฟชั่นเกาหลีและตะวันตกที่เห็นในโซเชียลมีเดีย
+            <input id='s2_4' class='match-answer sm' type='text' placeholder='...' style='margin-left:8px'/>
+          </div>
+        </div>
+        <div class='match-item'>
+          <div class='match-bullet'>5</div>
+          <div style='flex:1'>การใช้สมาร์ตโฟน วิดีโอคอล และแอปพลิเคชันต่างๆ ในชีวิตประจำวัน
+            <input id='s2_5' class='match-answer sm' type='text' placeholder='...' style='margin-left:8px'/>
+          </div>
+        </div>
+        <div class='match-item'>
+          <div class='match-bullet'>6</div>
+          <div style='flex:1'>การฟังเพลงสากล K-pop และเพลงตะวันตกผ่าน YouTube และ Spotify
+            <input id='s2_6' class='match-answer sm' type='text' placeholder='...' style='margin-left:8px'/>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class='match-col'><h4>🏷️ ประเภทวัฒนธรรมสากล</h4></div>
+        <div class='choice-item'><div class='choice-bullet'>ก</div><div><strong>ด้านอาหาร</strong><br/><span style='font-size:13px;color:#7a4830'>การแลกเปลี่ยนรสนิยมและการบริโภคข้ามวัฒนธรรม</span></div></div>
+        <div class='choice-item'><div class='choice-bullet'>ข</div><div><strong>ด้านภาษา</strong><br/><span style='font-size:13px;color:#7a4830'>การสื่อสารกับคนต่างชาติและการเข้าถึงความรู้ระดับโลก</span></div></div>
+        <div class='choice-item'><div class='choice-bullet'>ค</div><div><strong>ด้านสื่อและบันเทิง</strong><br/><span style='font-size:13px;color:#7a4830'>รับอิทธิพลจากสื่อนานาชาติ ภาพยนตร์ เพลง เกม</span></div></div>
+        <div class='choice-item'><div class='choice-bullet'>ง</div><div><strong>ด้านแฟชั่น</strong><br/><span style='font-size:13px;color:#7a4830'>รสนิยมและความนิยมที่แพร่กระจายระหว่างประเทศ</span></div></div>
+        <div class='choice-item'><div class='choice-bullet'>จ</div><div><strong>ด้านเทคโนโลยี</strong><br/><span style='font-size:13px;color:#7a4830'>การเชื่อมต่อโลกและการใช้ชีวิตแบบดิจิทัล</span></div></div>
+
+        <div class='reflection-box' style='margin-top:14px'>
+          <div class='reflect-q'>💭 คู่คิดร่วมกัน: มีตัวอย่างในชีวิตประจำวันของนักเรียนที่แสดงวัฒนธรรมสากลมากกว่า 1 ด้านพร้อมกันหรือไม่? ยกตัวอย่าง</div>
+          <textarea id='s2_ref' class='ab-sm blue' placeholder='เขียนคำตอบที่นี่...'></textarea>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: อัตนัยแยก -->
+  <section class='section'>
+    <div class='section-header'>
+      <div class='badge badge-orange'>✍️</div>
+      <h2>ส่วนที่ 3 — อัตนัย (ตอบแยกกัน)</h2>
+      <span class='score'>8 คะแนน</span>
+    </div>
+    <div class='instruct'>
+      <strong>คำชี้แจง :</strong> พาร์ตเนอร์ A และ B ตอบคนละชุดคำถามโดยอิสระ จากนั้นแลกอ่านและเพิ่มเติมสิ่งที่คู่ลืม
+    </div>
+    <div class='partner-split'>
+      <div class='partner-box partner-a'>
+        <div class='partner-tag tag-a'>🟠 พาร์ตเนอร์ A — ข้อดีของวัฒนธรรมสากล</div>
+        <div class='pq-row'><span class='q-num-a'>A1</span><span class='pq-text'>อธิบายข้อดี 3 ประการของการรับวัฒนธรรมสากล พร้อมยกตัวอย่างประกอบแต่ละข้อ</span></div>
+        <textarea id='a1' class='ab-sm' placeholder='ข้อดีที่ 1: ..........&#10;ข้อดีที่ 2: ..........&#10;ข้อดีที่ 3: ..........'></textarea>
+        <div class='pq-row' style='margin-top:14px'><span class='q-num-a'>A2</span><span class='pq-text'>วัฒนธรรมสากลช่วยพัฒนาทักษะด้านใดของนักเรียนบ้าง? อธิบายพร้อมตัวอย่างจากชีวิตจริง</span></div>
+        <textarea id='a2' class='ab-sm' placeholder='เขียนคำตอบที่นี่...'></textarea>
+        <div class='pq-row' style='margin-top:14px'><span class='q-num-a'>A3</span><span class='pq-text'>ยกตัวอย่างวัฒนธรรมสากล 1 อย่างที่เป็นประโยชน์ต่อสังคมไทยอย่างชัดเจน พร้อมเหตุผล</span></div>
+        <textarea id='a3' class='ab-sm' placeholder='ตัวอย่าง: ..........&#10;เหตุผล: ..........'></textarea>
+      </div>
+      <div class='partner-box partner-b'>
+        <div class='partner-tag tag-b'>🔵 พาร์ตเนอร์ B — ข้อควรระวังของวัฒนธรรมสากล</div>
+        <div class='pq-row'><span class='q-num-b'>B1</span><span class='pq-text'>อธิบายข้อควรระวัง 3 ประการจากการรับวัฒนธรรมสากล พร้อมยกตัวอย่างประกอบแต่ละข้อ</span></div>
+        <textarea id='b1' class='ab-sm blue' placeholder='ข้อควรระวังที่ 1: ..........&#10;ข้อควรระวังที่ 2: ..........&#10;ข้อควรระวังที่ 3: ..........'></textarea>
+        <div class='pq-row' style='margin-top:14px'><span class='q-num-b'>B2</span><span class='pq-text'>"บริโภคนิยม" หมายความว่าอย่างไร? เกี่ยวข้องกับวัฒนธรรมสากลอย่างไร? และส่งผลเสียได้อย่างไรบ้าง?</span></div>
+        <textarea id='b2' class='ab-sm blue' placeholder='ความหมาย: ..........&#10;ความเกี่ยวข้อง: ..........&#10;ผลเสีย: ..........'></textarea>
+        <div class='pq-row' style='margin-top:14px'><span class='q-num-b'>B3</span><span class='pq-text'>ยกตัวอย่างวัฒนธรรมสากล 1 อย่างที่อาจส่งผลเสียหากรับโดยไม่มีวิจารณญาณ พร้อมอธิบาย</span></div>
+        <textarea id='b3' class='ab-sm blue' placeholder='ตัวอย่าง: ..........&#10;ผลเสียหากขาดวิจารณญาณ: ..........'></textarea>
+      </div>
+    </div>
+    <div style='margin-top:16px;background:#f4f8ff;border:1.5px dashed #86b5f0;border-radius:16px;padding:16px 20px'>
+      <div style='font-size:13.5px;font-weight:800;color:#2e5eb0;margin-bottom:10px'>🔄 แลกเปลี่ยนกัน: หลังอ่านคำตอบของคู่ มีสิ่งที่ต้องการเพิ่มเติมหรือเห็นต่างไหม?</div>
+      <textarea id='s3_share' class='ab-sm blue' placeholder='A เพิ่มเติม: ............&#10;B เพิ่มเติม: ............'></textarea>
+    </div>
+  </section>
+
+  <!-- SECTION 4: สถานการณ์ -->
+  <section class='section'>
+    <div class='section-header'>
+      <div class='badge badge-pink'>🔍</div>
+      <h2>ส่วนที่ 4 — วิเคราะห์สถานการณ์</h2>
+      <span class='score'>5 คะแนน</span>
+    </div>
+    <div class='instruct'>
+      <strong>คำชี้แจง :</strong> อ่านสถานการณ์ร่วมกัน แล้วตอบคำถาม <strong>ทำร่วมกันทั้งคู่</strong>
+    </div>
+    <div class='situation'>
+      <div class='sit-label'>📖 สถานการณ์</div>
+      <div class='sit-text'>
+        "เต้" นักเรียน ม.3 ติดตามคอนเทนต์ K-pop และ YouTuber ต่างชาติทุกวัน แต่งกายและพูดตามไอดอล แชร์วิดีโอโดยไม่ตรวจสอบความถูกต้อง และใช้เงินซื้อสินค้าแบรนด์ต่างประเทศจนพ่อแม่กังวลเรื่องค่าใช้จ่าย อย่างไรก็ตาม เต้สามารถสื่อสารภาษาอังกฤษได้ดีขึ้นมากจากการดูเนื้อหาต่างชาติ และมีเพื่อนต่างชาติในโลกออนไลน์หลายคน
+      </div>
+    </div>
+    <div class='q-card'>
+      <div class='q-row'><span class='q-num'>1</span><span class='q-label'>จงวิเคราะห์พฤติกรรมของเต้ โดยระบุว่าอะไรเป็นข้อดีและอะไรเป็นข้อควรระวังจากการรับวัฒนธรรมสากล</span></div>
+      <textarea id='q4_1' class='answer-box' placeholder='ข้อดี: ..........&#10;ข้อควรระวัง: ..........'></textarea>
+    </div>
+    <div class='q-card'>
+      <div class='q-row'><span class='q-num'>2</span><span class='q-label'>พฤติกรรมใดของเต้ที่แสดงถึงการขาดวิจารณญาณ? และควรปรับปรุงอย่างไร?</span></div>
+      <textarea id='q4_2' class='answer-box' placeholder='พฤติกรรมที่ขาดวิจารณญาณ: ..........&#10;แนวทางปรับปรุง: ..........'></textarea>
+    </div>
+    <div class='q-card'>
+      <div class='q-row'><span class='q-num'>3</span><span class='q-label'>ในฐานะเพื่อน นักเรียนทั้งคู่จะให้คำแนะนำเต้อย่างไร ให้เขาเปิดรับวัฒนธรรมสากลได้โดยไม่สูญเสียอัตลักษณ์ไทย? (เสนอ 3 ข้อ)</span></div>
+      <div style='margin-top:10px'>
+        <div style='display:flex;align-items:center;gap:10px;margin-bottom:10px'>
+          <span style='width:24px;height:24px;border-radius:50%;background:#5b8cda;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0'>1</span>
+          <input id='q4_w1' class='answer-line-box' type='text' placeholder='คำแนะนำที่ 1...'/>
+        </div>
+        <div style='display:flex;align-items:center;gap:10px;margin-bottom:10px'>
+          <span style='width:24px;height:24px;border-radius:50%;background:#5b8cda;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0'>2</span>
+          <input id='q4_w2' class='answer-line-box' type='text' placeholder='คำแนะนำที่ 2...'/>
+        </div>
+        <div style='display:flex;align-items:center;gap:10px'>
+          <span style='width:24px;height:24px;border-radius:50%;background:#5b8cda;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0'>3</span>
+          <input id='q4_w3' class='answer-line-box' type='text' placeholder='คำแนะนำที่ 3...'/>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: การเลือกรับวัฒนธรรมสากล -->
+  <section class='section'>
+    <div class='section-header'>
+      <div class='badge badge-yellow'>🧭</div>
+      <h2>ส่วนที่ 5 — การเลือกรับวัฒนธรรมสากลอย่างเหมาะสม</h2>
+      <span class='score'>3 คะแนน</span>
+    </div>
+    <div class='instruct'>
+      <strong>คำชี้แจง :</strong> อธิบายหลักการเลือกรับวัฒนธรรมสากล 3 ข้อ จากใบความรู้ พร้อมยกตัวอย่างของนักเรียนเอง (ทำร่วมกัน)
+    </div>
+
+    <div class='principle-card'>
+      <div class='pc-title'>🔍 หลักที่ 1 — คิดก่อนเชื่อ</div>
+      <div style='font-size:14px;color:#3a4870;margin-bottom:8px'>นักเรียนจะปฏิบัติตามหลักนี้อย่างไร? ยกตัวอย่างสถานการณ์จริง</div>
+      <textarea id='p1' placeholder='เขียนอธิบาย + ตัวอย่างที่นี่...'></textarea>
+    </div>
+    <div class='principle-card'>
+      <div class='pc-title'>✅ หลักที่ 2 — เลือกสิ่งที่มีประโยชน์</div>
+      <div style='font-size:14px;color:#3a4870;margin-bottom:8px'>นักเรียนมีเกณฑ์อย่างไรในการตัดสินว่าวัฒนธรรมสากลใดมีประโยชน์และเหมาะสมกับตัวเอง?</div>
+      <textarea id='p2' placeholder='เขียนเกณฑ์และตัวอย่างที่นี่...'></textarea>
+    </div>
+    <div class='principle-card'>
+      <div class='pc-title'>🏳️ หลักที่ 3 — รักษาอัตลักษณ์ไทย</div>
+      <div style='font-size:14px;color:#3a4870;margin-bottom:8px'>นักเรียนรักษาความเป็นไทยของตนเองอย่างไร ขณะที่ยังเปิดรับวัฒนธรรมสากล? ยกตัวอย่างพฤติกรรมจริง</div>
+      <textarea id='p3' placeholder='เขียนแนวทางและตัวอย่างที่นี่...'></textarea>
+    </div>
+
+    <div class='q-card' style='margin-top:4px'>
+      <div class='q-row'><span class='q-num'>★</span><span class='q-label'>นักเรียนทั้งคู่คิดว่า หลักการใดในสามข้อนี้สำคัญที่สุดสำหรับเยาวชนไทยในยุคปัจจุบัน? เพราะเหตุใด? และมีอุปสรรคอะไรที่ทำให้ปฏิบัติได้ยาก?</span></div>
+      <textarea id='s5_star' class='answer-box' style='min-height:90px' placeholder='หลักที่สำคัญที่สุดคือ: ..........&#10;เหตุผล: ..........&#10;อุปสรรค: ..........'></textarea>
+    </div>
+  </section>
+
+  <!-- SECTION 6: สรุปและสะท้อนคิด -->
+  <section class='section'>
+    <div class='section-header'>
+      <div class='badge badge-purple'>💬</div>
+      <h2>ส่วนที่ 6 — สรุปและสะท้อนคิด</h2>
+    </div>
+    <div class='instruct'>
+      <strong>คำชี้แจง :</strong> ตอบคำถามสรุปร่วมกัน เพื่อทบทวนสิ่งที่ได้เรียนรู้
+    </div>
+
+    <div class='q-card'>
+      <div class='q-row'><span class='q-num'>1</span><span class='q-label'>วัฒนธรรมสากลแตกต่างจากวัฒนธรรมท้องถิ่นอย่างไร? จงอธิบายพร้อมยกตัวอย่างเปรียบเทียบ</span></div>
+      <textarea id='s6_q1' class='answer-box' placeholder='วัฒนธรรมสากล: ..........&#10;วัฒนธรรมท้องถิ่น: ..........&#10;ตัวอย่างเปรียบเทียบ: ..........'></textarea>
+    </div>
+
+    <div class='q-card'>
+      <div class='q-row'><span class='q-num'>2</span><span class='q-label'>เทคโนโลยีและสื่อดิจิทัลมีบทบาทอย่างไรในการแพร่กระจายวัฒนธรรมสากล? มีผลดีและผลเสียอย่างไร?</span></div>
+      <textarea id='s6_q2' class='answer-box' placeholder='บทบาทของเทคโนโลยี: ..........&#10;ผลดี: ..........&#10;ผลเสีย: ..........'></textarea>
+    </div>
+
+    <div class='divider'><span>🌟 ข้อคิดจากการทำใบงาน</span></div>
+    <div class='reflection-box'>
+      <div class='reflect-q'>✨ หลังทำใบงานนี้ร่วมกัน นักเรียนทั้งคู่เรียนรู้อะไรใหม่เกี่ยวกับวัฒนธรรมสากล? และจะนำไปปรับใช้ในชีวิตประจำวันอย่างไร?</div>
+      <textarea id='s6_ref' class='answer-box' style='min-height:100px' placeholder='A เรียนรู้ว่า..............&#10;B เรียนรู้ว่า..............&#10;เราจะนำไปใช้โดย...............'></textarea>
+    </div>
+  </section>
+
+  <!-- SCORE TABLE -->
+  <section class='section' style='margin-top:20px'>
+    <div class='section-header'>
+      <div class='badge badge-blue'>📊</div>
+      <h2>ตารางบันทึกคะแนน (ครูกรอก)</h2>
+    </div>
+    <table class='score-table'>
+      <thead><tr><th>ส่วนที่</th><th>เนื้อหา</th><th>คะแนนเต็ม</th><th>คะแนนที่ได้</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>จับคู่คำศัพท์กับความหมาย</td><td>8</td><td></td></tr>
+        <tr><td>2</td><td>จำแนกตัวอย่างวัฒนธรรมสากล</td><td>6</td><td></td></tr>
+        <tr><td>3</td><td>อัตนัยแยก (A และ B)</td><td>8</td><td></td></tr>
+        <tr><td>4</td><td>วิเคราะห์สถานการณ์</td><td>5</td><td></td></tr>
+        <tr><td>5</td><td>การเลือกรับวัฒนธรรมสากล</td><td>3</td><td></td></tr>
+        <tr><td>—</td><td>รวมทั้งหมด</td><td>30</td><td></td></tr>
+      </tbody>
+    </table>
+    <div style='display:flex;gap:16px;margin-top:16px;flex-wrap:wrap'>
+      <div style='flex:1;min-width:200px'>
+        <label style='font-size:13px;font-weight:700;color:#4a6898;display:block;margin-bottom:4px'>ลายมือชื่อครูผู้สอน</label>
+        <input class='il' type='text' placeholder='ลงชื่อ ...................................' style='width:100%'/>
+      </div>
+      <div style='flex:1;min-width:200px'>
+        <label style='font-size:13px;font-weight:700;color:#4a6898;display:block;margin-bottom:4px'>วันที่ตรวจ</label>
+        <input class='il' type='text' placeholder='__/__/____' style='width:100%'/>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUBMIT -->
+  <div class='submit-area' style='margin-top:24px'>
+    <button class='btn-submit' id='submitBtn' onclick='submitWorksheet()'>📤 ส่งใบงาน</button>
+    <div id='submitMsg'></div>
+  </div>
+
+  <div style='margin-top:12px;text-align:center;padding:20px 24px;border-radius:24px;background:rgba(255,255,255,.80);border:1px solid rgba(255,255,255,.95);color:#4a6898;font-weight:700;font-size:14px;box-shadow:var(--soft-shadow)'>
+    🌍 ใบงานวิชาสังคมศึกษา ศาสนา และวัฒนธรรม • ม.3 หน่วยที่ 3 • วัฒนธรรมสากล
+  </div>
+</main>
+
+<script type='module'>
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { FIREBASE_CONFIG } from './js/config.js';
+
+const app = initializeApp(FIREBASE_CONFIG);
+const db  = getFirestore(app);
+
+const KEYS_S1 = {
+  s1_1:'วัฒนธรรมสากล', s1_2:'โลกาภิวัตน์', s1_3:'วิจารณญาณ',
+  s1_4:'อัตลักษณ์', s1_5:'บริโภคนิยม', s1_6:'สื่อดิจิทัล',
+  s1_7:'การผสมผสานทางวัฒนธรรม', s1_8:'ความหลากหลายทางวัฒนธรรม'
+};
+const KEYS_S2 = { s2_1:'ก', s2_2:'ข', s2_3:'ค', s2_4:'ง', s2_5:'จ', s2_6:'ค' };
+
+window.submitWorksheet = async function(){
+  const name1 = (document.getElementById('name1').value||'').trim();
+  const name2 = (document.getElementById('name2').value||'').trim();
+  if(!name1 || !name2){
+    alert('📝 กรุณากรอกชื่อนักเรียนทั้ง 2 คนก่อนส่งใบงาน');
+    return;
+  }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = '⏳ กำลังส่ง...';
+
+  const v = id => (document.getElementById(id)?.value||'').trim();
+
+  let s1Score = 0;
+  Object.entries(KEYS_S1).forEach(([id, ans]) => { if(v(id)===ans) s1Score++; });
+  let s2Score = 0;
+  Object.entries(KEYS_S2).forEach(([id, ans]) => { if(v(id)===ans) s2Score++; });
+  const autoScore = s1Score + s2Score;
+  const autoMax   = Object.keys(KEYS_S1).length + Object.keys(KEYS_S2).length; // 14
+
+  const fields = [
+    {label:'ส่วน 1 ข้อ 1 (วัฒนธรรมสากล)', value: v('s1_1')||'ไม่ตอบ'},
+    {label:'ส่วน 1 ข้อ 2 (โลกาภิวัตน์)', value: v('s1_2')||'ไม่ตอบ'},
+    {label:'ส่วน 1 ข้อ 3 (วิจารณญาณ)', value: v('s1_3')||'ไม่ตอบ'},
+    {label:'ส่วน 1 ข้อ 4 (อัตลักษณ์)', value: v('s1_4')||'ไม่ตอบ'},
+    {label:'ส่วน 1 ข้อ 5 (บริโภคนิยม)', value: v('s1_5')||'ไม่ตอบ'},
+    {label:'ส่วน 1 ข้อ 6 (สื่อดิจิทัล)', value: v('s1_6')||'ไม่ตอบ'},
+    {label:'ส่วน 1 ข้อ 7 (การผสมผสานทางวัฒนธรรม)', value: v('s1_7')||'ไม่ตอบ'},
+    {label:'ส่วน 1 ข้อ 8 (ความหลากหลายทางวัฒนธรรม)', value: v('s1_8')||'ไม่ตอบ'},
+    {label:'ส่วน 2 ข้อ 1 (อาหาร)', value: v('s2_1')||'ไม่ตอบ'},
+    {label:'ส่วน 2 ข้อ 2 (ภาษา)', value: v('s2_2')||'ไม่ตอบ'},
+    {label:'ส่วน 2 ข้อ 3 (สื่อ/บันเทิง)', value: v('s2_3')||'ไม่ตอบ'},
+    {label:'ส่วน 2 ข้อ 4 (แฟชั่น)', value: v('s2_4')||'ไม่ตอบ'},
+    {label:'ส่วน 2 ข้อ 5 (เทคโนโลยี)', value: v('s2_5')||'ไม่ตอบ'},
+    {label:'ส่วน 2 ข้อ 6 (สื่อ/บันเทิง)', value: v('s2_6')||'ไม่ตอบ'},
+    {label:'ส่วน 2 — คิดร่วมกัน', value: v('s2_ref')||'ไม่ตอบ'},
+    {label:'ส่วน 3 — A1 ข้อดี 3 ประการ', value: v('a1')||'ไม่ตอบ'},
+    {label:'ส่วน 3 — A2 ทักษะที่พัฒนา', value: v('a2')||'ไม่ตอบ'},
+    {label:'ส่วน 3 — A3 ตัวอย่างที่เป็นประโยชน์', value: v('a3')||'ไม่ตอบ'},
+    {label:'ส่วน 3 — B1 ข้อควรระวัง 3 ประการ', value: v('b1')||'ไม่ตอบ'},
+    {label:'ส่วน 3 — B2 บริโภคนิยม', value: v('b2')||'ไม่ตอบ'},
+    {label:'ส่วน 3 — B3 ตัวอย่างที่ขาดวิจารณญาณ', value: v('b3')||'ไม่ตอบ'},
+    {label:'ส่วน 3 — แลกเปลี่ยน', value: v('s3_share')||'ไม่ตอบ'},
+    {label:'ส่วน 4 — วิเคราะห์เต้: ข้อดี/ข้อควรระวัง', value: v('q4_1')||'ไม่ตอบ'},
+    {label:'ส่วน 4 — พฤติกรรมขาดวิจารณญาณ', value: v('q4_2')||'ไม่ตอบ'},
+    {label:'ส่วน 4 — คำแนะนำ 1', value: v('q4_w1')||'ไม่ตอบ'},
+    {label:'ส่วน 4 — คำแนะนำ 2', value: v('q4_w2')||'ไม่ตอบ'},
+    {label:'ส่วน 4 — คำแนะนำ 3', value: v('q4_w3')||'ไม่ตอบ'},
+    {label:'ส่วน 5 — หลักที่ 1 คิดก่อนเชื่อ', value: v('p1')||'ไม่ตอบ'},
+    {label:'ส่วน 5 — หลักที่ 2 เลือกสิ่งที่มีประโยชน์', value: v('p2')||'ไม่ตอบ'},
+    {label:'ส่วน 5 — หลักที่ 3 รักษาอัตลักษณ์', value: v('p3')||'ไม่ตอบ'},
+    {label:'ส่วน 5 — หลักสำคัญที่สุด + เหตุผล', value: v('s5_star')||'ไม่ตอบ'},
+    {label:'ส่วน 6 — วัฒนธรรมสากล vs ท้องถิ่น', value: v('s6_q1')||'ไม่ตอบ'},
+    {label:'ส่วน 6 — บทบาทเทคโนโลยี', value: v('s6_q2')||'ไม่ตอบ'},
+    {label:'ส่วน 6 — สะท้อนคิด', value: v('s6_ref')||'ไม่ตอบ'},
+  ];
+
+  const data = {
+    studentName: name1 + ' & ' + name2,
+    name1, name2,
+    num1: v('num1'), num2: v('num2'),
+    grade: v('grade')||'ม.3',
+    subject: 'สังคมศึกษา',
+    worksheetTitle: 'ใบงานคู่ หน่วยที่ 3 — วัฒนธรรมสากล',
+    worksheetId: 'ws_global_culture_m3_unit3_pair',
+    submittedDate: v('subdate'),
+    fields,
+    submittedAt: serverTimestamp(),
+    score: null, maxScore: 30,
+    autoScore, autoMaxScore: autoMax,
+    s1Score, s1Max: Object.keys(KEYS_S1).length,
+    s2Score, s2Max: Object.keys(KEYS_S2).length,
+    feedback: '',
+    isPair: true,
+  };
+
+  try{
+    await addDoc(collection(db,'worksheet_submissions'), data);
+    const pct = Math.round(autoScore / autoMax * 100);
+    const msg = document.getElementById('submitMsg');
+    msg.innerHTML = `
+      <div style="font-size:26px;margin-bottom:8px">🎉</div>
+      <div style="font-size:17px;font-weight:800;color:#1e3a6e;margin-bottom:6px">ส่งใบงานสำเร็จแล้ว!</div>
+      <div style="font-size:15px;font-weight:700;color:#555;margin-bottom:6px">คู่: <b>${name1}</b> 🤝 <b>${name2}</b></div>
+      <div style="font-size:16px;font-weight:800;color:${pct>=60?'#2e7d32':'#c62828'};margin-bottom:4px">
+        📊 จับคู่อัตโนมัติ: ${autoScore}/${autoMax} ข้อ (${pct}%)
+      </div>
+      <div style="font-size:12.5px;color:#777;margin-top:6px">
+        ส่วนที่ 1: ${s1Score}/${Object.keys(KEYS_S1).length} &nbsp;|&nbsp; ส่วนที่ 2: ${s2Score}/${Object.keys(KEYS_S2).length}
+      </div>
+      <div style="font-size:13px;color:#555;margin-top:6px">ครูจะตรวจส่วนอัตนัยและแจ้งคะแนนรวม 30 คะแนนภายหลัง 💙</div>`;
+    msg.style.display = 'block';
+    btn.textContent = '✅ ส่งแล้ว';
+    btn.style.background = 'linear-gradient(135deg,#66bb6a,#4caf50)';
+    document.querySelectorAll('input:not([disabled]),textarea').forEach(el => el.disabled = true);
+    msg.scrollIntoView({behavior:'smooth',block:'center'});
+  } catch(e) {
+    btn.disabled = false; btn.textContent = '📤 ส่งใบงาน';
+    alert('❌ ส่งไม่สำเร็จ: ' + e.message);
+  }
+};
+</script>
+</body>
+</html>
