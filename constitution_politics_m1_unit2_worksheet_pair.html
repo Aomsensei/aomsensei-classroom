@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang='th'>
+<head>
+  <meta charset='UTF-8'/>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
+  <title>ใบงานคู่ ม.1 หน่วยที่ 2 รัฐธรรมนูญกับการเมืองการปกครองของไทย</title>
+  <link rel='preconnect' href='https://fonts.googleapis.com'>
+  <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
+  <link href='https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800;900&display=swap' rel='stylesheet'>
+  <style>
+    :root{
+      --orange:#ff9f68;--orange2:#ffbf93;--orange3:#ffe3cf;
+      --cream:#fffaf5;--text:#5a3b30;--muted:#86675c;
+      --soft-shadow:0 12px 28px rgba(120,72,40,.10);--shadow:0 24px 60px rgba(150,84,39,.14);--radius:28px;
+      --teal:#36b8a0;--blue:#5b8cda;--pink:#e87c9b;--yellow:#e8a82a;--green:#4caf7d;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;font-family:'Noto Sans Thai',system-ui,sans-serif;color:var(--text);
+      background:
+        radial-gradient(circle at 8% 10%,rgba(255,191,147,.50),transparent 24%),
+        radial-gradient(circle at 92% 18%,rgba(255,231,168,.45),transparent 20%),
+        radial-gradient(circle at 50% 100%,rgba(255,216,180,.35),transparent 24%),
+        linear-gradient(135deg,#fffaf5 0%,#fff0e3 55%,#ffe9d9 100%);
+      min-height:100vh;
+    }
+    .page{width:min(1100px,calc(100% - 28px));margin:0 auto;padding:24px 0 72px}
+
+    /* HERO */
+    .hero{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:start;background:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.95);border-radius:36px;padding:32px 36px;box-shadow:var(--shadow);backdrop-filter:blur(10px);overflow:hidden;position:relative;margin-bottom:20px}
+    .hero::before{content:'';position:absolute;right:-80px;top:-80px;width:240px;height:240px;border-radius:50%;background:rgba(255,159,104,.12)}
+    .hero::after{content:'';position:absolute;left:-60px;bottom:-90px;width:200px;height:200px;border-radius:50%;background:rgba(255,200,140,.14)}
+    .hero>*{position:relative;z-index:1}
+    .eyebrow{display:inline-flex;gap:8px;align-items:center;padding:8px 14px;border-radius:999px;background:#fff3ea;color:#ba612c;border:1px solid #ffd7ba;font-weight:800;font-size:13px;margin-bottom:12px}
+    .hero h1{margin:0 0 8px;font-size:clamp(22px,3.2vw,36px);line-height:1.15;color:#6a3925;font-weight:900}
+    .hero .subtitle{margin:0 0 16px;font-size:15px;line-height:1.85;color:var(--muted)}
+    .hero-meta{display:flex;flex-wrap:wrap;gap:8px}
+    .meta-chip{padding:8px 12px;border-radius:14px;background:#fff;border:1px solid #ffe3d1;box-shadow:var(--soft-shadow);font-weight:700;font-size:13px;color:#75452f}
+    .pair-badge{background:linear-gradient(135deg,#ff9f68,#ff6f3f);color:#fff;border-radius:18px;padding:18px 24px;text-align:center;box-shadow:0 10px 30px rgba(255,111,63,.28);flex-shrink:0;min-width:130px}
+    .pair-badge .icon{font-size:36px;margin-bottom:6px}
+    .pair-badge .label{font-size:13px;font-weight:800;opacity:.92}
+    .pair-badge .big{font-size:22px;font-weight:900}
+
+    /* NAMES */
+    .names-box{background:rgba(255,255,255,.88);border:1.5px dashed var(--orange2);border-radius:24px;padding:24px 28px;margin-bottom:20px;box-shadow:var(--soft-shadow)}
+    .names-box h2{font-size:17px;font-weight:800;color:#b05520;margin:0 0 16px;display:flex;align-items:center;gap:8px}
+    .names-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .name-card{background:linear-gradient(135deg,#fff8f2,#fff3e8);border-radius:18px;padding:16px 20px;border:1px solid #ffe4cc}
+    .name-card .role{font-size:13px;font-weight:800;color:var(--orange);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+    .il{border:none;border-bottom:2px solid #ffd3b0;background:transparent;width:100%;padding:4px 2px;font-size:15px;font-family:'Noto Sans Thai',sans-serif;color:var(--text);outline:none;transition:border-color .2s}
+    .il:focus{border-bottom-color:var(--orange)}
+    .meta-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+    .meta-field label{font-size:12.5px;font-weight:700;color:#8b5e44;display:block;margin-bottom:4px}
+
+    /* SECTION */
+    .section{margin-top:20px;background:rgba(255,255,255,.86);border:1px solid rgba(255,255,255,.96);border-radius:var(--radius);padding:28px 32px;box-shadow:var(--soft-shadow)}
+    .section-header{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+    .badge{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;font-weight:900;font-size:18px;box-shadow:0 8px 20px rgba(0,0,0,.12);flex-shrink:0}
+    .badge-orange{background:linear-gradient(135deg,#ff9f68,#ff7d3f);color:#fff}
+    .badge-teal{background:linear-gradient(135deg,#36b8a0,#2a9e87);color:#fff}
+    .badge-blue{background:linear-gradient(135deg,#5b8cda,#3a6fc0);color:#fff}
+    .badge-pink{background:linear-gradient(135deg,#e87c9b,#d45a7a);color:#fff}
+    .badge-yellow{background:linear-gradient(135deg,#e8a82a,#c98b10);color:#fff}
+    .badge-purple{background:linear-gradient(135deg,#9575cd,#7c5ab8);color:#fff}
+    .badge-green{background:linear-gradient(135deg,#4caf7d,#379962);color:#fff}
+    .section-header h2{font-size:21px;font-weight:800;color:#6a3925;margin:0;line-height:1.3}
+    .section-header .score{margin-left:auto;background:#fff4e8;border:1px solid #ffd3a8;border-radius:12px;padding:6px 14px;font-size:13px;font-weight:800;color:#b05020;white-space:nowrap}
+
+    .instruct{background:linear-gradient(135deg,#fff6ee,#fffdf9);border:2px dashed #ffc89a;border-radius:18px;padding:14px 18px;margin-bottom:18px;font-size:14.5px;color:#7a4a30;line-height:1.75}
+    .instruct strong{color:#b05020}
+
+    /* MCQ */
+    .mcq-card{background:#fffaf6;border:1px solid #ffe4d5;border-radius:20px;padding:18px 22px;margin-bottom:14px;box-shadow:0 6px 18px rgba(118,68,35,.06)}
+    .mcq-num{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#ff9f68,#ff7d3f);color:#fff;font-weight:900;font-size:13px;margin-right:10px;flex-shrink:0}
+    .mcq-q{font-size:15.5px;font-weight:700;color:#5a3220;line-height:1.6;margin-bottom:14px;display:flex;align-items:flex-start;gap:2px}
+    .mcq-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .mcq-opt{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:14px;border:1.5px solid #ffe4d0;background:#fff;cursor:pointer;transition:all .15s;font-size:14.5px;line-height:1.55;color:#5a3828}
+    .mcq-opt:hover{border-color:var(--orange);background:#fff8f2}
+    .mcq-opt input[type=radio]{display:none}
+    .mcq-opt input[type=radio]:checked + .opt-circle{background:var(--orange);color:#fff;border-color:var(--orange)}
+    .mcq-opt input[type=radio]:checked ~ .opt-text{font-weight:700;color:#7a3818}
+    .opt-circle{flex-shrink:0;width:26px;height:26px;border-radius:50%;border:2px solid #ffb07a;background:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;transition:all .15s;color:#c06030}
+    .opt-text{line-height:1.55}
+    label.mcq-opt{cursor:pointer}
+
+    /* MATCHING */
+    .match-wrap{margin-top:14px}
+    .match-2col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .match-col h4{font-size:14px;font-weight:800;color:#8b5030;margin:0 0 10px;padding-bottom:6px;border-bottom:2px solid #ffd3b0}
+    .match-item{display:flex;align-items:flex-start;gap:10px;background:#fffaf6;border:1px solid #ffe5d0;border-radius:14px;padding:11px 14px;margin-bottom:8px;font-size:14px;line-height:1.65;color:#66483d}
+    .match-bullet{flex-shrink:0;width:28px;height:28px;border-radius:50%;background:#fff;border:2px solid #ffb07a;color:#c06030;font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center}
+    .match-ans{border:none;border-bottom:2px solid #ffc49a;background:#fff8f2;border-radius:6px 6px 0 0;width:44px;padding:4px 6px;font-size:14px;font-family:'Noto Sans Thai',sans-serif;color:#c05820;font-weight:700;text-align:center;outline:none}
+    .match-ans:focus{border-bottom-color:#e8631a;background:#fff0e3}
+    .desc-item{display:flex;align-items:flex-start;gap:10px;background:#f0f9ff;border:1px solid #c8def8;border-radius:14px;padding:11px 14px;margin-bottom:8px;font-size:13.5px;line-height:1.6;color:#2e4870}
+    .desc-bullet{flex-shrink:0;width:28px;height:28px;border-radius:50%;background:#fff;border:2px solid #86b5f0;color:#2e5eb0;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center}
+
+    /* PARTNER SPLIT */
+    .partner-split{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:6px}
+    .partner-box{border-radius:18px;padding:20px;border:1.5px solid}
+    .partner-a{background:#fff6f0;border-color:#ffc49a}
+    .partner-b{background:#f0f6ff;border-color:#a8c5f5}
+    .partner-tag{font-size:14px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+    .tag-a{color:#c05820}
+    .tag-b{color:#2e5eb0}
+    .q-num-a{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#ff9f68,#ff7d3f);color:#fff;font-weight:900;font-size:12px;margin-right:8px;flex-shrink:0}
+    .q-num-b{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#5b8cda,#3a6fc0);color:#fff;font-weight:900;font-size:12px;margin-right:8px;flex-shrink:0}
+    .pq-text{font-size:14.5px;font-weight:600;color:#5a3820;line-height:1.65}
+    .pq-row{display:flex;align-items:flex-start;gap:4px;margin-bottom:8px}
+    .ab-sm{border:1.5px solid #ffd0ad;border-radius:12px;padding:10px 14px;min-height:64px;background:#fffcfa;width:100%;font-family:'Noto Sans Thai',sans-serif;font-size:14px;color:var(--text);outline:none;resize:vertical;line-height:1.7;transition:border-color .2s;margin-top:6px;display:block}
+    .ab-sm:focus{border-color:var(--orange)}
+    .ab-sm.blue{border-color:#b8d0f5;background:#f8fbff}
+    .ab-sm.blue:focus{border-color:var(--blue)}
+
+    /* SITUATION */
+    .situation{background:linear-gradient(135deg,#fff3e8,#fffaf5);border:2px solid #ffd3b0;border-radius:20px;padding:18px 22px;margin-bottom:16px}
+    .situation .sit-label{font-size:13px;font-weight:800;color:var(--orange);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+    .situation .sit-text{font-size:15px;line-height:1.85;color:#5a3828}
+
+    .q-card{background:#fffaf6;border:1px solid #ffe4d5;border-radius:20px;padding:18px 22px;margin-bottom:14px;box-shadow:0 6px 18px rgba(118,68,35,.06)}
+    .q-card .q-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--orange),#ff7d3f);color:#fff;font-weight:900;font-size:13px;margin-right:10px;flex-shrink:0}
+    .q-card .q-label{font-size:15.5px;font-weight:700;color:#5a3220;line-height:1.65}
+    .q-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px}
+    .answer-box{border:1.5px solid #ffd0ad;border-radius:14px;padding:12px 16px;min-height:72px;background:#fffcfa;width:100%;font-family:'Noto Sans Thai',sans-serif;font-size:15px;color:var(--text);outline:none;resize:vertical;line-height:1.75;transition:border-color .2s;margin-top:10px;display:block}
+    .answer-box:focus{border-color:var(--orange)}
+    .answer-line-box{border:none;border-bottom:1.5px solid #ffd0ad;background:transparent;width:100%;padding:6px 2px;font-size:15px;font-family:'Noto Sans Thai',sans-serif;color:var(--text);outline:none;display:block;margin-top:8px}
+    .answer-line-box:focus{border-bottom-color:var(--orange)}
+
+    /* POWER TABLE */
+    .power-table{width:100%;border-collapse:collapse;border-radius:16px;overflow:hidden;margin-top:14px;box-shadow:0 8px 20px rgba(100,60,30,.08)}
+    .power-table th{background:linear-gradient(135deg,#ff9f68,#ff7d3f);color:#fff;padding:12px 16px;text-align:center;font-size:14px;font-weight:800}
+    .power-table th:first-child{background:linear-gradient(135deg,#b06040,#8a4828)}
+    .power-table td{border-bottom:1px solid #ffe6d6;padding:0;vertical-align:top}
+    .power-table td:first-child{background:#fff4ea;font-weight:800;color:#8a4020;font-size:14px;padding:14px 16px;text-align:center;white-space:nowrap}
+    .power-table td textarea{border:none;width:100%;padding:12px 14px;font-size:14px;font-family:'Noto Sans Thai',sans-serif;color:var(--text);outline:none;resize:none;min-height:64px;background:transparent;line-height:1.7}
+    .power-table td textarea:focus{background:#fffaf6}
+
+    /* SCORE TABLE */
+    .score-table{width:100%;border-collapse:collapse;margin-top:16px;border-radius:16px;overflow:hidden}
+    .score-table th{background:#fff2e7;color:#70422c;font-size:13.5px;padding:12px 14px;text-align:center;font-weight:800}
+    .score-table td{background:#fffaf6;color:#66483d;border-bottom:1px solid #ffe6d6;font-size:13.5px;padding:10px 14px;text-align:center;vertical-align:middle}
+    .score-table tr:last-child td{font-weight:800;background:#fff4ea;color:#b05020}
+
+    .reflection-box{background:linear-gradient(135deg,#fff8f3,#fffdf8);border-radius:20px;padding:20px;border:1px solid #ffe4d0;margin-top:14px}
+    .reflect-q{font-size:15px;font-weight:700;color:#7a4228;margin-bottom:8px;display:flex;align-items:flex-start;gap:8px}
+
+    .divider{display:flex;align-items:center;gap:12px;margin:8px 0 16px}
+    .divider::before,.divider::after{content:'';flex:1;border-top:1.5px solid #ffd3b0}
+    .divider span{font-size:13px;font-weight:700;color:#c09070;white-space:nowrap}
+
+    /* SUBMIT */
+    .submit-area{text-align:center;padding:8px 0 24px}
+    .btn-submit{border:0;cursor:pointer;padding:16px 40px;border-radius:999px;background:linear-gradient(135deg,#ff9f68,#ff7d3f);color:#fff;font-family:'Noto Sans Thai',sans-serif;font-weight:900;font-size:16px;box-shadow:0 12px 30px rgba(255,125,63,.38);transition:transform .15s,box-shadow .15s}
+    .btn-submit:hover{transform:translateY(-2px);box-shadow:0 16px 36px rgba(255,125,63,.50)}
+    .btn-submit:disabled{opacity:.55;cursor:default;transform:none}
+    #submitMsg{display:none;margin:16px auto;max-width:480px;padding:20px 24px;border-radius:20px;background:#fff4e8;border:2px solid #ffb07a;text-align:center}
+
+    .fab-group{position:fixed;right:20px;bottom:20px;z-index:10;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
+    .print-btn{border:0;cursor:pointer;padding:12px 16px;border-radius:999px;background:#ff9158;color:#fff;font-family:'Noto Sans Thai',sans-serif;font-weight:900;font-size:13px;box-shadow:0 10px 24px rgba(255,145,88,.34);transition:transform .15s}
+    .print-btn:hover{transform:translateY(-2px)}
+
+    /* MCQ correct/wrong feedback (after submit) */
+    .mcq-opt.correct-ans{border-color:#4caf50!important;background:#f0fff4!important}
+    .mcq-opt.wrong-ans{border-color:#ef5350!important;background:#fff5f5!important}
+
+    @media print{
+      body{background:#fff}
+      .page{width:100%;padding:0}
+      .fab-group,.submit-area{display:none}
+      .hero,.section,.names-box{box-shadow:none;background:#fff;break-inside:avoid}
+      .answer-box,.ab-sm{border:1.5px solid #ffb07a}
+      .mcq-opt{border:1.5px solid #ffb07a}
+    }
+    @media (max-width:700px){
+      .names-grid,.partner-split,.match-2col,.mcq-opts{grid-template-columns:1fr}
+      .hero{grid-template-columns:1fr}
+      .pair-badge{display:none}
+      .meta-fields{grid-template-columns:1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+
+<div class='fab-group'>
+  <button class='print-btn' onclick='window.print()'>🖨️ พิมพ์</button>
+</div>
+
+<main class='page'>
+
+  <!-- HERO -->
+  <section class='hero'>
+    <div>
+      <div class='eyebrow'>📜 ใบงานวิชาสังคมศึกษา ศาสนา และวัฒนธรรม • ชั้นมัธยมศึกษาปีที่ 1 • หน่วยที่ 2</div>
+      <h1>ใบงานคู่ 🤝<br/>รัฐธรรมนูญกับการเมืองการปกครองของไทย</h1>
+      <p class='subtitle'>ร่วมกันเรียนรู้ความหมายและความสำคัญของ<strong>รัฐธรรมนูญ</strong> รูปแบบการปกครองไทย<br/>บทบาท<strong>3 ฝ่ายอำนาจ</strong> สิทธิ-หน้าที่ และการมีส่วนร่วมในระบอบประชาธิปไตย</p>
+      <div class='hero-meta'>
+        <span class='meta-chip'>🤝 ทำเป็นคู่</span>
+        <span class='meta-chip'>⏱️ 50 นาที</span>
+        <span class='meta-chip'>⭐ 30 คะแนน</span>
+        <span class='meta-chip'>📖 หน่วยที่ 2</span>
+      </div>
+    </div>
+    <div class='pair-badge'>
+      <div class='icon'>⚖️</div>
+      <div class='big'>คู่</div>
+      <div class='label'>ใบงาน ม.1</div>
+    </div>
+  </section>
+
+  <!-- NAMES -->
+  <div class='names-box'>
+    <h2>✏️ ข้อมูลนักเรียน</h2>
+    <div class='names-grid'>
+      <div class='name-card'>
+        <div class='role'>🟠 นักเรียนคนที่ 1 (พาร์ตเนอร์ A)</div>
+        <div style='display:flex;flex-direction:column;gap:8px'>
+          <label style='font-size:13px;font-weight:700;color:#8b5e44'>ชื่อ-นามสกุล</label>
+          <input id='name1' class='il' type='text' placeholder='ชื่อ นามสกุล'/>
+        </div>
+        <div style='display:flex;flex-direction:column;gap:8px;margin-top:8px'>
+          <label style='font-size:13px;font-weight:700;color:#8b5e44'>เลขที่</label>
+          <input id='num1' class='il' type='text' placeholder='เลขที่'/>
+        </div>
+      </div>
+      <div class='name-card' style='background:linear-gradient(135deg,#f0f6ff,#eaf1ff);border-color:#c8d8f5'>
+        <div class='role' style='color:var(--blue)'>🔵 นักเรียนคนที่ 2 (พาร์ตเนอร์ B)</div>
+        <div style='display:flex;flex-direction:column;gap:8px'>
+          <label style='font-size:13px;font-weight:700;color:#4a6898'>ชื่อ-นามสกุล</label>
+          <input id='name2' class='il' type='text' placeholder='ชื่อ นามสกุล' style='border-bottom-color:#b0c8f0'/>
+        </div>
+        <div style='display:flex;flex-direction:column;gap:8px;margin-top:8px'>
+          <label style='font-size:13px;font-weight:700;color:#4a6898'>เลขที่</label>
+          <input id='num2' class='il' type='text' placeholder='เลขที่' style='border-bottom-color:#b0c8f0'/>
+        </div>
+      </div>
+    </div>
+    <div class='meta-fields'>
+      <div class='meta-field'><label>ชั้น</label><input id='grade' class='il' type='text' placeholder='ม.1/_'/></div>
+      <div class='meta-field'><label>วันที่</label><input id='subdate' class='il' type='text' placeholder='__/__/____'/></div>
+      <div class='meta-field'><label>คะแนนที่ได้ / 30</label><input class='il' type='text' placeholder='(ครูกรอก)' disabled style='opacity:.5'/></div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: ปรนัย -->
+  <section class='section'>
+    <div class='section-header'>
+      <div class='badge badge-orange'>📝</div>
+      <h2>ส่วนที่ 1 — ปรนัย เลือกคำตอบที่ถูกต้องที่สุด</h2>
+      <span class='score'>5 คะแนน</span>
+    </div>
+    <div class='instruct'>
+      <strong>คำชี้แจง :</strong> ทำร่วมกันทั้งคู่ เลือกคำตอบที่ถูกต้องที่สุดเพียงข้อเดียว แล้วคลิกหรือทำเครื่องหมายที่คำตอบนั้น
+    </div>
+
+    <!-- Q1 -->
+    <div class='mcq-card'>
+      <div class='mcq-q'><span class='mcq-num'>1</span>รัฐธรรมนูญมีบทบาทสำคัญต่อประเทศอย่างไร?</div>
+      <div class='mcq-opts'>
+        <label class='mcq-opt'><input type='radio' name='q1' value='ก'/><span class='opt-circle'>ก</span><span class='opt-text'>เป็นกฎหมายที่ทุกคนสามารถแก้ไขได้เองตามต้องการ</span></label>
+        <label class='mcq-opt'><input type='radio' name='q1' value='ข'/><span class='opt-circle'>ข</span><span class='opt-text'>เป็นกฎหมายสูงสุดที่กำหนดรูปแบบการปกครองและคุ้มครองสิทธิประชาชน</span></label>
+        <label class='mcq-opt'><input type='radio' name='q1' value='ค'/><span class='opt-circle'>ค</span><span class='opt-text'>เป็นกฎหมายที่ใช้เฉพาะในศาลเท่านั้น</span></label>
+        <label class='mcq-opt'><input type='radio' name='q1' value='ง'/><span class='opt-circle'>ง</span><span class='opt-text'>เป็นกฎหมายที่ออกโดยพระมหากษัตริย์แต่เพียงผู้เดียว</span></label>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class='mcq-card'>
+      <div class='mcq-q'><span class='mcq-num'>2</span>ประเทศไทยปกครองในระบอบใด?</div>
+      <div class='mcq-opts'>
+        <label class='mcq-opt'><input type='radio' name='q2' value='ก'/><span class='opt-circle'>ก</span><span class='opt-text'>สาธารณรัฐแบบประธานาธิบดี</span></label>
+        <label class='mcq-opt'><input type='radio' name='q2' value='ข'/><span class='opt-circle'>ข</span><span class='opt-text'>สมบูรณาญาสิทธิราชย์</span></label>
+        <label class='mcq-opt'><input type='radio' name='q2' value='ค'/><span class='opt-circle'>ค</span><span class='opt-text'>ประชาธิปไตยอันมีพระมหากษัตริย์ทรงเป็นประมุข</span></label>
+        <label class='mcq-opt'><input type='radio' name='q2' value='ง'/><span class='opt-circle'>ง</span><span class='opt-text'>เผด็จการโดยคณะรัฐมนตรี</span></label>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class='mcq-card'>
+      <div class='mcq-q'><span class='mcq-num'>3</span>ฝ่ายใดทำหน้าที่ออกกฎหมายและตรวจสอบการบริหารราชการแผ่นดิน?</div>
+      <div class='mcq-opts'>
+        <label class='mcq-opt'><input type='radio' name='q3' value='ก'/><span class='opt-circle'>ก</span><span class='opt-text'>ฝ่ายบริหาร — คณะรัฐมนตรี</span></label>
+        <label class='mcq-opt'><input type='radio' name='q3' value='ข'/><span class='opt-circle'>ข</span><span class='opt-text'>ฝ่ายตุลาการ — ศาล</span></label>
+        <label class='mcq-opt'><input type='radio' name='q3' value='ค'/><span class='opt-circle'>ค</span><span class='opt-text'>ฝ่ายนิติบัญญัติ — รัฐสภา</span></label>
+        <label class='mcq-opt'><input type='radio' name='q3' value='ง'/><span class='opt-circle'>ง</span><span class='opt-text'>องค์กรอิสระ — คณะกรรมาธิการ</span></label>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class='mcq-card'>
+      <div class='mcq-q'><span class='mcq-num'>4</span>ข้อใดเป็นสิทธิของประชาชนที่รัฐธรรมนูญรับรอง?</div>
+      <div class='mcq-opts'>
+        <label class='mcq-opt'><input type='radio' name='q4' value='ก'/><span class='opt-circle'>ก</span><span class='opt-text'>สิทธิในการเลี่ยงการจ่ายภาษี</span></label>
+        <label class='mcq-opt'><input type='radio' name='q4' value='ข'/><span class='opt-circle'>ข</span><span class='opt-text'>สิทธิในการได้รับการศึกษาและความเสมอภาคตามกฎหมาย</span></label>
+        <label class='mcq-opt'><input type='radio' name='q4' value='ค'/><span class='opt-circle'>ค</span><span class='opt-text'>สิทธิในการฝ่าฝืนกฎหมายที่ไม่เห็นด้วย</span></label>
+        <label class='mcq-opt'><input type='radio' name='q4' value='ง'/><span class='opt-circle'>ง</span><span class='opt-text'>สิทธิในการครอบครองทรัพย์สินของรัฐ</span></label>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class='mcq-card'>
+      <div class='mcq-q'><span class='mcq-num'>5</span>การแบ่งอำนาจอธิปไตยออกเป็น 3 ฝ่ายมีประโยชน์อย่างไร?</div>
+      <div class='mcq-opts'>
+        <label class='mcq-opt'><input type='radio' name='q5' value='ก'/><span class='opt-circle'>ก</span><span class='opt-text'>ทำให้มีเจ้าหน้าที่รัฐเพิ่มมากขึ้น</span></label>
+        <label class='mcq-opt'><input type='radio' name='q5' value='ข'/><span class='opt-circle'>ข</span><span class='opt-text'>ป้องกันการรวมอำนาจและทำให้เกิดการตรวจสอบซึ่งกันและกัน</span></label>
+        <label class='mcq-opt'><input type='radio' name='q5' value='ค'/><span class='opt-circle'>ค</span><span class='opt-text'>ลดการมีส่วนร่วมของประชาชนในการปกครอง</span></label>
+        <label class='mcq-opt'><input type='radio' name='q5' value='ง'/><span class='opt-circle'>ง</span><span class='opt-text'>ทำให้ออกกฎหมายใหม่ได้รวดเร็วขึ้น</span></label>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: จับคู่ -->
+  <section class='section'>
+    <div class='section-header'>
+      <div class='badge badge-teal'>🔗</div>
+      <h2>ส่วนที่ 2 — จับคู่คำกับความหมาย</h2>
+      <span class='score'>8 คะแนน</span>
+    </div>
+    <div class='instruct'>
+      <strong>คำชี้แจง :</strong> เขียนอักษร <strong>ก–ซ</strong> ลงในช่องว่างหน้าคำในคอลัมน์ซ้าย ให้ตรงกับความหมายในคอลัมน์ขวา (ทำร่วมกันทั้งคู่)
+    </div>
+    <div class='match-2col'>
+      <div>
+        <div class='match-col'><h4>📋 คำ / แนวคิด (เขียนอักษรตอบ)</h4></div>
+        <div class='match-item'><input id='m1' class='match-ans' type='text' placeholder='  '/><div class='match-bullet' style='margin-left:6px'>1</div><span style='margin-left:4px'>รัฐธรรมนูญ</span></div>
+        <div class='match-item'><input id='m2' class='match-ans' type='text' placeholder='  '/><div class='match-bullet' style='margin-left:6px'>2</div><span style='margin-left:4px'>อำนาจอธิปไตย</span></div>
+        <div class='match-item'><input id='m3' class='match-ans' type='text' placeholder='  '/><div class='match-bullet' style='margin-left:6px'>3</div><span style='margin-left:4px'>ฝ่ายนิติบัญญัติ</span></div>
+        <div class='match-item'><input id='m4' class='match-ans' type='text' placeholder='  '/><div class='match-bullet' style='margin-left:6px'>4</div><span style='margin-left:4px'>ฝ่ายบริหาร</span></div>
+        <div class='match-item'><input id='m5' class='match-ans' type='text' placeholder='  '/><div class='match-bullet' style='margin-left:6px'>5</div><span style='margin-left:4px'>ฝ่ายตุลาการ</span></div>
+        <div class='match-item'><input id='m6' class='match-ans' type='text' placeholder='  '/><div class='match-bullet' style='margin-left:6px'>6</div><span style='margin-left:4px'>ระบอบประชาธิปไตย</span></div>
+        <div class='match-item'><input id='m7' class='match-ans' type='text' placeholder='  '/><div class='match-bullet' style='margin-left:6px'>7</div><span style='margin-left:4px'>สิทธิของประชาชน</span></div>
+        <div class='match-item'><input id='m8' class='match-ans' type='text' placeholder='  '/><div class='match-bullet' style='margin-left:6px'>8</div><span style='margin-left:4px'>หน้าที่ของประชาชน</span></div>
+      </div>
+      <div>
+        <div class='match-col'><h4>📖 ความหมาย / คำอธิบาย</h4></div>
+        <div class='desc-item'><div class='desc-bullet'>ก</div><div>กฎหมายสูงสุดของประเทศ กำหนดรูปแบบการปกครองและคุ้มครองสิทธิประชาชน กฎหมายอื่นจะขัดแย้งไม่ได้</div></div>
+        <div class='desc-item'><div class='desc-bullet'>ข</div><div>อำนาจสูงสุดในการปกครองประเทศซึ่งเป็นของประชาชน และประชาชนใช้ผ่านองค์กรของรัฐ 3 ฝ่าย</div></div>
+        <div class='desc-item'><div class='desc-bullet'>ค</div><div>ระบอบการปกครองที่ประชาชนมีส่วนร่วมเลือกผู้แทน มีอำนาจตรวจสอบรัฐ และเคารพสิทธิเสรีภาพซึ่งกันและกัน</div></div>
+        <div class='desc-item'><div class='desc-bullet'>ง</div><div>ทำหน้าที่ออกกฎหมายและตรวจสอบการบริหารประเทศ ตัวอย่างได้แก่ รัฐสภา</div></div>
+        <div class='desc-item'><div class='desc-bullet'>จ</div><div>บริหารประเทศและนำนโยบายไปปฏิบัติ ตัวอย่างได้แก่ คณะรัฐมนตรีและหน่วยงานราชการ</div></div>
+        <div class='desc-item'><div class='desc-bullet'>ฉ</div><div>พิจารณาพิพากษาคดีและอำนวยความยุติธรรม ตัวอย่างได้แก่ ศาลยุติธรรม</div></div>
+        <div class='desc-item'><div class='desc-bullet'>ช</div><div>สิ่งที่รัฐธรรมนูญรับรองให้แก่ประชาชน เช่น สิทธิในการศึกษา ความเสมอภาค และการแสดงความคิดเห็น</div></div>
+        <div class='desc-item'><div class='desc-bullet'>ซ</div><div>สิ่งที่ประชาชนต้องปฏิบัติ เช่น เคารพกฎหมาย รักษาประโยชน์ส่วนรวม และเคารพสิทธิของผู้อื่น</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: อัตนัยแยก -->
+  <section class='section'>
+    <div class='section-header'>
+      <div class='badge badge-blue'>✍️</div>
+      <h2>ส่วนที่ 3 — อัตนัย (ตอบแยกกัน)</h2>
+      <span class='score'>8 คะแนน</span>
+    </div>
+    <div class='instruct'>
+      <strong>คำชี้แจง :</strong> พาร์ตเนอร์ A และ B ตอบคนละชุด จากนั้นแลกอ่านคำตอบกัน และเพิ่มเติมสิ่งที่คู่ลืม
+    </div>
+    <div class='partner-split'>
+      <div class='partner-box partner-a'>
+        <div class='partner-tag tag-a'>🟠 พาร์ตเนอร์ A — รัฐธรรมนูญและความสำคัญ</div>
+        <div class='pq-row'><span class='q-num-a'>A1</span><span class='pq-text'>รัฐธรรมนูญถูกเปรียบว่าเป็น "กติกาใหญ่ของประเทศ" หมายความว่าอย่างไร? ใครบ้างที่ต้องเคารพกติกานี้?</span></div>
+        <textarea id='a1' class='ab-sm' placeholder='เขียนคำตอบที่นี่...'></textarea>
+        <div class='pq-row' style='margin-top:14px'><span class='q-num-a'>A2</span><span class='pq-text'>รัฐธรรมนูญมีความสำคัญต่อประชาชนอย่างไรบ้าง? จงอธิบาย 2 ด้าน พร้อมตัวอย่าง</span></div>
+        <textarea id='a2' class='ab-sm' placeholder='ด้านที่ 1: ..........&#10;ด้านที่ 2: ..........'></textarea>
+        <div class='pq-row' style='margin-top:14px'><span class='q-num-a'>A3</span><span class='pq-text'>ถ้าประเทศไม่มีรัฐธรรมนูญ จะเกิดผลเสียอย่างไรบ้าง? แสดงความคิดเห็นของคุณ</span></div>
+        <textarea id='a3' class='ab-sm' placeholder='เขียนคำตอบที่นี่...'></textarea>
+      </div>
+      <div class='partner-box partner-b'>
+        <div class='partner-tag tag-b'>🔵 พาร์ตเนอร์ B — การปกครองและการมีส่วนร่วม</div>
+        <div class='pq-row'><span class='q-num-b'>B1</span><span class='pq-text'>ลักษณะสำคัญ 4 ข้อของระบอบประชาธิปไตยมีอะไรบ้าง? จงเขียนให้ครบ</span></div>
+        <textarea id='b1' class='ab-sm blue' placeholder='1. ..........&#10;2. ..........&#10;3. ..........&#10;4. ..........'></textarea>
+        <div class='pq-row' style='margin-top:14px'><span class='q-num-b'>B2</span><span class='pq-text'>นักเรียน ม.1 สามารถมีส่วนร่วมในระบอบประชาธิปไตยได้อย่างไรบ้าง? ยกตัวอย่าง 3 วิธีที่ทำได้จริง</span></div>
+        <textarea id='b2' class='ab-sm blue' placeholder='วิธีที่ 1: ..........&#10;วิธีที่ 2: ..........&#10;วิธีที่ 3: ..........'></textarea>
+        <div class='pq-row' style='margin-top:14px'><span class='q-num-b'>B3</span><span class='pq-text'>เหตุใดการเคารพสิทธิของผู้อื่นจึงสำคัญในสังคมประชาธิปไตย? ให้เหตุผลและยกตัวอย่างสถานการณ์จริง</span></div>
+        <textarea id='b3' class='ab-sm blue' placeholder='เหตุผล: ..........&#10;ตัวอย่าง: ..........'></textarea>
+      </div>
+    </div>
+    <div style='margin-top:16px;background:#f9fff6;border:1.5px dashed #86d9a8;border-radius:16px;padding:16px 20px'>
+      <div style='font-size:13.5px;font-weight:800;color:#2e8f5a;margin-bottom:10px'>🔄 แลกเปลี่ยนกัน: หลังอ่านคำตอบของคู่ มีสิ่งที่ต้องการเพิ่มเติมหรือคิดเห็นต่างไหม?</div>
+      <textarea id='s3_share' class='ab-sm' style='border-color:#86d9a8;background:#f0fff6' placeholder='A เพิ่มเติม / คิดเห็น: ............&#10;B เพิ่มเติม / คิดเห็น: ............'></textarea>
+    </div>
+  </section>
+
+  <!-- SECTION 4: สถานการณ์ -->
+  <section class='section'>
+    <div class='section-header'>
+      <div class='badge badge-pink'>🔍</div>
+      <h2>ส่วนที่ 4 — วิเคราะห์สถานการณ์</h2>
+      <span class='score'>5 คะแนน</span>
+    </div>
+    <div class='instruct'>
+      <strong>คำชี้แจง :</strong> อ่านสถานการณ์ร่วมกัน แล้วตอบคำถาม <strong>ทำร่วมกันทั้งคู่</strong>
+    </div>
+    <div class='situation'>
+      <div class='sit-label'>📖 สถานการณ์</div>
+      <div class='sit-text'>
+        ห้องเรียน ม.1/3 จัดการเลือกตั้งประธานนักเรียนห้อง มีผู้สมัคร 3 คน ก่อนการเลือกตั้ง "โจ้" แจกขนมให้เพื่อนๆ แล้วขอให้โหวตให้ตน หลังนับคะแนน "ฝ้าย" ได้คะแนนมากที่สุดและชนะ แต่ "อาร์ม" ซึ่งแพ้การเลือกตั้ง ประกาศว่าไม่ยอมรับผลและจะไม่ร่วมกิจกรรมใดๆ ของห้องเรียน
+      </div>
+    </div>
+    <div class='q-card'>
+      <div class='q-row'><span class='q-num'>1</span><span class='q-label'>พฤติกรรมของนักเรียนคนใดบ้างที่ขัดกับหลักประชาธิปไตย? เพราะเหตุใด?</span></div>
+      <textarea id='q4_1' class='answer-box' placeholder='ระบุชื่อ + พฤติกรรมที่ขัดหลักประชาธิปไตย + เหตุผล...'></textarea>
+    </div>
+    <div class='q-card'>
+      <div class='q-row'><span class='q-num'>2</span><span class='q-label'>นักเรียนควรปฏิบัติตนอย่างไรในการเลือกตั้งประธานนักเรียน จึงจะถือว่าเป็นประชาธิปไตยที่แท้จริง? เสนอ 3 แนวทาง</span></div>
+      <div style='margin-top:10px'>
+        <div style='display:flex;align-items:center;gap:10px;margin-bottom:10px'>
+          <span style='width:24px;height:24px;border-radius:50%;background:#ff9f68;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0'>1</span>
+          <input id='q4_w1' class='answer-line-box' type='text' placeholder='แนวทางที่ 1...'/>
+        </div>
+        <div style='display:flex;align-items:center;gap:10px;margin-bottom:10px'>
+          <span style='width:24px;height:24px;border-radius:50%;background:#ff9f68;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0'>2</span>
+          <input id='q4_w2' class='answer-line-box' type='text' placeholder='แนวทางที่ 2...'/>
+        </div>
+        <div style='display:flex;align-items:center;gap:10px'>
+          <span style='width:24px;height:24px;border-radius:50%;background:#ff9f68;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0'>3</span>
+          <input id='q4_w3' class='answer-line-box' type='text' placeholder='แนวทางที่ 3...'/>
+        </div>
+      </div>
+    </div>
+    <div class='q-card'>
+      <div class='q-row'><span class='q-num'>3</span><span class='q-label'>เหตุการณ์นี้เชื่อมโยงกับหลักการ "การตรวจสอบซึ่งกันและกัน" ของ 3 ฝ่ายอำนาจอย่างไร? จงอธิบาย</span></div>
+      <textarea id='q4_3' class='answer-box' style='min-height:60px' placeholder='เขียนคำตอบที่นี่...'></textarea>
+    </div>
+  </section>
+
+  <!-- SECTION 5: สรุปตาราง + สะท้อนคิด -->
+  <section class='section'>
+    <div class='section-header'>
+      <div class='badge badge-yellow'>⚖️</div>
+      <h2>ส่วนที่ 5 — สรุป 3 ฝ่ายอำนาจ และสะท้อนคิด</h2>
+      <span class='score'>4 คะแนน</span>
+    </div>
+    <div class='instruct'>
+      <strong>คำชี้แจง :</strong> เติมตารางสรุปบทบาทขององค์กรของรัฐร่วมกัน จากนั้นตอบคำถามสะท้อนคิด
+    </div>
+
+    <table class='power-table'>
+      <thead>
+        <tr><th>ฝ่ายอำนาจ</th><th>หน้าที่สำคัญ</th><th>ตัวอย่างองค์กร / การดำเนินงาน</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>⚖️ ฝ่ายนิติบัญญัติ</td>
+          <td><textarea id='pt1a' placeholder='หน้าที่คือ...'></textarea></td>
+          <td><textarea id='pt1b' placeholder='ตัวอย่าง...'></textarea></td>
+        </tr>
+        <tr>
+          <td>🏛️ ฝ่ายบริหาร</td>
+          <td><textarea id='pt2a' placeholder='หน้าที่คือ...'></textarea></td>
+          <td><textarea id='pt2b' placeholder='ตัวอย่าง...'></textarea></td>
+        </tr>
+        <tr>
+          <td>🔨 ฝ่ายตุลาการ</td>
+          <td><textarea id='pt3a' placeholder='หน้าที่คือ...'></textarea></td>
+          <td><textarea id='pt3b' placeholder='ตัวอย่าง...'></textarea></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class='divider' style='margin-top:20px'><span>🌟 สะท้อนคิด</span></div>
+    <div class='reflection-box'>
+      <div class='reflect-q'>💬 หลังเรียนเรื่องรัฐธรรมนูญและการปกครองไทยแล้ว นักเรียนทั้งคู่ตั้งใจจะปฏิบัติตนอย่างไร เพื่อเป็นพลเมืองที่ดีในระบอบประชาธิปไตย?</div>
+      <textarea id='s5_ref' class='answer-box' style='min-height:100px' placeholder='A ตั้งใจว่า..............&#10;B ตั้งใจว่า..............&#10;สิ่งที่ทั้งคู่จะทำร่วมกัน: ...............'></textarea>
+    </div>
+  </section>
+
+  <!-- SCORE TABLE -->
+  <section class='section' style='margin-top:20px'>
+    <div class='section-header'>
+      <div class='badge badge-orange'>📊</div>
+      <h2>ตารางบันทึกคะแนน (ครูกรอก)</h2>
+    </div>
+    <table class='score-table'>
+      <thead><tr><th>ส่วนที่</th><th>เนื้อหา</th><th>คะแนนเต็ม</th><th>คะแนนที่ได้</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>ปรนัย 5 ข้อ</td><td>5</td><td></td></tr>
+        <tr><td>2</td><td>จับคู่ 8 ข้อ</td><td>8</td><td></td></tr>
+        <tr><td>3</td><td>อัตนัยแยก (A และ B)</td><td>8</td><td></td></tr>
+        <tr><td>4</td><td>วิเคราะห์สถานการณ์</td><td>5</td><td></td></tr>
+        <tr><td>5</td><td>สรุปตาราง + สะท้อนคิด</td><td>4</td><td></td></tr>
+        <tr><td>—</td><td>รวมทั้งหมด</td><td>30</td><td></td></tr>
+      </tbody>
+    </table>
+    <div style='display:flex;gap:16px;margin-top:16px;flex-wrap:wrap'>
+      <div style='flex:1;min-width:200px'>
+        <label style='font-size:13px;font-weight:700;color:#8b5e44;display:block;margin-bottom:4px'>ลายมือชื่อครูผู้สอน</label>
+        <input class='il' type='text' placeholder='ลงชื่อ ...................................' style='width:100%'/>
+      </div>
+      <div style='flex:1;min-width:200px'>
+        <label style='font-size:13px;font-weight:700;color:#8b5e44;display:block;margin-bottom:4px'>วันที่ตรวจ</label>
+        <input class='il' type='text' placeholder='__/__/____' style='width:100%'/>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUBMIT -->
+  <div class='submit-area' style='margin-top:24px'>
+    <button class='btn-submit' id='submitBtn' onclick='submitWorksheet()'>📤 ส่งใบงาน</button>
+    <div id='submitMsg'></div>
+  </div>
+
+  <div style='margin-top:12px;text-align:center;padding:20px 24px;border-radius:24px;background:rgba(255,255,255,.80);border:1px solid rgba(255,255,255,.95);color:#8a6a5f;font-weight:700;font-size:14px;box-shadow:var(--soft-shadow)'>
+    📜 ใบงานวิชาสังคมศึกษา ศาสนา และวัฒนธรรม • ม.1 หน่วยที่ 2 • รัฐธรรมนูญกับการเมืองการปกครองของไทย
+  </div>
+</main>
+
+<script type='module'>
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { FIREBASE_CONFIG } from './js/config.js';
+
+const app = initializeApp(FIREBASE_CONFIG);
+const db  = getFirestore(app);
+
+// ============ AUTO-GRADE KEYS ============
+const KEYS_MCQ = { q1:'ข', q2:'ค', q3:'ค', q4:'ข', q5:'ข' };
+const KEYS_MATCH = { m1:'ก', m2:'ข', m3:'ง', m4:'จ', m5:'ฉ', m6:'ค', m7:'ช', m8:'ซ' };
+
+window.submitWorksheet = async function(){
+  const name1 = (document.getElementById('name1').value||'').trim();
+  const name2 = (document.getElementById('name2').value||'').trim();
+  if(!name1 || !name2){
+    alert('📝 กรุณากรอกชื่อนักเรียนทั้ง 2 คนก่อนส่งใบงาน');
+    return;
+  }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = '⏳ กำลังส่ง...';
+
+  const v  = id => (document.getElementById(id)?.value||'').trim();
+  const r  = name => (document.querySelector(`input[name="${name}"]:checked`)?.value||'ไม่ตอบ');
+
+  // Auto-grade MCQ
+  let mcqScore = 0;
+  Object.entries(KEYS_MCQ).forEach(([name, ans]) => { if(r(name)===ans) mcqScore++; });
+
+  // Auto-grade Matching
+  let matchScore = 0;
+  Object.entries(KEYS_MATCH).forEach(([id, ans]) => { if(v(id)===ans) matchScore++; });
+
+  const autoScore = mcqScore + matchScore;
+  const autoMax   = Object.keys(KEYS_MCQ).length + Object.keys(KEYS_MATCH).length; // 13
+
+  // Visual feedback on MCQ
+  Object.entries(KEYS_MCQ).forEach(([name, correct]) => {
+    const chosen = r(name);
+    document.querySelectorAll(`input[name="${name}"]`).forEach(inp => {
+      const lbl = inp.closest('label');
+      if(!lbl) return;
+      if(inp.value === correct) lbl.classList.add('correct-ans');
+      else if(inp.value === chosen && chosen !== correct) lbl.classList.add('wrong-ans');
+    });
+  });
+
+  const fields = [
+    // MCQ
+    {label:'ส่วน 1 ปรนัย ข้อ 1 (รัฐธรรมนูญสำคัญอย่างไร)', value: r('q1')},
+    {label:'ส่วน 1 ปรนัย ข้อ 2 (ระบอบการปกครองไทย)', value: r('q2')},
+    {label:'ส่วน 1 ปรนัย ข้อ 3 (ฝ่ายออกกฎหมาย)', value: r('q3')},
+    {label:'ส่วน 1 ปรนัย ข้อ 4 (สิทธิประชาชน)', value: r('q4')},
+    {label:'ส่วน 1 ปรนัย ข้อ 5 (การแบ่ง 3 ฝ่าย)', value: r('q5')},
+    // Matching
+    {label:'ส่วน 2 จับคู่ ข้อ 1 (รัฐธรรมนูญ)', value: v('m1')||'ไม่ตอบ'},
+    {label:'ส่วน 2 จับคู่ ข้อ 2 (อำนาจอธิปไตย)', value: v('m2')||'ไม่ตอบ'},
+    {label:'ส่วน 2 จับคู่ ข้อ 3 (ฝ่ายนิติบัญญัติ)', value: v('m3')||'ไม่ตอบ'},
+    {label:'ส่วน 2 จับคู่ ข้อ 4 (ฝ่ายบริหาร)', value: v('m4')||'ไม่ตอบ'},
+    {label:'ส่วน 2 จับคู่ ข้อ 5 (ฝ่ายตุลาการ)', value: v('m5')||'ไม่ตอบ'},
+    {label:'ส่วน 2 จับคู่ ข้อ 6 (ระบอบประชาธิปไตย)', value: v('m6')||'ไม่ตอบ'},
+    {label:'ส่วน 2 จับคู่ ข้อ 7 (สิทธิประชาชน)', value: v('m7')||'ไม่ตอบ'},
+    {label:'ส่วน 2 จับคู่ ข้อ 8 (หน้าที่ประชาชน)', value: v('m8')||'ไม่ตอบ'},
+    // Section 3
+    {label:'ส่วน 3 — A1 กติกาใหญ่ของประเทศ', value: v('a1')||'ไม่ตอบ'},
+    {label:'ส่วน 3 — A2 ความสำคัญของรัฐธรรมนูญ 2 ด้าน', value: v('a2')||'ไม่ตอบ'},
+    {label:'ส่วน 3 — A3 ถ้าไม่มีรัฐธรรมนูญ', value: v('a3')||'ไม่ตอบ'},
+    {label:'ส่วน 3 — B1 ลักษณะ 4 ข้อของประชาธิปไตย', value: v('b1')||'ไม่ตอบ'},
+    {label:'ส่วน 3 — B2 การมีส่วนร่วม 3 วิธี', value: v('b2')||'ไม่ตอบ'},
+    {label:'ส่วน 3 — B3 ทำไมต้องเคารพสิทธิผู้อื่น', value: v('b3')||'ไม่ตอบ'},
+    {label:'ส่วน 3 — แลกเปลี่ยน', value: v('s3_share')||'ไม่ตอบ'},
+    // Section 4
+    {label:'ส่วน 4 — พฤติกรรมขัดประชาธิปไตย', value: v('q4_1')||'ไม่ตอบ'},
+    {label:'ส่วน 4 — แนวทาง 1', value: v('q4_w1')||'ไม่ตอบ'},
+    {label:'ส่วน 4 — แนวทาง 2', value: v('q4_w2')||'ไม่ตอบ'},
+    {label:'ส่วน 4 — แนวทาง 3', value: v('q4_w3')||'ไม่ตอบ'},
+    {label:'ส่วน 4 — เชื่อมกับ 3 ฝ่ายอำนาจ', value: v('q4_3')||'ไม่ตอบ'},
+    // Section 5
+    {label:'ส่วน 5 — ฝ่ายนิติบัญญัติ: หน้าที่', value: v('pt1a')||'ไม่ตอบ'},
+    {label:'ส่วน 5 — ฝ่ายนิติบัญญัติ: ตัวอย่าง', value: v('pt1b')||'ไม่ตอบ'},
+    {label:'ส่วน 5 — ฝ่ายบริหาร: หน้าที่', value: v('pt2a')||'ไม่ตอบ'},
+    {label:'ส่วน 5 — ฝ่ายบริหาร: ตัวอย่าง', value: v('pt2b')||'ไม่ตอบ'},
+    {label:'ส่วน 5 — ฝ่ายตุลาการ: หน้าที่', value: v('pt3a')||'ไม่ตอบ'},
+    {label:'ส่วน 5 — ฝ่ายตุลาการ: ตัวอย่าง', value: v('pt3b')||'ไม่ตอบ'},
+    {label:'ส่วน 5 — สะท้อนคิด', value: v('s5_ref')||'ไม่ตอบ'},
+  ];
+
+  const data = {
+    studentName: name1 + ' & ' + name2,
+    name1, name2,
+    num1: v('num1'), num2: v('num2'),
+    grade: v('grade')||'ม.1',
+    subject: 'สังคมศึกษา',
+    worksheetTitle: 'ใบงานคู่ หน่วยที่ 2 — รัฐธรรมนูญกับการเมืองการปกครองของไทย',
+    worksheetId: 'ws_constitution_politics_m1_unit2_pair',
+    submittedDate: v('subdate'),
+    fields,
+    submittedAt: serverTimestamp(),
+    score: null, maxScore: 30,
+    autoScore, autoMaxScore: autoMax,
+    mcqScore, mcqMax: Object.keys(KEYS_MCQ).length,
+    matchScore, matchMax: Object.keys(KEYS_MATCH).length,
+    feedback: '',
+    isPair: true,
+  };
+
+  try{
+    await addDoc(collection(db,'worksheet_submissions'), data);
+    const mcqPct  = Math.round(mcqScore / Object.keys(KEYS_MCQ).length * 100);
+    const mtPct   = Math.round(matchScore / Object.keys(KEYS_MATCH).length * 100);
+    const msg = document.getElementById('submitMsg');
+    msg.innerHTML = `
+      <div style="font-size:26px;margin-bottom:8px">🎉</div>
+      <div style="font-size:17px;font-weight:800;color:#7a3818;margin-bottom:6px">ส่งใบงานสำเร็จแล้ว!</div>
+      <div style="font-size:15px;font-weight:700;color:#555;margin-bottom:8px">คู่: <b>${name1}</b> 🤝 <b>${name2}</b></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;max-width:340px;margin-inline:auto">
+        <div style="background:#fff;border-radius:12px;padding:10px;border:1.5px solid #ffb07a">
+          <div style="font-size:12px;font-weight:700;color:#9a5030">ปรนัย</div>
+          <div style="font-size:20px;font-weight:900;color:${mcqPct>=60?'#2e7d32':'#c62828'}">${mcqScore}/${Object.keys(KEYS_MCQ).length}</div>
+          <div style="font-size:11px;color:#888">${mcqPct}%</div>
+        </div>
+        <div style="background:#fff;border-radius:12px;padding:10px;border:1.5px solid #86b5f0">
+          <div style="font-size:12px;font-weight:700;color:#2e5eb0">จับคู่</div>
+          <div style="font-size:20px;font-weight:900;color:${mtPct>=60?'#2e7d32':'#c62828'}">${matchScore}/${Object.keys(KEYS_MATCH).length}</div>
+          <div style="font-size:11px;color:#888">${mtPct}%</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:#555">ครูจะตรวจส่วนอัตนัยและแจ้งคะแนนรวม 30 คะแนนภายหลัง 🧡</div>`;
+    msg.style.display = 'block';
+    btn.textContent = '✅ ส่งแล้ว';
+    btn.style.background = 'linear-gradient(135deg,#66bb6a,#4caf50)';
+    document.querySelectorAll('input:not([type=radio]):not([disabled]),textarea').forEach(el => el.disabled = true);
+    document.querySelectorAll('input[type=radio]').forEach(el => el.disabled = true);
+    msg.scrollIntoView({behavior:'smooth',block:'center'});
+  } catch(e) {
+    btn.disabled = false; btn.textContent = '📤 ส่งใบงาน';
+    alert('❌ ส่งไม่สำเร็จ: ' + e.message);
+  }
+};
+</script>
+</body>
+</html>
