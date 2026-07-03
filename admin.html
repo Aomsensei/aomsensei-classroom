@@ -387,7 +387,7 @@ tbody tr:hover td{background:#fff3e8}
         <div id="cwGameStats" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px"></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>นักเรียน</th><th>ชั้น</th><th>วิชา</th><th>ชื่อเกม</th><th>วันที่ส่ง</th><th>คะแนน</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+            <thead><tr><th>นักเรียน / เลขที่</th><th>ชั้น</th><th>แบบฝึกหัด</th><th>วันที่ส่ง</th><th>คะแนน</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
             <tbody id="tbGameSub"></tbody>
           </table>
         </div>
@@ -1944,12 +1944,24 @@ window.loadGameSubmissions = async function loadGameSubmissions(){
   const tb = document.getElementById('tbGameSub'); if(!tb) return;
   const gradeF  = (document.getElementById('cwGameGradeFilter')?.value  || '');
   const statusF = (document.getElementById('cwGameStatusFilter')?.value || '');
-  tb.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#bbb">⏳ กำลังโหลด...</td></tr>';
+  tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#bbb">⏳ กำลังโหลด...</td></tr>';
   try{
     const snap = await getDocs(query(collection(db,'game_submissions'), orderBy('submittedAt','desc')));
     let rows = [];
     snap.forEach(d => rows.push({id:d.id,...d.data()}));
-    if(gradeF)  rows = rows.filter(r=>r.grade===gradeF);
+
+    // normalize field names — รองรับทั้งรูปแบบเก่าและใหม่
+    rows = rows.map(r => ({
+      ...r,
+      _name  : r.name       || r.studentName || '-',
+      _class : r.class      || r.grade       || '-',
+      _num   : r.number     || r.num         || '-',
+      _title : r.exerciseTitle || r.gameTitle || (r.exercise ? 'แบบฝึกหัดที่ '+r.exercise : '-'),
+      _img   : r.imageDataUrl  || r.imageData || '',
+      _blocks: r.blocks || '',
+    }));
+
+    if(gradeF)  rows = rows.filter(r=>r._class===gradeF);
     if(statusF==='pending') rows = rows.filter(r=>r.score===null||r.score===undefined);
     if(statusF==='graded')  rows = rows.filter(r=>r.score!==null&&r.score!==undefined);
 
@@ -1969,29 +1981,28 @@ window.loadGameSubmissions = async function loadGameSubmissions(){
         <div style="background:#e8f5e9;border-radius:8px;padding:8px 14px;font-size:13px"><b style="color:#2e7d32">${total-pend}</b> ตรวจแล้ว</div>`;
     }
 
-    if(!rows.length){ tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:#bbb;padding:20px">ไม่มีงานที่ตรงเงื่อนไข</td></tr>'; return; }
+    if(!rows.length){ tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:#bbb;padding:20px">ไม่มีงานที่ตรงเงื่อนไข</td></tr>'; return; }
     tb.innerHTML = rows.map(r=>{
       const dt = r.submittedAt?.toDate ? r.submittedAt.toDate().toLocaleString('th-TH') : '-';
       const scored = r.score!==null&&r.score!==undefined;
-      const badge  = scored
+      const statusBadge = scored
         ? `<span style="background:#4caf50;color:#fff;border-radius:6px;padding:2px 8px;font-size:11px">✅ ตรวจแล้ว</span>`
         : `<span style="background:#ff9800;color:#fff;border-radius:6px;padding:2px 8px;font-size:11px">⏳ รอตรวจ</span>`;
-      const score  = scored ? `${r.score}/${r.maxScore||'?'}` : '-';
+      const score = scored ? `${r.score}/${r.maxScore||'?'}` : '-';
       return `<tr>
-        <td style="font-weight:700">${esc(r.studentName)}</td>
-        <td>${esc(r.grade)}</td>
-        <td>${esc(r.subject)}</td>
-        <td>${esc(r.gameTitle)}</td>
+        <td style="font-weight:700">${esc(r._name)}<br><span style="font-size:11px;color:#aaa">เลขที่ ${esc(String(r._num))}</span></td>
+        <td>${esc(r._class)}</td>
+        <td>${esc(r._title)}</td>
         <td style="font-size:12px">${dt}</td>
         <td>${score}</td>
-        <td>${badge}</td>
+        <td>${statusBadge}</td>
         <td>
           <button class="btn btn-blue btn-sm" onclick="viewGameSubmission('${esc(r.id)}')">🖼️ ดู</button>
           <button class="btn btn-red btn-sm" onclick="delDoc('game_submissions','${esc(r.id)}',loadGameSubmissions)">🗑️</button>
         </td>
       </tr>`;
     }).join('');
-  }catch(e){ tb.innerHTML=`<tr><td colspan="8" style="color:#c62828;padding:14px">โหลดไม่ได้: ${e.message}</td></tr>`; }
+  }catch(e){ tb.innerHTML=`<tr><td colspan="7" style="color:#c62828;padding:14px">โหลดไม่ได้: ${e.message}</td></tr>`; }
 }
 
 window.viewGameSubmission = async function(id){
@@ -2000,16 +2011,56 @@ window.viewGameSubmission = async function(id){
     const snap = await getDoc(doc(db,'game_submissions',id));
     if(!snap.exists()) return;
     const r = snap.data();
+    // normalize fields
+    const name    = r.name       || r.studentName || '-';
+    const cls     = r.class      || r.grade       || '-';
+    const num     = r.number     || r.num         || '-';
+    const title   = r.exerciseTitle || r.gameTitle || (r.exercise ? 'แบบฝึกหัดที่ '+r.exercise : '-');
+    const imgSrc  = r.imageDataUrl  || r.imageData || '';
+    const blocks  = r.blocks || '';
+    const dt      = r.submittedAt?.toDate ? r.submittedAt.toDate().toLocaleString('th-TH') : '-';
+
     const el = document.getElementById('gameSubContent');
     el.innerHTML = `
-      <div style="margin-bottom:10px;font-size:13px">
-        <b>นักเรียน:</b> ${esc(r.studentName)} &nbsp; <b>ชั้น:</b> ${esc(r.grade)} &nbsp; <b>วิชา:</b> ${esc(r.subject)} &nbsp; <b>เกม:</b> ${esc(r.gameTitle)}
+      <!-- ข้อมูลนักเรียน -->
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+        <div style="background:#fff3e0;padding:6px 14px;border-radius:8px;font-size:13px">
+          <span style="color:#888;font-size:11px">นักเรียน</span><br>
+          <b style="color:#c94b00">${esc(name)}</b>
+        </div>
+        <div style="background:#fff3e0;padding:6px 14px;border-radius:8px;font-size:13px">
+          <span style="color:#888;font-size:11px">ชั้น / เลขที่</span><br>
+          <b>${esc(cls)} / ${esc(String(num))}</b>
+        </div>
+        <div style="background:#e3f2fd;padding:6px 14px;border-radius:8px;font-size:13px">
+          <span style="color:#888;font-size:11px">แบบฝึกหัด</span><br>
+          <b style="color:#1565c0">${esc(title)}</b>
+        </div>
+        <div style="background:#f3e5f5;padding:6px 14px;border-radius:8px;font-size:13px">
+          <span style="color:#888;font-size:11px">เวลาส่ง</span><br>
+          <b style="color:#6a1b9a">${dt}</b>
+        </div>
       </div>
-      <div style="text-align:center;margin:10px 0;border:2px solid #ffd0a0;border-radius:10px;overflow:hidden;max-height:500px;overflow-y:auto">
-        <img src="${r.imageData||''}" style="max-width:100%;display:block" alt="ผลงาน"/>
+
+      <!-- โค้ดบล็อค -->
+      ${blocks ? `
+      <div style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:700;color:#555;margin-bottom:5px">📋 โค้ดบล็อคที่ใช้</div>
+        <pre style="background:#0a0a18;border:1px solid rgba(255,255,255,.1);border-radius:8px;
+          padding:10px 14px;font-size:11px;font-family:monospace;color:#7ec8e3;
+          max-height:150px;overflow-y:auto;white-space:pre-wrap;line-height:1.6">${esc(blocks)}</pre>
+      </div>` : '<div style="color:#bbb;font-size:12px;margin-bottom:10px">⚠️ ไม่มีข้อมูลโค้ดบล็อค</div>'}
+
+      <!-- ภาพหน้าจอ -->
+      <div style="font-size:11px;font-weight:700;color:#555;margin-bottom:5px">🖼️ ภาพหน้าจอผลงาน</div>
+      <div style="text-align:center;border:2px solid #ffd0a0;border-radius:10px;overflow:hidden;max-height:450px;overflow-y:auto;background:#111827">
+        ${imgSrc
+          ? `<img src="${imgSrc}" style="max-width:100%;display:block;margin:0 auto" alt="ผลงาน"/>`
+          : '<div style="padding:30px;color:#666">ไม่มีภาพหน้าจอ</div>'}
       </div>`;
-    document.getElementById('gameSubScoreInp').value = r.score ?? '';
-    document.getElementById('gameSubMaxInp').value   = r.maxScore ?? 10;
+
+    document.getElementById('gameSubScoreInp').value    = r.score ?? '';
+    document.getElementById('gameSubMaxInp').value      = r.maxScore ?? 10;
     document.getElementById('gameSubFeedbackInp').value = r.feedback || '';
     document.getElementById('gameSubStatus').textContent = '';
     openModal('mGameGrade');
