@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>แบบทดสอบก่อนเรียน วิทยาการคำนวณ ม.3 ความน่าเชื่อถือของร้านค้าออนไลน์</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary:  #e65100;
+      --primary2: #f57c00;
+      --accent:   #ff9800;
+      --light:    #fff8f0;
+      --light2:   #fff3e0;
+      --border:   #ffe0b2;
+      --text:     #3e2000;
+      --muted:    #8d6e63;
+      --white:    #ffffff;
+    }
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background: linear-gradient(135deg,#fff8f0 0%,#fff3e0 50%,#fbe9e7 100%);
+      min-height: 100vh; padding: 20px; color: var(--text);
+    }
+    .page-wrapper { max-width: 860px; margin: 0 auto; }
+
+    .exam-header {
+      background: linear-gradient(135deg,#1a237e 0%,#283593 45%,#3949ab 100%);
+      border-radius: 18px; padding: 32px 36px 24px; color: #fff; text-align: center;
+      margin-bottom: 24px; box-shadow: 0 8px 32px rgba(26,35,126,.35);
+      position: relative; overflow: hidden;
+    }
+    .exam-header::before { content:''; position:absolute; top:-40px; right:-40px; width:160px; height:160px; border-radius:50%; background:rgba(255,255,255,.10); }
+    .exam-header::after  { content:''; position:absolute; bottom:-50px; left:-30px; width:200px; height:200px; border-radius:50%; background:rgba(255,255,255,.07); }
+    .pre-badge { display:inline-block; background:rgba(255,193,7,.85); color:#1a237e; border-radius:20px; padding:4px 18px; font-size:14px; font-weight:800; letter-spacing:.5px; margin-bottom:12px; }
+    .subject-badge { display:inline-block; background:rgba(255,255,255,.22); border:1px solid rgba(255,255,255,.40); border-radius:20px; padding:4px 16px; font-size:13px; font-weight:500; letter-spacing:.5px; margin-bottom:10px; margin-left:8px; }
+    .exam-header h1 { font-size:26px; font-weight:700; margin-bottom:6px; text-shadow:0 2px 4px rgba(0,0,0,.18); }
+    .exam-header h2 { font-size:17px; font-weight:500; opacity:.92; margin-bottom:16px; }
+    .exam-meta { display:flex; justify-content:center; gap:24px; flex-wrap:wrap; margin-top:12px; }
+    .meta-item { display:flex; align-items:center; gap:6px; font-size:14px; background:rgba(255,255,255,.18); border-radius:10px; padding:5px 14px; }
+
+    .info-bar { background:var(--white); border-radius:12px; padding:16px 24px; display:flex; gap:14px; align-items:flex-start; margin-bottom:20px; box-shadow:0 2px 12px rgba(26,35,126,.10); border-left:5px solid #3949ab; }
+    .info-icon { font-size:22px; flex-shrink:0; margin-top:2px; }
+    .info-bar p { font-size:14.5px; line-height:1.8; color:#1a237e; }
+    .info-bar strong { color:#c94b00; }
+
+    .student-form { background:var(--white); border-radius:14px; padding:20px 28px; margin-bottom:24px; box-shadow:0 2px 12px rgba(26,35,126,.08); display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .student-form .full-width { grid-column:1/-1; }
+    .form-field label { display:block; font-size:13.5px; font-weight:600; color:#1a237e; margin-bottom:6px; }
+    .form-field .line { border:none; border-bottom:2px solid var(--border); background:transparent; width:100%; padding:4px 2px; font-size:15px; font-family:'Sarabun',sans-serif; color:var(--text); outline:none; transition:border-color .2s; }
+    .form-field .line:focus { border-bottom-color:#1a237e; }
+    .form-field select.line { appearance:none; -webkit-appearance:none; cursor:pointer; }
+    .score-box { display:flex; justify-content:flex-end; align-items:center; }
+    .score-inner { border:2.5px solid #1a237e; border-radius:12px; padding:10px 24px; text-align:center; min-width:120px; }
+    .score-inner .label { font-size:13px; color:#1a237e; font-weight:600; }
+    .score-inner .value { font-size:26px; font-weight:700; color:#1a237e; line-height:1.3; }
+    .score-inner .total { font-size:13px; color:var(--muted); }
+
+    .section-title { background:linear-gradient(90deg,#1a237e,#3949ab); color:#fff; border-radius:10px; padding:10px 20px; font-size:15.5px; font-weight:600; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
+
+    .questions-container { display:flex; flex-direction:column; gap:16px; }
+    .question-card { background:var(--white); border-radius:14px; padding:20px 24px; box-shadow:0 2px 10px rgba(26,35,126,.08); border:1.5px solid transparent; transition:border-color .2s,box-shadow .2s; }
+    .question-card:hover { border-color:#9fa8da; box-shadow:0 4px 18px rgba(26,35,126,.15); }
+    .question-header { display:flex; align-items:flex-start; gap:14px; margin-bottom:14px; }
+    .q-number { flex-shrink:0; width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#1a237e,#3949ab); color:#fff; font-weight:700; font-size:14.5px; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 8px rgba(26,35,126,.35); }
+    .q-text { font-size:16px; font-weight:600; line-height:1.6; color:#0d0033; flex:1; padding-top:4px; }
+    .choices { display:flex; flex-direction:column; gap:8px; padding-left:48px; }
+    .choice-label { display:flex; align-items:flex-start; gap:10px; cursor:pointer; padding:9px 14px; border-radius:9px; border:1.5px solid var(--border); background:#fffaf5; transition:all .18s; font-size:15px; line-height:1.5; }
+    .choice-label:hover { border-color:#9fa8da; background:#e8eaf6; }
+    .choice-label input[type="radio"] { display:none; }
+    .choice-label input[type="radio"]:checked + .choice-letter { background:#1a237e; color:#fff; border-color:#1a237e; }
+    .choice-label:has(input:checked) { border-color:#1a237e; background:#e8eaf6; }
+    .choice-letter { flex-shrink:0; width:26px; height:26px; border-radius:50%; border:2px solid #3949ab; background:#fff; color:#1a237e; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; transition:all .18s; margin-top:1px; }
+    .choice-text { flex:1; }
+
+    .answer-section { margin-top:32px; text-align:center; }
+    #btnSubmit {
+      background:linear-gradient(90deg,#1a237e,#3949ab); color:#fff; border:none;
+      border-radius:12px; padding:14px 40px; font-size:17px; font-weight:700;
+      font-family:'Sarabun',sans-serif; cursor:pointer;
+      box-shadow:0 4px 16px rgba(26,35,126,.35); transition:transform .15s;
+    }
+    #btnSubmit:hover { transform:translateY(-2px); }
+
+    .sig-section { background:var(--white); border-radius:14px; padding:24px 28px; margin-top:28px; box-shadow:0 2px 12px rgba(26,35,126,.08); border:1.5px solid #c5cae9; }
+    .sig-title { font-size:15px; font-weight:700; color:#1a237e; margin-bottom:20px; padding-bottom:10px; border-bottom:2px dashed #c5cae9; display:flex; align-items:center; gap:8px; }
+    .sig-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+    .sig-box { text-align:center; }
+    .sig-line { border-bottom:1.8px solid #aaa; margin:0 12px 6px; height:48px; display:flex; align-items:flex-end; justify-content:center; padding-bottom:4px; font-size:13px; color:#bbb; }
+    .sig-name { font-size:14px; font-weight:600; color:var(--text); margin-top:6px; }
+    .sig-role { font-size:13px; color:var(--muted); margin-top:3px; }
+    .sig-date-row { display:flex; justify-content:flex-end; gap:8px; margin-top:4px; font-size:13px; color:var(--muted); }
+    .sig-date-line { border-bottom:1px solid #aaa; min-width:80px; display:inline-block; }
+
+    .exam-footer { text-align:center; margin-top:28px; padding:18px; background:var(--white); border-radius:12px; box-shadow:0 2px 10px rgba(26,35,126,.07); font-size:13.5px; color:var(--muted); }
+    .exam-footer strong { color:#1a237e; }
+
+    @media (max-width:600px) {
+      .student-form { grid-template-columns:1fr; }
+      .student-form .full-width { grid-column:1; }
+      .choices { padding-left:0; }
+      .sig-grid { grid-template-columns:1fr; gap:28px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- HEADER -->
+  <div class="exam-header">
+    <div>
+      <span class="pre-badge">📋 แบบทดสอบก่อนเรียน</span>
+      <span class="subject-badge">💻 วิทยาการคำนวณ ม.3</span>
+    </div>
+    <h1>ความน่าเชื่อถือของร้านค้าออนไลน์</h1>
+    <h2>รหัสวิชา ว23103 &nbsp;|&nbsp; การตรวจสอบและป้องกันภัยซื้อขายออนไลน์</h2>
+    <div class="exam-meta">
+      <div class="meta-item"><span>✏️</span> ปรนัย 10 ข้อ</div>
+      <div class="meta-item"><span>⭐</span> 10 คะแนน</div>
+      <div class="meta-item"><span>⏱️</span> เวลา 10 นาที</div>
+    </div>
+  </div>
+
+  <!-- INFO -->
+  <div class="info-bar">
+    <div class="info-icon">📌</div>
+    <p>
+      <strong>คำสั่ง:</strong> ให้นักเรียนเลือกคำตอบที่ถูกต้องที่สุด <strong>เพียง 1 ข้อ</strong> จากตัวเลือกที่กำหนด
+      (ข้อละ 1 คะแนน รวม 10 คะแนน) · แบบทดสอบนี้วัดความรู้<strong>ก่อนเรียน</strong> ไม่มีผลต่อคะแนนเก็บ
+    </p>
+  </div>
+
+  <!-- STUDENT FORM -->
+  <div class="student-form">
+    <div class="form-field full-width">
+      <label>ชื่อ–นามสกุล</label>
+      <select id="studentNameSel" class="line" style="font-size:15px;padding:4px 2px;">
+        <option value="">⏳ กำลังโหลดรายชื่อ...</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label>ชั้น / ห้อง</label>
+      <input class="line" type="text" id="studentGrade" placeholder="ม.3 / ........" />
+    </div>
+    <div class="form-field">
+      <label>เลขที่</label>
+      <input class="line" type="text" id="studentNo" placeholder="........." />
+    </div>
+    <div class="form-field">
+      <label>วันที่สอบ</label>
+      <input class="line" type="text" id="examDate" placeholder="......./......./........." />
+    </div>
+    <div class="score-box">
+      <div class="score-inner">
+        <div class="label">คะแนนที่ได้</div>
+        <div class="value" id="displayScore">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+        <div class="total">จาก 10 คะแนน</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUESTIONS -->
+  <div class="section-title"><span>📝</span> เลือกตอบข้อที่ถูกต้องที่สุด (ข้อละ 1 คะแนน)</div>
+
+  <div class="questions-container">
+
+    <!-- Q1 (ค) — 4 ตัวเลือก -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">1</div>
+        <div class="q-text">ร้านค้าออนไลน์ที่น่าเชื่อถือที่สุด ควรตรวจสอบจากอะไรเป็นอันดับแรก?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q1" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ราคาถูกกว่าร้านทั่วไปมาก</span></label>
+        <label class="choice-label"><input type="radio" name="q1" value="ข"><span class="choice-letter">ข</span><span class="choice-text">มีรีวิวจำนวนมาก</span></label>
+        <label class="choice-label"><input type="radio" name="q1" value="ค"><span class="choice-letter">ค</span><span class="choice-text">มีช่องทางติดต่อชัดเจนและมีประวัติการขาย</span></label>
+        <label class="choice-label"><input type="radio" name="q1" value="ง"><span class="choice-letter">ง</span><span class="choice-text">มีผู้ติดตามในโซเชียลมีเดียหลักล้านคน</span></label>
+      </div>
+    </div>
+
+    <!-- Q2 (ข) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">2</div>
+        <div class="q-text">หากเห็นเว็บไซต์ร้านค้ามีชื่อ URL ว่า <strong style="color:#c94b00">www.shop-sale-999.xyz</strong> นักเรียนควรคิดอย่างไร?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q2" value="ก"><span class="choice-letter">ก</span><span class="choice-text">น่าเชื่อถือ เพราะลดราคาเยอะ</span></label>
+        <label class="choice-label"><input type="radio" name="q2" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ควรระวัง เพราะอาจเป็นเว็บไซต์ปลอมหรือไม่น่าเชื่อถือ</span></label>
+        <label class="choice-label"><input type="radio" name="q2" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ซื้อได้เลย เพราะ .xyz แสดงว่าเว็บปลอดภัย</span></label>
+        <label class="choice-label"><input type="radio" name="q2" value="ง"><span class="choice-letter">ง</span><span class="choice-text">รอดูรีวิวก่อน แล้วค่อยตัดสินใจทีหลัง</span></label>
+      </div>
+    </div>
+
+    <!-- Q3 (ข) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">3</div>
+        <div class="q-text">การรีวิวที่ดู "น่าสงสัย" มีลักษณะอย่างไร?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q3" value="ก"><span class="choice-letter">ก</span><span class="choice-text">มีรูปถ่ายสินค้าจริงจากลูกค้าหลากหลาย</span></label>
+        <label class="choice-label"><input type="radio" name="q3" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ข้อความรีวิวเหมือนกันหมดทุกบรรทัดในหลายๆ สินค้า</span></label>
+        <label class="choice-label"><input type="radio" name="q3" value="ค"><span class="choice-letter">ค</span><span class="choice-text">มีการให้คะแนน 5 ดาวและ 1 ดาวปะปนกัน</span></label>
+        <label class="choice-label"><input type="radio" name="q3" value="ง"><span class="choice-letter">ง</span><span class="choice-text">มีรีวิวทั้งภาษาไทยและภาษาอังกฤษผสมกัน</span></label>
+      </div>
+    </div>
+
+    <!-- Q4 (ข) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">4</div>
+        <div class="q-text">การทำธุรกรรมที่ปลอดภัยที่สุดคือข้อใด?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q4" value="ก"><span class="choice-letter">ก</span><span class="choice-text">โอนเงินเข้าบัญชีส่วนตัวของผู้ขายโดยตรง</span></label>
+        <label class="choice-label"><input type="radio" name="q4" value="ข"><span class="choice-letter">ข</span><span class="choice-text">จ่ายผ่านระบบแพลตฟอร์มที่รองรับ หรือเลือกเก็บเงินปลายทาง</span></label>
+        <label class="choice-label"><input type="radio" name="q4" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ให้เพื่อนโอนเงินแทน เพื่อปิดบังข้อมูลส่วนตัว</span></label>
+        <label class="choice-label"><input type="radio" name="q4" value="ง"><span class="choice-letter">ง</span><span class="choice-text">โอนเงินผ่านบริการโอนเงินระหว่างประเทศที่ไม่มีหลักฐาน</span></label>
+      </div>
+    </div>
+
+    <!-- Q5 (ข) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">5</div>
+        <div class="q-text">หากได้รับข้อความว่า <em>"คุณได้รับรางวัลใหญ่ ให้กดลิงก์เพื่อยืนยันตัวตน"</em> ควรทำอย่างไร?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q5" value="ก"><span class="choice-letter">ก</span><span class="choice-text">กดทันที กลัวเสียสิทธิ์รับรางวัล</span></label>
+        <label class="choice-label"><input type="radio" name="q5" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ลบข้อความและไม่กดลิงก์ใดๆ ทั้งสิ้น</span></label>
+        <label class="choice-label"><input type="radio" name="q5" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ส่งต่อให้เพื่อนทดลองกดก่อน แล้วค่อยดูผล</span></label>
+        <label class="choice-label"><input type="radio" name="q5" value="ง"><span class="choice-letter">ง</span><span class="choice-text">โทรหาเบอร์ที่ระบุในข้อความเพื่อขอรับรางวัล</span></label>
+      </div>
+    </div>
+
+    <!-- Q6 (ข) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">6</div>
+        <div class="q-text">ราคาสินค้าที่ "สมเหตุสมผล" ควรเป็นอย่างไร?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q6" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ราคาต่ำกว่าท้องตลาดอย่างมากผิดปกติ</span></label>
+        <label class="choice-label"><input type="radio" name="q6" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ราคาสอดคล้องกับราคาตลาดทั่วไป ไม่ถูกผิดปกติ</span></label>
+        <label class="choice-label"><input type="radio" name="q6" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ราคาสูงกว่าท้องตลาดมาก เพราะแสดงว่าของมีคุณภาพดี</span></label>
+        <label class="choice-label"><input type="radio" name="q6" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ราคาเปลี่ยนแปลงทุกชั่วโมง แสดงว่าสินค้ามีความต้องการสูง</span></label>
+      </div>
+    </div>
+
+    <!-- Q7 (ข) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">7</div>
+        <div class="q-text">ร้านค้าที่มีการปิดกั้นไม่ให้แสดงความคิดเห็น (Comment) บ่งบอกถึงอะไร?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q7" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ร้านยุ่งมากจนไม่มีเวลาจัดการความคิดเห็น</span></label>
+        <label class="choice-label"><input type="radio" name="q7" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ร้านอาจมีเจตนาปิดบังข้อมูลบางอย่างจากลูกค้า</span></label>
+        <label class="choice-label"><input type="radio" name="q7" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ร้านมีนโยบายรักษาความเป็นส่วนตัวของลูกค้าอย่างเคร่งครัด</span></label>
+        <label class="choice-label"><input type="radio" name="q7" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ร้านอยู่ระหว่างปรับปรุงระบบชั่วคราว</span></label>
+      </div>
+    </div>
+
+    <!-- Q8 (ก) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">8</div>
+        <div class="q-text">การตรวจสอบชื่อผู้ขาย (ในบัญชีธนาคาร) กับชื่อร้านค้า ควรเป็นอย่างไร?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q8" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ต้องตรงกัน จึงจะน่าเชื่อถือ</span></label>
+        <label class="choice-label"><input type="radio" name="q8" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ไม่จำเป็นต้องตรงกัน ขึ้นอยู่กับดุลยพินิจของผู้ซื้อ</span></label>
+        <label class="choice-label"><input type="radio" name="q8" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ชื่อบัญชีธนาคารไม่มีความสำคัญ ดูแค่ยอดโอนถูกต้องก็พอ</span></label>
+        <label class="choice-label"><input type="radio" name="q8" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ดูแค่ชื่อร้านค้าพอ ไม่ต้องสนใจชื่อบัญชีธนาคาร</span></label>
+      </div>
+    </div>
+
+    <!-- Q9 (ข) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">9</div>
+        <div class="q-text">หากพบร้านค้าออนไลน์ที่หลอกลวง สิ่งที่ควรทำคืออะไร?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q9" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ปล่อยไป ไม่ต้องทำอะไร เพราะตนเองไม่ได้รับความเสียหาย</span></label>
+        <label class="choice-label"><input type="radio" name="q9" value="ข"><span class="choice-letter">ข</span><span class="choice-text">รวบรวมหลักฐานและแจ้งรายงานร้านค้าต่อหน่วยงานที่เกี่ยวข้อง</span></label>
+        <label class="choice-label"><input type="radio" name="q9" value="ค"><span class="choice-letter">ค</span><span class="choice-text">โพสต์ด่าร้านค้าในโซเชียลมีเดียทันที โดยไม่มีหลักฐาน</span></label>
+        <label class="choice-label"><input type="radio" name="q9" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ติดต่อร้านค้าโดยตรงเพื่อขอเงินคืน แล้วรอดูผล</span></label>
+      </div>
+    </div>
+
+    <!-- Q10 (ข) -->
+    <div class="question-card">
+      <div class="question-header"><div class="q-number">10</div>
+        <div class="q-text">วัตถุประสงค์หลักของการตรวจสอบความน่าเชื่อถือของร้านค้าออนไลน์คืออะไร?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q10" value="ก"><span class="choice-letter">ก</span><span class="choice-text">เพื่อหาสินค้าที่ราคาถูกที่สุด</span></label>
+        <label class="choice-label"><input type="radio" name="q10" value="ข"><span class="choice-letter">ข</span><span class="choice-text">เพื่อป้องกันความสูญเสียด้านทรัพย์สินและข้อมูลส่วนตัว</span></label>
+        <label class="choice-label"><input type="radio" name="q10" value="ค"><span class="choice-letter">ค</span><span class="choice-text">เพื่อเปรียบเทียบราคาสินค้าระหว่างร้านค้าออนไลน์ต่างๆ</span></label>
+        <label class="choice-label"><input type="radio" name="q10" value="ง"><span class="choice-letter">ง</span><span class="choice-text">เพื่อสะสมแต้มและรับสิทธิพิเศษจากร้านค้าออนไลน์</span></label>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SUBMIT -->
+  <div class="answer-section">
+    <button id="btnSubmit" onclick="submitAnswers()">📤 ส่งคำตอบ</button>
+    <div id="submitMsg" style="display:none;margin-top:16px;border-radius:12px;padding:16px 20px;border:1.5px solid #66bb6a;background:#f1f8e9;font-family:'Sarabun',sans-serif"></div>
+  </div>
+
+  <!-- SIGNATURE -->
+  <div class="sig-section" style="margin-top:28px;">
+    <div class="sig-title">✍️ ลงนามรับรองแบบทดสอบ</div>
+    <div class="sig-grid">
+      <div class="sig-box">
+        <div class="sig-line">ลงชื่อ .......................................</div>
+        <div class="sig-name">( นายรณฤทธิ์&nbsp; ศรีสองเมือง )</div>
+        <div class="sig-role">ครูผู้สอน</div>
+        <div class="sig-date-row">วันที่ <span class="sig-date-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+      </div>
+      <div class="sig-box">
+        <div class="sig-line">ลงชื่อ .......................................</div>
+        <div class="sig-name">( นางสาวอุทุมพร&nbsp; ยอดสิงห์จันทร์ )</div>
+        <div class="sig-role">หัวหน้างานบริหารวิชาการ</div>
+        <div class="sig-date-row">วันที่ <span class="sig-date-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+      </div>
+      <div class="sig-box">
+        <div class="sig-line">ลงชื่อ .......................................</div>
+        <div class="sig-name">( นายดนุภพ&nbsp; โพธิ์งาม )</div>
+        <div class="sig-role">ผู้อำนวยการโรงเรียนหินฝนวิทยาคม</div>
+        <div class="sig-date-row">วันที่ <span class="sig-date-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="exam-footer">
+    <strong>วิชาวิทยาการคำนวณ ว23103 ชั้น ม.3</strong> &nbsp;|&nbsp;
+    ความน่าเชื่อถือของร้านค้าออนไลน์ (ก่อนเรียน) &nbsp;|&nbsp;
+    จัดทำโดย <strong>ครูรณฤทธิ์&nbsp; ศรีสองเมือง</strong> &nbsp;|&nbsp;
+    โรงเรียนหินฝนวิทยาคม
+  </div>
+
+</div>
+
+<!-- ==================== เฉลย ==================== -->
+<script>
+var ANSWER_KEY = {
+  q1:'ค', q2:'ข', q3:'ข', q4:'ข', q5:'ข',
+  q6:'ข', q7:'ข', q8:'ก', q9:'ข', q10:'ข'
+};
+
+// ==================== ANTI-CHEAT ====================
+var _examSubmitted = false;
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'hidden' && !_examSubmitted) {
+    _examSubmitted = true;
+    var ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(198,40,40,.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:Sarabun,sans-serif;text-align:center;padding:20px';
+    ov.innerHTML = '<div style="font-size:60px;margin-bottom:14px">⚠️</div><div style="font-size:28px;font-weight:800;margin-bottom:8px">ตรวจพบการสลับหน้าจอ!</div><div style="font-size:17px;opacity:.9">ระบบส่งคำตอบอัตโนมัติแล้ว</div>';
+    document.body.appendChild(ov);
+    submitAnswers(true, 'สลับแท็บ/ซ่อนหน้าต่าง');
+  }
+});
+
+window.addEventListener('blur', function() {
+  if (!_examSubmitted) {
+    _examSubmitted = true;
+    var ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(198,40,40,.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:Sarabun,sans-serif;text-align:center;padding:20px';
+    ov.innerHTML = '<div style="font-size:60px;margin-bottom:14px">⚠️</div><div style="font-size:28px;font-weight:800;margin-bottom:8px">ตรวจพบการสลับแอป!</div><div style="font-size:17px;opacity:.9">ระบบส่งคำตอบอัตโนมัติแล้ว</div>';
+    document.body.appendChild(ov);
+    submitAnswers(true, 'เปิดแอปซ้อน/split-screen/notification');
+  }
+});
+
+function submitAnswers(isCheat, cheatReason) {
+  var name = document.getElementById('studentNameSel').value;
+  if (!name && !isCheat) { alert('⚠️ กรุณาเลือกชื่อนักเรียนก่อน'); return; }
+  if (!name) name = '(ไม่ระบุชื่อ)';
+  isCheat = isCheat || false;
+  cheatReason = cheatReason || null;
+
+  var answers = {}, mcScore = 0, mcDetails = {};
+  for (var i = 1; i <= 10; i++) {
+    var sel = document.querySelector('input[name="q'+i+'"]:checked');
+    answers['q'+i] = sel ? sel.value : '-';
+    var correct = (answers['q'+i]||'').trim() === ANSWER_KEY['q'+i];
+    mcDetails['q'+i] = correct;
+    if (correct) mcScore++;
+  }
+
+  // ===== แสดงผลทันที (ไม่รอ Firebase) =====
+  var btn = document.getElementById('btnSubmit');
+  btn.disabled = true;
+
+  document.getElementById('displayScore').textContent = mcScore;
+
+  var pct = Math.round(mcScore / 10 * 100);
+  var color = pct >= 60 ? '#2e7d32' : '#c62828';
+  var html = '<div style="font-size:16px;font-weight:800;color:#2e7d32;margin-bottom:10px">✅ ส่งคำตอบสำเร็จ!</div>';
+  html += '<div style="font-size:15px;margin-bottom:12px">📊 คะแนน: <span style="font-size:24px;font-weight:800;color:'+color+'">'+mcScore+'/10</span> ('+pct+'%)</div>';
+  html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">';
+  for (var qi = 1; qi <= 10; qi++) {
+    var ok = mcDetails['q'+qi];
+    html += '<span style="display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:8px;font-size:13px;font-weight:800;background:'+(ok?'#e8f5e9':'#ffebee')+';color:'+(ok?'#2e7d32':'#c62828')+';border:1.5px solid '+(ok?'#a5d6a7':'#ef9a9a')+'">'+(ok?'✓':'✗')+qi+'</span>';
+  }
+  html += '</div>';
+  html += '<div id="saveStatus" style="font-size:13px;color:#888;">⏳ กำลังบันทึกข้อมูล...</div>';
+  var msg = document.getElementById('submitMsg');
+  msg.innerHTML = html;
+  msg.style.display = 'block';
+  btn.textContent = '✅ ส่งแล้ว';
+  btn.style.background = '#43a047';
+  msg.scrollIntoView({behavior:'smooth', block:'center'});
+  // ===== จบการแสดงผล =====
+
+  var data = {
+    studentName: name,
+    grade: document.getElementById('studentGrade').value || 'ม.3',
+    subject: 'วิทยาการคำนวณ',
+    unit: 'ความน่าเชื่อถือของร้านค้าออนไลน์ (ก่อนเรียน)',
+    quizType: 'pre-test',
+    answers: answers,
+    mcScore: mcScore,
+    mcDetails: mcDetails,
+    totalOutOf: 10
+  };
+
+  if (isCheat) { data.cheated = true; data.cheatReason = cheatReason || 'unknown'; }
+
+  // บันทึก Firebase เงียบๆ ด้านหลัง
+  (function doSubmit() {
+    if (typeof window._submitAnswers === 'function') {
+      window._submitAnswers(data).then(function() {
+        var s = document.getElementById('saveStatus');
+        if (s) s.innerHTML = '☁️ บันทึกข้อมูลเรียบร้อยแล้ว';
+      }).catch(function() {
+        var s = document.getElementById('saveStatus');
+        if (s) s.innerHTML = '⚠️ บันทึกไม่สำเร็จ — แจ้งครูด้วยนะ';
+      });
+    } else { setTimeout(doSubmit, 400); }
+  })();
+}
+</script>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { FIREBASE_CONFIG } from "./js/config.js";
+
+var app = initializeApp(FIREBASE_CONFIG);
+var auth = getAuth(app);
+var db   = getFirestore(app);
+
+signInAnonymously(auth).catch(function(){});
+
+// โหลดรายชื่อนักเรียน ม.3 จาก score_system
+(async function loadStudents() {
+  var sel = document.getElementById('studentNameSel');
+  try {
+    var snap = await getDoc(doc(db,'score_system','hinfon_scores'));
+    if (!snap.exists()) throw new Error('no data');
+    var classes = snap.data()?.data?.classes || {};
+    var key = Object.keys(classes).find(k => k === 'ม.3' || k.startsWith('ม.3') || k.startsWith('ม3'));
+    var students = key ? (classes[key].students || []) : [];
+    sel.innerHTML = '<option value="">— เลือกชื่อนักเรียน —</option>';
+    students.forEach(function(s) {
+      var full = [s.prefix, s.first, s.last].filter(Boolean).join(' ');
+      var opt = document.createElement('option');
+      opt.value = full; opt.textContent = full;
+      sel.appendChild(opt);
+    });
+    if (students.length === 0) {
+      sel.innerHTML = '<option value="">ไม่พบรายชื่อ — กรอกเองด้านล่าง</option>';
+    }
+  } catch(e) {
+    sel.innerHTML = '<option value="">โหลดรายชื่อไม่ได้</option>';
+  }
+})();
+
+// ส่งคำตอบ Firebase
+window._submitAnswers = async function(data) {
+  await addDoc(collection(db,'quiz_results'), Object.assign({}, data, {
+    timestamp: serverTimestamp()
+  }));
+};
+</script>
+
+</body>
+</html>
