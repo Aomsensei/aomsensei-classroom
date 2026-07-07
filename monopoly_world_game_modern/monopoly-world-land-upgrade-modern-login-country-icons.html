@@ -211,8 +211,8 @@
   }
   .top-bar::before{
     content:''; position:absolute; inset:0;
-    background:url('assets/ui/ui_top_panel_world_monopoly.png') center/cover no-repeat;
-    opacity:.96; pointer-events:none;
+    background:none;
+    opacity:0; pointer-events:none;
   }
   .top-bar > *{ position:relative; z-index:1; }
   .top-bar h1{display:flex; align-items:center; margin:0; flex:1 1 360px;}
@@ -382,6 +382,17 @@
 @media(max-width:980px){.modern-login-shell{grid-template-columns:1fr;padding:18px;gap:18px}.hero-glass-card{min-height:520px}.modern-feature-grid{grid-template-columns:repeat(2,1fr)}.login-game-logo{margin-top:80px}.modern-login-panel{padding:18px}}
 @media(max-width:560px){.hero-glass-card{min-height:430px;border-radius:26px;padding:18px}.modern-login-panel{border-radius:26px}.modern-feature-grid{grid-template-columns:1fr 1fr;gap:8px}.feature-tile{padding:10px 8px}.login-game-logo{width:105%;margin-left:-12px}.modern-join-row{flex-direction:column}.modern-join-row input[type=text],.modern-join-row .btn{width:100%}.modern-rules-card summary{align-items:flex-start}.modern-rules-card summary em{display:none}}
 
+
+/* ---- Fix: remove header image and keep all controls clickable ---- */
+.game-title-text{font:800 clamp(22px,2.4vw,34px) var(--tv-font-h);color:#fff;text-shadow:0 3px 12px rgba(0,0,0,.35);letter-spacing:.2px;white-space:nowrap}
+.top-bar{overflow:visible!important; isolation:isolate; background:linear-gradient(135deg,#092a54,#0f7bcc 55%,#19c1df)!important; border:1px solid rgba(255,255,255,.18)}
+.top-bar::before{pointer-events:none!important;z-index:0!important}
+.top-bar > *{position:relative!important;z-index:5!important;pointer-events:auto!important}
+.top-actions,.action-row,.modal-btns,.modern-action-grid,.modern-join-row{position:relative;z-index:10;pointer-events:auto!important}
+.btn,button,input,select,summary,label{pointer-events:auto!important}
+#center-area .mini-banner-img,.title-banner-img{display:none!important}
+#center-area h2{font-size:clamp(18px,2.2vw,28px);}
+
 </style>
 </head>
 <body>
@@ -445,7 +456,7 @@
         <summary><span>📖</span><b>วิธีเล่นโดยย่อ</b><em>คลิกเพื่อเปิด/ปิด</em></summary>
         <div class="tv-rules-box modern-rules-box">
           🎲 <b>ทอยลูกเต๋า</b> เดินไปรอบโลก ผ่าน GO รับ 200 เหรียญทุกรอบ<br>
-          🎁 <b>เริ่มเกม</b> ทุกคนจะได้รับกรรมสิทธิ์ประเทศแบบสุ่มคนละ 3 แห่งทันที<br>
+          🎁 <b>เริ่มเกม</b> ทุกประเทศเริ่มเป็นที่ดินเปล่า ไม่มีเจ้าของ ผู้เล่นต้องซื้อเมื่อเดินตกช่อง<br>
           🌍 <b>ซื้อประเทศ</b> ที่ยังไม่มีเจ้าของ หรือจ่ายค่าเช่าถ้ามีเจ้าของแล้ว<br>
           ⬆️ <b>อัปเกรดพื้นที่</b> เมื่อตกพื้นที่ของตัวเอง อัปเกรดได้สูงสุด 3 ครั้ง เพื่อเพิ่มค่าเช่า<br>
           🤝 <b>แลกเปลี่ยน</b> ทรัพย์สิน/เงินกับผู้เล่นคนอื่นได้ตลอดเวลา<br>
@@ -483,7 +494,7 @@
 <!-- ================= GAME SCREEN ================= -->
 <div id="screen-game">
   <div class="top-bar">
-    <h1><img src="assets/ui/banner_world_monopoly.png" alt="ท่องโลกมหาสนุก" class="title-banner-img"></h1>
+    <h1 class="game-title-text">🌍 ท่องโลกมหาสนุก</h1>
     <div class="room-tag" id="game-room-tag">ห้อง ----</div>
     <div class="turn-banner" id="turn-banner">รอเริ่มเกม...</div>
     <div class="top-actions">
@@ -505,9 +516,8 @@
     <div id="board-wrap">
       <div id="board">
         <div id="center-area">
-          <img src="assets/ui/banner_world_monopoly.png" alt="ท่องโลกมหาสนุก" class="mini-banner-img">
           <div class="center-tag-wrap">
-            <h2>เกมเศรษฐีรอบโลก</h2>
+            <h2>🌍 เกมเศรษฐีรอบโลก</h2>
             <div class="tagline">ทอยลูกเต๋า ซื้อที่ดิน อัปเกรดพื้นที่ และเดินทางรอบโลก!</div>
           </div>
           <div class="dice-row">
@@ -556,7 +566,7 @@
       <button class="btn btn-grey" id="upgrade-decline">ข้าม</button>
     </div>
   </div>
-
+</div>
 
 <div class="modal-overlay" id="modal-card">
   <div class="modal-box">
@@ -654,7 +664,7 @@
       <h3>เป้าหมาย</h3>
       ท่องเที่ยวรอบโลก ซื้อประเทศ เก็บค่าเช่าจากผู้เล่นคนอื่น และเป็นผู้เล่นคนสุดท้ายที่ไม่ล้มละลาย
       <h3>เริ่มเกม</h3>
-      ทุกคนจะได้รับกรรมสิทธิ์ประเทศแบบสุ่มคนละ 3 แห่งทันทีที่เริ่มเกม (ฟรี ไม่เสียเงิน) ก่อนเริ่มทอยลูกเต๋า
+      ทุกประเทศเริ่มเป็นที่ดินเปล่า ไม่มีเจ้าของ ผู้เล่นต้องเดินตกช่องนั้นแล้วเลือกซื้อด้วยเงินของตนเอง
       <h3>การเดิน</h3>
       ทอยลูกเต๋า 2 ลูก เดินตามแต้มที่ได้ ผ่านช่อง GO รับ 200 เหรียญทุกครั้งที่ผ่าน (นับเป็น 1 รอบ) ถ้าออกเบิ้ล (แต้มเท่ากัน) ได้ทอยซ้ำ แต่ถ้าออกเบิ้ล 3 ครั้งติดต่อกัน ต้องไปด่านตรวจคนเข้าเมืองทันที
       <h3>ซื้อประเทศ / จ่ายค่าเช่า</h3>
@@ -662,7 +672,7 @@
       <h3>อัปเกรดพื้นที่</h3>
       เมื่อคุณตกพื้นที่ของตัวเอง สามารถอัปเกรดพื้นที่นั้นได้ทันทีเพื่อเพิ่มค่าเช่า สูงสุด 3 ครั้งต่อพื้นที่ และยังอัปเกรด/ขายระดับอัปเกรดได้ที่เมนู "จัดการทรัพย์สิน"
       <h3>แลกเปลี่ยน</h3>
-      กดปุ่ม "🤝 แลกเปลี่ยน" เพื่อเสนอแลกทรัพย์สิน/เงินกับผู้เล่นคนอื่นได้ตลอดเวลา ไม่ต้องรอถึงตาตัวเอง ผู้ถูกเสนอสามารถกดยอมรับหรือปฏิเสธได้
+      กดปุ่ม "🤝 แลกเปลี่ยน" เพื่อเสนอแลกทรัพย์สิน/เงินกับผู้เล่นคนอื่นได้ตลอดเวลา และสามารถขายที่ดินเปล่าคืนธนาคารได้จากเมนูจัดการทรัพย์สิน ไม่ต้องรอถึงตาตัวเอง ผู้ถูกเสนอสามารถกดยอมรับหรือปฏิเสธได้
       <h3>จำนอง</h3>
       หากเงินไม่พอ สามารถจำนองประเทศเพื่อรับเงินสดได้ (ระหว่างจำนองจะไม่เก็บค่าเช่า) และไถ่ถอนคืนได้ภายหลังโดยจ่ายเงินต้น+ดอกเบี้ย 10%
       <h3>สนามบิน (4 ช่อง)</h3>
@@ -1108,16 +1118,8 @@ async function startGame(){
     };
   });
 
-  /* ---- แจกกรรมสิทธิ์เริ่มต้นแบบสุ่มคนละ 3 แห่ง ---- */
+  /* ---- เริ่มเกมแบบที่ดินเปล่าทั้งกระดาน: ผู้เล่นต้องซื้อเองเมื่อเดินตกช่อง ---- */
   const ownership = freshOwnership();
-  const ownableIds = Object.keys(ownership);
-  for(let i=ownableIds.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=ownableIds[i]; ownableIds[i]=ownableIds[j]; ownableIds[j]=t; }
-  let cursor = 0;
-  ids.forEach(id=>{
-    for(let k=0;k<3 && cursor<ownableIds.length;k++,cursor++){
-      ownership[ownableIds[cursor]].ownerId = id;
-    }
-  });
 
   await roomRef.update({
     phase:'playing',
@@ -1133,7 +1135,7 @@ async function startGame(){
     pendingTrade:null,
     log: [
       '🎉 เริ่มเกม! ผู้เล่น: ' + ids.map(id=>newPlayers[id].name).join(', '),
-      '🎁 แจกพื้นที่เริ่มต้นให้ผู้เล่นคนละ 3 แห่งแบบสุ่มเรียบร้อย'
+      '🏦 เริ่มเกมแบบที่ดินเปล่า: ทุกประเทศยังไม่มีเจ้าของ ผู้เล่นต้องซื้อเมื่อเดินตกช่อง'
     ],
     winnerId:null
   });
@@ -1384,7 +1386,7 @@ function paintTurnUI(){
 
   if(mine){
     waitBanner.style.display='none';
-    turnMsg.textContent = room.awaitingDecision ? 'คุณมีการตัดสินใจค้างอยู่ กรุณาเลือกซื้อ/ไม่ซื้อ' :
+    turnMsg.textContent = room.awaitingDecision ? 'คุณมีการตัดสินใจค้างอยู่ กรุณาเลือกซื้อ/อัปเกรด/ข้าม' :
       (room.canEndTurn ? (room.pendingDouble ? 'คุณออกเบิ้ล! ทอยลูกเต๋าอีกครั้งหรือกดจบเทิร์น' : 'กดจบเทิร์นเพื่อส่งต่อให้ผู้เล่นถัดไป') : 'ตาของคุณ! กดทอยลูกเต๋า');
   } else {
     waitBanner.style.display='block';
@@ -1395,8 +1397,20 @@ function paintTurnUI(){
   document.getElementById('die1').textContent = (room.dice && room.dice[0]) ? room.dice[0] : '-';
   document.getElementById('die2').textContent = (room.dice && room.dice[1]) ? room.dice[1] : '-';
 
-  if(mine && room.awaitingDecision && room.pendingSpaceId!=null && !document.getElementById('modal-buy').classList.contains('show')){
-    openBuyModal(BOARD[room.pendingSpaceId]);
+  if(mine && room.awaitingDecision && room.pendingSpaceId!=null){
+    openPendingDecisionModal();
+  }
+}
+
+
+function openPendingDecisionModal(){
+  if(!room || !room.awaitingDecision || room.pendingSpaceId==null) return;
+  const sp = BOARD[room.pendingSpaceId];
+  const own = room.ownership ? room.ownership[sp.id] : null;
+  if(own && own.ownerId===null){
+    if(!document.getElementById('modal-buy').classList.contains('show')) openBuyModal(sp);
+  } else if(own && own.ownerId===myId && sp.type==='property'){
+    if(!document.getElementById('modal-upgrade').classList.contains('show')) openUpgradeModal(sp);
   }
 }
 
@@ -1565,6 +1579,8 @@ document.getElementById('buy-confirm').addEventListener('click', ()=>{
   closeModal('modal-buy');
   const p = me();
   const sp = BOARD[room.pendingSpaceId];
+  if(!sp || !room.ownership[sp.id] || room.ownership[sp.id].ownerId!==null){ return; }
+  if(p.money < sp.price){ localInfo('เงินไม่พอ', 'เงินไม่พอสำหรับซื้อพื้นที่นี้'); room.awaitingDecision=false; room.pendingSpaceId=null; room.canEndTurn=true; syncGame(); return; }
   p.money -= sp.price;
   room.ownership[sp.id].ownerId = myId;
   addLog(`✅ ${p.name} ซื้อ ${sp.icon} ${sp.name} ด้วยเงิน $${sp.price}`);
@@ -1765,7 +1781,7 @@ function openManageModal(){
       const sp = BOARD[idx];
       const color = sp.group ? GROUP_COLORS[sp.group] : '#666';
       o.houses = Math.min(o.houses||0, MAX_LAND_UPGRADE);
-      let canBuildHouse=false, canSellHouse=o.houses>0, canMortgage=!o.mortgaged, canUnmortgage=o.mortgaged;
+      let canBuildHouse=false, canSellHouse=o.houses>0, canSellLand=!o.mortgaged && (o.houses||0)===0, canMortgage=!o.mortgaged, canUnmortgage=o.mortgaged;
       let lockedNote = '';
       if(sp.type==='property'){
         canBuildHouse = o.houses < MAX_LAND_UPGRADE && !o.mortgaged;
@@ -1783,6 +1799,7 @@ function openManageModal(){
         <div class="mi-actions">
           ${canBuildHouse?`<button class="btn-green" data-act="build" data-idx="${idx}">⬆️ อัปเกรด ($${getUpgradeCost(sp,(o.houses||0)+1)})</button>`:''}
           ${canSellHouse?`<button class="btn-grey" data-act="sell" data-idx="${idx}">ขายระดับอัปเกรด</button>`:''}
+          ${canSellLand?`<button class="btn-red" data-act="sellland" data-idx="${idx}">ขายที่ดิน (+$${Math.floor(sp.price/2)})</button>`:''}
           ${canMortgage?`<button class="btn-red" data-act="mortgage" data-idx="${idx}">จำนอง (+$${Math.floor(sp.price/2)})</button>`:''}
           ${canUnmortgage?`<button class="btn-blue" data-act="unmortgage" data-idx="${idx}">ไถ่ถอน (-$${Math.floor(sp.price/2*1.1)})</button>`:''}
         </div>
@@ -1813,6 +1830,13 @@ function doPropertyAction(idx, act){
     const cost = getUpgradeCost(sp, o.houses||1);
     p.money += Math.floor(cost/2); o.houses=Math.max(0,(o.houses||0)-1);
     addLog(`↩️ ${p.name} ขายระดับอัปเกรดที่ ${sp.name} ได้ $${Math.floor(cost/2)}`);
+  } else if(act==='sellland'){
+    if((o.houses||0)>0){ localInfo('ขายที่ดินไม่ได้','ต้องขายระดับอัปเกรดให้หมดก่อน จึงจะขายที่ดินเปล่าได้'); return; }
+    if(o.mortgaged){ localInfo('ขายที่ดินไม่ได้','ต้องไถ่ถอนจำนองก่อน จึงจะขายที่ดินได้'); return; }
+    const refund = Math.floor(sp.price/2);
+    p.money += refund;
+    room.ownership[idx] = {ownerId:null, houses:0, mortgaged:false};
+    addLog(`🏦 ${p.name} ขายที่ดิน ${sp.name} คืนธนาคาร ได้เงิน $${refund}`);
   } else if(act==='mortgage'){
     o.mortgaged = true;
     p.money += Math.floor(sp.price/2);
