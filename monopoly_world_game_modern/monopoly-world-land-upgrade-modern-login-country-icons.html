@@ -1,0 +1,2001 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ท่องโลกมหาสนุก - เกมเศรษฐีรอบโลก (ออนไลน์)</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=Sarabun:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<style>
+  :root{
+    --brown:#955436; --lightblue:#aae0fa; --pink:#d93a96; --orange:#f7941d;
+    --red:#ed1b24; --yellow:#fef200; --green:#1fb25a; --darkblue:#0072bb;
+    --felt:#0b6e4f; --felt-dark:#095a41; --panel:#1b2430; --panel2:#232e3d;
+    --ink:#182024; --gold:#f2b90c;
+    --tv-orange:#f39800; --tv-orange-d:#e07800; --tv-orange-l:#fff3e0;
+    --tv-blue:#1565c0; --tv-blue-l:#e3f2fd; --tv-green:#2e7d32; --tv-green-l:#e8f5e9;
+    --tv-gray:#757575; --tv-gray-l:#f5f5f5; --tv-shadow:0 4px 20px rgba(0,0,0,.13); --tv-r:14px;
+    --tv-font:'Sarabun',sans-serif; --tv-font-h:'Kanit',sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh; font-family:'Segoe UI',Tahoma,'TH Sarabun New',sans-serif;
+    background:radial-gradient(circle at top,#123a52,#081722 70%);
+    color:#eef3f5;
+  }
+  /* ---------- HOME / LOBBY SCREENS ---------- */
+  #screen-home, #screen-lobby{
+    min-height:100vh; font-family:var(--tv-font); color:#333;
+    background-color:#c5e0a3;
+    background-image:
+      radial-gradient(ellipse at 82% 5%, rgba(255,236,60,.45) 0%, transparent 28%),
+      linear-gradient(180deg,#87ceeb 0%,#b3e5fc 16%,#c8e6c9 30%,#dcedc8 42%,#fff9c4 55%,#fff3e0 72%,#ffe0b2 100%);
+    display:none;
+  }
+  #screen-home.active, #screen-lobby.active{ display:block; }
+  .tv-hd{
+    background:linear-gradient(135deg,var(--tv-orange),#e65100); color:#fff; text-align:center;
+    padding:10px 16px; font-size:13px; font-weight:700; letter-spacing:.8px;
+    position:sticky; top:0; z-index:300; box-shadow:0 2px 10px rgba(0,0,0,.25);
+    font-family:var(--tv-font-h);
+  }
+  .login-wrap{max-width:480px; margin:0 auto; padding:18px 14px 34px; display:flex; flex-direction:column; gap:14px;}
+  .tv-hero{text-align:center; padding:6px 4px 2px;}
+  .tv-hero .emoji{font-size:64px; display:block; filter:drop-shadow(0 6px 10px rgba(0,0,0,.25)); margin-bottom:2px;}
+  .tv-hero h1{font-family:var(--tv-font-h); font-size:27px; font-weight:800; color:#5a3410; margin:2px 0 4px; text-shadow:0 1px 0 rgba(255,255,255,.5);}
+  .tv-hero .home-sub{font-size:13px; color:#5c4a34; line-height:1.5; max-width:400px; margin:0 auto;}
+  .quick-badges{display:flex; gap:6px; justify-content:center; margin-top:10px; flex-wrap:wrap;}
+  .quick-badges span{background:rgba(255,255,255,.85); color:var(--tv-orange-d); font-weight:700; font-size:11.5px; padding:4px 11px; border-radius:20px; box-shadow:0 2px 6px rgba(0,0,0,.1);}
+  .tv-card{background:rgba(255,255,255,.97); border-radius:var(--tv-r); padding:16px; box-shadow:var(--tv-shadow);}
+  .tv-section-head{display:flex; align-items:center; gap:8px; margin-bottom:10px;}
+  .tv-section-head .ic{font-size:19px;}
+  .tv-section-head h3{font-family:var(--tv-font-h); font-size:16px; font-weight:700; color:#3a2a15; margin:0;}
+  .name-row{
+    display:flex; flex-wrap:wrap; gap:8px; align-items:center; background:#fff8f0; border-radius:11px;
+    padding:10px; border:1.7px solid #ffd0a0; width:100%; min-width:0;
+  }
+  .name-row input[type=text]{
+    flex:1 1 100%; min-width:0; width:100%; padding:10px 12px; border-radius:9px; border:2px solid #ffd0a0; background:#fff;
+    color:#2a1c10; font-size:15px; font-family:var(--tv-font); outline:none;
+  }
+  .name-row input[type=text]:focus{border-color:var(--tv-orange);}
+  .token-pick-single{display:flex; flex-wrap:wrap; gap:6px; flex:1 1 100%;}
+  .token-swatch{
+    width:30px; height:30px; border-radius:50%; cursor:pointer; border:2px solid transparent;
+    display:flex; align-items:center; justify-content:center; font-size:15px; box-shadow:0 2px 5px rgba(0,0,0,.2);
+    flex-shrink:0; box-sizing:border-box;
+  }
+  .token-swatch.selected{border-color:#3a2a15; transform:scale(1.15);}
+  .join-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  .join-row input[type=text]{
+    flex:1; min-width:120px; text-transform:uppercase; letter-spacing:4px; font-weight:700; font-size:17px;
+    padding:10px 12px; border-radius:9px; border:2px solid #ffd0a0; background:#fff; color:#2a1c10; outline:none;
+  }
+  .login-actions{display:flex; gap:10px; justify-content:center; margin-top:2px; flex-wrap:wrap;}
+  .btn{
+    border:none; border-radius:11px; padding:13px 22px; font-size:15px; font-weight:700; cursor:pointer;
+    transition:transform .15s, box-shadow .15s; font-family:var(--tv-font);
+  }
+  .btn:hover{box-shadow:0 4px 14px rgba(0,0,0,.18);}
+  .btn:active{transform:scale(.96);}
+  .btn-gold{background:linear-gradient(135deg,#f39800,#e07800); color:#fff;}
+  .btn-blue{background:linear-gradient(135deg,#1e88e5,#1565c0); color:#fff;}
+  .btn-grey{background:#37474f; color:#fff;}
+  .btn-red{background:linear-gradient(135deg,#e53935,#c62828); color:#fff;}
+  .btn-green{background:linear-gradient(135deg,#43a047,#2e7d32); color:#fff;}
+  .btn-outline{background:#fff; border:2px solid var(--tv-orange); color:var(--tv-orange-d);}
+  .btn[disabled]{opacity:.4; cursor:not-allowed;}
+  .hint{font-size:12px; color:#6c4a31; text-align:center; margin-top:6px;}
+  .tv-rules-box{font-size:12.5px; color:#5c4a34; line-height:1.8; text-align:left;}
+  .tv-rules-box b{color:#3a2a15;}
+
+  .room-code-display{
+    font-size:38px; font-weight:800; letter-spacing:10px; color:#5a3410; text-align:center;
+    background:linear-gradient(180deg,#fff3d6,#f6dfa0); border-radius:14px; padding:14px; margin:6px 0;
+    border:2px solid #e0b96a; font-family:var(--tv-font-h);
+  }
+  .lobby-list{display:flex; flex-direction:column; gap:8px; margin-top:4px;}
+  .lobby-player{display:flex; align-items:center; gap:10px; background:#fff8f0; border:1.7px solid #ffd0a0; border-radius:10px; padding:8px 10px;}
+  .lobby-player .lp-token{width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;}
+  .lobby-player .lp-name{flex:1; font-weight:700; color:#3a2a15;}
+  .lobby-player .lp-host{font-size:10px; background:var(--tv-orange); color:#fff; padding:2px 7px; border-radius:6px; font-weight:700;}
+  #lobby-empty-hint{font-size:12.5px; color:#8a7355; text-align:center; padding:10px;}
+
+  /* ---------- GAME SCREEN ---------- */
+  #screen-game{display:none; padding:14px; max-width:1600px; margin:0 auto;}
+  #screen-game.active{display:block;}
+  .top-bar{
+    display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;
+  }
+  .top-bar h1{font-size:22px; margin:0; color:var(--gold);}
+  .top-bar .turn-banner{
+    background:#101820; border:2px solid var(--gold); border-radius:10px; padding:6px 16px; font-weight:700;
+  }
+  .top-bar .top-actions{display:flex; gap:8px; flex-wrap:wrap;}
+  .room-tag{font-size:12px; background:#101820; border:1px solid var(--gold); border-radius:8px; padding:4px 10px; color:var(--gold); font-weight:700;}
+  .wait-banner{background:rgba(0,0,0,.55); border:2px solid var(--gold); border-radius:10px; padding:10px 16px; text-align:center; font-weight:700; color:#ffd447; margin:0 0 8px;}
+  .trade-banner{background:#101820; border:2px solid #3aa0e6; border-radius:10px; padding:8px 14px; margin:0 0 8px; font-size:12.5px; text-align:center;}
+  .trade-banner button{margin-left:8px;}
+  .main-layout{display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;}
+  #players-panel{
+    display:flex; flex-direction:column; gap:10px; width:270px; flex-shrink:0;
+  }
+  .player-card{
+    background:var(--panel); border-radius:12px; padding:12px; border:3px solid #2b3948;
+    position:relative; overflow:hidden;
+  }
+  .player-card.active{border-color:var(--gold); box-shadow:0 0 0 3px rgba(242,185,12,.25);}
+  .player-card.bankrupt{opacity:.4; filter:grayscale(1);}
+  .player-card .pc-head{display:flex; align-items:center; gap:8px; margin-bottom:8px;}
+  .pc-token{
+    width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:16px; flex-shrink:0; border:2px solid rgba(255,255,255,.5);
+  }
+  .pc-name{font-weight:700; font-size:15px; flex:1;}
+  .pc-turn-tag{font-size:10px; background:var(--gold); color:#231600; padding:2px 6px; border-radius:5px; font-weight:700;}
+  .pc-you-tag{font-size:10px; background:#3aa0e6; color:#fff; padding:2px 6px; border-radius:5px; font-weight:700; margin-left:4px;}
+  .pc-money{font-size:20px; font-weight:800; color:#8ef3a4; margin-bottom:6px;}
+  .pc-row{display:flex; justify-content:space-between; font-size:12px; color:#a9bccb; margin-bottom:3px;}
+  .pc-props{display:flex; flex-wrap:wrap; gap:3px; margin-top:6px;}
+  .pc-prop-chip{
+    font-size:10px; padding:2px 5px; border-radius:4px; color:#111; font-weight:700;
+  }
+  .pc-jail{color:#ff9b7a; font-weight:700; font-size:11px; margin-top:4px;}
+  .pc-laps{font-size:10px; color:#7fd1ff; margin-top:2px;}
+
+  #board-wrap{flex:1 1 320px; min-width:0; display:flex; justify-content:center;}
+  #board{
+    display:grid; grid-template-columns:repeat(11,1fr); grid-template-rows:repeat(11,1fr);
+    width:min(84vw,860px); height:min(84vw,860px); background:var(--felt);
+    border:6px solid #06331f; border-radius:10px; box-shadow:inset 0 0 30px rgba(0,0,0,.5);
+  }
+  .cell{
+    position:relative; border:1px solid rgba(255,255,255,.12); background:#0f2419;
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+    font-size:9px; text-align:center; padding:3px 2px; overflow:hidden; cursor:pointer;
+    box-shadow: inset 0 0 0 0 transparent; transition: box-shadow .25s;
+  }
+  .cell:hover{background:#173a29;}
+  .cell.corner{background:#0d2e1f; font-size:11px; justify-content:center;}
+  .cell .band{position:absolute; top:0; left:0; right:0; height:14%; min-height:8px;}
+  .cell .flag{font-size:16px; margin-bottom:1px;}
+  .cell .cname{font-weight:700; line-height:1.1; color:#eafff2;}
+  .cell .cprice{font-size:8px; color:#9fd; margin-top:1px;}
+  .cell .mortgaged-tag{position:absolute; top:2px; right:2px; font-size:8px; background:#a11; padding:1px 3px; border-radius:3px;}
+  .cell .owner-dot{position:absolute; bottom:2px; left:2px; width:8px; height:8px; border-radius:50%; border:1px solid #fff;}
+  .cell .houses{position:absolute; top:16%; left:0; right:0; display:flex; justify-content:center; gap:1px;}
+  .cell .houses span{font-size:9px;}
+  .cell .tokens{position:absolute; bottom:2px; right:2px; display:flex; flex-wrap:wrap; gap:1px; max-width:70%; justify-content:flex-end;}
+  .token-dot{
+    width:11px; height:11px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:7px; border:1px solid #fff; box-shadow:0 0 2px rgba(0,0,0,.6); transition:opacity .2s;
+  }
+
+  #center-area{
+    grid-column:2/11; grid-row:2/11; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:10px; padding:10px; text-align:center;
+  }
+  #center-area h2{margin:0; color:var(--gold); font-size:clamp(16px,2.4vw,26px); text-shadow:0 2px 4px #000;}
+  #center-area .tagline{font-size:11px; color:#bcd; margin-bottom:4px;}
+  .dice-row{display:flex; gap:10px; align-items:center; justify-content:center;}
+  .die{
+    width:42px; height:42px; background:#fff; border-radius:8px; display:flex; align-items:center; justify-content:center;
+    font-size:22px; font-weight:800; color:#111; box-shadow:0 3px 6px rgba(0,0,0,.4);
+  }
+  .action-row{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; max-width:420px;}
+  #turn-msg{background:rgba(0,0,0,.45); border-radius:8px; padding:6px 12px; font-size:12px; min-height:18px; max-width:420px;}
+
+  #log-panel{
+    width:280px; flex-shrink:0; background:var(--panel); border-radius:12px; padding:10px; height:min(84vw,860px);
+    display:flex; flex-direction:column;
+  }
+  #log-panel h3{margin:0 0 8px; font-size:14px; color:var(--gold);}
+  #log-list{overflow-y:auto; flex:1; display:flex; flex-direction:column-reverse; gap:6px; font-size:12px;}
+  #log-list .entry{background:#101820; border-radius:6px; padding:6px 8px; border-left:3px solid var(--gold);}
+
+
+  .title-banner-img{
+    display:block; width:min(420px, 92vw); max-width:100%; height:auto;
+    filter: drop-shadow(0 8px 18px rgba(0,0,0,.35));
+  }
+  .mini-banner-img{
+    display:block; width:min(320px, 70vw); max-width:100%; height:auto;
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,.30));
+    margin-bottom:4px;
+  }
+  .top-bar{
+    position:relative; padding:14px 18px; border-radius:18px; overflow:hidden;
+    background:linear-gradient(135deg,#12335d,#1c6bd4);
+    box-shadow:0 8px 24px rgba(0,0,0,.28);
+  }
+  .top-bar::before{
+    content:''; position:absolute; inset:0;
+    background:url('assets/ui/ui_top_panel_world_monopoly.png') center/cover no-repeat;
+    opacity:.96; pointer-events:none;
+  }
+  .top-bar > *{ position:relative; z-index:1; }
+  .top-bar h1{display:flex; align-items:center; margin:0; flex:1 1 360px;}
+  .room-tag, .top-bar .turn-banner{
+    background:rgba(8,20,33,.70); backdrop-filter: blur(3px);
+    box-shadow:0 4px 12px rgba(0,0,0,.18);
+  }
+  .top-actions .btn{ box-shadow:0 4px 10px rgba(0,0,0,.18); }
+
+  #board{
+    background:
+      radial-gradient(circle at center, rgba(9,55,96,.55), rgba(6,31,54,.85)),
+      url('assets/ui/banner_world_monopoly.png') center/cover no-repeat;
+    border:8px solid #f2c24f;
+    box-shadow:0 0 0 4px rgba(255,255,255,.08), inset 0 0 40px rgba(0,0,0,.45), 0 12px 24px rgba(0,0,0,.28);
+  }
+  .cell{
+    background:rgba(11,31,45,.82);
+    border:1px solid rgba(255,255,255,.18);
+    backdrop-filter: blur(2px);
+  }
+  .cell.corner{background:rgba(8,27,41,.92);}
+  .cell:hover{background:rgba(23,58,41,.88);}
+  .cell .flag{font-size:16px; margin-bottom:3px; display:flex; align-items:center; justify-content:center; min-height:20px;}
+  .cell .flag img{
+    width:26px; height:26px; object-fit:contain; filter:drop-shadow(0 2px 3px rgba(0,0,0,.35));
+  }
+  .modal-box{
+    background:linear-gradient(160deg,var(--panel),var(--panel2));
+    border:3px solid var(--gold);
+    box-shadow:0 18px 36px rgba(0,0,0,.35);
+    position:relative;
+  }
+  .modal-box::before{
+    content:''; position:absolute; inset:8px; border-radius:14px;
+    background:url('assets/ui/ui_popup_frame_world_monopoly.png') center/cover no-repeat;
+    opacity:.18; pointer-events:none;
+  }
+  .modal-box > *{ position:relative; z-index:1; }
+  #buy-flag, #upgrade-flag{ display:flex; justify-content:center; align-items:center; min-height:58px; }
+  #buy-flag img, #upgrade-flag img{ width:54px; height:54px; object-fit:contain; }
+  .space-icon-inline{display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; margin-right:6px;}
+  .space-icon-inline img{width:20px; height:20px; object-fit:contain;}
+  .center-tag-wrap{display:flex; flex-direction:column; align-items:center; gap:2px;}
+
+
+  .cell .flag img{
+    width:30px; height:30px; object-fit:contain; filter:drop-shadow(0 2px 4px rgba(0,0,0,.45));
+  }
+  .cell.corner .flag img{width:34px;height:34px;}
+  #buy-flag img, #upgrade-flag img{width:72px;height:72px;object-fit:contain;}
+  .country-icon-note{font-size:10px;color:#9fd;margin-top:1px;}
+
+  /* ---------- MODAL ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; align-items:center; justify-content:center;
+    z-index:100; padding:16px;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal-box{
+    background:linear-gradient(160deg,var(--panel),var(--panel2)); border:3px solid var(--gold); border-radius:16px;
+    padding:24px; max-width:440px; width:100%; text-align:center; max-height:86vh; overflow-y:auto;
+  }
+  .modal-box h2{margin-top:0; color:var(--gold); font-size:20px;}
+  .modal-box .price-tag{font-size:26px; font-weight:800; color:#8ef3a4; margin:10px 0;}
+  .modal-box .modal-btns{display:flex; gap:10px; justify-content:center; margin-top:16px; flex-wrap:wrap;}
+  .card-visual{
+    background:#fffdf3; color:#222; border-radius:12px; padding:20px; font-size:15px; font-weight:600;
+    line-height:1.5; margin:10px 0; box-shadow:0 4px 12px rgba(0,0,0,.4);
+  }
+  .rent-table{width:100%; font-size:12px; text-align:left; border-collapse:collapse; margin-top:10px;}
+  .rent-table td{padding:3px 4px; border-bottom:1px solid #33414f;}
+
+  .mgmt-list{display:flex; flex-direction:column; gap:8px; max-height:50vh; overflow-y:auto; margin:10px 0;}
+  .mgmt-item{
+    display:flex; align-items:center; gap:8px; background:#101820; border-radius:8px; padding:8px; text-align:left;
+  }
+  .mgmt-item .mi-color{width:14px; height:36px; border-radius:4px; flex-shrink:0;}
+  .mgmt-item .mi-info{flex:1; font-size:12px;}
+  .mgmt-item .mi-actions{display:flex; gap:4px; flex-wrap:wrap;}
+  .mgmt-item button{font-size:11px; padding:5px 7px; border-radius:6px; border:none; cursor:pointer; font-weight:700;}
+
+  #rules-modal .modal-box{max-width:560px; text-align:left; font-size:13px; line-height:1.7;}
+  #rules-modal h3{color:var(--gold); margin-bottom:4px;}
+
+  .trade-cols{display:flex; gap:10px; flex-wrap:wrap; text-align:left; margin-top:10px;}
+  .trade-col{flex:1; min-width:150px; background:#101820; border-radius:10px; padding:10px;}
+  .trade-col h4{margin:0 0 6px; font-size:13px; color:var(--gold);}
+  .trade-prop-list{display:flex; flex-direction:column; gap:4px; max-height:160px; overflow-y:auto; margin-bottom:8px;}
+  .trade-prop-list label{display:flex; align-items:center; gap:6px; font-size:11.5px; background:#182430; padding:4px 6px; border-radius:6px; cursor:pointer;}
+  .trade-money-input{width:100%; padding:6px 8px; border-radius:6px; border:1px solid #33414f; background:#0d141c; color:#eef3f5; font-size:13px;}
+  .trade-target-select{width:100%; padding:8px; border-radius:8px; border:1px solid #33414f; background:#0d141c; color:#eef3f5; font-size:13px; margin-top:10px;}
+
+  @media (max-width:1100px){
+    .main-layout{flex-direction:column; align-items:stretch;}
+    #board-wrap{order:1; width:100%; min-width:0;}
+    #board{width:min(94vw,820px); height:min(94vw,820px); margin:0 auto;}
+    #players-panel{order:2; width:100%; flex-direction:row; flex-wrap:wrap;}
+    .player-card{flex:1; min-width:200px;}
+    #log-panel{order:3; width:100%; height:220px;}
+  }
+  @media (max-width:600px){
+    #board{width:97vw; height:97vw;}
+    .cell{font-size:7.3px; padding:2px 1px;}
+    .cell .flag{font-size:13px;}
+    .cell .cprice{font-size:6.5px;}
+    .die{width:34px; height:34px; font-size:17px;}
+    #center-area h2{font-size:14px;}
+    .top-bar h1{font-size:17px;}
+    .btn{padding:10px 14px; font-size:13px;}
+  }
+
+/* ---------- MODERN LOGIN SCREEN UPDATE ---------- */
+#screen-home{
+  color:#fff;
+  background:
+    radial-gradient(circle at 10% 10%, rgba(255,214,78,.34), transparent 26%),
+    radial-gradient(circle at 90% 16%, rgba(55,180,255,.36), transparent 30%),
+    linear-gradient(135deg,#071a35 0%,#0a4f91 45%,#13a7d3 100%);
+  overflow-x:hidden;
+}
+#screen-home::before{
+  content:'';position:fixed;inset:0;pointer-events:none;opacity:.18;
+  background:url('assets/ui/banner_world_monopoly.png') center/cover no-repeat;
+  filter:saturate(1.1) blur(1px);
+}
+.modern-login-shell{
+  position:relative;z-index:1;min-height:100vh;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(370px,.85fr);
+  gap:28px;align-items:center;max-width:1280px;margin:0 auto;padding:clamp(18px,3.2vw,44px);
+}
+.modern-bg-orb{position:fixed;border-radius:999px;filter:blur(8px);pointer-events:none;opacity:.72;z-index:0}
+.orb-a{width:260px;height:260px;left:-70px;top:12%;background:rgba(255,196,44,.30)}
+.orb-b{width:220px;height:220px;right:-50px;top:6%;background:rgba(0,213,255,.28)}
+.orb-c{width:180px;height:180px;right:16%;bottom:6%;background:rgba(113,255,190,.20)}
+.modern-login-hero,.modern-login-panel{position:relative;z-index:2}
+.hero-glass-card{
+  min-height:640px;border-radius:34px;padding:28px;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;
+  background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.06));
+  border:1px solid rgba(255,255,255,.32);box-shadow:0 28px 70px rgba(0,0,0,.32);backdrop-filter:blur(12px);
+}
+.hero-glass-card::before{content:'';position:absolute;inset:0;background:url('assets/ui/banner_world_monopoly.png') center/cover no-repeat;opacity:.96;z-index:-2}
+.hero-glass-card::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,20,39,.08) 0%,rgba(4,20,39,.36) 45%,rgba(4,20,39,.88) 100%);z-index:-1}
+.game-pill{align-self:flex-start;background:rgba(255,255,255,.92);color:#0d4f91;border-radius:999px;padding:8px 14px;font:800 12px var(--tv-font-h);letter-spacing:.6px;box-shadow:0 8px 18px rgba(0,0,0,.16);margin-bottom:auto}
+.login-game-logo{width:min(520px,92%);height:auto;filter:drop-shadow(0 14px 20px rgba(0,0,0,.42));margin:110px 0 4px -6px}
+.hero-glass-card h1{font:800 clamp(34px,5vw,72px) var(--tv-font-h);line-height:.95;margin:0;color:#fff;text-shadow:0 6px 20px rgba(0,0,0,.45)}
+.hero-glass-card p{max-width:720px;color:#e9f8ff;font-size:clamp(15px,1.8vw,19px);line-height:1.65;margin:14px 0 18px;text-shadow:0 2px 8px rgba(0,0,0,.35)}
+.modern-feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.feature-tile{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.24);border-radius:18px;padding:12px 10px;backdrop-filter:blur(8px);box-shadow:0 10px 24px rgba(0,0,0,.16)}
+.feature-tile span{font-size:24px;display:block;margin-bottom:4px}.feature-tile b{display:block;font:800 14px var(--tv-font-h);color:#fff}.feature-tile small{display:block;color:#ccefff;font-size:11px;margin-top:2px}
+.modern-login-panel{border-radius:32px;background:rgba(255,255,255,.93);box-shadow:0 28px 70px rgba(0,0,0,.32);border:1px solid rgba(255,255,255,.55);padding:24px;color:#223;backdrop-filter:blur(18px)}
+.login-panel-head{text-align:left;margin-bottom:16px}.panel-badge{display:inline-flex;background:linear-gradient(135deg,#ff9d16,#ffcf4a);color:#5a3100;border-radius:999px;padding:5px 12px;font:800 12px var(--tv-font-h);box-shadow:0 5px 14px rgba(255,157,22,.28)}
+.login-panel-head h2{font:800 clamp(24px,2.4vw,34px) var(--tv-font-h);margin:10px 0 4px;color:#10233f}.login-panel-head p{margin:0;color:#536170;font-size:14px;line-height:1.55}
+.modern-card{background:#fff;border:1px solid #e6eef8;border-radius:22px;padding:16px;box-shadow:0 10px 26px rgba(20,64,118,.10);margin-bottom:14px}
+.modern-card-head{display:flex;gap:10px;align-items:center;margin-bottom:12px}.modern-card-head span{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#eaf7ff,#d8edff);font-size:22px}.modern-card-head b{display:block;font:800 16px var(--tv-font-h);color:#17243b}.modern-card-head small{display:block;color:#708092;font-size:12px;margin-top:1px}
+.modern-name-row{border:none;background:linear-gradient(180deg,#f7fbff,#eef7ff);padding:12px;gap:10px}.modern-name-row input[type=text]{border:2px solid #d6e8ff;border-radius:15px;font-size:16px;padding:13px 15px;box-shadow:inset 0 2px 6px rgba(0,40,90,.05)}
+.modern-name-row input[type=text]:focus{border-color:#1898f5;box-shadow:0 0 0 4px rgba(24,152,245,.12)}
+.modern-name-row .token-pick-single{gap:9px}.modern-name-row .token-swatch{width:38px;height:38px;font-size:18px;border:3px solid rgba(255,255,255,.85);box-shadow:0 6px 13px rgba(0,0,0,.17)}
+.modern-name-row .token-swatch.selected{outline:3px solid #ffbd2e;outline-offset:2px;transform:translateY(-2px) scale(1.08)}
+.modern-action-grid{display:grid;grid-template-columns:1fr;gap:14px}
+.modern-action-card{border:none;border-radius:24px;padding:18px;cursor:pointer;text-align:left;color:#fff;background:linear-gradient(135deg,#ff9416,#ffbd24 55%,#ffdf6c);box-shadow:0 14px 28px rgba(226,112,0,.28);display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:center;font-family:var(--tv-font);transition:transform .15s,box-shadow .15s}
+.modern-action-card:hover{transform:translateY(-2px);box-shadow:0 18px 34px rgba(226,112,0,.35)}.modern-action-card:active{transform:translateY(0) scale(.985)}
+.modern-action-card .action-icon{grid-row:1/3;width:52px;height:52px;border-radius:18px;display:grid;place-items:center;background:rgba(255,255,255,.24);font-size:24px;box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+.modern-action-card strong{font:800 20px var(--tv-font-h);text-shadow:0 2px 8px rgba(0,0,0,.20)}.modern-action-card small{font-size:13px;color:#fff7d8}
+.join-room-card{margin-bottom:0}.modern-join-row{gap:10px}.modern-join-row input[type=text]{text-align:center;letter-spacing:8px;font-size:22px;font-weight:800;border:2px solid #d6e8ff;border-radius:16px;background:#f8fcff;color:#0c315a;padding:12px 14px}.modern-join-row input[type=text]:focus{border-color:#1898f5;box-shadow:0 0 0 4px rgba(24,152,245,.12)}.modern-join-row .btn{border-radius:16px;padding:13px 18px;font-weight:800}
+.modern-status{min-height:20px;margin:10px 2px 6px;color:#2360a8;font-weight:700;text-align:center}
+.modern-rules-card{margin-top:12px;background:linear-gradient(180deg,#f8fcff,#eef6ff);border:1px solid #dbeafe;border-radius:22px;overflow:hidden;box-shadow:0 10px 26px rgba(20,64,118,.10);color:#25344a}.modern-rules-card summary{list-style:none;cursor:pointer;padding:15px 16px;display:flex;gap:10px;align-items:center}.modern-rules-card summary::-webkit-details-marker{display:none}.modern-rules-card summary span{font-size:22px}.modern-rules-card summary b{font:800 16px var(--tv-font-h);flex:1}.modern-rules-card summary em{font-style:normal;color:#789;font-size:12px}.modern-rules-box{padding:0 18px 18px;color:#3e5065;background:transparent;font-size:13px;line-height:1.85}
+@media(max-width:980px){.modern-login-shell{grid-template-columns:1fr;padding:18px;gap:18px}.hero-glass-card{min-height:520px}.modern-feature-grid{grid-template-columns:repeat(2,1fr)}.login-game-logo{margin-top:80px}.modern-login-panel{padding:18px}}
+@media(max-width:560px){.hero-glass-card{min-height:430px;border-radius:26px;padding:18px}.modern-login-panel{border-radius:26px}.modern-feature-grid{grid-template-columns:1fr 1fr;gap:8px}.feature-tile{padding:10px 8px}.login-game-logo{width:105%;margin-left:-12px}.modern-join-row{flex-direction:column}.modern-join-row input[type=text],.modern-join-row .btn{width:100%}.modern-rules-card summary{align-items:flex-start}.modern-rules-card summary em{display:none}}
+
+</style>
+</head>
+<body>
+
+<!-- ================= HOME SCREEN ================= -->
+<div id="screen-home">
+  <div class="modern-login-shell">
+    <div class="modern-bg-orb orb-a"></div>
+    <div class="modern-bg-orb orb-b"></div>
+    <div class="modern-bg-orb orb-c"></div>
+
+    <section class="modern-login-hero">
+      <div class="hero-glass-card">
+        <div class="game-pill">🌍 ONLINE WORLD BOARD GAME</div>
+        <img src="assets/ui/banner_world_monopoly.png" alt="ท่องโลกมหาสนุก" class="login-game-logo">
+        <h1>ท่องโลกมหาสนุก</h1>
+        <p>เกมเศรษฐีรอบโลกออนไลน์ เล่นกับเพื่อน 2–4 คน ซื้อประเทศ อัปเกรดพื้นที่ เก็บค่าเช่า และแข่งกันเป็นเศรษฐีนักเดินทาง!</p>
+        <div class="modern-feature-grid">
+          <div class="feature-tile"><span>🎲</span><b>ทอยลูกเต๋า</b><small>เดินทางรอบโลก</small></div>
+          <div class="feature-tile"><span>🏙️</span><b>ซื้อที่ดิน</b><small>สร้างรายได้</small></div>
+          <div class="feature-tile"><span>⬆️</span><b>อัปเกรด</b><small>สูงสุด 3 ระดับ</small></div>
+          <div class="feature-tile"><span>🤝</span><b>แลกเปลี่ยน</b><small>ต่อรองกับเพื่อน</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="modern-login-panel">
+      <div class="login-panel-head">
+        <span class="panel-badge">เริ่มเล่น</span>
+        <h2>สร้างห้องหรือเข้าร่วมเกม</h2>
+        <p>ตั้งชื่อ เลือกตัวละคร แล้วชวนเพื่อนเข้าห้องด้วยรหัส 4 ตัว</p>
+      </div>
+
+      <div class="modern-card player-setup-card">
+        <div class="modern-card-head"><span>🧑</span><div><b>โปรไฟล์ผู้เล่น</b><small>ชื่อและตัวเดินของคุณ</small></div></div>
+        <div class="name-row modern-name-row">
+          <input type="text" id="home-name" maxlength="12" placeholder="ใส่ชื่อของคุณ">
+          <div class="token-pick-single" id="home-token-pick"></div>
+        </div>
+      </div>
+
+      <div class="modern-action-grid">
+        <button class="modern-action-card create-room-action" id="btn-create-room">
+          <span class="action-icon">➕</span>
+          <strong>สร้างห้องใหม่</strong>
+          <small>เป็นเจ้าของห้องแล้วเริ่มเกม</small>
+        </button>
+
+        <div class="modern-card join-room-card">
+          <div class="modern-card-head"><span>🔑</span><div><b>เข้าร่วมห้องเพื่อน</b><small>กรอกรหัสห้อง 4 ตัว</small></div></div>
+          <div class="join-row modern-join-row">
+            <input type="text" id="join-code" maxlength="4" placeholder="ABCD">
+            <button class="btn btn-blue" id="btn-join-room">เข้าร่วม</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="hint modern-status" id="home-status"></div>
+
+      <details class="modern-rules-card">
+        <summary><span>📖</span><b>วิธีเล่นโดยย่อ</b><em>คลิกเพื่อเปิด/ปิด</em></summary>
+        <div class="tv-rules-box modern-rules-box">
+          🎲 <b>ทอยลูกเต๋า</b> เดินไปรอบโลก ผ่าน GO รับ 200 เหรียญทุกรอบ<br>
+          🎁 <b>เริ่มเกม</b> ทุกคนจะได้รับกรรมสิทธิ์ประเทศแบบสุ่มคนละ 3 แห่งทันที<br>
+          🌍 <b>ซื้อประเทศ</b> ที่ยังไม่มีเจ้าของ หรือจ่ายค่าเช่าถ้ามีเจ้าของแล้ว<br>
+          ⬆️ <b>อัปเกรดพื้นที่</b> เมื่อตกพื้นที่ของตัวเอง อัปเกรดได้สูงสุด 3 ครั้ง เพื่อเพิ่มค่าเช่า<br>
+          🤝 <b>แลกเปลี่ยน</b> ทรัพย์สิน/เงินกับผู้เล่นคนอื่นได้ตลอดเวลา<br>
+          🚔 <b>ด่านตรวจคนเข้าเมือง</b> ออกเบิ้ล 3 ครั้งติดจะถูกจับ<br>
+          🏆 เป็นผู้เล่นคนสุดท้ายที่ไม่ล้มละลายเพื่อชนะเกม
+        </div>
+      </details>
+    </section>
+  </div>
+</div>
+
+<!-- ================= LOBBY SCREEN ================= -->
+<div id="screen-lobby">
+  <div class="tv-hd">🌍 ท่องโลกมหาสนุก · ห้องรอผู้เล่น</div>
+  <div class="login-wrap">
+    <div class="tv-card">
+      <div class="tv-section-head"><span class="ic">🔑</span><h3>รหัสห้อง — แชร์ให้เพื่อน</h3></div>
+      <div class="room-code-display" id="lobby-code">----</div>
+    </div>
+
+    <div class="tv-card">
+      <div class="tv-section-head"><span class="ic">🧑‍🤝‍🧑</span><h3>ผู้เล่นในห้อง (<span id="lobby-count">0</span>/4)</h3></div>
+      <div class="lobby-list" id="lobby-list"></div>
+      <div id="lobby-empty-hint" style="display:none;">รอผู้เล่นเข้าร่วม... ต้องมีอย่างน้อย 2 คนถึงจะเริ่มได้</div>
+    </div>
+
+    <div class="login-actions">
+      <button class="btn btn-gold" id="btn-start-game" style="display:none;">🎲 เริ่มเกม</button>
+      <button class="btn btn-red" id="btn-leave-lobby">🚪 ออกจากห้อง</button>
+    </div>
+    <div class="hint" id="lobby-hint">รอเจ้าของห้องกดเริ่มเกม...</div>
+  </div>
+</div>
+
+<!-- ================= GAME SCREEN ================= -->
+<div id="screen-game">
+  <div class="top-bar">
+    <h1><img src="assets/ui/banner_world_monopoly.png" alt="ท่องโลกมหาสนุก" class="title-banner-img"></h1>
+    <div class="room-tag" id="game-room-tag">ห้อง ----</div>
+    <div class="turn-banner" id="turn-banner">รอเริ่มเกม...</div>
+    <div class="top-actions">
+      <button class="btn btn-blue" id="btn-trade" style="display:none;">🤝 แลกเปลี่ยน</button>
+      <button class="btn btn-grey" id="btn-rules">📖 กติกา</button>
+      <button class="btn btn-red" id="btn-leave-game">🚪 ออกจากห้อง</button>
+    </div>
+  </div>
+
+  <div class="wait-banner" id="wait-banner" style="display:none;"></div>
+  <div class="trade-banner" id="trade-wait-banner" style="display:none;">
+    ⏳ กำลังรอการตอบรับข้อเสนอแลกเปลี่ยน...
+    <button class="btn btn-grey" id="trade-cancel" style="padding:4px 10px; font-size:11px;">ยกเลิก</button>
+  </div>
+
+  <div class="main-layout">
+    <div id="players-panel"></div>
+
+    <div id="board-wrap">
+      <div id="board">
+        <div id="center-area">
+          <img src="assets/ui/banner_world_monopoly.png" alt="ท่องโลกมหาสนุก" class="mini-banner-img">
+          <div class="center-tag-wrap">
+            <h2>เกมเศรษฐีรอบโลก</h2>
+            <div class="tagline">ทอยลูกเต๋า ซื้อที่ดิน อัปเกรดพื้นที่ และเดินทางรอบโลก!</div>
+          </div>
+          <div class="dice-row">
+            <div class="die" id="die1">-</div>
+            <div class="die" id="die2">-</div>
+          </div>
+          <div id="turn-msg">รอข้อมูลห้อง...</div>
+          <div class="action-row">
+            <button class="btn btn-gold" id="btn-roll" style="display:none;">🎲 ทอยลูกเต๋า</button>
+            <button class="btn btn-grey" id="btn-manage" style="display:none;">🏠 จัดการทรัพย์สิน</button>
+            <button class="btn btn-blue" id="btn-endturn" style="display:none;">➡️ จบเทิร์น</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="log-panel">
+      <h3>📜 บันทึกการเดินทาง</h3>
+      <div id="log-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODALS ================= -->
+<div class="modal-overlay" id="modal-buy">
+  <div class="modal-box">
+    <h2 id="buy-title">ซื้อประเทศนี้หรือไม่?</h2>
+    <div class="flag" id="buy-flag" style="font-size:40px;"></div>
+    <div class="price-tag" id="buy-price"></div>
+    <table class="rent-table" id="buy-rent-table"></table>
+    <div class="modal-btns">
+      <button class="btn btn-green" id="buy-confirm">✅ ซื้อ</button>
+      <button class="btn btn-grey" id="buy-decline">❌ ไม่ซื้อ</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-upgrade">
+  <div class="modal-box">
+    <h2 id="upgrade-title">อัปเกรดพื้นที่ของคุณ?</h2>
+    <div class="flag" id="upgrade-flag" style="font-size:40px;"></div>
+    <div class="price-tag" id="upgrade-level"></div>
+    <table class="rent-table" id="upgrade-rent-table"></table>
+    <div class="modal-btns">
+      <button class="btn btn-green" id="upgrade-confirm">⬆️ อัปเกรด</button>
+      <button class="btn btn-grey" id="upgrade-decline">ข้าม</button>
+    </div>
+  </div>
+
+
+<div class="modal-overlay" id="modal-card">
+  <div class="modal-box">
+    <h2 id="card-title">🎴 การ์ด</h2>
+    <div class="card-visual" id="card-text"></div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" id="card-ok">ตกลง</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-info">
+  <div class="modal-box">
+    <h2 id="info-title">แจ้งเตือน</h2>
+    <div class="card-visual" id="info-text"></div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" id="info-ok">ตกลง</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-jail">
+  <div class="modal-box">
+    <h2>🚔 คุณติดด่านตรวจคนเข้าเมือง</h2>
+    <div class="card-visual" id="jail-text"></div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" id="jail-pay">💵 จ่าย 50 เหรียญ เพื่อออก</button>
+      <button class="btn btn-green" id="jail-card" style="display:none;">🎫 ใช้บัตรผ่านด่านฟรี</button>
+      <button class="btn btn-blue" id="jail-roll">🎲 ทอยเพื่อออก (ต้องออกเบิ้ล)</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-manage">
+  <div class="modal-box">
+    <h2>🏠 จัดการทรัพย์สิน</h2>
+    <div class="mgmt-list" id="mgmt-list"></div>
+    <div class="modal-btns">
+      <button class="btn btn-grey" id="mgmt-close">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-trade">
+  <div class="modal-box" style="max-width:540px;">
+    <h2>🤝 เสนอแลกเปลี่ยน</h2>
+    <select class="trade-target-select" id="trade-target"></select>
+    <div class="trade-cols">
+      <div class="trade-col">
+        <h4>สิ่งที่คุณจะให้</h4>
+        <div class="trade-prop-list" id="trade-my-props"></div>
+        <label style="font-size:11px;">เงิน (เหรียญ)</label>
+        <input type="number" class="trade-money-input" id="trade-offer-money" min="0" value="0">
+      </div>
+      <div class="trade-col">
+        <h4>สิ่งที่คุณต้องการ</h4>
+        <div class="trade-prop-list" id="trade-their-props"></div>
+        <label style="font-size:11px;">เงิน (เหรียญ)</label>
+        <input type="number" class="trade-money-input" id="trade-request-money" min="0" value="0">
+      </div>
+    </div>
+    <div id="trade-error" style="color:#ff8a7a; font-size:12px; margin-top:8px; min-height:14px;"></div>
+    <div class="modal-btns">
+      <button class="btn btn-green" id="trade-send">📨 ส่งข้อเสนอ</button>
+      <button class="btn btn-grey" id="trade-cancel-compose">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-trade-incoming">
+  <div class="modal-box">
+    <h2>🤝 ข้อเสนอแลกเปลี่ยน</h2>
+    <div class="card-visual" id="trade-incoming-text"></div>
+    <div class="modal-btns">
+      <button class="btn btn-green" id="trade-accept">✅ ยอมรับ</button>
+      <button class="btn btn-red" id="trade-decline">❌ ปฏิเสธ</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-gameover">
+  <div class="modal-box">
+    <h2 id="gameover-title">🏆 จบเกม!</h2>
+    <div class="card-visual" id="gameover-text"></div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" id="gameover-restart">กลับหน้าแรก</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="rules-modal">
+  <div class="modal-box">
+    <h2 style="color:var(--gold)">📖 กติกาการเล่น</h2>
+    <div>
+      <h3>เป้าหมาย</h3>
+      ท่องเที่ยวรอบโลก ซื้อประเทศ เก็บค่าเช่าจากผู้เล่นคนอื่น และเป็นผู้เล่นคนสุดท้ายที่ไม่ล้มละลาย
+      <h3>เริ่มเกม</h3>
+      ทุกคนจะได้รับกรรมสิทธิ์ประเทศแบบสุ่มคนละ 3 แห่งทันทีที่เริ่มเกม (ฟรี ไม่เสียเงิน) ก่อนเริ่มทอยลูกเต๋า
+      <h3>การเดิน</h3>
+      ทอยลูกเต๋า 2 ลูก เดินตามแต้มที่ได้ ผ่านช่อง GO รับ 200 เหรียญทุกครั้งที่ผ่าน (นับเป็น 1 รอบ) ถ้าออกเบิ้ล (แต้มเท่ากัน) ได้ทอยซ้ำ แต่ถ้าออกเบิ้ล 3 ครั้งติดต่อกัน ต้องไปด่านตรวจคนเข้าเมืองทันที
+      <h3>ซื้อประเทศ / จ่ายค่าเช่า</h3>
+      เมื่อเดินไปตกช่องประเทศที่ยังไม่มีเจ้าของ สามารถซื้อได้ ถ้ามีเจ้าของแล้วต้องจ่ายค่าเช่าให้เจ้าของอัตโนมัติ ค่าเช่าจะสูงขึ้นตามระดับอัปเกรดของพื้นที่ สูงสุด 3 ระดับ ช่องที่มีเจ้าของแล้วจะขึ้นกรอบสีตามสีของเจ้าของให้ดูง่าย
+      <h3>อัปเกรดพื้นที่</h3>
+      เมื่อคุณตกพื้นที่ของตัวเอง สามารถอัปเกรดพื้นที่นั้นได้ทันทีเพื่อเพิ่มค่าเช่า สูงสุด 3 ครั้งต่อพื้นที่ และยังอัปเกรด/ขายระดับอัปเกรดได้ที่เมนู "จัดการทรัพย์สิน"
+      <h3>แลกเปลี่ยน</h3>
+      กดปุ่ม "🤝 แลกเปลี่ยน" เพื่อเสนอแลกทรัพย์สิน/เงินกับผู้เล่นคนอื่นได้ตลอดเวลา ไม่ต้องรอถึงตาตัวเอง ผู้ถูกเสนอสามารถกดยอมรับหรือปฏิเสธได้
+      <h3>จำนอง</h3>
+      หากเงินไม่พอ สามารถจำนองประเทศเพื่อรับเงินสดได้ (ระหว่างจำนองจะไม่เก็บค่าเช่า) และไถ่ถอนคืนได้ภายหลังโดยจ่ายเงินต้น+ดอกเบี้ย 10%
+      <h3>สนามบิน (4 ช่อง)</h3>
+      ค่าเช่าขึ้นกับจำนวนสนามบินที่เจ้าของถือครอง (1 สนาม=25, 2=50, 3=100, 4=200)
+      <h3>บริษัทพลังงาน (2 ช่อง)</h3>
+      ค่าเช่า = แต้มลูกเต๋าที่ทอยได้ x 4 (ถ้าถือครองช่องเดียว) หรือ x10 (ถ้าถือครองทั้ง 2 ช่อง)
+      <h3>ด่านตรวจคนเข้าเมือง (คุก)</h3>
+      จ่าย 50 เหรียญ / ใช้บัตรผ่านด่านฟรี / หรือทอยเบิ้ลเพื่อออก (ทอยได้สูงสุด 3 ครั้ง)
+      <h3>ล้มละลาย</h3>
+      หากมีเงินติดลบและไม่สามารถจำนองทรัพย์สินเพื่อชดใช้หนี้ได้ ผู้เล่นนั้นจะตกรอบทันที
+      <h3>ออนไลน์</h3>
+      แต่ละคนเล่นจากเครื่องของตัวเอง ระบบจะสลับให้ทำการเฉพาะตาของตัวเองเท่านั้น ปุ่มต่างๆ จะแสดงเมื่อถึงตาคุณ (ยกเว้นปุ่มแลกเปลี่ยนที่ใช้ได้ตลอดเวลา)
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" id="rules-close">เข้าใจแล้ว</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= FIREBASE ================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyAYFY_9VqMFsVX22EW2aPVq7NawWQV-n_g",
+  authDomain: "aomsensei-classroom.firebaseapp.com",
+  databaseURL: "https://aomsensei-classroom-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "aomsensei-classroom",
+  storageBucket: "aomsensei-classroom.firebasestorage.app",
+  messagingSenderId: "152996049271",
+  appId: "1:152996049271:web:a9a2927490e1e908d9f172"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const ROOMS_PATH = 'mp_rooms';
+
+/* ================= STATIC DATA ================= */
+const GROUP_COLORS = {
+  brown:'#955436', lightblue:'#aae0fa', pink:'#d93a96', orange:'#f7941d',
+  red:'#ed1b24', yellow:'#fef200', green:'#1fb25a', darkblue:'#0072bb'
+};
+const RENT_BY_PRICE = {
+  60:[2,10,30,90,160,250], 100:[6,30,90,270,400,550], 120:[8,40,100,300,450,600],
+  140:[10,50,150,450,625,750], 160:[12,60,180,500,700,900], 180:[14,70,200,550,750,950],
+  200:[16,80,220,600,800,1000], 220:[18,90,250,700,875,1050], 240:[20,100,300,750,925,1100],
+  260:[22,110,330,800,975,1150], 280:[24,120,360,850,1025,1200], 300:[26,130,390,900,1100,1275],
+  320:[28,150,450,1000,1200,1400], 350:[35,175,500,1100,1300,1500], 400:[50,200,600,1400,1700,2000]
+};
+const HOUSE_COST = {brown:50, lightblue:50, pink:100, orange:100, red:150, yellow:150, green:200, darkblue:200};
+
+const BOARD = [
+  {id:0, type:'go', name:'เริ่มต้นการเดินทาง', icon:'🏁'},
+  {id:1, type:'property', name:'เนปาล', icon:'🇳🇵', group:'brown', price:60},
+  {id:2, type:'chest', name:'กล่องสมบัติโลก', icon:'🎁'},
+  {id:3, type:'property', name:'ลาว', icon:'🇱🇦', group:'brown', price:60},
+  {id:4, type:'tax', name:'ภาษีศุลกากร', icon:'💰', amount:200},
+  {id:5, type:'railroad', name:'สนามบินสุวรรณภูมิ', icon:'✈️', price:200},
+  {id:6, type:'property', name:'เวียดนาม', icon:'🇻🇳', group:'lightblue', price:100},
+  {id:7, type:'chance', name:'โอกาสเดินทาง', icon:'❓'},
+  {id:8, type:'property', name:'กัมพูชา', icon:'🇰🇭', group:'lightblue', price:100},
+  {id:9, type:'property', name:'เมียนมา', icon:'🇲🇲', group:'lightblue', price:120},
+  {id:10, type:'jail', name:'ด่านตรวจคนเข้าเมือง', icon:'🚔'},
+  {id:11, type:'property', name:'กรีซ', icon:'🇬🇷', group:'pink', price:140},
+  {id:12, type:'utility', name:'บริษัทน้ำมันโลก', icon:'🛢️', price:150},
+  {id:13, type:'property', name:'โปรตุเกส', icon:'🇵🇹', group:'pink', price:140},
+  {id:14, type:'property', name:'สเปน', icon:'🇪🇸', group:'pink', price:160},
+  {id:15, type:'railroad', name:'สนามบินชางงี', icon:'✈️', price:200},
+  {id:16, type:'property', name:'อิตาลี', icon:'🇮🇹', group:'orange', price:180},
+  {id:17, type:'chest', name:'กล่องสมบัติโลก', icon:'🎁'},
+  {id:18, type:'property', name:'เยอรมนี', icon:'🇩🇪', group:'orange', price:180},
+  {id:19, type:'property', name:'ฝรั่งเศส', icon:'🇫🇷', group:'orange', price:200},
+  {id:20, type:'parking', name:'จุดพักผ่อน', icon:'🏖️'},
+  {id:21, type:'property', name:'เม็กซิโก', icon:'🇲🇽', group:'red', price:220},
+  {id:22, type:'chance', name:'โอกาสเดินทาง', icon:'❓'},
+  {id:23, type:'property', name:'บราซิล', icon:'🇧🇷', group:'red', price:220},
+  {id:24, type:'property', name:'อาร์เจนตินา', icon:'🇦🇷', group:'red', price:240},
+  {id:25, type:'railroad', name:'สนามบินฮีทโธรว์', icon:'✈️', price:200},
+  {id:26, type:'property', name:'แคนาดา', icon:'🇨🇦', group:'yellow', price:260},
+  {id:27, type:'property', name:'สหรัฐอเมริกา', icon:'🇺🇸', group:'yellow', price:260},
+  {id:28, type:'utility', name:'บริษัทไฟฟ้าโลก', icon:'⚡', price:150},
+  {id:29, type:'property', name:'จาเมกา', icon:'🇯🇲', group:'yellow', price:280},
+  {id:30, type:'gotojail', name:'ไปด่านตรวจคนเข้าเมือง', icon:'🚨'},
+  {id:31, type:'property', name:'แอฟริกาใต้', icon:'🇿🇦', group:'green', price:300},
+  {id:32, type:'property', name:'อียิปต์', icon:'🇪🇬', group:'green', price:300},
+  {id:33, type:'chest', name:'กล่องสมบัติโลก', icon:'🎁'},
+  {id:34, type:'property', name:'โมร็อกโก', icon:'🇲🇦', group:'green', price:320},
+  {id:35, type:'railroad', name:'สนามบิน JFK', icon:'✈️', price:200},
+  {id:36, type:'chance', name:'โอกาสเดินทาง', icon:'❓'},
+  {id:37, type:'property', name:'ออสเตรเลีย', icon:'🇦🇺', group:'darkblue', price:350},
+  {id:38, type:'tax', name:'ภาษีสัมภาระหรู', icon:'🧳', amount:100},
+  {id:39, type:'property', name:'นิวซีแลนด์', icon:'🇳🇿', group:'darkblue', price:400}
+];
+
+const TOKENS = ['🚗','🐘','✈️','🚢','🎩','🐈','⚽','🦁'];
+const PLAYER_COLORS = ['#ff5b5b','#4fa3ff','#3fcf7f','#ffd447','#c86dff','#ff9b3f'];
+
+const SPACE_ICON_PATHS = {
+  go:'assets/icons/icon_finish_crown.png',
+  chest:'assets/icons/icon_bonus_treasure.png',
+  chance:'assets/icons/icon_chance_map.png',
+  railroad:'assets/icons/icon_airport.png',
+  utility_oil:'assets/icons/icon_utility_oil.png',
+  utility_power:'assets/icons/icon_utility_power.png',
+  tax:'assets/icons/icon_tax_customs.png',
+  jail:'assets/icons/icon_jail_checkpoint.png',
+  gotojail:'assets/icons/icon_jail_checkpoint.png',
+  parking:'assets/icons/icon_free_parking_vacation.png'
+};
+
+const COUNTRY_ICON_PATHS = {
+  'เนปาล':'assets/countries/nepal.png',
+  'ลาว':'assets/countries/laos.png',
+  'เวียดนาม':'assets/countries/vietnam.png',
+  'กัมพูชา':'assets/countries/cambodia.png',
+  'เมียนมา':'assets/countries/myanmar.png',
+  'กรีซ':'assets/countries/greece.png',
+  'โปรตุเกส':'assets/countries/portugal.png',
+  'สเปน':'assets/countries/spain.png',
+  'อิตาลี':'assets/countries/italy.png',
+  'เยอรมนี':'assets/countries/germany.png',
+  'ฝรั่งเศส':'assets/countries/france.png',
+  'เม็กซิโก':'assets/countries/mexico.png',
+  'บราซิล':'assets/countries/brazil.png',
+  'อาร์เจนตินา':'assets/countries/argentina.png',
+  'แคนาดา':'assets/countries/canada.png',
+  'สหรัฐอเมริกา':'assets/countries/united_states.png',
+  'จาเมกา':'assets/countries/jamaica.png',
+  'แอฟริกาใต้':'assets/countries/south_africa.png',
+  'อียิปต์':'assets/countries/egypt.png',
+  'โมร็อกโก':'assets/countries/morocco.png',
+  'ออสเตรเลีย':'assets/countries/australia.png'
+};
+function assignSpaceAssets(){
+  BOARD.forEach(function(sp){
+    if(sp.type==='property' && COUNTRY_ICON_PATHS[sp.name]) sp.asset = COUNTRY_ICON_PATHS[sp.name];
+    else if(sp.type==='railroad') sp.asset = SPACE_ICON_PATHS.railroad;
+    else if(sp.type==='utility' && /น้ำมัน/.test(sp.name)) sp.asset = SPACE_ICON_PATHS.utility_oil;
+    else if(sp.type==='utility' && /ไฟฟ้า/.test(sp.name)) sp.asset = SPACE_ICON_PATHS.utility_power;
+    else if(sp.type==='tax') sp.asset = SPACE_ICON_PATHS.tax;
+    else if(sp.type==='go') sp.asset = SPACE_ICON_PATHS.go;
+    else if(sp.type==='chest') sp.asset = SPACE_ICON_PATHS.chest;
+    else if(sp.type==='chance') sp.asset = SPACE_ICON_PATHS.chance;
+    else if(sp.type==='jail') sp.asset = SPACE_ICON_PATHS.jail;
+    else if(sp.type==='gotojail') sp.asset = SPACE_ICON_PATHS.gotojail;
+    else if(sp.type==='parking') sp.asset = SPACE_ICON_PATHS.parking;
+  });
+}
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]); });
+}
+function spaceIconHtml(sp, cls){
+  const klass = cls || 'space-icon-inline';
+  if(sp && sp.asset) return '<span class="'+klass+'"><img src="'+sp.asset+'" alt="'+escapeHtml(sp.name)+'"></span>';
+  return '<span class="'+klass+'">'+escapeHtml(sp.icon || '')+'</span>';
+}
+assignSpaceAssets();
+
+
+/* card effects operate on (p) = the acting player's live object inside `room.players` */
+function changeMoneyLocal(p, amt){
+  p.money = (p.money||0) + amt;
+  addLog(`${amt>=0?'💵':'💸'} ${p.name} ${amt>=0?'ได้รับ':'จ่าย'} ${Math.abs(amt)} เหรียญ`);
+}
+function moveTo(p, pos, passGo){
+  const passed = pos < p.pos;
+  p.pos = pos;
+  if(passed){
+    p.laps = (p.laps||0) + 1;
+    if(passGo!==false){
+      p.money+=200;
+      addLog(`🏁 ${p.name} ผ่าน GO รับ 200 เหรียญ (เดินครบรอบที่ ${p.laps})`);
+    }
+  }
+}
+function moveBy(p, delta){ p.pos = (p.pos + delta + 40) % 40; }
+function toNearestRailroad(p){
+  const rails=[5,15,25,35];
+  let t = rails.find(r=>r>p.pos);
+  if(t===undefined) t = rails[0];
+  moveTo(p, t, true);
+  addLog(`✈️ ${p.name} เดินทางไปยัง ${BOARD[t].name}`);
+}
+function toJail(p){
+  p.pos=10; p.jail=true; p.jailTurns=0;
+  addLog(`🚨 ${p.name} ถูกส่งไปด่านตรวจคนเข้าเมือง!`);
+}
+function payEach(p, amt){
+  Object.keys(room.players).forEach(id=>{
+    const op = room.players[id];
+    if(op!==p && !op.bankrupt){ p.money-=amt; op.money+=amt; }
+  });
+  addLog(`${p.name} จ่ายเงินให้ผู้เล่นทุกคนคนละ ${amt} เหรียญ`);
+}
+function collectEach(p, amt){
+  Object.keys(room.players).forEach(id=>{
+    const op = room.players[id];
+    if(op!==p && !op.bankrupt){ op.money-=amt; p.money+=amt; }
+  });
+  addLog(`${p.name} ได้รับเงินจากผู้เล่นทุกคนคนละ ${amt} เหรียญ`);
+}
+
+const CHANCE_CARDS = [
+  {text:'คุณถูกรางวัลตั๋วเครื่องบินฟรี! เดินหน้าไปยัง GO รับ 200 เหรียญ', movesPlayer:true, effect:(p)=>{ moveTo(p,0,true); handleLanding(); }},
+  {text:'หลงทางในเมืองใหม่ เดินถอยหลัง 3 ช่อง', movesPlayer:true, effect:(p)=>{ moveBy(p,-3); handleLanding(); }},
+  {text:'ถูกปรับเพราะทำพาสปอร์ตหาย จ่าย 100 เหรียญ', movesPlayer:false, effect:(p)=>{ changeMoneyLocal(p,-100); }},
+  {text:'ได้รับเงินคืนภาษีนักท่องเที่ยว รับ 50 เหรียญ', movesPlayer:false, effect:(p)=>{ changeMoneyLocal(p,50); }},
+  {text:'บัตรผ่านด่านฟรี! เก็บไว้ใช้ได้เมื่อติดคุก', movesPlayer:false, effect:(p)=>{ p.jailFreeCards=(p.jailFreeCards||0)+1; }},
+  {text:'ถูกจับเพราะวีซ่าหมดอายุ ไปด่านตรวจคนเข้าเมืองทันที!', movesPlayer:false, effect:(p)=>{ toJail(p); }},
+  {text:'บริจาคเพื่อการกุศลท้องถิ่น จ่าย 50 เหรียญให้ผู้เล่นทุกคน', movesPlayer:false, effect:(p)=>{ payEach(p,50); }},
+  {text:'ถูกรางวัลจากเทศกาลท้องถิ่น รับ 100 เหรียญจากธนาคาร', movesPlayer:false, effect:(p)=>{ changeMoneyLocal(p,100); }},
+  {text:'ค่าซ่อมสัมภาระเดินทาง จ่าย 75 เหรียญ', movesPlayer:false, effect:(p)=>{ changeMoneyLocal(p,-75); }},
+  {text:'ได้รับตำแหน่ง CEO สายการบิน! รับเงินจากผู้เล่นทุกคนคนละ 50 เหรียญ', movesPlayer:false, effect:(p)=>{ collectEach(p,50); }},
+  {text:'เดินทางไปยังสนามบินที่ใกล้ที่สุด', movesPlayer:true, effect:(p)=>{ toNearestRailroad(p); handleLanding(); }},
+  {text:'โปรโมชั่นพิเศษ! รับ 75 เหรียญ', movesPlayer:false, effect:(p)=>{ changeMoneyLocal(p,75); }}
+];
+const CHEST_CARDS = [
+  {text:'คืนภาษีนักเดินทาง รับ 100 เหรียญ', movesPlayer:false, effect:(p)=>{ changeMoneyLocal(p,100); }},
+  {text:'ค่ารักษาพยาบาลระหว่างเดินทาง จ่าย 50 เหรียญ', movesPlayer:false, effect:(p)=>{ changeMoneyLocal(p,-50); }},
+  {text:'ขายของที่ระลึกได้กำไร รับ 20 เหรียญ', movesPlayer:false, effect:(p)=>{ changeMoneyLocal(p,20); }},
+  {text:'วันเกิดของคุณ! รับ 10 เหรียญจากผู้เล่นทุกคน', movesPlayer:false, effect:(p)=>{ collectEach(p,10); }},
+  {text:'บริจาคช่วยเหลือผู้ประสบภัย จ่าย 100 เหรียญ', movesPlayer:false, effect:(p)=>{ changeMoneyLocal(p,-100); }},
+  {text:'ถูกลอตเตอรี่ท่องเที่ยว รับ 150 เหรียญ', movesPlayer:false, effect:(p)=>{ changeMoneyLocal(p,150); }},
+  {text:'จ่ายค่าปรับที่จอดรถผิดกฎหมาย จ่าย 30 เหรียญ', movesPlayer:false, effect:(p)=>{ changeMoneyLocal(p,-30); }},
+  {text:'ได้รับมรดกจากญาติ รับ 200 เหรียญ', movesPlayer:false, effect:(p)=>{ changeMoneyLocal(p,200); }},
+  {text:'บัตรผ่านด่านฟรี! เก็บไว้ใช้ได้เมื่อติดคุก', movesPlayer:false, effect:(p)=>{ p.jailFreeCards=(p.jailFreeCards||0)+1; }},
+  {text:'ตรวจคนเข้าเมืองสุ่มตรวจ! ไปด่านตรวจคนเข้าเมืองทันที', movesPlayer:false, effect:(p)=>{ toJail(p); }},
+  {text:'ค่าธรรมเนียมวีซ่ากรุ๊ป จ่าย 100 เหรียญ', movesPlayer:false, effect:(p)=>{ changeMoneyLocal(p,-100); }},
+  {text:'กองทุนท่องเที่ยวคืนเงิน รับ 45 เหรียญ', movesPlayer:false, effect:(p)=>{ changeMoneyLocal(p,45); }}
+];
+
+/* ================= SESSION / CONNECTION STATE ================= */
+let myId = null;
+let roomCode = null;
+let room = null;          // latest synced snapshot mirror (also used as local working buffer during my turn)
+let roomRef = null;
+let lastPositions = {};   // client-local: playerId -> last rendered board position (for movement animation)
+let animatingTokens = {}; // client-local: playerId -> true while a walk animation is in progress
+
+function getMyId(){
+  let id = localStorage.getItem('mp_myid');
+  if(!id){
+    id = 'u' + Math.random().toString(36).slice(2,10) + Date.now().toString(36);
+    localStorage.setItem('mp_myid', id);
+  }
+  return id;
+}
+function saveSession(){ localStorage.setItem('mp_session', JSON.stringify({roomCode})); }
+function clearSession(){ localStorage.removeItem('mp_session'); }
+function loadSession(){
+  try{ return JSON.parse(localStorage.getItem('mp_session')||'null'); }catch(e){ return null; }
+}
+function genCode(){
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s='';
+  for(let i=0;i<4;i++) s += chars[Math.floor(Math.random()*chars.length)];
+  return s;
+}
+
+/* ================= SCREEN HELPERS ================= */
+function showScreen(name){
+  ['home','lobby','game'].forEach(s=>{
+    document.getElementById('screen-'+s).classList.toggle('active', s===name);
+  });
+}
+function showModal(id){ document.getElementById(id).classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+function localInfo(title, html){
+  document.getElementById('info-title').textContent = title;
+  document.getElementById('info-text').innerHTML = html;
+  showModal('modal-info');
+}
+
+/* ================= HOME SCREEN LOGIC ================= */
+const homeTokenPick = document.getElementById('home-token-pick');
+let homeSelectedToken = TOKENS[0];
+TOKENS.forEach((t,i)=>{
+  const sw = document.createElement('div');
+  sw.className = 'token-swatch' + (i===0?' selected':'');
+  sw.dataset.token = t;
+  sw.style.background = PLAYER_COLORS[i % PLAYER_COLORS.length];
+  sw.textContent = t;
+  sw.addEventListener('click', ()=>{
+    homeTokenPick.querySelectorAll('.token-swatch').forEach(s=>s.classList.remove('selected'));
+    sw.classList.add('selected');
+    homeSelectedToken = t;
+  });
+  homeTokenPick.appendChild(sw);
+});
+
+function setHomeStatus(msg){ document.getElementById('home-status').textContent = msg||''; }
+
+document.getElementById('btn-create-room').addEventListener('click', createRoom);
+document.getElementById('btn-join-room').addEventListener('click', joinRoom);
+
+async function createRoom(){
+  const name = document.getElementById('home-name').value.trim() || 'ผู้เล่น';
+  setHomeStatus('กำลังสร้างห้อง...');
+  try{
+    myId = getMyId();
+    let code, exists=true, tries=0;
+    do{
+      code = genCode();
+      const snap = await db.ref(ROOMS_PATH+'/'+code).get();
+      exists = snap.exists();
+      tries++;
+    } while(exists && tries<6);
+    if(exists){ setHomeStatus('สร้างห้องไม่สำเร็จ ลองใหม่อีกครั้ง'); return; }
+    roomCode = code;
+    await db.ref(ROOMS_PATH+'/'+code).set({
+      host: myId, phase:'lobby', createdAt: Date.now(),
+      players: { [myId]: { name, token: homeSelectedToken, color: PLAYER_COLORS[0], order:0 } }
+    });
+    db.ref(ROOMS_PATH+'/'+code+'/players/'+myId).onDisconnect().remove();
+    saveSession();
+    attachRoomListener();
+    setHomeStatus('');
+  }catch(e){ setHomeStatus('เกิดข้อผิดพลาด: '+e.message); }
+}
+
+async function joinRoom(){
+  const code = document.getElementById('join-code').value.trim().toUpperCase();
+  const name = document.getElementById('home-name').value.trim() || 'ผู้เล่น';
+  if(code.length!==4){ setHomeStatus('กรุณากรอกรหัสห้อง 4 ตัวอักษร'); return; }
+  setHomeStatus('กำลังเข้าร่วมห้อง...');
+  try{
+    const snap = await db.ref(ROOMS_PATH+'/'+code).get();
+    if(!snap.exists()){ setHomeStatus('ไม่พบห้องนี้'); return; }
+    const r = snap.val();
+    if(r.phase!=='lobby'){ setHomeStatus('เกมนี้เริ่มไปแล้ว ไม่สามารถเข้าร่วมได้'); return; }
+    const players = r.players || {};
+    const ids = Object.keys(players);
+    if(ids.length>=4){ setHomeStatus('ห้องเต็มแล้ว (สูงสุด 4 คน)'); return; }
+    myId = getMyId();
+    roomCode = code;
+    const usedColors = ids.map(id=>players[id].color);
+    const color = PLAYER_COLORS.find(c=>!usedColors.includes(c)) || PLAYER_COLORS[ids.length % PLAYER_COLORS.length];
+    await db.ref(ROOMS_PATH+'/'+code+'/players/'+myId).set({ name, token: homeSelectedToken, color, order: ids.length });
+    db.ref(ROOMS_PATH+'/'+code+'/players/'+myId).onDisconnect().remove();
+    saveSession();
+    attachRoomListener();
+    setHomeStatus('');
+  }catch(e){ setHomeStatus('เกิดข้อผิดพลาด: '+e.message); }
+}
+
+/* ================= ROOM LISTENER ================= */
+function attachRoomListener(){
+  if(roomRef) roomRef.off();
+  roomRef = db.ref(ROOMS_PATH+'/'+roomCode);
+  roomRef.on('value', snap=>{
+    room = snap.val();
+    if(!room){ onRoomGone(); return; }
+    renderForPhase();
+  });
+}
+function onRoomGone(){
+  clearSession();
+  roomCode = null; room = null;
+  lastPositions = {}; animatingTokens = {};
+  showScreen('home');
+  setHomeStatus('ห้องถูกปิดหรือไม่มีอยู่แล้ว');
+}
+function renderForPhase(){
+  if(!room) return;
+  if(room.phase==='lobby'){ showScreen('lobby'); renderLobby(); }
+  else { showScreen('game'); renderGameFromRoom(); }
+}
+
+/* try auto-reconnect on load */
+(function tryReconnect(){
+  const sess = loadSession();
+  if(sess && sess.roomCode){
+    myId = getMyId();
+    roomCode = sess.roomCode;
+    attachRoomListener();
+  } else {
+    showScreen('home');
+  }
+})();
+
+/* ================= LOBBY SCREEN ================= */
+function renderLobby(){
+  document.getElementById('lobby-code').textContent = roomCode;
+  const players = room.players || {};
+  const ids = Object.keys(players).sort((a,b)=>(players[a].order||0)-(players[b].order||0));
+  document.getElementById('lobby-count').textContent = ids.length;
+  const list = document.getElementById('lobby-list');
+  list.innerHTML = ids.map(id=>{
+    const p = players[id];
+    return `<div class="lobby-player">
+      <div class="lp-token" style="background:${p.color}">${p.token}</div>
+      <div class="lp-name">${p.name}${id===myId?' (คุณ)':''}</div>
+      ${room.host===id?'<div class="lp-host">เจ้าของห้อง</div>':''}
+    </div>`;
+  }).join('');
+  document.getElementById('lobby-empty-hint').style.display = ids.length<2 ? 'block':'none';
+  const isHost = room.host===myId;
+  const startBtn = document.getElementById('btn-start-game');
+  startBtn.style.display = isHost ? 'inline-block' : 'none';
+  startBtn.disabled = ids.length<2 || ids.length>4;
+  document.getElementById('lobby-hint').textContent = isHost
+    ? (ids.length<2 ? 'ต้องมีผู้เล่นอย่างน้อย 2 คนถึงจะเริ่มได้' : 'กดเริ่มเกมได้เลย!')
+    : 'รอเจ้าของห้องกดเริ่มเกม...';
+}
+
+document.getElementById('btn-start-game').addEventListener('click', startGame);
+document.getElementById('btn-leave-lobby').addEventListener('click', leaveRoom);
+document.getElementById('btn-leave-game').addEventListener('click', leaveRoom);
+
+async function leaveRoom(){
+  try{
+    if(roomRef) roomRef.off();
+    if(roomCode && myId){
+      await db.ref(ROOMS_PATH+'/'+roomCode+'/players/'+myId).remove();
+    }
+  }catch(e){ /* ignore */ }
+  clearSession();
+  roomCode=null; room=null; roomRef=null;
+  lastPositions = {}; animatingTokens = {};
+  showScreen('home');
+}
+
+function freshOwnership(){
+  const o = {};
+  BOARD.forEach(sp=>{
+    if(sp.type==='property'||sp.type==='railroad'||sp.type==='utility'){
+      o[sp.id] = {ownerId:null, houses:0, mortgaged:false};
+    }
+  });
+  return o;
+}
+
+async function startGame(){
+  if(room.host!==myId) return;
+  const players = room.players||{};
+  const ids = Object.keys(players);
+  if(ids.length<2){ return; }
+  let order = ids.slice();
+  for(let i=order.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=order[i]; order[i]=order[j]; order[j]=t; }
+  const newPlayers = {};
+  ids.forEach(id=>{
+    const base = players[id];
+    newPlayers[id] = {
+      name: base.name, token: base.token, color: base.color,
+      money:1500, pos:0, jail:false, jailTurns:0, jailFreeCards:0, bankrupt:false, doublesStreak:0, laps:0
+    };
+  });
+
+  /* ---- แจกกรรมสิทธิ์เริ่มต้นแบบสุ่มคนละ 3 แห่ง ---- */
+  const ownership = freshOwnership();
+  const ownableIds = Object.keys(ownership);
+  for(let i=ownableIds.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=ownableIds[i]; ownableIds[i]=ownableIds[j]; ownableIds[j]=t; }
+  let cursor = 0;
+  ids.forEach(id=>{
+    for(let k=0;k<3 && cursor<ownableIds.length;k++,cursor++){
+      ownership[ownableIds[cursor]].ownerId = id;
+    }
+  });
+
+  await roomRef.update({
+    phase:'playing',
+    players: newPlayers,
+    ownership: ownership,
+    order,
+    currentTurn: order[0],
+    dice:[0,0],
+    pendingDouble:false,
+    canEndTurn:false,
+    awaitingDecision:false,
+    pendingSpaceId:null,
+    pendingTrade:null,
+    log: [
+      '🎉 เริ่มเกม! ผู้เล่น: ' + ids.map(id=>newPlayers[id].name).join(', '),
+      '🎁 แจกพื้นที่เริ่มต้นให้ผู้เล่นคนละ 3 แห่งแบบสุ่มเรียบร้อย'
+    ],
+    winnerId:null
+  });
+}
+
+/* ================= GAME HELPERS ================= */
+function isMyTurn(){ return room && room.phase==='playing' && room.currentTurn===myId; }
+function me(){ return room.players ? room.players[myId] : null; }
+function addLog(msg){
+  if(!room.log) room.log=[];
+  room.log = room.log.concat(msg);
+  if(room.log.length>60) room.log = room.log.slice(room.log.length-60);
+}
+function syncGame(){
+  roomRef.update({
+    players: room.players,
+    ownership: room.ownership,
+    order: room.order,
+    currentTurn: room.currentTurn,
+    dice: room.dice,
+    pendingDouble: !!room.pendingDouble,
+    canEndTurn: !!room.canEndTurn,
+    awaitingDecision: !!room.awaitingDecision,
+    pendingSpaceId: (room.pendingSpaceId===undefined?null:room.pendingSpaceId),
+    log: room.log||[],
+    winnerId: room.winnerId===undefined?null:room.winnerId,
+    phase: room.phase
+  });
+}
+
+/* ================= BOARD RENDER ================= */
+let boardBuilt = false;
+function gridPos(i){
+  if(i<=10) return {row:11, col:11-i};
+  if(i<=20) return {row:21-i, col:1};
+  if(i<=30) return {row:1, col:i-19};
+  return {row:i-29, col:11};
+}
+function ensureBoardBuilt(){
+  if(boardBuilt) return;
+  const board = document.getElementById('board');
+  BOARD.forEach(sp=>{
+    const pos = gridPos(sp.id);
+    const cell = document.createElement('div');
+    cell.className = 'cell' + ([0,10,20,30].includes(sp.id)?' corner':'');
+    cell.style.gridRow = pos.row;
+    cell.style.gridColumn = pos.col;
+    cell.dataset.id = sp.id;
+    let bandHtml = '';
+    if(sp.type==='property'){
+      bandHtml = `<div class="band" style="background:${GROUP_COLORS[sp.group]}"></div>`;
+    }
+    cell.innerHTML = `
+      ${bandHtml}
+      <div class="houses" data-houses></div>
+      <div class="flag">${spaceIconHtml(sp,'space-icon-inline')}</div>
+      <div class="cname">${sp.name}</div>
+      ${sp.price?`<div class="cprice">$${sp.price}</div>`:''}
+      <div class="owner-dot" data-owner style="display:none;"></div>
+      <div class="mortgaged-tag" data-mortgaged style="display:none;">จำนอง</div>
+      <div class="tokens" data-tokens></div>
+    `;
+    cell.addEventListener('click',()=>showCellInfo(sp.id));
+    board.appendChild(cell);
+  });
+  boardBuilt = true;
+}
+function showCellInfo(id){
+  const sp = BOARD[id];
+  let txt = `<b>${spaceIconHtml(sp,'space-icon-inline')} ${sp.name}</b><br>`;
+  const own = room.ownership ? room.ownership[id] : null;
+  if(sp.type==='property'||sp.type==='railroad'||sp.type==='utility'){
+    txt += `ราคา: ${sp.price} เหรียญ<br>`;
+    if(own && own.ownerId){
+      const owner = room.players[own.ownerId];
+      txt += `เจ้าของ: ${owner?owner.name:'?'}<br>`;
+      if(own.mortgaged) txt += `สถานะ: จำนองอยู่<br>`;
+      if(sp.type==='property') txt += `ระดับอัปเกรด: ${Math.min(own.houses||0,3)}/3<br>`;
+    } else {
+      txt += `ยังไม่มีเจ้าของ`;
+    }
+  } else if(sp.type==='tax'){
+    txt += `จ่ายภาษี ${sp.amount} เหรียญเมื่อตกช่องนี้`;
+  } else {
+    txt += `ช่องพิเศษ`;
+  }
+  localInfo(sp.name, txt);
+}
+function paintBoard(){
+  document.querySelectorAll('#board .cell').forEach(cell=>{
+    const id = parseInt(cell.dataset.id);
+    const sp = BOARD[id];
+    const own = room.ownership ? room.ownership[id] : null;
+    const ownerDot = cell.querySelector('[data-owner]');
+    const mortTag = cell.querySelector('[data-mortgaged]');
+    const housesEl = cell.querySelector('[data-houses]');
+    if(own && own.ownerId){
+      const owner = room.players[own.ownerId];
+      const ownerColor = owner ? owner.color : '#888';
+      ownerDot.style.display='block';
+      ownerDot.style.background = ownerColor;
+      mortTag.style.display = own.mortgaged ? 'block':'none';
+      cell.style.boxShadow = 'inset 0 0 0 4px ' + ownerColor;
+      if(sp.type==='property'){
+        housesEl.innerHTML = '⬆️'.repeat(Math.min(own.houses||0,3));
+      }
+    } else {
+      ownerDot.style.display='none';
+      mortTag.style.display='none';
+      cell.style.boxShadow = '';
+      if(housesEl) housesEl.innerHTML='';
+    }
+  });
+  paintTokens();
+}
+
+/* ---- token movement + walk animation (client-local visual only; state truth stays in `room`) ---- */
+function animStepDelay(){ return (typeof window!=='undefined' && window.__FAST_ANIM__) ? 2 : 90; }
+function animTeleportDelay(){ return (typeof window!=='undefined' && window.__FAST_ANIM__) ? 10 : 260; }
+function sleep(ms){ return new Promise(function(resolve){ setTimeout(resolve, ms); }); }
+function placeTokenInCell(id, pos, p){
+  const cell = document.querySelector('#board .cell[data-id="'+pos+'"]');
+  if(!cell) return;
+  const tokensEl = cell.querySelector('[data-tokens]');
+  if(!tokensEl) return;
+  let el = document.getElementById('token-'+id);
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'token-'+id;
+    el.className = 'token-dot';
+  }
+  el.style.background = p.color;
+  el.textContent = p.token;
+  if(el.parentNode !== tokensEl) tokensEl.appendChild(el);
+}
+async function animateWalk(id, from, to, p){
+  animatingTokens[id] = true;
+  let pos = from;
+  const steps = (to - from + 40) % 40;
+  for(let i=0;i<steps;i++){
+    pos = (pos+1)%40;
+    placeTokenInCell(id, pos, p);
+    await sleep(animStepDelay());
+  }
+  animatingTokens[id] = false;
+  const latest = room && room.players ? room.players[id] : null;
+  if(latest && !latest.bankrupt && latest.pos!==pos){
+    lastPositions[id] = latest.pos;
+    placeTokenInCell(id, latest.pos, latest);
+  }
+}
+function animateTeleport(id, from, to, p){
+  placeTokenInCell(id, from, p);
+  const el = document.getElementById('token-'+id);
+  if(el) el.style.opacity = '0.15';
+  setTimeout(function(){
+    placeTokenInCell(id, to, p);
+    const el2 = document.getElementById('token-'+id);
+    if(el2) el2.style.opacity = '1';
+  }, animTeleportDelay());
+}
+function paintTokens(){
+  const players = room.players||{};
+  Object.keys(players).forEach(id=>{
+    const p = players[id];
+    if(!p) return;
+    if(p.bankrupt){
+      const el = document.getElementById('token-'+id);
+      if(el && el.parentNode) el.parentNode.removeChild(el);
+      delete lastPositions[id];
+      return;
+    }
+    const prev = lastPositions[id];
+    if(prev === undefined){
+      lastPositions[id] = p.pos;
+      placeTokenInCell(id, p.pos, p);
+      return;
+    }
+    if(prev === p.pos){
+      placeTokenInCell(id, p.pos, p);
+      return;
+    }
+    if(animatingTokens[id]) return;
+    const steps = (p.pos - prev + 40) % 40;
+    lastPositions[id] = p.pos;
+    if(steps>=1 && steps<=12){
+      animateWalk(id, prev, p.pos, p);
+    } else {
+      animateTeleport(id, prev, p.pos, p);
+    }
+  });
+}
+
+/* ================= PLAYERS PANEL ================= */
+function paintPlayers(){
+  const panel = document.getElementById('players-panel');
+  const players = room.players||{};
+  const order = room.order || Object.keys(players);
+  panel.innerHTML = order.map(id=>{
+    const p = players[id];
+    if(!p) return '';
+    const ownedEntries = Object.entries(room.ownership||{}).filter(([sid,o])=>o.ownerId===id);
+    const chips = ownedEntries.map(([sid])=>BOARD[sid])
+      .map(sp=>`<span class="pc-prop-chip" style="background:${sp.group?GROUP_COLORS[sp.group]:'#888'}">${sp.icon}</span>`).join('');
+    const isActive = id===room.currentTurn && !p.bankrupt;
+    return `
+    <div class="player-card ${isActive?'active':''} ${p.bankrupt?'bankrupt':''}">
+      <div class="pc-head">
+        <div class="pc-token" style="background:${p.color}">${p.token}</div>
+        <div class="pc-name">${p.name}</div>
+        ${isActive?'<div class="pc-turn-tag">กำลังเล่น</div>':''}
+        ${id===myId?'<div class="pc-you-tag">คุณ</div>':''}
+      </div>
+      <div class="pc-money">${p.bankrupt?'ล้มละลาย':'$'+p.money}</div>
+      <div class="pc-row"><span>ตำแหน่ง</span><span>${BOARD[p.pos].icon} ${BOARD[p.pos].name}</span></div>
+      <div class="pc-row"><span>ทรัพย์สิน</span><span>${ownedEntries.length} แห่ง</span></div>
+      <div class="pc-row"><span>บัตรผ่านด่านฟรี</span><span>${p.jailFreeCards||0}</span></div>
+      ${p.jail?'<div class="pc-jail">🚔 ติดด่านตรวจคนเข้าเมือง</div>':''}
+      <div class="pc-laps">🔄 เดินครบ ${p.laps||0} รอบ ${(p.laps||0)<1?'(ยังอัพเกรดไม่ได้)':''}</div>
+      <div class="pc-props">${chips}</div>
+    </div>`;
+  }).join('');
+}
+
+function paintLog(){
+  const list = document.getElementById('log-list');
+  const entries = room.log||[];
+  list.innerHTML = entries.map(msg=>`<div class="entry">${msg}</div>`).join('');
+  list.scrollTop = list.scrollHeight;
+}
+
+function paintTurnUI(){
+  const players = room.players||{};
+  const activeP = players[room.currentTurn];
+  document.getElementById('turn-banner').textContent = activeP ? `🎯 ตาของ: ${activeP.token} ${activeP.name}` : 'รอเริ่มเกม...';
+  document.getElementById('game-room-tag').textContent = 'ห้อง ' + (roomCode||'----');
+
+  const mine = isMyTurn();
+  const rollBtn = document.getElementById('btn-roll');
+  const endBtn = document.getElementById('btn-endturn');
+  const manageBtn = document.getElementById('btn-manage');
+  const waitBanner = document.getElementById('wait-banner');
+  const turnMsg = document.getElementById('turn-msg');
+
+  rollBtn.style.display = (mine && !room.awaitingDecision && (!room.canEndTurn || room.pendingDouble)) ? 'inline-block' : 'none';
+  endBtn.style.display = (mine && room.canEndTurn) ? 'inline-block' : 'none';
+  manageBtn.style.display = mine ? 'inline-block' : 'none';
+
+  if(mine){
+    waitBanner.style.display='none';
+    turnMsg.textContent = room.awaitingDecision ? 'คุณมีการตัดสินใจค้างอยู่ กรุณาเลือกซื้อ/ไม่ซื้อ' :
+      (room.canEndTurn ? (room.pendingDouble ? 'คุณออกเบิ้ล! ทอยลูกเต๋าอีกครั้งหรือกดจบเทิร์น' : 'กดจบเทิร์นเพื่อส่งต่อให้ผู้เล่นถัดไป') : 'ตาของคุณ! กดทอยลูกเต๋า');
+  } else {
+    waitBanner.style.display='block';
+    waitBanner.textContent = activeP ? `⏳ รอ ${activeP.token} ${activeP.name} เล่นอยู่...` : '';
+    turnMsg.textContent = '';
+  }
+
+  document.getElementById('die1').textContent = (room.dice && room.dice[0]) ? room.dice[0] : '-';
+  document.getElementById('die2').textContent = (room.dice && room.dice[1]) ? room.dice[1] : '-';
+
+  if(mine && room.awaitingDecision && room.pendingSpaceId!=null && !document.getElementById('modal-buy').classList.contains('show')){
+    openBuyModal(BOARD[room.pendingSpaceId]);
+  }
+}
+
+function renderGameFromRoom(){
+  ensureBoardBuilt();
+  paintBoard();
+  paintPlayers();
+  paintLog();
+  paintTurnUI();
+  paintTradeUI();
+  if(room.phase==='gameover'){
+    showGameOverIfNeeded();
+  }
+}
+
+let gameOverShown = false;
+function showGameOverIfNeeded(){
+  if(gameOverShown) return;
+  gameOverShown = true;
+  const winner = room.winnerId ? room.players[room.winnerId] : null;
+  document.getElementById('gameover-title').textContent = winner ? `🏆 ${winner.name} ชนะ!` : '🏆 จบเกม';
+  document.getElementById('gameover-text').innerHTML = winner
+    ? `${winner.token} <b>${winner.name}</b> เป็นผู้เล่นคนสุดท้ายที่ไม่ล้มละลาย! ยินดีด้วย 🎉`
+    : 'เกมจบลงแล้ว';
+  showModal('modal-gameover');
+}
+document.getElementById('gameover-restart').addEventListener('click', async ()=>{
+  closeModal('modal-gameover');
+  gameOverShown = false;
+  await leaveRoom();
+});
+
+/* ================= RENT ================= */
+function calcRent(spaceId, diceSum){
+  const sp = BOARD[spaceId];
+  const own = room.ownership[spaceId];
+  if(!own || own.ownerId==null || own.mortgaged) return 0;
+  if(sp.type==='property'){
+    const table = RENT_BY_PRICE[sp.price];
+    if((own.houses||0)>0) return table[Math.min(own.houses||0,3)];
+    const groupSpaces = BOARD.filter(s=>s.group===sp.group);
+    const ownsAll = groupSpaces.every(s=>{
+      const o = room.ownership[s.id];
+      return o && o.ownerId===own.ownerId;
+    });
+    return ownsAll ? table[0]*2 : table[0];
+  }
+  if(sp.type==='railroad'){
+    const count = [5,15,25,35].filter(id=>{
+      const o = room.ownership[id]; return o && o.ownerId===own.ownerId && !o.mortgaged;
+    }).length;
+    return [0,25,50,100,200][count];
+  }
+  if(sp.type==='utility'){
+    const count = [12,28].filter(id=>{
+      const o = room.ownership[id]; return o && o.ownerId===own.ownerId && !o.mortgaged;
+    }).length;
+    return (count===2 ? 10 : 4) * diceSum;
+  }
+  return 0;
+}
+
+/* ================= LANDING ================= */
+function handleLanding(){
+  const p = me();
+  const sp = BOARD[p.pos];
+  if(sp.type==='property' || sp.type==='railroad' || sp.type==='utility'){
+    const own = room.ownership[sp.id];
+    if(own.ownerId===null){
+      if(p.money >= sp.price){
+        room.awaitingDecision = true;
+        room.pendingSpaceId = sp.id;
+        room.canEndTurn = false;
+        syncGame();
+        openBuyModal(sp);
+      } else {
+        addLog(`${p.name} เงินไม่พอซื้อ ${sp.name}`);
+        room.canEndTurn = true;
+        syncGame();
+      }
+    } else if(own.ownerId===myId){
+      if(sp.type==='property' && !own.mortgaged && (own.houses||0) < MAX_LAND_UPGRADE){
+        room.awaitingDecision = true;
+        room.pendingSpaceId = sp.id;
+        room.canEndTurn = false;
+        syncGame();
+        openUpgradeModal(sp);
+      } else {
+        addLog(`นี่คือทรัพย์สินของคุณเอง (${sp.name})${sp.type==='property' && (own.houses||0)>=MAX_LAND_UPGRADE ? ' · อัปเกรดสูงสุดแล้ว' : ''}`);
+        room.canEndTurn = true;
+        syncGame();
+      }
+    } else {
+      const rent = calcRent(sp.id, (room.dice[0]||0)+(room.dice[1]||0));
+      const owner = room.players[own.ownerId];
+      p.money -= rent;
+      if(owner) owner.money += rent;
+      addLog(`🏠 ${p.name} จ่ายค่าเช่า ${rent} เหรียญให้ ${owner?owner.name:'?'} สำหรับ ${sp.icon} ${sp.name}`);
+      room.canEndTurn = true;
+      syncGame();
+      settleActivePlayerBankruptcy();
+    }
+  } else if(sp.type==='tax'){
+    p.money -= sp.amount;
+    addLog(`${p.name} จ่ายภาษี ${sp.amount} เหรียญ (${sp.name})`);
+    room.canEndTurn = true;
+    syncGame();
+    settleActivePlayerBankruptcy();
+  } else if(sp.type==='chance'){
+    resolveCard(CHANCE_CARDS, 'โอกาสเดินทาง 🧳');
+  } else if(sp.type==='chest'){
+    resolveCard(CHEST_CARDS, 'กล่องสมบัติโลก 🎁');
+  } else if(sp.type==='gotojail'){
+    toJail(p);
+    room.canEndTurn = true;
+    syncGame();
+  } else {
+    room.canEndTurn = true;
+    syncGame();
+  }
+}
+
+function resolveCard(deck, title){
+  const card = deck[Math.floor(Math.random()*deck.length)];
+  const p = me();
+  addLog(`🎴 ${p.name} จั่วการ์ด: ${card.text}`);
+  card.effect(p);
+  autoBankruptOthersIfNegative();
+  if(!card.movesPlayer){
+    room.canEndTurn = true;
+    syncGame();
+    settleActivePlayerBankruptcy();
+    document.getElementById('card-title').textContent = title;
+    document.getElementById('card-text').textContent = card.text;
+    showModal('modal-card');
+  }
+}
+document.getElementById('card-ok').addEventListener('click', ()=>closeModal('modal-card'));
+
+/* ================= BUY MODAL ================= */
+const MAX_LAND_UPGRADE = 3;
+function getUpgradeCost(sp, nextLevel){
+  if(!sp || sp.type!=='property') return 0;
+  return Math.max(30, HOUSE_COST[sp.group] || Math.ceil(sp.price * 0.5));
+}
+function buildRentTableHtml(sp){
+  if(sp.type==='property'){
+    const r = RENT_BY_PRICE[sp.price];
+    return `<tr><td>ค่าเช่าพื้นฐาน</td><td>$${r[0]}</td></tr>
+             <tr><td>อัปเกรดระดับ 1</td><td>$${r[1]}</td></tr>
+             <tr><td>อัปเกรดระดับ 2</td><td>$${r[2]}</td></tr>
+             <tr><td>อัปเกรดระดับ 3</td><td>$${r[3]}</td></tr>`;
+  } else if(sp.type==='railroad'){
+    return `<tr><td>ถือครอง 1 / 2 / 3 / 4 สนามบิน</td><td>$25 / $50 / $100 / $200</td></tr>`;
+  }
+  return `<tr><td>ถือครอง 1 บริษัท</td><td>4 x แต้มลูกเต๋า</td></tr><tr><td>ถือครองทั้ง 2 บริษัท</td><td>10 x แต้มลูกเต๋า</td></tr>`;
+}
+function openBuyModal(sp){
+  document.getElementById('buy-title').textContent = `ซื้อ ${sp.name} หรือไม่?`;
+  document.getElementById('buy-flag').innerHTML = spaceIconHtml(sp,'space-icon-inline');
+  document.getElementById('buy-price').textContent = `$${sp.price}`;
+  document.getElementById('buy-rent-table').innerHTML = buildRentTableHtml(sp);
+  showModal('modal-buy');
+}
+document.getElementById('buy-confirm').addEventListener('click', ()=>{
+  closeModal('modal-buy');
+  const p = me();
+  const sp = BOARD[room.pendingSpaceId];
+  p.money -= sp.price;
+  room.ownership[sp.id].ownerId = myId;
+  addLog(`✅ ${p.name} ซื้อ ${sp.icon} ${sp.name} ด้วยเงิน $${sp.price}`);
+  room.awaitingDecision=false; room.pendingSpaceId=null; room.canEndTurn=true;
+  syncGame();
+});
+document.getElementById('buy-decline').addEventListener('click', ()=>{
+  closeModal('modal-buy');
+  const p = me();
+  const sp = BOARD[room.pendingSpaceId];
+  addLog(`${p.name} เลือกไม่ซื้อ ${sp.name}`);
+  room.awaitingDecision=false; room.pendingSpaceId=null; room.canEndTurn=true;
+  syncGame();
+});
+
+
+/* ================= LAND UPGRADE MODAL ================= */
+function openUpgradeModal(sp){
+  const own = room.ownership[sp.id];
+  const level = Math.min(own.houses||0, MAX_LAND_UPGRADE);
+  const nextLevel = level + 1;
+  const cost = getUpgradeCost(sp, nextLevel);
+  const rentTable = RENT_BY_PRICE[sp.price];
+  document.getElementById('upgrade-title').textContent = `อัปเกรด ${sp.name} หรือไม่?`;
+  document.getElementById('upgrade-flag').innerHTML = spaceIconHtml(sp,'space-icon-inline');
+  document.getElementById('upgrade-level').textContent = `ระดับ ${level}/3 → ${nextLevel}/3 · ค่าอัปเกรด $${cost}`;
+  document.getElementById('upgrade-rent-table').innerHTML = `
+    <tr><td>ค่าเช่าปัจจุบัน</td><td>$${level>0 ? rentTable[level] : rentTable[0]}</td></tr>
+    <tr><td>ค่าเช่าหลังอัปเกรด</td><td>$${rentTable[nextLevel]}</td></tr>
+    <tr><td>อัปเกรดได้สูงสุด</td><td>3 ครั้งต่อพื้นที่</td></tr>`;
+  document.getElementById('upgrade-confirm').disabled = me().money < cost;
+  showModal('modal-upgrade');
+}
+document.getElementById('upgrade-confirm').addEventListener('click', ()=>{
+  closeModal('modal-upgrade');
+  const p = me();
+  const sp = BOARD[room.pendingSpaceId];
+  if(!sp){ return; }
+  const own = room.ownership[sp.id];
+  const level = Math.min(own.houses||0, MAX_LAND_UPGRADE);
+  if(sp.type!=='property' || own.ownerId!==myId || own.mortgaged || level>=MAX_LAND_UPGRADE){
+    room.awaitingDecision=false; room.pendingSpaceId=null; room.canEndTurn=true; syncGame(); return;
+  }
+  const cost = getUpgradeCost(sp, level+1);
+  if(p.money < cost){
+    localInfo('เงินไม่พอ', `ต้องใช้เงิน $${cost} เพื่ออัปเกรด ${sp.name}`);
+    room.awaitingDecision=false; room.pendingSpaceId=null; room.canEndTurn=true; syncGame(); return;
+  }
+  p.money -= cost;
+  own.houses = level + 1;
+  addLog(`⬆️ ${p.name} อัปเกรด ${sp.icon} ${sp.name} เป็นระดับ ${own.houses}/3 ด้วยเงิน $${cost}`);
+  room.awaitingDecision=false; room.pendingSpaceId=null; room.canEndTurn=true;
+  syncGame();
+});
+document.getElementById('upgrade-decline').addEventListener('click', ()=>{
+  closeModal('modal-upgrade');
+  const p = me();
+  const sp = BOARD[room.pendingSpaceId];
+  if(sp) addLog(`${p.name} เลือกยังไม่อัปเกรด ${sp.name}`);
+  room.awaitingDecision=false; room.pendingSpaceId=null; room.canEndTurn=true;
+  syncGame();
+});
+
+/* ================= DICE / TURN FLOW ================= */
+document.getElementById('btn-roll').addEventListener('click', rollDice);
+
+function rollDice(){
+  if(!isMyTurn() || room.awaitingDecision) return;
+  const p = me();
+  if(p.jail){ openJailModal(); return; }
+  const d1 = 1+Math.floor(Math.random()*6);
+  const d2 = 1+Math.floor(Math.random()*6);
+  room.dice = [d1,d2];
+  const isDouble = d1===d2;
+  p.doublesStreak = isDouble ? (p.doublesStreak||0)+1 : 0;
+
+  if(isDouble && p.doublesStreak>=3){
+    addLog(`🎲 ${p.name} ออกเบิ้ล 3 ครั้งติดกัน! ถูกจับส่งด่านตรวจคนเข้าเมือง`);
+    toJail(p);
+    p.doublesStreak=0;
+    room.pendingDouble=false;
+    room.canEndTurn=true;
+    syncGame();
+    return;
+  }
+  const steps = d1+d2;
+  addLog(`🎲 ${p.name} ทอยได้ ${d1} + ${d2} = ${steps}${isDouble?' (ออกเบิ้ล!)':''}`);
+  moveTo(p, (p.pos+steps)%40, true);
+  room.pendingDouble = isDouble && p.doublesStreak<3;
+  syncGame();
+  handleLanding();
+}
+
+document.getElementById('btn-endturn').addEventListener('click', ()=>{
+  if(!isMyTurn()) return;
+  const p = me();
+  if(room.pendingDouble && !p.jail){
+    room.pendingDouble=false;
+    room.canEndTurn=false;
+    syncGame();
+    return;
+  }
+  nextTurn();
+});
+
+function nextTurn(){
+  if(checkWinCondition()){ syncGame(); return; }
+  const order = room.order || [];
+  let idx = order.indexOf(room.currentTurn);
+  let next, guard=0;
+  do{
+    idx = (idx+1) % order.length;
+    next = order[idx];
+    guard++;
+  } while(room.players[next] && room.players[next].bankrupt && guard<=order.length);
+  room.currentTurn = next;
+  room.dice=[0,0];
+  room.pendingDouble=false;
+  room.canEndTurn=false;
+  room.awaitingDecision=false;
+  room.pendingSpaceId=null;
+  syncGame();
+}
+
+/* ================= JAIL ================= */
+function openJailModal(){
+  const p = me();
+  document.getElementById('jail-text').textContent = `${p.name} ติดด่านตรวจคนเข้าเมืองอยู่ (รอบที่ ${(p.jailTurns||0)+1}/3) เลือกวิธีออก:`;
+  document.getElementById('jail-card').style.display = (p.jailFreeCards>0) ? 'inline-block':'none';
+  showModal('modal-jail');
+}
+document.getElementById('jail-pay').addEventListener('click', ()=>{
+  closeModal('modal-jail');
+  const p = me();
+  if(p.money<50){ localInfo('เงินไม่พอ','คุณมีเงินไม่พอจ่าย 50 เหรียญ'); return; }
+  p.money-=50; p.jail=false; p.jailTurns=0;
+  addLog(`💵 ${p.name} จ่าย 50 เหรียญ ออกจากด่านตรวจคนเข้าเมือง`);
+  syncGame();
+  rollAfterJailExit();
+});
+document.getElementById('jail-card').addEventListener('click', ()=>{
+  closeModal('modal-jail');
+  const p = me();
+  p.jailFreeCards--; p.jail=false; p.jailTurns=0;
+  addLog(`🎫 ${p.name} ใช้บัตรผ่านด่านฟรี ออกจากด่านตรวจคนเข้าเมือง`);
+  syncGame();
+  rollAfterJailExit();
+});
+document.getElementById('jail-roll').addEventListener('click', ()=>{
+  closeModal('modal-jail');
+  const p = me();
+  const d1 = 1+Math.floor(Math.random()*6), d2 = 1+Math.floor(Math.random()*6);
+  room.dice=[d1,d2];
+  if(d1===d2){
+    p.jail=false; p.jailTurns=0;
+    addLog(`🎲 ${p.name} ทอยออกเบิ้ล (${d1},${d2}) หลุดจากด่านตรวจคนเข้าเมือง!`);
+    moveTo(p, (p.pos+d1+d2)%40, true);
+    syncGame();
+    handleLanding();
+  } else {
+    p.jailTurns=(p.jailTurns||0)+1;
+    if(p.jailTurns>=3){
+      p.money-=50; p.jail=false; p.jailTurns=0;
+      addLog(`🚔 ${p.name} ทอยไม่ออกครบ 3 ครั้ง ต้องจ่าย 50 เหรียญออกจากด่าน`);
+      moveTo(p, (p.pos+d1+d2)%40, true);
+      syncGame();
+      handleLanding();
+    } else {
+      addLog(`🎲 ${p.name} ทอยไม่ออกเบิ้ล (${d1},${d2}) ยังติดด่านตรวจคนเข้าเมือง`);
+      room.canEndTurn=true;
+      syncGame();
+    }
+  }
+});
+function rollAfterJailExit(){
+  const p = me();
+  const d1 = 1+Math.floor(Math.random()*6), d2 = 1+Math.floor(Math.random()*6);
+  room.dice=[d1,d2];
+  addLog(`🎲 ${p.name} ทอยได้ ${d1} + ${d2} = ${d1+d2}`);
+  moveTo(p, (p.pos+d1+d2)%40, true);
+  syncGame();
+  handleLanding();
+}
+
+/* ================= MANAGE PROPERTIES ================= */
+document.getElementById('btn-manage').addEventListener('click', openManageModal);
+document.getElementById('mgmt-close').addEventListener('click', ()=>closeModal('modal-manage'));
+
+function openManageModal(){
+  if(!isMyTurn()) return;
+  const list = document.getElementById('mgmt-list');
+  const owned = Object.entries(room.ownership).filter(([id,o])=>o.ownerId===myId);
+  let html = '';
+  if(owned.length===0){
+    html += '<div style="text-align:center; color:#8aa;">คุณยังไม่มีทรัพย์สิน</div>';
+  } else {
+    html += owned.map(([idx,o])=>{
+      const sp = BOARD[idx];
+      const color = sp.group ? GROUP_COLORS[sp.group] : '#666';
+      o.houses = Math.min(o.houses||0, MAX_LAND_UPGRADE);
+      let canBuildHouse=false, canSellHouse=o.houses>0, canMortgage=!o.mortgaged, canUnmortgage=o.mortgaged;
+      let lockedNote = '';
+      if(sp.type==='property'){
+        canBuildHouse = o.houses < MAX_LAND_UPGRADE && !o.mortgaged;
+        if(o.houses >= MAX_LAND_UPGRADE) lockedNote = '<br><span style="color:#8ef3a4; font-size:10.5px;">✅ อัปเกรดสูงสุดแล้ว</span>';
+      }
+      return `
+      <div class="mgmt-item">
+        <div class="mi-color" style="background:${color}"></div>
+        <div class="mi-info">
+          <b>${sp.icon} ${sp.name}</b><br>
+          ${sp.type==='property'?`ระดับอัปเกรด: ${Math.min(o.houses||0,3)}/3`:''}
+          ${o.mortgaged?'<br><span style="color:#ff8a7a">จำนองอยู่</span>':''}
+          ${lockedNote}
+        </div>
+        <div class="mi-actions">
+          ${canBuildHouse?`<button class="btn-green" data-act="build" data-idx="${idx}">⬆️ อัปเกรด ($${getUpgradeCost(sp,(o.houses||0)+1)})</button>`:''}
+          ${canSellHouse?`<button class="btn-grey" data-act="sell" data-idx="${idx}">ขายระดับอัปเกรด</button>`:''}
+          ${canMortgage?`<button class="btn-red" data-act="mortgage" data-idx="${idx}">จำนอง (+$${Math.floor(sp.price/2)})</button>`:''}
+          ${canUnmortgage?`<button class="btn-blue" data-act="unmortgage" data-idx="${idx}">ไถ่ถอน (-$${Math.floor(sp.price/2*1.1)})</button>`:''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+  list.innerHTML = html;
+  list.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      doPropertyAction(parseInt(btn.dataset.idx), btn.dataset.act);
+      openManageModal();
+    });
+  });
+  showModal('modal-manage');
+}
+function doPropertyAction(idx, act){
+  const p = me();
+  const sp = BOARD[idx];
+  const o = room.ownership[idx];
+  if(act==='build'){
+    o.houses = Math.min(o.houses||0, MAX_LAND_UPGRADE);
+    if(sp.type!=='property' || o.houses>=MAX_LAND_UPGRADE || o.mortgaged){ localInfo('อัปเกรดไม่ได้','พื้นที่นี้ไม่สามารถอัปเกรดได้ในตอนนี้'); return; }
+    const cost = getUpgradeCost(sp, o.houses+1);
+    if(p.money<cost){ localInfo('เงินไม่พอ','เงินไม่พอสำหรับอัปเกรดพื้นที่'); return; }
+    p.money -= cost; o.houses++;
+    addLog(`⬆️ ${p.name} อัปเกรด ${sp.name} เป็นระดับ ${o.houses}/3 (เหลือ $${p.money})`);
+  } else if(act==='sell'){
+    const cost = getUpgradeCost(sp, o.houses||1);
+    p.money += Math.floor(cost/2); o.houses=Math.max(0,(o.houses||0)-1);
+    addLog(`↩️ ${p.name} ขายระดับอัปเกรดที่ ${sp.name} ได้ $${Math.floor(cost/2)}`);
+  } else if(act==='mortgage'){
+    o.mortgaged = true;
+    p.money += Math.floor(sp.price/2);
+    addLog(`📄 ${p.name} จำนอง ${sp.name} ได้เงิน $${Math.floor(sp.price/2)}`);
+  } else if(act==='unmortgage'){
+    const cost = Math.floor(sp.price/2*1.1);
+    if(p.money<cost){ localInfo('เงินไม่พอ','เงินไม่พอสำหรับไถ่ถอน'); return; }
+    p.money -= cost; o.mortgaged=false;
+    addLog(`📄 ${p.name} ไถ่ถอน ${sp.name} จ่าย $${cost}`);
+  }
+  syncGame();
+}
+
+/* ================= TRADE SYSTEM ================= */
+document.getElementById('btn-trade').addEventListener('click', openTradeModal);
+document.getElementById('trade-cancel-compose').addEventListener('click', ()=>closeModal('modal-trade'));
+
+function openTradeModal(){
+  if(!room || room.phase!=='playing') return;
+  const meP = me();
+  if(!meP || meP.bankrupt) return;
+  if(room.pendingTrade){ localInfo('มีข้อเสนอค้างอยู่', 'ระบบรองรับการแลกเปลี่ยนทีละ 1 ข้อเสนอเท่านั้น กรุณารอให้ข้อเสนอปัจจุบันเสร็จสิ้นก่อน'); return; }
+  const targetSel = document.getElementById('trade-target');
+  const others = Object.keys(room.players).filter(id=>id!==myId && !room.players[id].bankrupt);
+  if(others.length===0){ localInfo('ไม่มีคู่เทรด','ไม่มีผู้เล่นคนอื่นให้แลกเปลี่ยนด้วย'); return; }
+  targetSel.innerHTML = others.map(id=>`<option value="${id}">${room.players[id].name}</option>`).join('');
+  document.getElementById('trade-error').textContent = '';
+  document.getElementById('trade-offer-money').value = 0;
+  document.getElementById('trade-request-money').value = 0;
+  renderTradePropLists();
+  targetSel.onchange = renderTradePropLists;
+  showModal('modal-trade');
+}
+function renderTradePropLists(){
+  const targetId = document.getElementById('trade-target').value;
+  const myProps = Object.entries(room.ownership).filter(([id,o])=>o.ownerId===myId);
+  const theirProps = Object.entries(room.ownership).filter(([id,o])=>o.ownerId===targetId);
+  document.getElementById('trade-my-props').innerHTML = myProps.length ? myProps.map(([id])=>{
+    const sp = BOARD[id];
+    return `<label><input type="checkbox" value="${id}" class="trade-my-check"> ${sp.icon} ${sp.name}</label>`;
+  }).join('') : '<div style="font-size:11px;color:#889;">ไม่มีทรัพย์สิน</div>';
+  document.getElementById('trade-their-props').innerHTML = theirProps.length ? theirProps.map(([id])=>{
+    const sp = BOARD[id];
+    return `<label><input type="checkbox" value="${id}" class="trade-their-check"> ${sp.icon} ${sp.name}</label>`;
+  }).join('') : '<div style="font-size:11px;color:#889;">ไม่มีทรัพย์สิน</div>';
+}
+document.getElementById('trade-send').addEventListener('click', async ()=>{
+  const targetId = document.getElementById('trade-target').value;
+  const offerProps = Array.from(document.querySelectorAll('.trade-my-check:checked')).map(el=>parseInt(el.value));
+  const requestProps = Array.from(document.querySelectorAll('.trade-their-check:checked')).map(el=>parseInt(el.value));
+  const offerMoney = Math.max(0, parseInt(document.getElementById('trade-offer-money').value)||0);
+  const requestMoney = Math.max(0, parseInt(document.getElementById('trade-request-money').value)||0);
+  const errEl = document.getElementById('trade-error');
+  if(offerProps.length===0 && requestProps.length===0 && offerMoney===0 && requestMoney===0){
+    errEl.textContent = 'กรุณาเลือกอย่างน้อย 1 รายการเพื่อแลกเปลี่ยน'; return;
+  }
+  const meP = room.players[myId];
+  if(offerMoney > meP.money){ errEl.textContent = 'คุณมีเงินไม่พอสำหรับข้อเสนอนี้'; return; }
+  if(room.pendingTrade){ errEl.textContent = 'มีข้อเสนอค้างอยู่แล้ว'; return; }
+  const trade = {
+    id: 't'+Date.now(), fromId: myId, toId: targetId,
+    offerProps, offerMoney, requestProps, requestMoney, status:'pending'
+  };
+  const newLog = (room.log||[]).concat(`🤝 ${meP.name} เสนอแลกเปลี่ยนกับ ${room.players[targetId].name}`);
+  await roomRef.update({ pendingTrade: trade, log: newLog });
+  closeModal('modal-trade');
+});
+document.getElementById('trade-cancel').addEventListener('click', async ()=>{
+  if(!room.pendingTrade || room.pendingTrade.fromId!==myId) return;
+  const newLog = (room.log||[]).concat(`↩️ ${me().name} ยกเลิกข้อเสนอแลกเปลี่ยน`);
+  await roomRef.update({ pendingTrade: null, log: newLog });
+});
+document.getElementById('trade-accept').addEventListener('click', async ()=>{
+  const trade = room.pendingTrade;
+  if(!trade || trade.toId!==myId) return;
+  closeModal('modal-trade-incoming');
+  const players = JSON.parse(JSON.stringify(room.players));
+  const ownership = JSON.parse(JSON.stringify(room.ownership));
+  const fromP = players[trade.fromId], toP = players[trade.toId];
+  const offerValid = !!fromP && !!toP
+    && trade.offerProps.every(id=>ownership[id] && ownership[id].ownerId===trade.fromId)
+    && trade.requestProps.every(id=>ownership[id] && ownership[id].ownerId===trade.toId)
+    && fromP.money>=trade.offerMoney && toP.money>=trade.requestMoney;
+  if(!offerValid){
+    const newLog = (room.log||[]).concat('⚠️ ข้อเสนอแลกเปลี่ยนไม่ถูกต้องแล้ว (มีการเปลี่ยนแปลงระหว่างทาง) ถูกยกเลิกอัตโนมัติ');
+    await roomRef.update({ pendingTrade:null, log:newLog });
+    return;
+  }
+  trade.offerProps.forEach(id=>{ ownership[id].ownerId = trade.toId; });
+  trade.requestProps.forEach(id=>{ ownership[id].ownerId = trade.fromId; });
+  fromP.money += (trade.requestMoney - trade.offerMoney);
+  toP.money += (trade.offerMoney - trade.requestMoney);
+  const newLog = (room.log||[]).concat(`✅ การแลกเปลี่ยนระหว่าง ${fromP.name} และ ${toP.name} สำเร็จ!`);
+  await roomRef.update({ players, ownership, pendingTrade:null, log:newLog });
+});
+document.getElementById('trade-decline').addEventListener('click', async ()=>{
+  const trade = room.pendingTrade;
+  if(!trade || trade.toId!==myId) return;
+  closeModal('modal-trade-incoming');
+  const fromName = room.players[trade.fromId] ? room.players[trade.fromId].name : '?';
+  const newLog = (room.log||[]).concat(`❌ ${room.players[trade.toId].name} ปฏิเสธข้อเสนอแลกเปลี่ยนจาก ${fromName}`);
+  await roomRef.update({ pendingTrade:null, log:newLog });
+});
+
+function paintTradeUI(){
+  const btnTrade = document.getElementById('btn-trade');
+  const meP = me();
+  btnTrade.style.display = (room.phase==='playing' && meP && !meP.bankrupt) ? 'inline-block' : 'none';
+
+  const trade = room.pendingTrade;
+  const waitBanner = document.getElementById('trade-wait-banner');
+  waitBanner.style.display = (trade && trade.fromId===myId) ? 'block' : 'none';
+
+  if(trade && trade.toId===myId){
+    if(!document.getElementById('modal-trade-incoming').classList.contains('show')){
+      const fromP = room.players[trade.fromId];
+      const offerNames = trade.offerProps.map(id=>BOARD[id].icon+' '+BOARD[id].name).join(', ') || '-';
+      const requestNames = trade.requestProps.map(id=>BOARD[id].icon+' '+BOARD[id].name).join(', ') || '-';
+      document.getElementById('trade-incoming-text').innerHTML =
+        `<b>${fromP?fromP.name:'?'}</b> เสนอแลกเปลี่ยนกับคุณ:<br><br>`+
+        `🎁 เขาจะให้: ${offerNames}${trade.offerMoney?` + ${trade.offerMoney} เหรียญ`:''}<br>`+
+        `🙏 เขาต้องการ: ${requestNames}${trade.requestMoney?` + ${trade.requestMoney} เหรียญ`:''}`;
+      showModal('modal-trade-incoming');
+    }
+  } else {
+    closeModal('modal-trade-incoming');
+  }
+}
+
+/* ================= BANKRUPTCY / WIN ================= */
+function liquidValueOf(id){
+  const owned = Object.entries(room.ownership).filter(([sid,o])=>o.ownerId===id);
+  let liquid = 0;
+  owned.forEach(([sid,o])=>{
+    const sp = BOARD[sid];
+    if(o.houses>0) liquid += (HOUSE_COST[sp.group]/2)*o.houses;
+    if(!o.mortgaged) liquid += Math.floor(sp.price/2);
+  });
+  return {owned, liquid};
+}
+function settleActivePlayerBankruptcy(){
+  const p = me();
+  if(p.money>=0) return;
+  const {owned, liquid} = liquidValueOf(myId);
+  if(p.money+liquid<0){
+    p.bankrupt = true;
+    owned.forEach(([sid])=>{ room.ownership[sid] = {ownerId:null, houses:0, mortgaged:false}; });
+    addLog(`💀 ${p.name} ล้มละลาย! ออกจากเกม`);
+    syncGame();
+    if(checkWinCondition()) syncGame();
+  } else {
+    localInfo('⚠️ เงินติดลบ!', `คุณมีเงินติดลบ ($${p.money}) กรุณาจำนองทรัพย์สินหรือขายบ้าน/โรงแรมผ่าน "จัดการทรัพย์สิน" ก่อนจบเทิร์น มิฉะนั้นจะล้มละลาย`);
+  }
+}
+function autoBankruptOthersIfNegative(){
+  Object.keys(room.players).forEach(id=>{
+    if(id===myId) return;
+    const pl = room.players[id];
+    if(!pl || pl.bankrupt || pl.money>=0) return;
+    const {owned, liquid} = liquidValueOf(id);
+    if(pl.money+liquid<0){
+      pl.bankrupt = true;
+      owned.forEach(([sid])=>{ room.ownership[sid] = {ownerId:null, houses:0, mortgaged:false}; });
+      addLog(`💀 ${pl.name} ล้มละลาย! ออกจากเกม`);
+    }
+  });
+}
+function checkWinCondition(){
+  const players = room.players||{};
+  const ids = Object.keys(players);
+  const alive = ids.filter(id=>!players[id].bankrupt);
+  if(alive.length<=1 && ids.length>1){
+    room.winnerId = alive[0] || null;
+    room.phase = 'gameover';
+    return true;
+  }
+  return false;
+}
+
+/* ================= RULES MODAL ================= */
+document.getElementById('btn-rules').addEventListener('click', ()=>showModal('rules-modal'));
+document.getElementById('rules-close').addEventListener('click', ()=>closeModal('rules-modal'));
+document.getElementById('info-ok').addEventListener('click', ()=>closeModal('modal-info'));
+</script>
+</body>
+</html>
