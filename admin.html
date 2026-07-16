@@ -322,6 +322,13 @@ tbody tr:hover td{background:#fff3e8}
             <option value="ม.1">ม.1</option><option value="ม.2">ม.2</option><option value="ม.3">ม.3</option>
           </select>
           <select id="resSubjectFilter" onchange="loadResults()" style="padding:7px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-family:inherit;font-size:13px"><option value="">ทุกวิชา</option></select>
+          <select id="resTypeFilter" onchange="loadResults()" style="padding:7px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-family:inherit;font-size:13px">
+            <option value="">ทุกประเภท</option>
+            <option value="pre-test">📋 ก่อนเรียน</option>
+            <option value="post-test">✅ หลังเรียน</option>
+            <option value="html">🌐 HTML</option>
+            <option value="questions">🔘 ปรนัย (ระบบเก่า)</option>
+          </select>
           <select id="resStatusFilter" onchange="loadResults()" style="padding:7px 10px;border:1.5px solid #ffd0a0;border-radius:8px;font-family:inherit;font-size:13px">
             <option value="">ทั้งหมด</option>
             <option value="pending">⏳ รอตรวจ</option>
@@ -330,7 +337,7 @@ tbody tr:hover td{background:#fff3e8}
           </select>
         </div>
       </div>
-      <div class="table-wrap"><table><thead><tr><th>นักเรียน</th><th>ชั้น/วิชา</th><th>ข้อสอบ/หน่วย</th><th>คะแนน</th><th>ถูก/ทั้งหมด</th><th>วันที่สอบ</th><th>จัดการ</th></tr></thead><tbody id="tbRes"></tbody></table></div>
+      <div class="table-wrap"><table><thead><tr><th>นักเรียน</th><th>ชั้น/วิชา</th><th>ข้อสอบ/หน่วย</th><th>ประเภท</th><th>คะแนน</th><th>ถูก/ทั้งหมด</th><th>จัดการ</th></tr></thead><tbody id="tbRes"></tbody></table></div>
     </div>
 
     <!-- CHECK WORK -->
@@ -1124,6 +1131,7 @@ window.loadResults=async function(){
   const filter=document.getElementById('resFilter').value;
   const gradeF=document.getElementById('resGradeFilter').value;
   const subjectF=document.getElementById('resSubjectFilter').value;
+  const typeF=document.getElementById('resTypeFilter')?.value||'';
   const statusF=document.getElementById('resStatusFilter')?.value||'';
   try{
     const snap=await getDocs(collection(db,'quiz_results'));
@@ -1142,14 +1150,25 @@ window.loadResults=async function(){
       if(filter&&r.quizId!==filter)return;
       if(gradeF&&r.grade!==gradeF)return;
       if(subjectF&&r.subject!==subjectF)return;
+      // กรองตามประเภทข้อสอบ
+      if(typeF){
+        const rType=r.quizType||'';
+        if(rType!==typeF)return;
+      }
       const isGradedCheck=r.gradedAt!==undefined;
       const isCheatCheck=!!r.cheated;
       if(statusF==='pending'&&isGradedCheck)return;
       if(statusF==='graded'&&!isGradedCheck)return;
       if(statusF==='cheat'&&!isCheatCheck)return;
-      const dt=(r.submittedAt||r.timestamp)?.toDate?.()?.toLocaleDateString('th-TH')||'';
       const isFormatB=r.grade!==undefined||r.mcScore!==undefined;
-      let scoreDisplay,correctDisplay,quizLabel,gradeSubject;
+      let scoreDisplay,correctDisplay,quizLabel,gradeSubject,typeTag;
+      // ป้ายประเภทข้อสอบ
+      const qt=r.quizType||'';
+      if(qt==='pre-test') typeTag='<span style="background:#1565c0;color:#fff;border-radius:6px;padding:2px 7px;font-size:10.5px;font-weight:700">📋 ก่อนเรียน</span>';
+      else if(qt==='post-test') typeTag='<span style="background:#2e7d32;color:#fff;border-radius:6px;padding:2px 7px;font-size:10.5px;font-weight:700">✅ หลังเรียน</span>';
+      else if(qt==='html') typeTag='<span style="background:#6a1b9a;color:#fff;border-radius:6px;padding:2px 7px;font-size:10.5px;font-weight:700">🌐 HTML</span>';
+      else if(qt==='questions') typeTag='<span style="background:#e65100;color:#fff;border-radius:6px;padding:2px 7px;font-size:10.5px;font-weight:700">🔘 ปรนัย</span>';
+      else typeTag='<span style="background:#78909c;color:#fff;border-radius:6px;padding:2px 7px;font-size:10.5px;font-weight:700">–</span>';
       if(isFormatB){
         const pct=r.totalOutOf?Math.round((r.mcScore||0)/r.totalOutOf*100):0;
         const pass=pct>=60;
@@ -1180,7 +1199,7 @@ window.loadResults=async function(){
         ?`<br><span style="background:#ffebee;color:#c62828;padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:800;display:inline-block;margin-top:2px" title="${r.cheatReason||'สลับแท็บ/ซ่อนหน้าต่าง'}">⚠️ สลับหน้า</span>`
         :'';
       const rowBg=isCheatCheck?'style="background:#fff8f8"':'';
-      rows+=`<tr ${rowBg}><td>${r.studentName||r.studentId||'-'}</td><td><small>${gradeSubject}</small></td><td>${quizLabel}</td><td>${scoreDisplay}${gradedTag}${cheatTag}</td><td>${correctDisplay}</td><td>${dt}</td><td style="white-space:nowrap">${hasAns?`<button class="btn btn-blue btn-sm" onclick="viewAnswers('${id}')">✏️ ตรวจ/ให้คะแนน</button> `:''}  <button class="btn btn-red btn-sm" onclick="deleteResult('${id}')">🗑️ ลบ</button></td></tr>`;
+      rows+=`<tr ${rowBg}><td>${r.studentName||r.studentId||'-'}</td><td><small>${gradeSubject}</small></td><td>${quizLabel}</td><td>${typeTag}</td><td>${scoreDisplay}${gradedTag}${cheatTag}</td><td>${correctDisplay}</td><td style="white-space:nowrap">${hasAns?`<button class="btn btn-blue btn-sm" onclick="viewAnswers('${id}')">✏️ ตรวจ/ให้คะแนน</button> `:''}  <button class="btn btn-red btn-sm" onclick="deleteResult('${id}')">🗑️ ลบ</button></td></tr>`;
     });
     tb.innerHTML=rows||'<tr><td colspan="7" style="text-align:center;padding:20px;color:#aaa">ยังไม่มีข้อมูลผลสอบ</td></tr>';
   }catch(e){tb.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:20px;color:#c62828">โหลดไม่ได้: ${e.message}</td></tr>`;}
