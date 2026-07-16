@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>แบบทดสอบหลังเรียน สังคมศึกษา ป.6 หน่วยที่ 1</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #e65100; --primary2: #f57c00; --accent: #ff9800;
+      --light: #fff8f0; --light2: #fff3e0; --border: #ffe0b2;
+      --text: #3e2000; --muted: #8d6e63; --white: #ffffff;
+    }
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background: linear-gradient(135deg, #fff8f0 0%, #fff3e0 50%, #fbe9e7 100%);
+      min-height: 100vh; padding: 20px; color: var(--text);
+    }
+    .page-wrapper { max-width: 860px; margin: 0 auto; }
+
+    .exam-header {
+      background: linear-gradient(135deg, #e65100 0%, #f57c00 45%, #ff9800 100%);
+      border-radius: 18px; padding: 32px 36px 24px;
+      color: #fff; text-align: center; margin-bottom: 24px;
+      box-shadow: 0 8px 32px rgba(230,81,0,.30);
+      position: relative; overflow: hidden;
+    }
+    .exam-header::before { content:''; position:absolute; top:-40px; right:-40px; width:160px; height:160px; border-radius:50%; background:rgba(255,255,255,.10); }
+    .exam-header::after  { content:''; position:absolute; bottom:-50px; left:-30px; width:200px; height:200px; border-radius:50%; background:rgba(255,255,255,.07); }
+    .subject-badge { display:inline-block; background:rgba(255,255,255,.22); border:1px solid rgba(255,255,255,.40); border-radius:20px; padding:4px 16px; font-size:13px; font-weight:500; margin-bottom:10px; }
+    .test-type-badge { display:inline-block; background:#2e7d32; border:2px solid #a5d6a7; border-radius:20px; padding:5px 18px; font-size:14px; font-weight:700; margin-bottom:12px; color:#fff; box-shadow:0 2px 8px rgba(0,0,0,.20); }
+    .exam-header h1 { font-size:26px; font-weight:700; margin-bottom:6px; text-shadow:0 2px 4px rgba(0,0,0,.18); }
+    .exam-header h2 { font-size:17px; font-weight:500; opacity:.92; margin-bottom:16px; }
+    .exam-meta { display:flex; justify-content:center; gap:24px; flex-wrap:wrap; margin-top:12px; }
+    .meta-item { display:flex; align-items:center; gap:6px; font-size:14px; background:rgba(255,255,255,.18); border-radius:10px; padding:5px 14px; }
+
+    .info-bar { background:var(--white); border-radius:12px; padding:16px 24px; display:flex; gap:14px; align-items:flex-start; margin-bottom:20px; box-shadow:0 2px 12px rgba(230,81,0,.10); border-left:5px solid var(--accent); }
+    .info-icon { font-size:22px; flex-shrink:0; margin-top:2px; }
+    .info-bar p { font-size:14.5px; line-height:1.8; color:#5d4037; }
+    .info-bar strong { color:var(--primary); }
+
+    .student-form { background:var(--white); border-radius:14px; padding:20px 28px; margin-bottom:24px; box-shadow:0 2px 12px rgba(230,81,0,.08); display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .student-form .full-width { grid-column:1/-1; }
+    .form-field label { display:block; font-size:13.5px; font-weight:600; color:var(--primary); margin-bottom:6px; }
+    .form-field .line { border:none; border-bottom:2px solid var(--border); background:transparent; width:100%; padding:4px 2px; font-size:15px; font-family:'Sarabun',sans-serif; color:var(--text); outline:none; transition:border-color .2s; }
+    .form-field .line:focus { border-bottom-color:var(--primary); }
+    .score-box { display:flex; justify-content:flex-end; align-items:center; }
+    .score-inner { border:2.5px solid var(--primary); border-radius:12px; padding:10px 24px; text-align:center; min-width:120px; }
+    .score-inner .label { font-size:13px; color:var(--primary); font-weight:600; }
+    .score-inner .value { font-size:26px; font-weight:700; color:var(--primary); line-height:1.3; }
+    .score-inner .total { font-size:13px; color:var(--muted); }
+
+    .section-title { background:linear-gradient(90deg,var(--primary),var(--accent)); color:#fff; border-radius:10px; padding:10px 20px; font-size:15.5px; font-weight:600; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
+
+    .questions-container { display:flex; flex-direction:column; gap:16px; }
+    .question-card { background:var(--white); border-radius:14px; padding:20px 24px; box-shadow:0 2px 10px rgba(230,81,0,.08); border:1.5px solid transparent; transition:border-color .2s, box-shadow .2s; }
+    .question-card:hover { border-color:#ffcc80; box-shadow:0 4px 18px rgba(230,81,0,.15); }
+    .question-header { display:flex; align-items:flex-start; gap:14px; margin-bottom:14px; }
+    .q-number { flex-shrink:0; width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--accent)); color:#fff; font-weight:700; font-size:14.5px; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 8px rgba(230,81,0,.35); }
+    .q-text { font-size:16px; font-weight:600; line-height:1.6; color:#2c1500; flex:1; padding-top:4px; }
+    .choices { display:flex; flex-direction:column; gap:8px; padding-left:48px; }
+    .choice-label { display:flex; align-items:flex-start; gap:10px; cursor:pointer; padding:9px 14px; border-radius:9px; border:1.5px solid var(--border); background:#fffaf5; transition:all .18s; font-size:15px; line-height:1.5; }
+    .choice-label:hover { border-color:var(--accent); background:var(--light2); }
+    .choice-label input[type="radio"] { display:none; }
+    .choice-label input[type="radio"]:checked + .choice-letter { background:var(--primary); color:#fff; border-color:var(--primary); }
+    .choice-label:has(input:checked) { border-color:var(--primary); background:var(--light2); }
+    .choice-letter { flex-shrink:0; width:26px; height:26px; border-radius:50%; border:2px solid var(--accent); background:#fff; color:var(--primary); font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; transition:all .18s; margin-top:1px; }
+    .choice-text { flex:1; }
+
+    .answer-section { margin-top:32px; text-align:center; }
+    #btnSubmit { background:linear-gradient(90deg,#c94b00,#f39800); color:#fff; border:none; border-radius:12px; padding:14px 40px; font-size:17px; font-weight:700; font-family:'Sarabun',sans-serif; cursor:pointer; box-shadow:0 4px 16px rgba(201,75,0,.35); transition:transform .15s; }
+    #btnSubmit:hover { transform:translateY(-2px); }
+    #submitMsg { display:none; margin-top:20px; background:#fff; border-radius:14px; padding:22px 24px; box-shadow:0 4px 20px rgba(230,81,0,.15); text-align:left; }
+
+    .signature-section { background:var(--white); border-radius:14px; padding:24px 28px; margin-top:28px; box-shadow:0 2px 10px rgba(230,81,0,.08); }
+    .sig-title { font-size:14px; font-weight:600; color:var(--muted); text-align:center; margin-bottom:20px; }
+    .sig-row { display:flex; justify-content:space-around; flex-wrap:wrap; gap:20px; }
+    .sig-block { text-align:center; min-width:160px; }
+    .sig-line { border-bottom:1.5px solid #ccc; margin:0 auto 6px; width:160px; padding-top:40px; font-size:13px; color:#999; }
+    .sig-name { font-size:14px; font-weight:600; color:var(--text); }
+    .sig-role { font-size:12.5px; color:var(--muted); margin-top:2px; }
+    .sig-date-row { font-size:12.5px; color:var(--muted); margin-top:6px; }
+    .sig-date-line { display:inline-block; border-bottom:1px solid #bbb; min-width:80px; }
+
+    .exam-footer { text-align:center; margin-top:24px; padding:14px; font-size:13px; color:var(--muted); border-top:1.5px solid var(--border); }
+
+    @media (max-width:600px) {
+      .student-form { grid-template-columns:1fr; }
+      .student-form .full-width { grid-column:1; }
+      .exam-header { padding:22px 18px 18px; }
+      .exam-header h1 { font-size:20px; }
+      .choices { padding-left:0; }
+      .sig-row { flex-direction:column; align-items:center; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- HEADER -->
+  <div class="exam-header">
+    <div class="subject-badge">📚 วิชาสังคมศึกษา ศาสนาและวัฒนธรรม</div>
+    <br/>
+    <div class="test-type-badge">✅ แบบทดสอบหลังเรียน</div>
+    <h1>ศาสนากับการดำเนินชีวิต</h1>
+    <h2>ชั้นประถมศึกษาปีที่ 6 &nbsp;|&nbsp; หน่วยที่ 1</h2>
+    <div class="exam-meta">
+      <div class="meta-item">📝 ปรนัย 20 ข้อ</div>
+      <div class="meta-item">⭐ 20 คะแนน</div>
+      <div class="meta-item">⏱️ 20 นาที</div>
+    </div>
+  </div>
+
+  <!-- INFO BAR -->
+  <div class="info-bar">
+    <div class="info-icon">ℹ️</div>
+    <p>
+      <strong>คำชี้แจง:</strong> แบบทดสอบนี้มีทั้งหมด <strong>20 ข้อ</strong> ข้อละ 1 คะแนน รวม <strong>20 คะแนน</strong><br/>
+      ให้นักเรียนเลือกคำตอบที่ถูกต้องที่สุดเพียงข้อเดียว<br/>
+      <strong>⚠️ ห้ามเปลี่ยนแท็บหรือออกจากหน้านี้ระหว่างทำข้อสอบ</strong> — ระบบจะส่งคำตอบอัตโนมัติ
+    </p>
+  </div>
+
+  <!-- STUDENT FORM -->
+  <div class="student-form">
+    <div class="form-field full-width">
+      <label>ชื่อ–นามสกุล</label>
+      <select id="studentNameSel" class="line" style="font-family:'Sarabun',sans-serif;font-size:15px;padding:6px 4px;border:none;border-bottom:2px solid #ccc;width:100%;background:transparent">
+        <option value="">— เลือกชื่อนักเรียน —</option>
+        <option value="เด็กชายกิตติภพ ทองสัมฤทธิ์">เด็กชายกิตติภพ ทองสัมฤทธิ์</option>
+        <option value="เด็กชายวีรภาพ จันทร์สิงห์">เด็กชายวีรภาพ จันทร์สิงห์</option>
+        <option value="เด็กชายอนันท์ชัย หินชัยภูมิ">เด็กชายอนันท์ชัย หินชัยภูมิ</option>
+        <option value="เด็กชายชาญชัย บุญหล้า">เด็กชายชาญชัย บุญหล้า</option>
+        <option value="เด็กชายจักรภัทร เงินคำ">เด็กชายจักรภัทร เงินคำ</option>
+        <option value="เด็กหญิงสุภัสรา โพธิ์แก้ว">เด็กหญิงสุภัสรา โพธิ์แก้ว</option>
+        <option value="เด็กหญิงอรนิชา ชำนาญ">เด็กหญิงอรนิชา ชำนาญ</option>
+        <option value="เด็กหญิงดาวิกา ขาวดี">เด็กหญิงดาวิกา ขาวดี</option>
+        <option value="เด็กหญิงปวันรัตน์ พรมจินดาศรี">เด็กหญิงปวันรัตน์ พรมจินดาศรี</option>
+        <option value="เด็กหญิงศุภิสรา เณรสุวรรณ">เด็กหญิงศุภิสรา เณรสุวรรณ</option>
+        <option value="เด็กหญิงสุภัชชา แสงประทุม">เด็กหญิงสุภัชชา แสงประทุม</option>
+        <option value="เด็กหญิงน้ำมนต์ มีเพชร">เด็กหญิงน้ำมนต์ มีเพชร</option>
+        <option value="เด็กหญิงมัญชุสา บินสูงเนิน">เด็กหญิงมัญชุสา บินสูงเนิน</option>
+        <option value="เด็กชายอลงกรณ์ เสาธงทอง">เด็กชายอลงกรณ์ เสาธงทอง</option>
+        <option value="เด็กชายสุรเชษฐ์ เงินจัตุรัส">เด็กชายสุรเชษฐ์ เงินจัตุรัส</option>
+        <option value="เด็กหญิงกมลพร พงษ์สวัสดิ์">เด็กหญิงกมลพร พงษ์สวัสดิ์</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label>ชั้น</label>
+      <input type="text" class="line" value="ป.6" readonly />
+    </div>
+    <div class="score-box">
+      <div class="score-inner">
+        <div class="label">คะแนนที่ได้</div>
+        <div class="value"><span id="displayScore">–</span><span style="font-size:16px;font-weight:500">/20</span></div>
+        <div class="total">ปรนัย 20 ข้อ</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION TITLE -->
+  <div class="section-title">
+    📋 ตอนที่ 1 — ปรนัย (เลือกคำตอบที่ถูกต้องที่สุด)
+    <span style="margin-left:auto;font-size:13px;font-weight:500;opacity:.85">20 ข้อ × 1 คะแนน = 20 คะแนน</span>
+  </div>
+
+  <div class="questions-container">
+
+    <!-- Q1 -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">1</div>
+        <div class="q-text">ศาสนาที่ประชาชนส่วนใหญ่ในประเทศไทยนับถือคือศาสนาใด?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q1" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ศาสนาพุทธ</span></label>
+        <label class="choice-label"><input type="radio" name="q1" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ศาสนาคริสต์</span></label>
+        <label class="choice-label"><input type="radio" name="q1" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ศาสนาอิสลาม</span></label>
+        <label class="choice-label"><input type="radio" name="q1" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ศาสนาพราหมณ์-ฮินดู</span></label>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">2</div>
+        <div class="q-text">พระรัตนตรัยประกอบด้วยสิ่งใดบ้าง?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q2" value="ก"><span class="choice-letter">ก</span><span class="choice-text">พระพุทธ พระธรรม พระอรหันต์</span></label>
+        <label class="choice-label"><input type="radio" name="q2" value="ข"><span class="choice-letter">ข</span><span class="choice-text">พระพุทธ พระธรรม พระสงฆ์</span></label>
+        <label class="choice-label"><input type="radio" name="q2" value="ค"><span class="choice-letter">ค</span><span class="choice-text">พระพุทธ พระวินัย พระสงฆ์</span></label>
+        <label class="choice-label"><input type="radio" name="q2" value="ง"><span class="choice-letter">ง</span><span class="choice-text">พระอินทร์ พระพรหม พระพุทธ</span></label>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">3</div>
+        <div class="q-text">ไตรสิกขา หมายถึงการฝึกฝนตนเองในด้านใดบ้าง?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q3" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ความรู้ ความดี ความสุข</span></label>
+        <label class="choice-label"><input type="radio" name="q3" value="ข"><span class="choice-letter">ข</span><span class="choice-text">กาย วาจา ใจ</span></label>
+        <label class="choice-label"><input type="radio" name="q3" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ศีล สมาธิ ปัญญา</span></label>
+        <label class="choice-label"><input type="radio" name="q3" value="ง"><span class="choice-letter">ง</span><span class="choice-text">สติ สมาธิ วิปัสสนา</span></label>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">4</div>
+        <div class="q-text">อริยสัจ 4 ข้อแรกสุด คือข้อใด?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q4" value="ก"><span class="choice-letter">ก</span><span class="choice-text">มรรค (หนทางดับทุกข์)</span></label>
+        <label class="choice-label"><input type="radio" name="q4" value="ข"><span class="choice-letter">ข</span><span class="choice-text">สมุทัย (สาเหตุของทุกข์)</span></label>
+        <label class="choice-label"><input type="radio" name="q4" value="ค"><span class="choice-letter">ค</span><span class="choice-text">นิโรธ (ความดับทุกข์)</span></label>
+        <label class="choice-label"><input type="radio" name="q4" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ทุกข์ (ความทุกข์ที่ต้องรู้จัก)</span></label>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">5</div>
+        <div class="q-text">"ทำดีได้ดี ทำชั่วได้ชั่ว" สอดคล้องกับหลักธรรมข้อใดในพุทธศาสนา?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q5" value="ก"><span class="choice-letter">ก</span><span class="choice-text">กฎแห่งกรรม</span></label>
+        <label class="choice-label"><input type="radio" name="q5" value="ข"><span class="choice-letter">ข</span><span class="choice-text">อริยสัจ 4</span></label>
+        <label class="choice-label"><input type="radio" name="q5" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ไตรสิกขา</span></label>
+        <label class="choice-label"><input type="radio" name="q5" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ขันธ์ 5</span></label>
+      </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">6</div>
+        <div class="q-text">บุญกิริยาวัตถุ 3 ประกอบด้วยข้อใดบ้าง?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q6" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ทาน ศีล สมาธิ</span></label>
+        <label class="choice-label"><input type="radio" name="q6" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ทาน ศีล ภาวนา</span></label>
+        <label class="choice-label"><input type="radio" name="q6" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ทาน สมาธิ ปัญญา</span></label>
+        <label class="choice-label"><input type="radio" name="q6" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ศีล สมาธิ ปัญญา</span></label>
+      </div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">7</div>
+        <div class="q-text">ข้อใดเป็นกุศลกรรม (การกระทำที่ดี) ทางกาย?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q7" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ไม่พูดเท็จ</span></label>
+        <label class="choice-label"><input type="radio" name="q7" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ไม่คิดพยาบาทผู้อื่น</span></label>
+        <label class="choice-label"><input type="radio" name="q7" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ไม่ฆ่าสัตว์</span></label>
+        <label class="choice-label"><input type="radio" name="q7" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ไม่โลภอยากได้ของผู้อื่น</span></label>
+      </div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">8</div>
+        <div class="q-text">ศีล 5 ข้อที่ 5 ห้ามกระทำสิ่งใด?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q8" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ลักทรัพย์ของผู้อื่น</span></label>
+        <label class="choice-label"><input type="radio" name="q8" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ประพฤติผิดในกาม</span></label>
+        <label class="choice-label"><input type="radio" name="q8" value="ค"><span class="choice-letter">ค</span><span class="choice-text">พูดเท็จและพูดส่อเสียด</span></label>
+        <label class="choice-label"><input type="radio" name="q8" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ดื่มสุราและของมึนเมาทุกชนิด</span></label>
+      </div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">9</div>
+        <div class="q-text">สถานที่ประกอบพิธีกรรมทางศาสนาพุทธเรียกว่าอะไร?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q9" value="ก"><span class="choice-letter">ก</span><span class="choice-text">วัด</span></label>
+        <label class="choice-label"><input type="radio" name="q9" value="ข"><span class="choice-letter">ข</span><span class="choice-text">มัสยิด</span></label>
+        <label class="choice-label"><input type="radio" name="q9" value="ค"><span class="choice-letter">ค</span><span class="choice-text">โบสถ์คริสต์</span></label>
+        <label class="choice-label"><input type="radio" name="q9" value="ง"><span class="choice-letter">ง</span><span class="choice-text">เทวสถาน</span></label>
+      </div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">10</div>
+        <div class="q-text">วันมาฆบูชาเกิดขึ้นเพื่อระลึกถึงเหตุการณ์ใด?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q10" value="ก"><span class="choice-letter">ก</span><span class="choice-text">วันที่พระพุทธเจ้าตรัสรู้</span></label>
+        <label class="choice-label"><input type="radio" name="q10" value="ข"><span class="choice-letter">ข</span><span class="choice-text">วันที่พระสงฆ์ 1,250 รูปมาเฝ้าพระพุทธเจ้าโดยมิได้นัดหมาย</span></label>
+        <label class="choice-label"><input type="radio" name="q10" value="ค"><span class="choice-letter">ค</span><span class="choice-text">วันที่พระพุทธเจ้าแสดงปฐมเทศนา</span></label>
+        <label class="choice-label"><input type="radio" name="q10" value="ง"><span class="choice-letter">ง</span><span class="choice-text">วันที่พระพุทธเจ้าเสด็จดับขันธปรินิพพาน</span></label>
+      </div>
+    </div>
+
+    <!-- Q11 -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">11</div>
+        <div class="q-text">ไตรลักษณ์ หมายถึงลักษณะสามประการของสิ่งใด?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q11" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ชีวิตมนุษย์เท่านั้น</span></label>
+        <label class="choice-label"><input type="radio" name="q11" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ธรรมชาติรอบข้างเท่านั้น</span></label>
+        <label class="choice-label"><input type="radio" name="q11" value="ค"><span class="choice-letter">ค</span><span class="choice-text">สรรพสิ่งทั้งหลายในโลก</span></label>
+        <label class="choice-label"><input type="radio" name="q11" value="ง"><span class="choice-letter">ง</span><span class="choice-text">สัตว์และพืชเท่านั้น</span></label>
+      </div>
+    </div>
+
+    <!-- Q12 -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">12</div>
+        <div class="q-text">"อนิจจัง" ซึ่งเป็นหนึ่งในไตรลักษณ์ หมายความว่าอย่างไร?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q12" value="ก"><span class="choice-letter">ก</span><span class="choice-text">เป็นทุกข์</span></label>
+        <label class="choice-label"><input type="radio" name="q12" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ไม่มีตัวตนถาวร</span></label>
+        <label class="choice-label"><input type="radio" name="q12" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ไม่มีอะไรแน่นอนตลอดไป</span></label>
+        <label class="choice-label"><input type="radio" name="q12" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ไม่เที่ยง ไม่คงทน มีการเปลี่ยนแปลงอยู่ตลอด</span></label>
+      </div>
+    </div>
+
+    <!-- Q13 -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">13</div>
+        <div class="q-text">การที่นักเรียนแบ่งอาหารให้เพื่อนที่ไม่มีกิน โดยไม่หวังสิ่งตอบแทน ตรงกับหลักธรรมใด?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q13" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ทาน (การให้)</span></label>
+        <label class="choice-label"><input type="radio" name="q13" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ศีล (ความประพฤติดี)</span></label>
+        <label class="choice-label"><input type="radio" name="q13" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ภาวนา (การพัฒนาจิต)</span></label>
+        <label class="choice-label"><input type="radio" name="q13" value="ง"><span class="choice-letter">ง</span><span class="choice-text">สมาธิ (การตั้งมั่นของจิต)</span></label>
+      </div>
+    </div>
+
+    <!-- Q14 -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">14</div>
+        <div class="q-text">ชาวมุสลิมในศาสนาอิสลามนับถือพระผู้เป็นเจ้าพระองค์เดียว มีพระนามว่า?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q14" value="ก"><span class="choice-letter">ก</span><span class="choice-text">พระเยซู</span></label>
+        <label class="choice-label"><input type="radio" name="q14" value="ข"><span class="choice-letter">ข</span><span class="choice-text">อัลลอฮ์</span></label>
+        <label class="choice-label"><input type="radio" name="q14" value="ค"><span class="choice-letter">ค</span><span class="choice-text">พระพรหม</span></label>
+        <label class="choice-label"><input type="radio" name="q14" value="ง"><span class="choice-letter">ง</span><span class="choice-text">พระวิษณุ</span></label>
+      </div>
+    </div>
+
+    <!-- Q15 -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">15</div>
+        <div class="q-text">ข้อใดเป็นการนำหลักธรรมทางพุทธศาสนาไปใช้ในชีวิตประจำวันที่เหมาะสมที่สุด?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q15" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ทำบุญให้มากที่สุดเพื่อให้คนอื่นชื่นชม</span></label>
+        <label class="choice-label"><input type="radio" name="q15" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ท่องบ่นพระสูตรโดยไม่เข้าใจความหมาย</span></label>
+        <label class="choice-label"><input type="radio" name="q15" value="ค"><span class="choice-letter">ค</span><span class="choice-text">รู้จักพอเพียง อดทน ซื่อสัตย์ และมีสติในการตัดสินใจ</span></label>
+        <label class="choice-label"><input type="radio" name="q15" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ไปวัดเฉพาะวันสำคัญทางศาสนาเท่านั้น</span></label>
+      </div>
+    </div>
+
+    <!-- Q16 -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">16</div>
+        <div class="q-text">มรรคมีองค์ 8 ถือเป็นส่วนใดในอริยสัจ 4?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q16" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ทุกข์</span></label>
+        <label class="choice-label"><input type="radio" name="q16" value="ข"><span class="choice-letter">ข</span><span class="choice-text">สมุทัย</span></label>
+        <label class="choice-label"><input type="radio" name="q16" value="ค"><span class="choice-letter">ค</span><span class="choice-text">นิโรธ</span></label>
+        <label class="choice-label"><input type="radio" name="q16" value="ง"><span class="choice-letter">ง</span><span class="choice-text">มรรค</span></label>
+      </div>
+    </div>
+
+    <!-- Q17 -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">17</div>
+        <div class="q-text">ผู้ก่อตั้งศาสนาพุทธ ก่อนตรัสรู้มีพระนามว่าอะไร?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q17" value="ก"><span class="choice-letter">ก</span><span class="choice-text">เจ้าชายสิทธัตถะ โคตมะ</span></label>
+        <label class="choice-label"><input type="radio" name="q17" value="ข"><span class="choice-letter">ข</span><span class="choice-text">พระเยซูคริสต์</span></label>
+        <label class="choice-label"><input type="radio" name="q17" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ท่านนบีมุฮัมหมัด</span></label>
+        <label class="choice-label"><input type="radio" name="q17" value="ง"><span class="choice-letter">ง</span><span class="choice-text">พระพรหม</span></label>
+      </div>
+    </div>
+
+    <!-- Q18 -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">18</div>
+        <div class="q-text">ข้อใดเป็นหน้าที่ของชาวพุทธที่ดี?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q18" value="ก"><span class="choice-letter">ก</span><span class="choice-text">เชื่อฟังพระสงฆ์ทุกคำโดยไม่ใช้วิจารณญาณ</span></label>
+        <label class="choice-label"><input type="radio" name="q18" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ศึกษาหลักธรรม ปฏิบัติตามศีล และเป็นแบบอย่างที่ดีให้ผู้อื่น</span></label>
+        <label class="choice-label"><input type="radio" name="q18" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ทำบุญให้มากที่สุดโดยไม่สนใจการปฏิบัติตนในชีวิตประจำวัน</span></label>
+        <label class="choice-label"><input type="radio" name="q18" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ไปวัดเฉพาะวันเกิดของตนเอง</span></label>
+      </div>
+    </div>
+
+    <!-- Q19 -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">19</div>
+        <div class="q-text">"สติ" ในทางพุทธศาสนาหมายความว่าอย่างไร?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q19" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ความสุขสงบภายในจิตใจ</span></label>
+        <label class="choice-label"><input type="radio" name="q19" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ความอดทนต่อความลำบาก</span></label>
+        <label class="choice-label"><input type="radio" name="q19" value="ค"><span class="choice-letter">ค</span><span class="choice-text">การระลึกรู้ ตื่นตัว รู้ทันความคิดและการกระทำของตนเอง</span></label>
+        <label class="choice-label"><input type="radio" name="q19" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ความเพียรพยายามในการทำงานอย่างไม่ย่อท้อ</span></label>
+      </div>
+    </div>
+
+    <!-- Q20 -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">20</div>
+        <div class="q-text">ข้อใดสรุปความสำคัญของศาสนากับการดำเนินชีวิตได้ถูกต้องที่สุด?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q20" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ศาสนาเป็นเรื่องของผู้สูงอายุและพระสงฆ์เท่านั้น</span></label>
+        <label class="choice-label"><input type="radio" name="q20" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ศาสนาสำคัญเฉพาะในวันหยุดและเทศกาลทางศาสนา</span></label>
+        <label class="choice-label"><input type="radio" name="q20" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ศาสนาเป็นเรื่องส่วนตัวที่ไม่เกี่ยวกับผู้อื่นในสังคม</span></label>
+        <label class="choice-label"><input type="radio" name="q20" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ศาสนาเป็นหลักยึดเหนี่ยวจิตใจ สอนให้เป็นคนดี และอยู่ร่วมกันในสังคมอย่างสงบสุข</span></label>
+      </div>
+    </div>
+
+  </div><!-- end questions-container -->
+
+  <!-- SUBMIT -->
+  <div class="answer-section">
+    <button id="btnSubmit" onclick="submitAnswers(false, null)">📤 ส่งคำตอบ</button>
+    <div id="submitMsg"></div>
+  </div>
+
+  <!-- SIGNATURE -->
+  <div class="signature-section">
+    <div class="sig-title">— ลงนามผู้เกี่ยวข้อง —</div>
+    <div class="sig-row">
+      <div class="sig-block">
+        <div class="sig-line">ลงชื่อ .......................................</div>
+        <div class="sig-name">( ครูรณฤทธิ์&nbsp; ศรีสองเมือง )</div>
+        <div class="sig-role">ครูผู้สอน</div>
+        <div class="sig-date-row">วันที่ <span class="sig-date-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+      </div>
+      <div class="sig-block">
+        <div class="sig-line">ลงชื่อ .......................................</div>
+        <div class="sig-name">( นางสาวอุทุมพร&nbsp; ยอดสิงห์จันทร์ )</div>
+        <div class="sig-role">หัวหน้ากลุ่มสาระฯ</div>
+        <div class="sig-date-row">วันที่ <span class="sig-date-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+      </div>
+      <div class="sig-block">
+        <div class="sig-line">ลงชื่อ .......................................</div>
+        <div class="sig-name">( นายดนุภพ&nbsp; โพธิ์งาม )</div>
+        <div class="sig-role">ผู้อำนวยการโรงเรียนหินฝนวิทยาคม</div>
+        <div class="sig-date-row">วันที่ <span class="sig-date-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="exam-footer">
+    <strong>วิชาสังคมศึกษา ชั้น ป.6 หน่วยที่ 1</strong> &nbsp;|&nbsp;
+    ศาสนากับการดำเนินชีวิต &nbsp;|&nbsp;
+    จัดทำโดย <strong>ครูรณฤทธิ์&nbsp; ศรีสองเมือง</strong> &nbsp;|&nbsp;
+    โรงเรียนหินฝนวิทยาคม
+  </div>
+
+</div><!-- end page-wrapper -->
+
+<script>
+  // ==================== เฉลย ====================
+  // ก: q1, q5, q9, q13, q17 = 5
+  // ข: q2, q6, q10, q14, q18 = 5
+  // ค: q3, q7, q11, q15, q19 = 5
+  // ง: q4, q8, q12, q16, q20 = 5
+  var ANSWER_KEY = {
+    q1:'ก', q2:'ข', q3:'ค', q4:'ง', q5:'ก',
+    q6:'ข', q7:'ค', q8:'ง', q9:'ก', q10:'ข',
+    q11:'ค', q12:'ง', q13:'ก', q14:'ข', q15:'ค',
+    q16:'ง', q17:'ก', q18:'ข', q19:'ค', q20:'ง'
+  };
+
+  // ==================== ANTI-CHEAT ====================
+  var _examSubmitted = false;
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden' && !_examSubmitted) {
+      _examSubmitted = true;
+      var ov = document.createElement('div');
+      ov.style.cssText = 'position:fixed;inset:0;background:rgba(198,40,40,.95);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;';
+      ov.innerHTML = '<div style="font-size:52px">⚠️</div><div style="font-size:22px;font-weight:800;color:#fff;text-align:center">ตรวจพบการออกจากหน้าข้อสอบ<br/>ระบบส่งคำตอบอัตโนมัติแล้ว</div>';
+      document.body.appendChild(ov);
+      submitAnswers(true, 'tab-switch');
+    }
+  });
+  window.addEventListener('blur', function() {
+    if (!_examSubmitted) { _examSubmitted = true; submitAnswers(true, 'window-blur'); }
+  });
+
+  // ==================== SUBMIT ====================
+  function submitAnswers(isCheat, cheatReason) {
+    var name = document.getElementById('studentNameSel').value;
+    if (!name && !isCheat) { alert('⚠️ กรุณาเลือกชื่อนักเรียนก่อน'); return; }
+    if (!name) name = '(ไม่ระบุชื่อ)';
+    isCheat = isCheat || false;
+
+    var answers = {};
+    for (var i = 1; i <= 20; i++) {
+      var sel = document.querySelector('input[name="q' + i + '"]:checked');
+      answers['q' + i] = sel ? sel.value : '-';
+    }
+
+    var mcScore = 0, mcDetails = {};
+    for (var qi = 1; qi <= 20; qi++) {
+      var qk = 'q' + qi;
+      var correct = (answers[qk] === ANSWER_KEY[qk]);
+      mcDetails[qk] = correct;
+      if (correct) mcScore++;
+    }
+
+    // ===== แสดงผลทันที =====
+    var btn = document.getElementById('btnSubmit');
+    btn.disabled = true;
+    document.getElementById('displayScore').textContent = mcScore;
+
+    var msg = document.getElementById('submitMsg');
+    var pct = Math.round(mcScore / 20 * 100);
+    var passColor = pct >= 60 ? '#2e7d32' : '#c62828';
+    var passText  = pct >= 60 ? '✅ ผ่าน' : '❌ ไม่ผ่าน';
+
+    var html = '<div style="font-size:16px;font-weight:800;color:#2e7d32;margin-bottom:12px">✅ ส่งคำตอบสำเร็จ!</div>';
+    html += '<div style="font-size:15px;margin-bottom:12px">📊 <b>คะแนน:</b> <span style="font-size:22px;font-weight:800;color:' + passColor + '">' + mcScore + '/20</span> &nbsp;(' + pct + '%) &nbsp;<span style="font-size:14px;font-weight:700;background:' + passColor + ';color:#fff;padding:3px 10px;border-radius:8px">' + passText + '</span></div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">';
+    for (var qi2 = 1; qi2 <= 20; qi2++) {
+      var ok = mcDetails['q' + qi2];
+      var bgC  = ok ? '#e8f5e9' : '#ffebee';
+      var txtC = ok ? '#2e7d32' : '#c62828';
+      var borC = ok ? '#a5d6a7' : '#ef9a9a';
+      html += '<span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;font-size:12px;font-weight:800;background:' + bgC + ';color:' + txtC + ';border:1.5px solid ' + borC + ';flex-direction:column;gap:1px">';
+      html += '<span style="font-size:11px">' + (ok ? '✓' : '✗') + '</span><span>' + qi2 + '</span></span>';
+    }
+    html += '</div>';
+    if (isCheat) html += '<div style="background:#fff3e0;border-radius:8px;padding:8px 12px;font-size:13px;color:#e65100;border:1px solid #ffcc80;margin-bottom:8px">⚠️ ตรวจพบการออกจากหน้าข้อสอบ — ระบบบันทึกไว้แล้ว</div>';
+    html += '<div id="saveStatus" style="font-size:13px;color:#888;margin-top:6px">⏳ กำลังบันทึกข้อมูล...</div>';
+
+    msg.innerHTML = html;
+    msg.style.display = 'block';
+    btn.textContent = '✅ ส่งแล้ว';
+    btn.style.background = '#43a047';
+    msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    var data = {
+      studentName: name, grade: 'ป.6', subject: 'สังคมศึกษา',
+      unit: 'หน่วยที่ 1', quizType: 'post-test',
+      topic: 'ศาสนากับการดำเนินชีวิต (หลังเรียน)',
+      answers: answers, mcScore: mcScore, mcDetails: mcDetails, totalOutOf: 20
+    };
+    if (isCheat) { data.cheated = true; data.cheatReason = cheatReason || 'unknown'; }
+
+    (function doSubmit() {
+      if (typeof window._submitAnswers === 'function') {
+        window._submitAnswers(data).then(function() {
+          var s = document.getElementById('saveStatus');
+          if (s) s.innerHTML = '☁️ บันทึกข้อมูลเรียบร้อยแล้ว';
+        }).catch(function() {
+          var s = document.getElementById('saveStatus');
+          if (s) s.innerHTML = '⚠️ บันทึกไม่สำเร็จ — แจ้งครูด้วยนะ';
+        });
+      } else { setTimeout(doSubmit, 400); }
+    })();
+  }
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { FIREBASE_CONFIG } from "./js/config.js";
+  var app = initializeApp(FIREBASE_CONFIG), auth = getAuth(app), db = getFirestore(app);
+  signInAnonymously(auth).catch(function(){});
+  window._submitAnswers = async function(data) {
+    await addDoc(collection(db, 'quiz_results'), Object.assign({}, data, { timestamp: serverTimestamp() }));
+  };
+</script>
+</body>
+</html>
