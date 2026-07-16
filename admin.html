@@ -998,13 +998,10 @@ async function loadQz(){
   const tb=document.getElementById('tbQz');tb.innerHTML='';_qz={};
   const roomF=document.getElementById('qzRoomFilter')?.value||'';
   const subjF=document.getElementById('qzSubjFilter')?.value||'';
-  const sel=document.getElementById('resFilter');sel.innerHTML='<option value="">ทุกข้อสอบ</option>';
   const q=query(collection(db,'quizzes'),orderBy('createdAt','desc'));
   const snap=await getDocs(q);
   const subjSet=new Set();
   snap.forEach(d=>{const qz=d.data();_qz[d.id]=qz;
-    // เติม dropdown ผลสอบ (ทุกข้อสอบ ไม่กรอง)
-    sel.innerHTML+=`<option value="${d.id}">${qz.title||d.id}</option>`;
     const subj=qz.subject||''; if(subj) subjSet.add(subj);
     const rid=qz.roomId||'all';
     if(roomF&&rid!=='all'&&rid!==roomF) return;
@@ -1143,11 +1140,24 @@ window.loadResults=async function(){
       const tb2=(b.data.submittedAt||b.data.timestamp)?.toDate?.()?.getTime()||0;
       return tb2-ta;
     });
+    // Populate resFilter จากข้อมูลผลสอบจริง
+    const curUnitSel = document.getElementById('resFilter').value;
+    const unitLabelSet = new Set();
+    docs.forEach(({data:r})=>{
+      const lbl = r.unit||r.quizTitle||r.quizId||'';
+      if(lbl) unitLabelSet.add(lbl);
+    });
+    const unitSel = document.getElementById('resFilter');
+    const unitArr = [...unitLabelSet].sort((a,b)=>a.localeCompare(b,'th'));
+    unitSel.innerHTML = '<option value="">ทุกข้อสอบ/หน่วย</option>' +
+      unitArr.map(u=>`<option value="${u}"${u===curUnitSel?' selected':''}>${u}</option>`).join('');
+
     _resultsDocs={};
     let rows='';
     docs.forEach(({id,data:r})=>{
       _resultsDocs[id]=r;
-      if(filter&&r.quizId!==filter)return;
+      // กรองตามข้อสอบ/หน่วย (ใช้ label แทน quizId)
+      if(filter){const lbl=r.unit||r.quizTitle||r.quizId||'';if(lbl!==filter)return;}
       if(gradeF&&r.grade!==gradeF)return;
       if(subjectF&&r.subject!==subjectF)return;
       // กรองตามประเภทข้อสอบ
