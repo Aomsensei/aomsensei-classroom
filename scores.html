@@ -307,6 +307,33 @@ function loadFromLocal(){
   }catch(e){state=JSON.parse(JSON.stringify(INITIAL_DATA));}
 }
 
+// สแกนหา field ที่ Firestore รับไม่ได้จริง ๆ (undefined, NaN, function, array ซ้อน array,
+// หรือ key ที่ต้องห้าม) แล้วคืน path ที่มีปัญหา เพื่อ debug ได้ตรงจุดแทนการเดา
+function findBadFields(val, path){
+  let issues=[];
+  if(val===undefined){ issues.push(path+' = undefined'); return issues; }
+  if(typeof val==='number' && Number.isNaN(val)){ issues.push(path+' = NaN'); return issues; }
+  if(typeof val==='function'){ issues.push(path+' = function (ห้ามเก็บ)'); return issues; }
+  if(val instanceof Date) return issues;
+  if(Array.isArray(val)){
+    val.forEach((v,i)=>{
+      const p=path+'['+i+']';
+      if(Array.isArray(v)) issues.push(p+' = array ซ้อน array (Firestore ไม่รองรับ)');
+      issues=issues.concat(findBadFields(v,p));
+    });
+    return issues;
+  }
+  if(val && typeof val==='object'){
+    Object.keys(val).forEach(k=>{
+      if(/^__.*__$/.test(k)) issues.push((path?path+'.':'')+k+' = key ต้องห้าม (ขึ้นต้น/ลงท้ายด้วย __)');
+      if(k==='') issues.push((path||'(root)')+' มี key ว่างเปล่า');
+      issues=issues.concat(findBadFields(val[k], path?path+'.'+k:k));
+    });
+    return issues;
+  }
+  return issues;
+}
+
 // ทำความสะอาด state ก่อนส่ง Firestore: แก้ sparse array (holes) และค่า undefined
 // ซึ่งเป็นสาเหตุหลักของ error "invalid-argument" เวลา setDoc
 function sanitizeForFirestore(val){
@@ -347,12 +374,16 @@ async function syncToFirebase(silent){
     if(badge) badge.textContent='☁️ auto-sync ✓';
     return {ok:true};
   }catch(e){
+    // สแกนหา field ที่มีปัญหาจริง ๆ จาก state ดิบ เพื่อบอกจุดที่ต้องแก้ตรง ๆ
+    let badFields=[];
+    try{ badFields=findBadFields(state,''); }catch(scanErr){ console.error('scan error',scanErr); }
     console.error('[syncToFirebase] Firebase write failed:', e.code, e.message, e);
+    if(badFields.length) console.error('[syncToFirebase] พบ field ที่มีปัญหา:', badFields);
     localStorage.setItem(STORE_KEY,JSON.stringify(state));
     setStatus('warn','⚠️ บันทึก Local เท่านั้น · Firebase ล้มเหลว ('+e.code+')');
     const badge=document.getElementById('autoSyncBadge');
     if(badge) badge.textContent='⚠️ ออฟไลน์ (บันทึกเฉพาะเครื่อง)';
-    return {ok:false, reason:'firebase-error', code:e.code, message:e.message};
+    return {ok:false, reason:'firebase-error', code:e.code, message:e.message, badFields};
   }
 }
 
@@ -374,7 +405,11 @@ window.forceSyncNow = async function(){
     } else if(result.code==='unavailable' || result.code==='network-request-failed'){
       hint='\n\nดูเหมือนเน็ตหลุดหรือเชื่อมต่อ Firebase ไม่ได้ ลองเช็คอินเทอร์เน็ตแล้วกดใหม่';
     } else if(result.code==='invalid-argument'){
-      hint='\n\nข้อมูลบางส่วนมีรูปแบบไม่ถูกต้อง (เช่น ช่องคะแนนว่างบางจุด) ระบบได้ทำความสะอาดข้อมูลอัตโนมัติแล้ว ลองกด "บันทึกทันที" ซ้ำอีกครั้ง ถ้ายังไม่ได้ให้แจ้งผู้ดูแลระบบ';
+      if(result.badFields && result.badFields.length){
+        hint='\n\nพบจุดข้อมูลที่มีปัญหา (ดูเพิ่มเติมใน Console กด F12):\n'+result.badFields.slice(0,8).join('\n')+(result.badFields.length>8?'\n...และอีก '+(result.badFields.length-8)+' จุด':'');
+      } else {
+        hint='\n\nไม่พบ field ที่ผิดปกติชัดเจนจากการสแกน (state สะอาดแล้ว) — อาจเป็นเพราะขนาดข้อมูลใหญ่เกินไป (เกิน 1MB) กรุณาแจ้งผู้ดูแลระบบพร้อมข้อความ error นี้';
+      }
     }
     alert('❌ บันทึกลง Firebase ไม่สำเร็จ\nรหัส error: '+result.code+'\n'+(result.message||'')+hint);
   }
