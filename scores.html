@@ -307,6 +307,28 @@ function loadFromLocal(){
   }catch(e){state=JSON.parse(JSON.stringify(INITIAL_DATA));}
 }
 
+// ทำความสะอาด state ก่อนส่ง Firestore: แก้ sparse array (holes) และค่า undefined
+// ซึ่งเป็นสาเหตุหลักของ error "invalid-argument" เวลา setDoc
+function sanitizeForFirestore(val){
+  if(Array.isArray(val)){
+    const out=new Array(val.length);
+    for(let i=0;i<val.length;i++){
+      const v=val[i];
+      out[i]= v===undefined ? '' : sanitizeForFirestore(v);
+    }
+    return out;
+  }
+  if(val && typeof val==='object'){
+    const out={};
+    Object.keys(val).forEach(k=>{
+      const v=val[k];
+      if(v!==undefined) out[k]=sanitizeForFirestore(v);
+    });
+    return out;
+  }
+  return val;
+}
+
 async function syncToFirebase(silent){
   // เขียน Firebase ได้เฉพาะ admin (email-login) เท่านั้น
   if(!isTeacher){
@@ -317,7 +339,8 @@ async function syncToFirebase(silent){
     return {ok:false, reason:'not-logged-in'};
   }
   try{
-    await setDoc(doc(db,'score_system',FB_DOC),{data:state,updatedAt:serverTimestamp()});
+    const cleanState=sanitizeForFirestore(state);
+    await setDoc(doc(db,'score_system',FB_DOC),{data:cleanState,updatedAt:serverTimestamp()});
     localStorage.setItem(STORE_KEY,JSON.stringify(state));
     setStatus('sync','☁️ บันทึกอัตโนมัติแล้ว · '+new Date().toLocaleTimeString('th-TH'));
     const badge=document.getElementById('autoSyncBadge');
@@ -350,6 +373,8 @@ window.forceSyncNow = async function(){
       hint='\n\nสาเหตุที่เป็นไปได้:\n1) อีเมลที่ล็อกอินอยู่ ('+user.email+') ไม่ตรงกับอีเมลแอดมินที่ตั้งไว้ใน Firestore Rules\n2) กฎ Firestore Rules (isAdmin) ยังไม่ได้ publish ขึ้น Firebase Console จริง\n\nให้ตรวจสอบใน Firebase Console → Firestore Database → Rules ว่า publish แล้ว และอีเมลตรงกัน';
     } else if(result.code==='unavailable' || result.code==='network-request-failed'){
       hint='\n\nดูเหมือนเน็ตหลุดหรือเชื่อมต่อ Firebase ไม่ได้ ลองเช็คอินเทอร์เน็ตแล้วกดใหม่';
+    } else if(result.code==='invalid-argument'){
+      hint='\n\nข้อมูลบางส่วนมีรูปแบบไม่ถูกต้อง (เช่น ช่องคะแนนว่างบางจุด) ระบบได้ทำความสะอาดข้อมูลอัตโนมัติแล้ว ลองกด "บันทึกทันที" ซ้ำอีกครั้ง ถ้ายังไม่ได้ให้แจ้งผู้ดูแลระบบ';
     }
     alert('❌ บันทึกลง Firebase ไม่สำเร็จ\nรหัส error: '+result.code+'\n'+(result.message||'')+hint);
   }
@@ -389,7 +414,10 @@ window.renameCol=function(cls,sub,i){
   if(!state.colLabels)state.colLabels={};
   if(!state.colLabels[cls])state.colLabels[cls]={};
   if(!state.colLabels[cls][sub])state.colLabels[cls][sub]=[];
-  state.colLabels[cls][sub][i]=nw.trim()||`ก${i+1}`;
+  // เติมช่องว่างก่อนหน้า index i ให้ครบ ป้องกัน sparse array (holes → undefined → Firestore invalid-argument)
+  const arr=state.colLabels[cls][sub];
+  for(let k=0;k<i;k++){ if(arr[k]===undefined) arr[k]=`ก${k+1}`; }
+  arr[i]=nw.trim()||`ก${i+1}`;
   saveState();renderTable();
 };
 
