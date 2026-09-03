@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>แบบทดสอบ สังคมศึกษา ม.1 หน่วยที่ 3 กฎหมายคุ้มครองสิทธิของบุคคล</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:   #e65100;
+      --primary2:  #f57c00;
+      --accent:    #ff9800;
+      --light:     #fff8f0;
+      --light2:    #fff3e0;
+      --border:    #ffe0b2;
+      --text:      #3e2000;
+      --muted:     #8d6e63;
+      --white:     #ffffff;
+    }
+
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background: linear-gradient(135deg, #fff8f0 0%, #fff3e0 50%, #fbe9e7 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: var(--text);
+    }
+
+    .page-wrapper { max-width: 860px; margin: 0 auto; }
+
+    /* ===== HEADER ===== */
+    .exam-header {
+      background: linear-gradient(135deg, #e65100 0%, #f57c00 45%, #ff9800 100%);
+      border-radius: 18px;
+      padding: 32px 36px 24px;
+      color: #fff;
+      text-align: center;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 32px rgba(230,81,0,0.30);
+      position: relative;
+      overflow: hidden;
+    }
+    .exam-header::before {
+      content: '';
+      position: absolute; top: -40px; right: -40px;
+      width: 160px; height: 160px; border-radius: 50%;
+      background: rgba(255,255,255,0.10);
+    }
+    .exam-header::after {
+      content: '';
+      position: absolute; bottom: -50px; left: -30px;
+      width: 200px; height: 200px; border-radius: 50%;
+      background: rgba(255,255,255,0.07);
+    }
+    .subject-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.22);
+      border: 1px solid rgba(255,255,255,0.40);
+      border-radius: 20px;
+      padding: 4px 16px;
+      font-size: 13px; font-weight: 500; letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+    .exam-header h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; text-shadow: 0 2px 4px rgba(0,0,0,0.18); }
+    .exam-header h2 { font-size: 17px; font-weight: 500; opacity: .92; margin-bottom: 16px; }
+    .exam-meta { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-top: 12px; }
+    .meta-item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 14px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 10px; padding: 5px 14px;
+    }
+
+    /* ===== INFO BAR ===== */
+    .info-bar {
+      background: var(--white);
+      border-radius: 12px; padding: 16px 24px;
+      display: flex; gap: 14px; align-items: flex-start;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 12px rgba(230,81,0,0.10);
+      border-left: 5px solid var(--accent);
+    }
+    .info-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+    .info-bar p { font-size: 14.5px; line-height: 1.8; color: #5d4037; }
+    .info-bar strong { color: var(--primary); }
+
+    /* ===== STUDENT FORM ===== */
+    .student-form {
+      background: var(--white);
+      border-radius: 14px; padding: 20px 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 12px rgba(230,81,0,0.08);
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    }
+    .student-form .full-width { grid-column: 1 / -1; }
+    .form-field label { display: block; font-size: 13.5px; font-weight: 600; color: var(--primary); margin-bottom: 6px; }
+    .form-field .line {
+      border: none; border-bottom: 2px solid var(--border);
+      background: transparent; width: 100%; padding: 4px 2px;
+      font-size: 15px; font-family: 'Sarabun', sans-serif; color: var(--text);
+      outline: none; transition: border-color .2s;
+    }
+    .form-field .line:focus { border-bottom-color: var(--primary); }
+    .score-box { display: flex; justify-content: flex-end; align-items: center; }
+    .score-inner {
+      border: 2.5px solid var(--primary);
+      border-radius: 12px; padding: 10px 24px;
+      text-align: center; min-width: 120px;
+    }
+    .score-inner .label { font-size: 13px; color: var(--primary); font-weight: 600; }
+    .score-inner .value { font-size: 26px; font-weight: 700; color: var(--primary); line-height: 1.3; }
+    .score-inner .total { font-size: 13px; color: var(--muted); }
+
+    /* ===== SECTION TITLE ===== */
+    .section-title {
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      color: #fff; border-radius: 10px;
+      padding: 10px 20px; font-size: 15.5px; font-weight: 600;
+      margin-bottom: 18px; display: flex; align-items: center; gap: 8px;
+    }
+
+    /* ===== QUESTIONS ===== */
+    .questions-container { display: flex; flex-direction: column; gap: 16px; }
+
+    .question-card {
+      background: var(--white); border-radius: 14px; padding: 20px 24px;
+      box-shadow: 0 2px 10px rgba(230,81,0,0.08);
+      border: 1.5px solid transparent;
+      transition: border-color .2s, box-shadow .2s; position: relative;
+    }
+    .question-card:hover { border-color: #ffcc80; box-shadow: 0 4px 18px rgba(230,81,0,0.15); }
+
+    .question-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+    .q-number {
+      flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff; font-weight: 700; font-size: 14.5px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 8px rgba(230,81,0,0.35);
+    }
+    .q-text { font-size: 16px; font-weight: 600; line-height: 1.6; color: #2c1500; flex: 1; padding-top: 4px; }
+
+    .choices { display: flex; flex-direction: column; gap: 8px; padding-left: 48px; }
+    .choice-label {
+      display: flex; align-items: flex-start; gap: 10px; cursor: pointer;
+      padding: 9px 14px; border-radius: 9px;
+      border: 1.5px solid var(--border); background: #fffaf5;
+      transition: all .18s; font-size: 15px; line-height: 1.5;
+    }
+    .choice-label:hover { border-color: var(--accent); background: var(--light2); }
+    .choice-label input[type="radio"] { display: none; }
+    .choice-label input[type="radio"]:checked + .choice-letter {
+      background: var(--primary); color: #fff; border-color: var(--primary);
+    }
+    .choice-label:has(input:checked) { border-color: var(--primary); background: var(--light2); }
+    .choice-letter {
+      flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+      border: 2px solid var(--accent); background: #fff; color: var(--primary);
+      font-weight: 700; font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .18s; margin-top: 1px;
+    }
+    .choice-text { flex: 1; }
+
+    /* ===== SUBJECTIVE ===== */
+    .subjective-card {
+      background: var(--white); border-radius: 14px; padding: 22px 24px;
+      box-shadow: 0 2px 10px rgba(230,81,0,0.08);
+      border: 1.5px solid #ffcc80;
+    }
+    .subj-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 16px; }
+    .q-number-subj {
+      flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, #bf360c, var(--primary));
+      color: #fff; font-weight: 700; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 8px rgba(191,54,12,0.40);
+    }
+    .subj-text { font-size: 16px; font-weight: 600; line-height: 1.6; color: #2c1500; flex: 1; padding-top: 4px; }
+    .answer-lines { display: flex; flex-direction: column; gap: 0; margin-top: 4px; }
+    .answer-line {
+      border: none; border-bottom: 1.8px solid var(--border);
+      background: transparent; width: 100%; height: 36px;
+      font-size: 15px; font-family: 'Sarabun', sans-serif; color: var(--text);
+      outline: none; padding: 4px 6px; transition: border-color .2s;
+    }
+    .answer-line:focus { border-bottom-color: var(--primary); }
+    .score-tag {
+      display: inline-block; background: var(--light2); border: 1.5px solid var(--accent);
+      color: var(--primary); font-size: 12.5px; font-weight: 600;
+      border-radius: 20px; padding: 2px 12px; margin-bottom: 12px;
+    }
+
+    /* ===== ANSWER KEY ===== */
+    .answer-section { margin-top: 32px; }
+    .answer-toggle {
+      background: linear-gradient(90deg, #bf360c, var(--primary));
+      color: #fff; border: none; border-radius: 10px;
+      padding: 11px 24px; font-size: 15px; font-weight: 600;
+      font-family: 'Sarabun', sans-serif; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 14px rgba(191,54,12,0.35);
+      transition: transform .15s, box-shadow .15s; margin-bottom: 16px; margin-right: 10px;
+    }
+    .answer-toggle:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(191,54,12,0.40); }
+
+    /* ===== PRINT BUTTON ===== */
+    .print-btn {
+      background: linear-gradient(90deg, #2e7d32, #43a047);
+      color: #fff; border: none; border-radius: 10px;
+      padding: 11px 24px; font-size: 15px; font-weight: 600;
+      font-family: 'Sarabun', sans-serif; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 14px rgba(46,125,50,0.30);
+      transition: transform .15s, box-shadow .15s; margin-bottom: 16px;
+    }
+    .print-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(46,125,50,0.38); }
+
+    .answer-key-grid {
+      display: none; grid-template-columns: repeat(5, 1fr); gap: 10px;
+    }
+    .answer-key-grid.show { display: grid; }
+    .ans-cell {
+      background: var(--white); border-radius: 10px; padding: 10px 8px;
+      text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      border: 1.5px solid var(--border);
+    }
+    .ans-cell .ans-q { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .ans-cell .ans-a { font-size: 18px; font-weight: 700; color: var(--primary); }
+
+    /* ===== SIGNATURE SECTION ===== */
+    .sig-section {
+      background: var(--white); border-radius: 14px; padding: 24px 28px;
+      margin-top: 28px;
+      box-shadow: 0 2px 12px rgba(230,81,0,0.08);
+      border: 1.5px solid var(--border);
+    }
+    .sig-title {
+      font-size: 15px; font-weight: 700; color: var(--primary);
+      margin-bottom: 20px; padding-bottom: 10px;
+      border-bottom: 2px dashed var(--border);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .sig-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .sig-box { text-align: center; }
+    .sig-line {
+      border-bottom: 1.8px solid #aaa; margin: 0 12px 6px;
+      height: 48px; display: flex; align-items: flex-end; justify-content: center;
+      padding-bottom: 4px; font-size: 13px; color: #bbb;
+    }
+    .sig-name { font-size: 14px; font-weight: 600; color: var(--text); margin-top: 6px; }
+    .sig-role { font-size: 13px; color: var(--muted); margin-top: 3px; }
+    .sig-date-row {
+      display: flex; justify-content: flex-end; gap: 8px;
+      margin-top: 4px; font-size: 13px; color: var(--muted);
+    }
+    .sig-date-line {
+      border-bottom: 1px solid #aaa; min-width: 80px; display: inline-block;
+    }
+
+    /* ===== FOOTER ===== */
+    .exam-footer {
+      text-align: center; margin-top: 28px; padding: 18px;
+      background: var(--white); border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(230,81,0,0.07);
+      font-size: 13.5px; color: var(--muted);
+    }
+    .exam-footer strong { color: var(--primary); }
+
+    /* ===== PASSWORD MODAL ===== */
+    .pw-modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.60); z-index: 2000;
+      align-items: center; justify-content: center;
+    }
+    .pw-modal-overlay.show { display: flex; }
+    .pw-box {
+      background: #fff; border-radius: 18px; padding: 32px 36px;
+      max-width: 380px; width: 92%;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.28);
+      text-align: center;
+    }
+    .pw-icon { font-size: 40px; margin-bottom: 12px; }
+    .pw-title { font-size: 19px; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
+    .pw-sub { font-size: 13.5px; color: var(--muted); margin-bottom: 20px; }
+    .pw-input {
+      width: 100%; padding: 12px 16px; font-size: 22px; letter-spacing: 8px;
+      border: 2px solid var(--border); border-radius: 10px;
+      font-family: 'Sarabun', sans-serif; color: var(--text);
+      text-align: center; outline: none; transition: border-color .2s;
+      margin-bottom: 8px;
+    }
+    .pw-input:focus { border-color: var(--primary); }
+    .pw-error { font-size: 13px; color: #c62828; min-height: 20px; margin-bottom: 12px; font-weight: 600; }
+    .pw-actions { display: flex; gap: 10px; justify-content: center; }
+    .pw-btn-cancel {
+      background: #f5f5f5; color: #555; border: none; border-radius: 9px;
+      padding: 10px 22px; font-size: 14px; font-weight: 600;
+      font-family: 'Sarabun', sans-serif; cursor: pointer;
+    }
+    .pw-btn-ok {
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      color: #fff; border: none; border-radius: 9px;
+      padding: 10px 26px; font-size: 14px; font-weight: 600;
+      font-family: 'Sarabun', sans-serif; cursor: pointer;
+    }
+
+    /* ===== SUBJECTIVE SCORING (teacher) ===== */
+    .subj-score-section {
+      background: var(--white); border-radius: 14px;
+      margin-top: 20px;
+      box-shadow: 0 2px 12px rgba(230,81,0,0.10);
+      border: 2px dashed var(--accent); overflow: hidden;
+    }
+    .subj-score-locked {
+      padding: 22px 24px; display: flex; align-items: center; gap: 14px;
+    }
+    .lock-icon { font-size: 28px; }
+    .lock-text { flex: 1; }
+    .lock-text strong { font-size: 15px; color: var(--primary); display: block; margin-bottom: 2px; }
+    .lock-text span { font-size: 13px; color: var(--muted); }
+    .btn-unlock {
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      color: #fff; border: none; border-radius: 9px;
+      padding: 10px 20px; font-size: 14px; font-weight: 600;
+      font-family: 'Sarabun', sans-serif; cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      box-shadow: 0 3px 10px rgba(230,81,0,0.30);
+      transition: transform .15s;
+    }
+    .btn-unlock:hover { transform: translateY(-1px); }
+    .subj-score-content {
+      display: none; padding: 24px 28px;
+      border-top: 2px dashed var(--accent);
+    }
+    .subj-score-content.open { display: block; }
+    .score-section-title {
+      font-size: 15px; font-weight: 700; color: var(--primary);
+      margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+    }
+    .subj-score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .ss-card {
+      background: var(--light); border-radius: 12px; padding: 18px 20px;
+      border: 1.5px solid var(--border);
+    }
+    .ss-card-title { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 10px; }
+    .ss-card-desc { font-size: 13px; color: var(--muted); margin-bottom: 12px; line-height: 1.5; }
+    .ss-criteria { margin-bottom: 14px; }
+    .ss-crit-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+    }
+    .ss-crit-row:last-child { border-bottom: none; }
+    .ss-crit-label { color: #5d4037; }
+    .ss-crit-score {
+      width: 44px; padding: 3px 6px; text-align: center;
+      border: 1.5px solid var(--border); border-radius: 6px;
+      font-size: 13px; font-family: 'Sarabun', sans-serif;
+      color: var(--text); outline: none;
+    }
+    .ss-crit-score:focus { border-color: var(--primary); }
+    .ss-total-row {
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--light2); border-radius: 8px; padding: 10px 14px;
+      font-weight: 700; font-size: 15px; color: var(--primary); margin-top: 4px;
+    }
+    .ss-total-val { font-size: 22px; font-weight: 700; color: var(--primary); }
+    .comment-field {
+      width: 100%; padding: 8px 10px; border: 1.5px solid var(--border);
+      border-radius: 8px; font-size: 13.5px; font-family: 'Sarabun', sans-serif;
+      color: var(--text); resize: vertical; min-height: 64px; outline: none;
+      transition: border-color .2s;
+    }
+    .comment-field:focus { border-color: var(--primary); }
+    .ss-grand-total {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff; border-radius: 12px; padding: 16px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .ss-grand-label { font-size: 15px; font-weight: 600; }
+    .ss-grand-score { font-size: 28px; font-weight: 700; }
+    .btn-lock-again {
+      background: #f5f5f5; color: #555; border: 1.5px solid #ddd; border-radius: 8px;
+      padding: 7px 16px; font-size: 13px; font-weight: 600;
+      font-family: 'Sarabun', sans-serif; cursor: pointer; margin-top: 14px;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+
+    /* ===== PRINT SCORE MODAL ===== */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55); z-index: 1000;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-box {
+      background: #fff; border-radius: 18px; padding: 32px 36px;
+      max-width: 480px; width: 92%; box-shadow: 0 12px 48px rgba(0,0,0,0.25);
+      position: relative;
+    }
+    .modal-title {
+      font-size: 20px; font-weight: 700; color: var(--primary);
+      margin-bottom: 6px; display: flex; align-items: center; gap: 8px;
+    }
+    .modal-sub { font-size: 13.5px; color: var(--muted); margin-bottom: 20px; }
+    .score-input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+    .score-input-row .si-field label { font-size: 13px; font-weight: 600; color: var(--primary); margin-bottom: 5px; display: block; }
+    .score-input-row .si-field input {
+      width: 100%; padding: 8px 10px; border: 1.5px solid var(--border);
+      border-radius: 8px; font-size: 15px; font-family: 'Sarabun', sans-serif;
+      color: var(--text); outline: none; transition: border-color .2s;
+    }
+    .score-input-row .si-field input:focus { border-color: var(--primary); }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .btn-cancel {
+      background: #f5f5f5; color: #555; border: none; border-radius: 9px;
+      padding: 10px 22px; font-size: 14px; font-weight: 600;
+      font-family: 'Sarabun', sans-serif; cursor: pointer;
+    }
+    .btn-print-confirm {
+      background: linear-gradient(90deg, #2e7d32, #43a047);
+      color: #fff; border: none; border-radius: 9px;
+      padding: 10px 22px; font-size: 14px; font-weight: 600;
+      font-family: 'Sarabun', sans-serif; cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    /* ===== PRINT SCORE REPORT PAGE ===== */
+    #printReport {
+      display: none;
+      font-family: 'Sarabun', sans-serif;
+    }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .exam-header { background: var(--primary) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; border-radius: 0; }
+      .question-card, .subjective-card { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+      .answer-toggle, .print-btn, .modal-overlay { display: none !important; }
+      .answer-key-grid { display: grid !important; }
+      .page-wrapper { max-width: 100%; }
+      #printReport { display: block !important; }
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+    }
+    .print-only { display: none; }
+
+    @media (max-width: 600px) {
+      .exam-meta { gap: 12px; }
+      .student-form { grid-template-columns: 1fr; }
+      .student-form .full-width { grid-column: 1; }
+      .answer-key-grid { grid-template-columns: repeat(4, 1fr); }
+      .choices { padding-left: 0; }
+      .sig-grid { grid-template-columns: 1fr; gap: 28px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrapper no-print">
+
+  <!-- HEADER -->
+  <div class="exam-header">
+    <div class="subject-badge">📚 กลุ่มสาระการเรียนรู้สังคมศึกษา ศาสนา และวัฒนธรรม</div>
+    <h1>แบบทดสอบวิชาสังคมศึกษา ชั้นมัธยมศึกษาปีที่ 1</h1>
+    <h2>หน่วยที่ 3 กฎหมายคุ้มครองสิทธิของบุคคล</h2>
+    <div class="exam-meta">
+      <div class="meta-item"><span>✏️</span> ปรนัย 20 ข้อ</div>
+      <div class="meta-item"><span>⭐</span> 20 คะแนน</div>
+      <div class="meta-item"><span>⏱️</span> เวลา 40 นาที</div>
+    </div>
+  </div>
+
+  <!-- INFO -->
+  <div class="info-bar">
+    <div class="info-icon">📌</div>
+    <p>
+      <strong>คำสั่ง:</strong>
+      เลือกคำตอบที่ถูกต้องที่สุด <strong>1 ข้อ</strong> จากตัวเลือก ก ข ค ง (ข้อละ 1 คะแนน รวม 20 คะแนน)
+    </p>
+  </div>
+
+  <!-- STUDENT FORM -->
+  <div class="student-form">
+    <div class="form-field full-width">
+      <label>ชื่อ–นามสกุล</label>
+      <select id="studentNameSel" class="line" style="font-family:'Sarabun',sans-serif;font-size:15px;padding:6px 4px;border:none;border-bottom:2px solid #ccc;width:100%;background:transparent">
+        <option value="">— เลือกชื่อนักเรียน —</option>
+        <option value="เด็กชายอาชวิน เณรสุวรรณ">เด็กชายอาชวิน เณรสุวรรณ</option>
+        <option value="เด็กชายทยากร กองพา">เด็กชายทยากร กองพา</option>
+        <option value="เด็กชายณฐภัทร ก้อนแก้ว">เด็กชายณฐภัทร ก้อนแก้ว</option>
+        <option value="เด็กชายดนัย พลอยขุนทด">เด็กชายดนัย พลอยขุนทด</option>
+        <option value="เด็กชายพุทธรักษ์ จอนโคกกรวด">เด็กชายพุทธรักษ์ จอนโคกกรวด</option>
+        <option value="เด็กหญิงชนิสรา ศรีม่วง">เด็กหญิงชนิสรา ศรีม่วง</option>
+        <option value="เด็กหญิงวิลาสินี คำเขื่อน">เด็กหญิงวิลาสินี คำเขื่อน</option>
+        <option value="เด็กหญิงปิ่นมณี หาญเวช">เด็กหญิงปิ่นมณี หาญเวช</option>
+        <option value="เด็กหญิงวิจิตตรา ปานสันเทียะ">เด็กหญิงวิจิตตรา ปานสันเทียะ</option>
+        <option value="เด็กหญิงปริณดา แสงประทุม">เด็กหญิงปริณดา แสงประทุม</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label>ชั้น / ห้อง</label>
+      <input class="line" type="text" placeholder="ม.1 / ........" />
+    </div>
+    <div class="form-field">
+      <label>เลขที่</label>
+      <input class="line" type="text" placeholder="........." />
+    </div>
+    <div class="form-field">
+      <label>วันที่สอบ</label>
+      <input class="line" type="text" placeholder="......./......./........." />
+    </div>
+    <div class="score-box">
+      <div class="score-inner">
+        <div class="label">คะแนนที่ได้</div>
+        <div class="value">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+        <div class="total">จาก 20 คะแนน</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION TITLE — PART 1 -->
+  <div class="section-title">
+    <span>📝</span> ปรนัย — เลือกตอบข้อที่ถูกต้องที่สุด (ข้อละ 1 คะแนน)
+  </div>
+
+  <!-- QUESTIONS 1–20 -->
+  <div class="questions-container">
+
+    <!-- Q1 (ตอบ ก) -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">1</div>
+        <div class="q-text">ข้อใดอธิบายความสำคัญของกฎหมายคุ้มครองสิทธิของบุคคลได้ถูกต้องที่สุด?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q1" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ช่วยคุ้มครองศักดิ์ศรี ความปลอดภัย และประโยชน์ที่บุคคลควรได้รับ</span></label>
+        <label class="choice-label"><input type="radio" name="q1" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ทำให้บุคคลทำสิ่งใดก็ได้โดยไม่ต้องรับผิดชอบ</span></label>
+        <label class="choice-label"><input type="radio" name="q1" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ใช้ลงโทษเฉพาะเด็กและเยาวชนเท่านั้น</span></label>
+        <label class="choice-label"><input type="radio" name="q1" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ทำให้ทุกคนมีฐานะทางเศรษฐกิจเท่ากัน</span></label>
+      </div>
+    </div>
+
+    <!-- Q2 (ตอบ ข) -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">2</div>
+        <div class="q-text">การเรียนรู้กฎหมายคุ้มครองสิทธิของบุคคลให้ประโยชน์สำคัญอย่างไร?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q2" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ทำให้หลีกเลี่ยงหน้าที่ของตนได้</span></label>
+        <label class="choice-label"><input type="radio" name="q2" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ช่วยให้รู้จักปกป้องสิทธิของตนและเคารพสิทธิของผู้อื่น</span></label>
+        <label class="choice-label"><input type="radio" name="q2" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ช่วยให้ตัดสินผู้อื่นได้โดยไม่ต้องมีหลักฐาน</span></label>
+        <label class="choice-label"><input type="radio" name="q2" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ทำให้ใช้สิทธิของตนเหนือกว่าคนอื่น</span></label>
+      </div>
+    </div>
+
+    <!-- Q3 (ตอบ ค) -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">3</div>
+        <div class="q-text">ตามพระราชบัญญัติคุ้มครองเด็ก พ.ศ. 2546 โดยทั่วไป “เด็ก” หมายถึงบุคคลในข้อใด?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q3" value="ก"><span class="choice-letter">ก</span><span class="choice-text">บุคคลที่มีอายุต่ำกว่า 15 ปีทุกกรณี</span></label>
+        <label class="choice-label"><input type="radio" name="q3" value="ข"><span class="choice-letter">ข</span><span class="choice-text">บุคคลที่มีอายุไม่เกิน 20 ปีทุกกรณี</span></label>
+        <label class="choice-label"><input type="radio" name="q3" value="ค"><span class="choice-letter">ค</span><span class="choice-text">บุคคลที่มีอายุต่ำกว่า 18 ปีบริบูรณ์ แต่ไม่รวมผู้บรรลุนิติภาวะด้วยการสมรส</span></label>
+        <label class="choice-label"><input type="radio" name="q3" value="ง"><span class="choice-letter">ง</span><span class="choice-text">บุคคลที่กำลังศึกษาอยู่ในโรงเรียนเท่านั้น</span></label>
+      </div>
+    </div>
+
+    <!-- Q4 (ตอบ ง) -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">4</div>
+        <div class="q-text">ข้อใดเป็นสิทธิพื้นฐานที่เด็กควรได้รับ?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q4" value="ก"><span class="choice-letter">ก</span><span class="choice-text">สิทธิซื้อสินค้าทุกชนิดโดยไม่ต้องชำระเงิน</span></label>
+        <label class="choice-label"><input type="radio" name="q4" value="ข"><span class="choice-letter">ข</span><span class="choice-text">สิทธิปฏิเสธกฎทุกข้อที่ตนไม่พอใจ</span></label>
+        <label class="choice-label"><input type="radio" name="q4" value="ค"><span class="choice-letter">ค</span><span class="choice-text">สิทธิใช้ทรัพย์สินของผู้อื่นโดยไม่ขออนุญาต</span></label>
+        <label class="choice-label"><input type="radio" name="q4" value="ง"><span class="choice-letter">ง</span><span class="choice-text">สิทธิได้รับการศึกษา การเลี้ยงดู และการคุ้มครองให้ปลอดภัย</span></label>
+      </div>
+    </div>
+
+    <!-- Q5 (ตอบ ก) -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">5</div>
+        <div class="q-text">ข้อใดเป็นการกระทำที่กฎหมายคุ้มครองเด็กมุ่งป้องกัน?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q5" value="ก"><span class="choice-letter">ก</span><span class="choice-text">การทำร้ายร่างกายหรือจิตใจและการแสวงหาประโยชน์จากเด็ก</span></label>
+        <label class="choice-label"><input type="radio" name="q5" value="ข"><span class="choice-letter">ข</span><span class="choice-text">การให้เด็กเข้าร่วมกิจกรรมสร้างสรรค์ตามวัย</span></label>
+        <label class="choice-label"><input type="radio" name="q5" value="ค"><span class="choice-letter">ค</span><span class="choice-text">การดูแลให้เด็กได้รับอาหารที่เหมาะสม</span></label>
+        <label class="choice-label"><input type="radio" name="q5" value="ง"><span class="choice-letter">ง</span><span class="choice-text">การส่งเสริมให้เด็กแสดงความคิดเห็นอย่างสุภาพ</span></label>
+      </div>
+    </div>
+
+    <!-- Q6 (ตอบ ข) -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">6</div>
+        <div class="q-text">หากนักเรียนพบว่าเพื่อนถูกทำร้ายอย่างต่อเนื่อง ควรทำอย่างไรเหมาะสมที่สุด?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q6" value="ก"><span class="choice-letter">ก</span><span class="choice-text">เก็บเรื่องไว้เพราะเป็นเรื่องส่วนตัว</span></label>
+        <label class="choice-label"><input type="radio" name="q6" value="ข"><span class="choice-letter">ข</span><span class="choice-text">แจ้งครู ผู้ปกครอง เจ้าหน้าที่ หรือผู้ใหญ่ที่ไว้วางใจเพื่อขอความช่วยเหลือ</span></label>
+        <label class="choice-label"><input type="radio" name="q6" value="ค"><span class="choice-letter">ค</span><span class="choice-text">โพสต์ข้อมูลส่วนตัวของผู้เกี่ยวข้องทั้งหมดทันที</span></label>
+        <label class="choice-label"><input type="radio" name="q6" value="ง"><span class="choice-letter">ง</span><span class="choice-text">เข้าไปเผชิญหน้ากับผู้ทำร้ายเพียงลำพัง</span></label>
+      </div>
+    </div>
+
+    <!-- Q7 (ตอบ ง) -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">7</div>
+        <div class="q-text">ข้อใดเป็นสิทธิของผู้บริโภค?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q7" value="ก"><span class="choice-letter">ก</span><span class="choice-text">สิทธินำสินค้าไปใช้โดยไม่ชำระเงิน</span></label>
+        <label class="choice-label"><input type="radio" name="q7" value="ข"><span class="choice-letter">ข</span><span class="choice-text">สิทธิกำหนดราคาสินค้าของร้านเอง</span></label>
+        <label class="choice-label"><input type="radio" name="q7" value="ค"><span class="choice-letter">ค</span><span class="choice-text">สิทธิเรียกร้องของแถมจากผู้ขายทุกครั้ง</span></label>
+        <label class="choice-label"><input type="radio" name="q7" value="ง"><span class="choice-letter">ง</span><span class="choice-text">สิทธิได้รับข้อมูลเกี่ยวกับสินค้าและบริการอย่างถูกต้องและเพียงพอ</span></label>
+      </div>
+    </div>
+
+    <!-- Q8 (ตอบ ค) -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">8</div>
+        <div class="q-text">เมื่อได้รับสินค้าออนไลน์ไม่ตรงกับโฆษณา ควรปฏิบัติอย่างไร?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q8" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ทำลายสินค้าทันทีโดยไม่เก็บหลักฐาน</span></label>
+        <label class="choice-label"><input type="radio" name="q8" value="ข"><span class="choice-letter">ข</span><span class="choice-text">โพสต์ด่าทอและเปิดเผยข้อมูลส่วนตัวของผู้ขาย</span></label>
+        <label class="choice-label"><input type="radio" name="q8" value="ค"><span class="choice-letter">ค</span><span class="choice-text">เก็บหลักฐาน ติดต่อผู้ขาย และร้องเรียนหน่วยงานที่เกี่ยวข้องหากไม่ได้รับการแก้ไข</span></label>
+        <label class="choice-label"><input type="radio" name="q8" value="ง"><span class="choice-letter">ง</span><span class="choice-text">สั่งซื้อซ้ำเพื่อดูว่าครั้งต่อไปจะได้ของตรงหรือไม่</span></label>
+      </div>
+    </div>
+
+    <!-- Q9 (ตอบ ก) -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">9</div>
+        <div class="q-text">หลักฐานใดมีประโยชน์มากที่สุดเมื่อร้องเรียนปัญหาจากการซื้อสินค้าออนไลน์?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q9" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ใบเสร็จ หลักฐานการชำระเงิน ข้อความสนทนา และภาพโฆษณา</span></label>
+        <label class="choice-label"><input type="radio" name="q9" value="ข"><span class="choice-letter">ข</span><span class="choice-text">จำนวนผู้ติดตามของร้านค้าเพียงอย่างเดียว</span></label>
+        <label class="choice-label"><input type="radio" name="q9" value="ค"><span class="choice-letter">ค</span><span class="choice-text">คำบอกเล่าของเพื่อนที่ไม่ได้เห็นเหตุการณ์</span></label>
+        <label class="choice-label"><input type="radio" name="q9" value="ง"><span class="choice-letter">ง</span><span class="choice-text">การจำชื่อร้านโดยไม่บันทึกรายละเอียดอื่น</span></label>
+      </div>
+    </div>
+
+    <!-- Q10 (ตอบ ข) -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">10</div>
+        <div class="q-text">ข้อใดเป็นข้อมูลส่วนบุคคลที่สามารถใช้ระบุตัวบุคคลได้?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q10" value="ก"><span class="choice-letter">ก</span><span class="choice-text">อุณหภูมิประจำวันของจังหวัด</span></label>
+        <label class="choice-label"><input type="radio" name="q10" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ชื่อ–นามสกุลพร้อมเลขประจำตัวประชาชน</span></label>
+        <label class="choice-label"><input type="radio" name="q10" value="ค"><span class="choice-letter">ค</span><span class="choice-text">จำนวนหนังสือในห้องสมุด</span></label>
+        <label class="choice-label"><input type="radio" name="q10" value="ง"><span class="choice-letter">ง</span><span class="choice-text">สีประจำโรงเรียน</span></label>
+      </div>
+    </div>
+
+    <!-- Q11 (ตอบ ค) -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">11</div>
+        <div class="q-text">ก่อนนำภาพเพื่อนไปโพสต์ในสื่อสังคมออนไลน์ ควรทำอย่างไร?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q11" value="ก"><span class="choice-letter">ก</span><span class="choice-text">โพสต์ได้ทันทีเพราะเป็นผู้ถ่ายภาพ</span></label>
+        <label class="choice-label"><input type="radio" name="q11" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ส่งให้กลุ่มใหญ่ช่วยตัดสินใจก่อน</span></label>
+        <label class="choice-label"><input type="radio" name="q11" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ขออนุญาตเพื่อนและพิจารณาผลกระทบก่อนเผยแพร่</span></label>
+        <label class="choice-label"><input type="radio" name="q11" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ใส่ข้อความตลกแล้วโพสต์ได้โดยไม่ต้องถาม</span></label>
+      </div>
+    </div>
+
+    <!-- Q12 (ตอบ ง) -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">12</div>
+        <div class="q-text">ข้อใดช่วยปกป้องข้อมูลและบัญชีออนไลน์ได้เหมาะสมที่สุด?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q12" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ใช้รหัสผ่านเดียวกันทุกบัญชีเพื่อให้จำง่าย</span></label>
+        <label class="choice-label"><input type="radio" name="q12" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ตั้งรหัสผ่านเป็นวันเกิดของตนเอง</span></label>
+        <label class="choice-label"><input type="radio" name="q12" value="ค"><span class="choice-letter">ค</span><span class="choice-text">บอกรหัสผ่านแก่เพื่อนสนิทไว้สำรอง</span></label>
+        <label class="choice-label"><input type="radio" name="q12" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ใช้รหัสผ่านที่คาดเดายากไม่ซ้ำกันและเปิดการยืนยันตัวตนสองขั้นตอน</span></label>
+      </div>
+    </div>
+
+    <!-- Q13 (ตอบ ข) -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">13</div>
+        <div class="q-text">ข้อใดกล่าวถึงลิขสิทธิ์ได้ถูกต้อง?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q13" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ลิขสิทธิ์เกิดขึ้นเมื่อผลงานมียอดชมจำนวนมากเท่านั้น</span></label>
+        <label class="choice-label"><input type="radio" name="q13" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ลิขสิทธิ์คุ้มครองงานสร้างสรรค์ตามกฎหมายและโดยหลักเกิดขึ้นเมื่อสร้างผลงาน</span></label>
+        <label class="choice-label"><input type="radio" name="q13" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ลิขสิทธิ์มีเฉพาะหนังสือเรียนของทางราชการ</span></label>
+        <label class="choice-label"><input type="radio" name="q13" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ผลงานบนอินเทอร์เน็ตทุกชิ้นนำไปใช้ได้โดยไม่ต้องขออนุญาต</span></label>
+      </div>
+    </div>
+
+    <!-- Q14 (ตอบ ก) -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">14</div>
+        <div class="q-text">หากต้องนำข้อความหรือภาพของผู้อื่นมาใช้ในรายงาน ควรทำอย่างไร?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q14" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ใช้เท่าที่เหมาะสม ตรวจสอบเงื่อนไข และอ้างอิงแหล่งที่มา</span></label>
+        <label class="choice-label"><input type="radio" name="q14" value="ข"><span class="choice-letter">ข</span><span class="choice-text">คัดลอกทั้งหมดแล้วใส่ชื่อของตนแทน</span></label>
+        <label class="choice-label"><input type="radio" name="q14" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ลบชื่อเจ้าของผลงานเดิมออก</span></label>
+        <label class="choice-label"><input type="radio" name="q14" value="ง"><span class="choice-letter">ง</span><span class="choice-text">นำมาใช้ได้ทุกกรณีหากส่งให้ครูเท่านั้น</span></label>
+      </div>
+    </div>
+
+    <!-- Q15 (ตอบ ค) -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">15</div>
+        <div class="q-text">การคัดลอกโปรแกรมคอมพิวเตอร์ที่มีลิขสิทธิ์ไปแจกโดยไม่ได้รับอนุญาตเป็นการกระทำใด?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q15" value="ก"><span class="choice-letter">ก</span><span class="choice-text">การใช้สิทธิผู้บริโภค</span></label>
+        <label class="choice-label"><input type="radio" name="q15" value="ข"><span class="choice-letter">ข</span><span class="choice-text">การประชาสัมพันธ์เจ้าของโปรแกรม</span></label>
+        <label class="choice-label"><input type="radio" name="q15" value="ค"><span class="choice-letter">ค</span><span class="choice-text">การละเมิดลิขสิทธิ์</span></label>
+        <label class="choice-label"><input type="radio" name="q15" value="ง"><span class="choice-letter">ง</span><span class="choice-text">การแบ่งปันที่กฎหมายอนุญาตเสมอ</span></label>
+      </div>
+    </div>
+
+    <!-- Q16 (ตอบ ง) -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">16</div>
+        <div class="q-text">เมื่อถูกกลั่นแกล้งทางออนไลน์ นักเรียนควรรับมืออย่างไร?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q16" value="ก"><span class="choice-letter">ก</span><span class="choice-text">เปิดเผยข้อมูลส่วนตัวของผู้กลั่นแกล้งเพื่อแก้แค้น</span></label>
+        <label class="choice-label"><input type="radio" name="q16" value="ข"><span class="choice-letter">ข</span><span class="choice-text">สร้างบัญชีใหม่ไปกลั่นแกล้งกลับ</span></label>
+        <label class="choice-label"><input type="radio" name="q16" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ลบหลักฐานทั้งหมดและเก็บเรื่องไว้คนเดียว</span></label>
+        <label class="choice-label"><input type="radio" name="q16" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ไม่ตอบโต้ด้วยความรุนแรง เก็บหลักฐาน บล็อกหรือรายงาน และขอความช่วยเหลือ</span></label>
+      </div>
+    </div>
+
+    <!-- Q17 (ตอบ ก) -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">17</div>
+        <div class="q-text">ข้อใดสอดคล้องกับหลักความเสมอภาคและการไม่เลือกปฏิบัติ?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q17" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ปฏิบัติต่อทุกคนอย่างเป็นธรรมโดยไม่แบ่งแยกอย่างไร้เหตุผล</span></label>
+        <label class="choice-label"><input type="radio" name="q17" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ให้สิทธิเฉพาะผู้ที่มีฐานะดี</span></label>
+        <label class="choice-label"><input type="radio" name="q17" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ตัดสินคุณค่าของคนจากรูปลักษณ์ภายนอก</span></label>
+        <label class="choice-label"><input type="radio" name="q17" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ยอมให้คนส่วนใหญ่ละเมิดสิทธิของคนส่วนน้อย</span></label>
+      </div>
+    </div>
+
+    <!-- Q18 (ตอบ ข) -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">18</div>
+        <div class="q-text">เมื่อนักเรียนเห็นว่าตนถูกละเมิดสิทธิ ควรปฏิบัติอย่างไรเป็นลำดับแรก?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q18" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ทำลายทรัพย์สินของอีกฝ่ายเพื่อชดเชย</span></label>
+        <label class="choice-label"><input type="radio" name="q18" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ตั้งสติ เก็บหลักฐาน และปรึกษาผู้ใหญ่หรือหน่วยงานที่เกี่ยวข้อง</span></label>
+        <label class="choice-label"><input type="radio" name="q18" value="ค"><span class="choice-letter">ค</span><span class="choice-text">เผยแพร่ข้อมูลทั้งหมดทันทีโดยไม่ตรวจสอบ</span></label>
+        <label class="choice-label"><input type="radio" name="q18" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ชวนเพื่อนไปข่มขู่อีกฝ่าย</span></label>
+      </div>
+    </div>
+
+    <!-- Q19 (ตอบ ง) -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">19</div>
+        <div class="q-text">ข้อใดเป็นการใช้สิทธิและเสรีภาพอย่างรับผิดชอบ?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q19" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ใช้สิทธิของตนเหนือกว่าทุกคน</span></label>
+        <label class="choice-label"><input type="radio" name="q19" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ทำสิ่งใดก็ได้หากไม่มีผู้ใหญ่เห็น</span></label>
+        <label class="choice-label"><input type="radio" name="q19" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ปฏิเสธหน้าที่ทั้งหมดเพื่อรักษาสิทธิของตน</span></label>
+        <label class="choice-label"><input type="radio" name="q19" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ใช้สิทธิของตนภายใต้กฎหมายและไม่ละเมิดสิทธิของผู้อื่น</span></label>
+      </div>
+    </div>
+
+    <!-- Q20 (ตอบ ค) -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-number">20</div>
+        <div class="q-text">ข้อใดเป็นประโยชน์ที่เกิดจากการปฏิบัติตามกฎหมายคุ้มครองสิทธิของบุคคล?</div>
+      </div>
+      <div class="choices">
+        <label class="choice-label"><input type="radio" name="q20" value="ก"><span class="choice-letter">ก</span><span class="choice-text">ทำให้ไม่ต้องรับผิดชอบต่อการกระทำของตน</span></label>
+        <label class="choice-label"><input type="radio" name="q20" value="ข"><span class="choice-letter">ข</span><span class="choice-text">ทำให้ประชาชนฟ้องร้องกันมากขึ้นทุกกรณี</span></label>
+        <label class="choice-label"><input type="radio" name="q20" value="ค"><span class="choice-letter">ค</span><span class="choice-text">ช่วยลดการละเมิด สร้างความเป็นธรรม และทำให้สังคมอยู่ร่วมกันอย่างสงบ</span></label>
+        <label class="choice-label"><input type="radio" name="q20" value="ง"><span class="choice-letter">ง</span><span class="choice-text">ทำให้หน่วยงานของรัฐไม่ต้องดูแลประชาชน</span></label>
+      </div>
+    </div>
+
+  </div><!-- end q1–20 -->
+
+  <!-- ===== ANSWER KEY + PRINT BUTTONS ===== -->
+    <!-- ส่งคำตอบ -->
+  <div class="answer-section" style="margin-top:32px;text-align:center;">
+    <button id="btnSubmit" onclick="submitAnswers()" style="
+      background:linear-gradient(90deg,#c94b00,#f39800);color:#fff;border:none;
+      border-radius:12px;padding:14px 40px;font-size:17px;font-weight:700;
+      font-family:'Sarabun',sans-serif;cursor:pointer;
+      box-shadow:0 4px 16px rgba(201,75,0,.35);transition:transform .15s;">
+      📤 ส่งคำตอบ
+    </button>
+    <div id="submitMsg" style="display:none;margin-top:16px;border-radius:12px;padding:16px 20px;border:1.5px solid #66bb6a;background:#f1f8e9;font-family:'Sarabun',sans-serif"></div>
+  </div>
+
+
+  <!-- ===== SIGNATURE SECTION ===== -->
+  <div class="sig-section">
+    <div class="sig-title">✍️ ลงนามรับรองแบบทดสอบ</div>
+    <div class="sig-grid">
+
+      <div class="sig-box">
+        <div class="sig-line">ลงชื่อ .......................................</div>
+        <div class="sig-name">( นายรณฤทธิ์&nbsp; ศรีสองเมือง )</div>
+        <div class="sig-role">ครูผู้สอน</div>
+        <div class="sig-date-row">วันที่ <span class="sig-date-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+      </div>
+
+      <div class="sig-box">
+        <div class="sig-line">ลงชื่อ .......................................</div>
+        <div class="sig-name">( นางสาวอุทุมพร&nbsp; ยอดสิงห์จันทร์ )</div>
+        <div class="sig-role">หัวหน้างานบริหารวิชาการ</div>
+        <div class="sig-date-row">วันที่ <span class="sig-date-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+      </div>
+
+      <div class="sig-box">
+        <div class="sig-line">ลงชื่อ .......................................</div>
+        <div class="sig-name">( นายดนุภพ&nbsp; โพธิ์งาม )</div>
+        <div class="sig-role">ผู้อำนวยการโรงเรียนหินฝนวิทยาคม</div>
+        <div class="sig-date-row">วันที่ <span class="sig-date-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="exam-footer">
+    <strong>วิชาสังคมศึกษา ชั้น ม.1 หน่วยที่ 3</strong> &nbsp;|&nbsp;
+    กฎหมายคุ้มครองสิทธิของบุคคล &nbsp;|&nbsp;
+    จัดทำโดย <strong>ครูรณฤทธิ์&nbsp; ศรีสองเมือง</strong> &nbsp;|&nbsp;
+    โรงเรียนหินฝนวิทยาคม
+  </div>
+
+</div><!-- end page-wrapper -->
+
+<!-- ===== PASSWORD MODAL ===== -->
+
+<!-- ===== PRINT MODAL ===== -->
+
+<!-- ===== PRINT REPORT (hidden, shows on print) ===== -->
+
+
+  <script>
+  
+  // ==================== เฉลยข้อสอบปรนัย (ครูกรอก) ====================
+  // ใส่คำตอบที่ถูกต้อง: 'ก', 'ข', 'ค', หรือ 'ง' (ถ้ายังไม่กรอก ใส่ '')
+  var ANSWER_KEY_M1 = {
+    q1:'ก', q2:'ข', q3:'ค', q4:'ง', q5:'ก',
+    q6:'ข', q7:'ง', q8:'ค', q9:'ก', q10:'ข',
+    q11:'ค', q12:'ง', q13:'ข', q14:'ก', q15:'ค',
+    q16:'ง', q17:'ก', q18:'ข', q19:'ง', q20:'ค'
+  };
+
+  
+// ==================== ANTI-CHEAT ====================
+var _examSubmitted = false;
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'hidden' && !_examSubmitted) {
+    _examSubmitted = true;
+    var ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(198,40,40,.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:Sarabun,sans-serif;text-align:center;padding:20px';
+    ov.innerHTML = '<div style="font-size:60px;margin-bottom:14px">⚠️</div><div style="font-size:28px;font-weight:800;margin-bottom:8px">ตรวจพบการสลับหน้าจอ!</div><div style="font-size:17px;opacity:.9">ระบบส่งคำตอบอัตโนมัติแล้ว</div>';
+    document.body.appendChild(ov);
+    submitAnswers(true, 'สลับแท็บ/ซ่อนหน้าต่าง');
+  }
+});
+
+// -- Mobile: app overlay / split-screen / notification --
+window.addEventListener('blur', function() {
+  if (!_examSubmitted) {
+    _examSubmitted = true;
+    var ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(198,40,40,.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:Sarabun,sans-serif;text-align:center;padding:20px';
+    ov.innerHTML = '<div style="font-size:60px;margin-bottom:14px">\u26a0\ufe0f</div><div style="font-size:28px;font-weight:800;margin-bottom:8px">\u0e15\u0e23\u0e27\u0e08\u0e1e\u0e1a\u0e01\u0e32\u0e23\u0e2a\u0e25\u0e31\u0e1a\u0e41\u0e2d\u0e1b!</div><div style="font-size:17px;opacity:.9">\u0e23\u0e30\u0e1a\u0e1a\u0e2a\u0e48\u0e07\u0e04\u0e33\u0e15\u0e2d\u0e1a\u0e2d\u0e31\u0e15\u0e42\u0e19\u0e21\u0e31\u0e15\u0e34\u0e41\u0e25\u0e49\u0e27</div>';
+    document.body.appendChild(ov);
+    submitAnswers(true, '\u0e40\u0e1b\u0e34\u0e14\u0e41\u0e2d\u0e1b\u0e0b\u0e49\u0e2d\u0e19/split-screen/notification');
+  }
+});
+
+  function submitAnswers(isCheat, cheatReason) {
+    var name = document.getElementById('studentNameSel').value;
+    if (!name && !isCheat) { alert('⚠️ กรุณาเลือกชื่อนักเรียนก่อน'); return; }
+    if (!name) name = '(ไม่ระบุชื่อ)';
+    isCheat = isCheat || false;
+    cheatReason = cheatReason || null;
+    var answers = {};
+    for (var i = 1; i <= 20; i++) {
+      var sel = document.querySelector('input[name="q'+i+'"]:checked');
+      answers['q'+i] = sel ? sel.value : '-';
+    }
+    var subCards = document.querySelectorAll('.subjective-card');
+    subCards.forEach(function(card, idx) {
+      var qn = idx + 21;
+      var lines = card.querySelectorAll('.answer-line');
+      answers['q'+qn] = Array.from(lines).map(function(l){return l.value.trim();}).filter(Boolean).join(' | ');
+    });
+    // ตรวจข้อปรนัยอัตโนมัติ
+    var mcDetails = {}, mcScore = 0;
+    var hasKey = Object.values(ANSWER_KEY_M1).some(function(v){ return v !== ''; });
+    if (hasKey) {
+      for (var j = 1; j <= 20; j++) {
+        var k = 'q'+j;
+        if (ANSWER_KEY_M1[k]) {
+          var correct = (answers[k]||'').trim() === ANSWER_KEY_M1[k].trim();
+          mcDetails[k] = correct;
+          if (correct) mcScore++;
+        }
+      }
+    }
+    var btn = document.getElementById('btnSubmit');
+    btn.disabled = true;
+    btn.textContent = '⏳ กำลังส่ง...';
+    var data = {
+      studentName: name, grade: 'ม.1', subject: 'สังคมศึกษา',
+      unit: 'หน่วยที่ 3', answers: answers, totalOutOf: 20
+    };
+    if (hasKey) { data.mcScore = mcScore; data.mcDetails = mcDetails; }
+        if (isCheat) { data.cheated = true; data.cheatReason = cheatReason || "unknown"; }
+    (function doSubmit() {
+      if (typeof window._submitAnswers === 'function') {
+        window._submitAnswers(data).then(function() {
+          // Build result display
+          var msg = document.getElementById('submitMsg');
+          var html = '<div style="font-size:16px;font-weight:800;color:#2e7d32;margin-bottom:10px">✅ ส่งคำตอบสำเร็จ!</div>';
+          if (hasKey) {
+            var pct = Math.round(mcScore / 20 * 100);
+            html += '<div style="font-size:15px;margin-bottom:10px">📊 <b>ปรนัย:</b> <span style="font-size:20px;font-weight:800;color:#' + (pct>=60?'2e7d32':'c62828') + '">' + mcScore + '/20</span> (' + pct + '%)</div>';
+            html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">';
+            for (var qi = 1; qi <= 20; qi++) {
+              var qk = 'q'+qi;
+              if (ANSWER_KEY_M1[qk]) {
+                var ok = mcDetails[qk];
+                html += '<span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;font-size:13px;font-weight:800;background:' + (ok?'#e8f5e9':'#ffebee') + ';color:' + (ok?'#2e7d32':'#c62828') + ';border:1.5px solid ' + (ok?'#a5d6a7':'#ef9a9a') + '">' + (ok?'✅':'❌') + qi + '</span>';
+              }
+            }
+            html += '</div>';
+          } else {
+            html += '<div style="color:#777;font-size:13px;margin-bottom:8px">ครูจะแจ้งคะแนนปรนัยภายหลัง</div>';
+          }
+          var essayCards = document.querySelectorAll('.subjective-card');
+          if (essayCards.length > 0) {
+            html += '<div style="background:#fff8e1;border-radius:8px;padding:8px 12px;font-size:13px;color:#f57c00;border:1px solid #ffe082">✍️ อัตนัย ' + essayCards.length + ' ข้อ — ครูจะตรวจและแจ้งคะแนนภายหลัง</div>';
+          }
+          msg.innerHTML = html;
+          msg.style.display = 'block';
+          btn.textContent = '✅ ส่งแล้ว';
+          btn.style.background = '#66bb6a';
+          // Scroll to result
+          msg.scrollIntoView({behavior:'smooth', block:'center'});
+        }).catch(function(e) {
+          btn.disabled = false;
+          btn.textContent = '📤 ส่งคำตอบ';
+          alert('❌ ส่งไม่สำเร็จ: ' + e.message);
+        });
+      } else { setTimeout(doSubmit, 400); }
+    })();
+  }
+
+</script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { FIREBASE_CONFIG } from "./js/config.js";
+    var app=initializeApp(FIREBASE_CONFIG), auth=getAuth(app), db=getFirestore(app);
+    signInAnonymously(auth).catch(function(){});
+    window._submitAnswers = async function(data) {
+      await addDoc(collection(db,'quiz_results'), Object.assign({},data,{timestamp:serverTimestamp()}));
+    };
+  </script>
+</body>
+</html>
